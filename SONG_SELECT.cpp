@@ -297,7 +297,7 @@ void SONG_SELECT(int *l_n,
 		for (j = 0; j <= 9; j++) {
 			Highscore[i].score[j] = 0;
 			Highscore[i].rank[j] = 0;
-			Highscore[i].clear_state[j] = 0;
+			Highscore[i].clear_state[j] = CLEARTYPE_NO_PLAY;
 			Highscore[i].play_count[j] = 0;
 			Highscore[i].sky_perfect[j] = 0;//SKY_PERFECT数
 			Highscore[i].perfect[j] = 0;//PERFECT数
@@ -308,7 +308,7 @@ void SONG_SELECT(int *l_n,
 
 			HighscoreRival[i].score[j] = 0;
 			HighscoreRival[i].rank[j] = 0;
-			HighscoreRival[i].clear_state[j] = 0;
+			HighscoreRival[i].clear_state[j] = CLEARTYPE_NO_PLAY;
 			HighscoreRival[i].play_count[j] = 0;
 			HighscoreRival[i].sky_perfect[j] = 0;//SKY_PERFECT数
 			HighscoreRival[i].perfect[j] = 0;//PERFECT数
@@ -604,21 +604,21 @@ void SONG_SELECT(int *l_n,
 						}
 						if (before.save_data_version >= SAVE_DATA_VERSION_MIN_MISS) {
 							Highscore[i].min_miss[j] = before.min_miss;//最小ミス記録バージョン以降のセーブデータなら読み込む
-							if (before.clear == -1 && Highscore[i].min_miss[j] == 0) {//MISS 0ならPLAY状態でもフルコンボを表示するようにする
-								Highscore[i].clear_state[j] = 5;
+							if (before.clear == CLEARTYPE_PLAY && Highscore[i].min_miss[j] == 0) {//MISS 0ならPLAY状態でもフルコンボを表示するようにする
+								Highscore[i].clear_state[j] = CLEARTYPE_FULL_COMBO;
 							}
-							if (before.clear == -1 && Highscore[i].min_miss[j] == 0 && Highscore[i].good[j] == 0) {//GOOD 0ならPLAY状態でもPERFECTを表示するようにする
-								Highscore[i].clear_state[j] = 6;
+							if (before.clear == CLEARTYPE_PLAY && Highscore[i].min_miss[j] == 0 && Highscore[i].good[j] == 0) {//GOOD 0ならPLAY状態でもPERFECTを表示するようにする
+								Highscore[i].clear_state[j] = CLEARTYPE_PERFECT;
 							}
 						}
 						else {//それ以前のセーブデータ
-							if (Highscore[i].clear_state[j] == 5 || Highscore[i].clear_state[j] == 6) {//フルコン済みなら
+							if (Highscore[i].clear_state[j] == CLEARTYPE_FULL_COMBO || Highscore[i].clear_state[j] == CLEARTYPE_PERFECT) {//フルコン済みなら
 								Highscore[i].min_miss[j] = 0;
 							}
-							else if (Highscore[i].clear_state[j] == 1 ||
-								Highscore[i].clear_state[j] == 2 ||
-								Highscore[i].clear_state[j] == 3 ||
-								Highscore[i].clear_state[j] == 4) {//クリア済み
+							else if (Highscore[i].clear_state[j] == CLEARTYPE_EASY_CLEARED ||
+								Highscore[i].clear_state[j] == CLEARTYPE_CLEARED ||
+								Highscore[i].clear_state[j] == CLEARTYPE_HARD_CLEARED ||
+								Highscore[i].clear_state[j] == CLEARTYPE_SUPER_HARD_CLEARED) {//クリア済み
 								Highscore[i].min_miss[j] = Highscore[i].miss[j];
 							}
 							else {
@@ -645,20 +645,20 @@ void SONG_SELECT(int *l_n,
 						if (before.save_data_version >= SAVE_DATA_VERSION_MIN_MISS) {
 							HighscoreRival[i].min_miss[j] = before.min_miss;//最小ミス記録バージョン以降のセーブデータなら読み込む
 							if (HighscoreRival[i].min_miss[j] == 0) {//MISS 0ならPLAY状態でもフルコンボを表示するようにする
-								HighscoreRival[i].clear_state[j] = 5;
+								HighscoreRival[i].clear_state[j] = CLEARTYPE_FULL_COMBO;
 							}
 							if (HighscoreRival[i].min_miss[j] == 0 && HighscoreRival[i].good[j] == 0) {//GOOD 0ならPLAY状態でもPERFECTを表示するようにする
-								HighscoreRival[i].clear_state[j] = 6;
+								HighscoreRival[i].clear_state[j] = CLEARTYPE_PERFECT;
 							}
 						}
 						else {//それ以前のセーブデータ
-							if (HighscoreRival[i].clear_state[j] == 5 || HighscoreRival[i].clear_state[j] == 6) {//フルコン済みなら
+							if (HighscoreRival[i].clear_state[j] == CLEARTYPE_FULL_COMBO || HighscoreRival[i].clear_state[j] == CLEARTYPE_PERFECT) {//フルコン済みなら
 								HighscoreRival[i].min_miss[j] = 0;
 							}
-							else if (HighscoreRival[i].clear_state[j] == 1 ||
-								HighscoreRival[i].clear_state[j] == 2 ||
-								HighscoreRival[i].clear_state[j] == 3 ||
-								HighscoreRival[i].clear_state[j] == 4) {//クリア済み
+							else if (HighscoreRival[i].clear_state[j] == CLEARTYPE_EASY_CLEARED ||
+								HighscoreRival[i].clear_state[j] == CLEARTYPE_CLEARED ||
+								HighscoreRival[i].clear_state[j] == CLEARTYPE_HARD_CLEARED ||
+								HighscoreRival[i].clear_state[j] == CLEARTYPE_SUPER_HARD_CLEARED) {//クリア済み
 								HighscoreRival[i].min_miss[j] = HighscoreRival[i].miss[j];
 							}
 							else {
@@ -673,7 +673,7 @@ void SONG_SELECT(int *l_n,
 		}
 	}
 
-	typedef struct FolderScore {
+	typedef struct FolderScore {//フォルダ全体のスコア構造体
 		int AverageScore = 0;//平均点
 		int Global = 0;
 		int Local = 0;
@@ -682,8 +682,8 @@ void SONG_SELECT(int *l_n,
 		int Streak = 0;
 		int Color = 0;
 
-		int ClearType[8] = {0,0,0,0,0,0,0,0};
-		int Rank[7] = { 0,0,0,0,0,0,0 };
+		int ClearType = CLEARTYPE_PERFECT;//フォルダ全体のクリアタイプ
+		int Rank = 0;//フォルダ全体のランク(平均)
 	}FolderScore;
 		
 	FolderScore FolderScore[2][NUMBER_OF_FOLDERS][5];
@@ -727,6 +727,11 @@ void SONG_SELECT(int *l_n,
 							FolderScore[rainbow][i][diff].Unstability += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].unstability[rainbow][diff];
 							FolderScore[rainbow][i][diff].Streak      += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
 							FolderScore[rainbow][i][diff].Color       += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].color[rainbow][diff];
+
+
+							if (FolderScore[rainbow][i][diff].ClearType > Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4]) {//フォルダにある譜面の中で一番低いクリア状態をそのフォルダのクリア状態にする
+								FolderScore[rainbow][i][diff].ClearType = Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4];
+							}
 
 							count++;
 
@@ -772,6 +777,10 @@ void SONG_SELECT(int *l_n,
 						FolderScore[rainbow][i][1].Streak += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
 						FolderScore[rainbow][i][1].Color += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].color[rainbow][diff];
 
+						if (FolderScore[rainbow][i][1].ClearType > Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4]) {//フォルダにある譜面の中で一番低いクリア状態をそのフォルダのクリア状態にする
+							FolderScore[rainbow][i][1].ClearType = Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4];
+						}
+
 						count++;
 
 					}
@@ -785,7 +794,7 @@ void SONG_SELECT(int *l_n,
 				if (FolderScoreRaderBuf.Streak != 0)     FolderScore[rainbow][i][1].Streak =  FolderScore[rainbow][i][1].Streak / FolderScoreRaderBuf.Streak;
 				if (FolderScoreRaderBuf.Color != 0)      FolderScore[rainbow][i][1].Color = FolderScore[rainbow][i][1].Color / FolderScoreRaderBuf.Color;
 
-				for (int diff = 2; diff <= 4; diff++) {
+				for (int diff = 2; diff <= 4; diff++) {//難易度固定フォルダはフォルダ選択時にどの譜面難易度を選んでいても同じ値を表示するために値をコピー
 					FolderScore[rainbow][i][diff].AverageScore = FolderScore[rainbow][i][1].AverageScore;
 
 					FolderScore[rainbow][i][diff].Global = FolderScore[rainbow][i][1].Global;
@@ -795,9 +804,44 @@ void SONG_SELECT(int *l_n,
 				    FolderScore[rainbow][i][diff].Streak = FolderScore[rainbow][i][1].Streak;
 					FolderScore[rainbow][i][diff].Color = FolderScore[rainbow][i][1].Color;
 
+					FolderScore[rainbow][i][diff].ClearType = FolderScore[rainbow][i][1].ClearType;
 				}
 
 			}
+			//フォルダのランク決定 (0:未プレイ 1:F 2:E 3:D 4:C 5:B 6:A 7:S)
+			for (int diff = 1; diff < 5; diff++) {//難易度
+				if (FolderScore[rainbow][i][diff].AverageScore >= RANK_S_SCORE) {
+					FolderScore[rainbow][i][diff].Rank = RANK_S;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_A_SCORE) {
+					FolderScore[rainbow][i][diff].Rank = RANK_A;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_B_SCORE) {
+					FolderScore[rainbow][i][diff].Rank = RANK_B;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_C_SCORE) {
+					FolderScore[rainbow][i][diff].Rank = RANK_C;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_D_SCORE) {
+					FolderScore[rainbow][i][diff].Rank = RANK_D;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_E_SCORE) {
+					FolderScore[rainbow][i][diff].Rank = RANK_E;
+				}
+				else {
+					FolderScore[rainbow][i][diff].Rank = RANK_F;
+				}
+				if (FolderScore[rainbow][i][diff].AverageScore == 0) {
+					FolderScore[rainbow][i][diff].Rank = RANK_NONE;
+				}
+
+			}
+		}
+	}
+
+	for (int rainbow = 0; rainbow < 2; rainbow++) {//自然管理技術者検定フォルダでランク、クリア状態を表示しないようプレイ状態扱いにする
+		for (int diff = 1; diff < 5; diff++) {
+			FolderScore[rainbow][FOLDER_SKILL_TEST_NUMBER][diff].ClearType = CLEARTYPE_PLAY;
 		}
 	}
 
@@ -2970,7 +3014,7 @@ void SONG_SELECT(int *l_n,
 
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 
-		if (SelectingTarget == SELECTING_SONG || SelectingTarget == SELECTING_COURSE) {
+		if (SelectingTarget == SELECTING_SONG || SelectingTarget == SELECTING_FOLDER || SelectingTarget == SELECTING_COURSE) {
 			int RankBuf = 0;
 			int ClearStateBuf = 0;
 			int PlayCountBuf = 0;
@@ -2994,6 +3038,12 @@ void SONG_SELECT(int *l_n,
 				PlayCountBuf = STplay_count[list_number];
 				ExistBuf = 1;
 			}
+			else if (SelectingTarget == SELECTING_FOLDER) {
+				RankBuf = FolderScore[Option->op.color == Option->OP_COLOR_RAINBOW][folder->selected_folder][difficulty].Rank;
+				ClearStateBuf = FolderScore[Option->op.color == Option->OP_COLOR_RAINBOW][folder->selected_folder][difficulty].ClearType;
+				PlayCountBuf = 1;
+				ExistBuf = 1;
+			}
 
 			//ランク描画
 			if (RankBuf != 0) {
@@ -3009,18 +3059,18 @@ void SONG_SELECT(int *l_n,
 			int PlayStatex = -30;
 
 			//プレイ状態描画
-			if (RankBuf != 0 && ClearStateBuf == 0 && ExistBuf == 1) {//FAILED,不合格状態
-				if (SelectingTarget == SELECTING_SONG) {
+			if (RankBuf != 0 && ClearStateBuf == CLEARTYPE_FAILED && ExistBuf == 1) {//FAILED,不合格状態
+				if (SelectingTarget == SELECTING_SONG || SelectingTarget == SELECTING_FOLDER) {
 					DrawExtendGraph(PlayStatex-5, PlayStateY, int(PlayStatex-5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_FAILED, TRUE);
 				}
 				else if(SelectingTarget == SELECTING_COURSE){
 					DrawExtendGraph(PlayStatex+5, PlayStateY, int(PlayStatex+5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_SKILL_TEST_FAILED, TRUE);
 				}
 			}
-			if (ClearStateBuf == -1 && ExistBuf == 1) {//PLAY状態(何も表示しない)
+			if (ClearStateBuf == CLEARTYPE_PLAY && ExistBuf == 1) {//PLAY状態(何も表示しない)
 				//DrawExtendGraph(-95, 580, int(-95 + ((double)640 * 0.8)), int(580 + ((double)100 * 0.8)), H_CLEARED_EASY, TRUE);
 			}
-			if (ClearStateBuf == 1 && ExistBuf == 1) {//EASY_CLEARED,合格状態
+			if (ClearStateBuf == CLEARTYPE_EASY_CLEARED && ExistBuf == 1) {//EASY_CLEARED,合格状態
 				if (SelectingTarget == SELECTING_SONG) {
 					DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_EASY, TRUE);
 				}
@@ -3028,24 +3078,24 @@ void SONG_SELECT(int *l_n,
 					DrawExtendGraph(PlayStatex+5, PlayStateY, int(PlayStatex+5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_SKILL_TEST_PASSED, TRUE);
 				}
 			}
-			if (ClearStateBuf == 2 && ExistBuf == 1) {//NORMAL_CLEARED状態
+			if (ClearStateBuf == CLEARTYPE_CLEARED && ExistBuf == 1) {//NORMAL_CLEARED状態
 				DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_NORMAL, TRUE);
 			}
-			if (ClearStateBuf == 3 && ExistBuf == 1) {//HARD_CLEARED状態
+			if (ClearStateBuf == CLEARTYPE_HARD_CLEARED && ExistBuf == 1) {//HARD_CLEARED状態
 				DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_HARD, TRUE);
 			}
-			if (ClearStateBuf == 4 && ExistBuf == 1) {//SUPER_HARD_CLEARED状態
+			if (ClearStateBuf == CLEARTYPE_SUPER_HARD_CLEARED && ExistBuf == 1) {//SUPER_HARD_CLEARED状態
 				DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_SUPER_HARD, TRUE);
 			}
-			if (ClearStateBuf == 5 && ExistBuf == 1) {//FULL_COMBO状態
+			if (ClearStateBuf == CLEARTYPE_FULL_COMBO && ExistBuf == 1) {//FULL_COMBO状態
 				DrawExtendGraph(PlayStatex+30, PlayStateY+10, int(PlayStatex+30 + ((double)640 * PlayStateRatioF)), int(PlayStateY+10 + ((double)100 * PlayStateRatioF)), H_FULL_COMBO[(int(GAME_passed_time) / 70) % 6], TRUE);
 			}
 
-			if (ClearStateBuf == 6 && ExistBuf == 1) {//PERFECT_FULLCOMBO状態
+			if (ClearStateBuf == CLEARTYPE_PERFECT && ExistBuf == 1) {//PERFECT_FULLCOMBO状態
 				DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_PFC, TRUE);
 			}
 
-			if (PlayCountBuf == 0 && ExistBuf == 1) {//no play状態
+			if (ClearStateBuf == CLEARTYPE_NO_PLAY && ExistBuf == 1) {//no play状態
 				DrawExtendGraph(PlayStatex-5, PlayStateY, int(PlayStatex-5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_NO_PLAY, TRUE);
 			}
 
@@ -3197,6 +3247,8 @@ void SONG_SELECT(int *l_n,
 		cash = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280);//リザルトカバー
 
 		DrawGraph(cash, 0, H_RESULT, TRUE);//リザルトカバー
+
+
 		if ((Music[song_number].exist[difficulty] == 1 && SelectingTarget == SELECTING_SONG) || SelectingTarget == SELECTING_COURSE) {//曲選択状態で譜面が存在するときか、段位選択のとき
 			int SkyPerfectBuf = 0;
 			int PerfectBuf = 0;

@@ -40,7 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetDXArchiveKeyString(DX_PASSWORD);
 	SetOutApplicationLogValidFlag(FALSE);//ログ出力を行わない
 
-	SetGraphMode(1280, 720, 16);//画面サイズは1280*720
+	SetGraphMode(1280, 720, 32);//画面サイズは1280*720
 
 	CONFIG config;
 	ConfigLoad(&config);//Config.dat読み込み
@@ -64,7 +64,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
 	SetWindowIconID(333);//ウィンドウアイコンの設定
 #endif
-	//SetEnableXAudioFlag(TRUE);
+	//SetEnableXAudioFlag(TRUE);//サウンドデバイスを何使うか
 	//SetEnableASIOFlag(TRUE);
 	//SetEnableWASAPIFlag(TRUE);
 
@@ -72,7 +72,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		return -1;			// エラーが起きたら直ちに終了
 	}
-	SetDrawScreen(DX_SCREEN_BACK);
+	SetDrawScreen(DX_SCREEN_BACK);// 描画先を裏画面にする
 	EffekseerInitProcess();//Effekseer用初期化処理
 
 	SetCreateGraphColorBitDepth(32);//作成するグラフィックのビット数設定

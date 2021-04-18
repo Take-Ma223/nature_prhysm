@@ -7,10 +7,44 @@
 
 
 #define SAVE_DATA_VERSION 1.11//現在のセーブデータバージョン
+
+static const int RANK_S = 7;//Sランク
+static const int RANK_A = 6;//Aランク
+static const int RANK_B = 5;//Bランク
+static const int RANK_C = 4;//Cランク
+static const int RANK_D = 3;//Dランク
+static const int RANK_E = 2;//Eランク
+static const int RANK_F = 1;//Fランク
+static const int RANK_NONE = 0;//ランク無し
+
+static const int RANK_S_SCORE = 9500;//Sランク下限スコア
+static const int RANK_A_SCORE = 9000;//Aランク下限スコア
+static const int RANK_B_SCORE = 8000;//Bランク下限スコア
+static const int RANK_C_SCORE = 7000;//Cランク下限スコア
+static const int RANK_D_SCORE = 6000;//Dランク下限スコア
+static const int RANK_E_SCORE = 5000;//Eランク下限スコア
+
+
+static const int CLEARTYPE_PERFECT = 6;//PERFECT
+static const int CLEARTYPE_FULL_COMBO = 5;//FULL_COMBO
+static const int CLEARTYPE_SUPER_HARD_CLEARED = 4;//SUPER HARD CLEARED
+static const int CLEARTYPE_HARD_CLEARED = 3;//HARD CLEARED
+static const int CLEARTYPE_CLEARED = 2;//CLEARED
+static const int CLEARTYPE_EASY_CLEARED = 1;//EASY CLEARED
+static const int CLEARTYPE_FAILED = 0;//FAILED
+static const int CLEARTYPE_PLAY = -1;//PLAY
+static const int CLEARTYPE_NO_PLAY = -2;//NO PLAY
+
+
+static const int RESULT_WEATHER_SUNNY = 3;//晴れ
+static const int RESULT_WEATHER_CLOUDY = 2;//曇り
+static const int RESULT_WEATHER_RAINY = 1;//雨
+static const int RESULT_WEATHER_THUNDER = 0;//雷
+
 typedef struct RESULT {//リザルト用構造体
 	int hash = 0;//譜面のハッシュ(譜面やスコアが改ざんされてないか確認する)
 	int difficulty = 0;//難易度
-	int clear = 0;//-1:PLAY 0:FAILED(不合格) 1:EASY_CLEARED(合格) 2:CLEARED 3:HARD_CLEARED 4:SUPER_HARD_CLEARED 5:FULL_COMBO 6:PERFECT
+	int clear = -2;//-1:PLAY 0:FAILED(不合格) 1:EASY_CLEARED(合格) 2:CLEARED 3:HARD_CLEARED 4:SUPER_HARD_CLEARED 5:FULL_COMBO 6:PERFECT
 	int score = 0;//
 
 

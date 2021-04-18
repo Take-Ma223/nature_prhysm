@@ -2763,21 +2763,21 @@ void GAME(int song_number, int difficulty,
 							   //res->song_number = song_number;
 				res->difficulty = difficulty;
 				if (ClearFlag == 1) {
-					if (Option->op.gauge == Option->OP_GAUGE_NORMAL) res->clear = 2;//NORMAL
-					if (Option->op.gauge == Option->OP_GAUGE_HARD) res->clear = 3;//HARD
-					if (Option->op.gauge == Option->OP_GAUGE_SUPER_HARD) res->clear = 4;//SUPER HARD
-					if (Option->op.color == Option->OP_COLOR_RGB_ONLY) res->clear = 1;//EASYCLEARED(Onlyオプション使ってたら灰クリアに塗り替える)
-					if (Option->op.color == Option->OP_COLOR_CMY_ONLY) res->clear = 1;//EASYCLEARED
-					if (Option->op.color == Option->OP_COLOR_W_ONLY) res->clear = 1;//EASYCLEARED
+					if (Option->op.gauge == Option->OP_GAUGE_NORMAL) res->clear = CLEARTYPE_CLEARED;//NORMAL
+					if (Option->op.gauge == Option->OP_GAUGE_HARD) res->clear = CLEARTYPE_HARD_CLEARED;//HARD
+					if (Option->op.gauge == Option->OP_GAUGE_SUPER_HARD) res->clear = CLEARTYPE_SUPER_HARD_CLEARED;//SUPER HARD
+					if (Option->op.color == Option->OP_COLOR_RGB_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED(Onlyオプション使ってたら灰クリアに塗り替える)
+					if (Option->op.color == Option->OP_COLOR_CMY_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
+					if (Option->op.color == Option->OP_COLOR_W_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
 
-					if (Option->op.gauge == Option->OP_GAUGE_SKILL_TEST) res->clear = 2;//段位ゲージ
+					if (Option->op.gauge == Option->OP_GAUGE_SKILL_TEST) res->clear = CLEARTYPE_CLEARED;//段位ゲージ
 				}
 
 				if (SkillTestFlag != 0) {
 					*GaugeVal = gauge;//段位認定のときはゲージ量継承
 				}
 
-				if (ClearFlag == 2)res->clear = 0;
+				if (ClearFlag == 2)res->clear = CLEARTYPE_FAILED;
 				if (ClearFlag == 1 && MISS == 0 && (
 					Option->op.color == Option->OP_COLOR_NONE ||
 				    Option->op.color == Option->OP_COLOR_RGB_CHANGE ||
@@ -2788,11 +2788,11 @@ void GAME(int song_number, int difficulty,
 
 					if (GOOD == 0) {
 						//PERFECTフルコンボ
-						res->clear = 6;
+						res->clear = CLEARTYPE_PERFECT;
 					}
 					else {
 						//フルコンボ
-						res->clear = 5;
+						res->clear = CLEARTYPE_FULL_COMBO;
 					}
 				}
 				res->score = int(score + 0.5);
@@ -2801,13 +2801,13 @@ void GAME(int song_number, int difficulty,
 				res->good = GOOD;
 				res->miss = MISS;
 
-				if (res->score < 5000)res->rank = 1;//ランクF
-				if (res->score >= 5000)res->rank = 2;//ランクE
-				if (res->score >= 6000)res->rank = 3;//ランクD
-				if (res->score >= 7000)res->rank = 4;//ランクC
-				if (res->score >= 8000)res->rank = 5;//ランクB
-				if (res->score >= 9000)res->rank = 6;//ランクA
-				if (res->score >= 9500)res->rank = 7;//ランクS
+				if (res->score < RANK_E_SCORE)res->rank = RANK_F;//ランクF
+				if (res->score >= RANK_E_SCORE)res->rank = RANK_E;//ランクE
+				if (res->score >= RANK_D_SCORE)res->rank = RANK_D;//ランクD
+				if (res->score >= RANK_C_SCORE)res->rank = RANK_C;//ランクC
+				if (res->score >= RANK_B_SCORE)res->rank = RANK_B;//ランクB
+				if (res->score >= RANK_A_SCORE)res->rank = RANK_A;//ランクA
+				if (res->score >= RANK_S_SCORE)res->rank = RANK_S;//ランクS
 
 												//res->artist;
 												//res->genre;
@@ -2818,16 +2818,16 @@ void GAME(int song_number, int difficulty,
 
 
 					if (TimeAcc[i] >= 90){//晴れ精度
-						res->weather[i] = 3;
+						res->weather[i] = RESULT_WEATHER_SUNNY;
 					}
 					else if (TimeAcc[i] >= 80) {//曇り精度
-						res->weather[i] = 2;
+						res->weather[i] = RESULT_WEATHER_CLOUDY;
 					}
 					else if (TimeAcc[i] >= 70) {//雨精度
-						res->weather[i] = 1;
+						res->weather[i] = RESULT_WEATHER_RAINY;
 					}
 					else{//69以下は雷精度
-						res->weather[i] = 0;
+						res->weather[i] = RESULT_WEATHER_THUNDER;
 					}
 				}
 

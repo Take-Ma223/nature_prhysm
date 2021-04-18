@@ -140,8 +140,8 @@ void SHOW_RESULT(RESULT res,
 
 	int StrLength = 0;//オプション表示用の文字の長さ格納
 
-	wchar_t ScreenShotFileNameBuf[256] = L"SccreenShot.png";//スクリーンショットのファイル名バッファ
-	wchar_t ScreenShotFileName[256] = L"SccreenShot.png";//スクリーンショットのファイル名
+	wchar_t ScreenShotFileNameBuf[256] = L"SccreenShot.jpg";//スクリーンショットのファイル名バッファ
+	wchar_t ScreenShotFileName[256] = L"SccreenShot.jpg";//スクリーンショットのファイル名
 	double SccreenShot_ShowWhite_counter = 0;//スクリーンショットを取ったときに出る白い光を表示するカウンタ
 	
 	wchar_t *DifficultyName[6] = {L"晴れ",L"曇り",L"雨",L"雷",L"雪",L"大雪"};
@@ -191,7 +191,7 @@ void SHOW_RESULT(RESULT res,
 	}
 
 	if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-		swprintf_s(ScreenShotFileNameBuf, L"%s_%s%s%s_%d.png",
+		swprintf_s(ScreenShotFileNameBuf, L"%s_%s%s%s_%d.jpg",
 			Music[song_number].title[difficulty],
 			DifficultyName[DifficultyUse],
 			Rainbow[RainbowUse],
@@ -199,7 +199,7 @@ void SHOW_RESULT(RESULT res,
 			res.score);//ファイル名は「曲名 難易度 虹 Auto スコア」になる
 	}
 	else {
-		swprintf_s(ScreenShotFileNameBuf, L"%s_%d.png", STList->title[list_number], res.score);
+		swprintf_s(ScreenShotFileNameBuf, L"%s_%d.jpg", STList->title[list_number], res.score);
 	}
 
 	//ファイル名に使えない文字があったら消去する
@@ -302,7 +302,7 @@ void SHOW_RESULT(RESULT res,
 					save.pop[i] = res.pop[i];
 
 					save.max_combo = res.max_combo;
-					if (high_score.clear==5) {//フルコンボ済みの曲なら
+					if (high_score.clear == CLEARTYPE_FULL_COMBO) {//フルコンボ済みの曲なら
 						save.max_combo = Music[song_number].total_note[difficulty];//ノート数を格納
 						high_score.max_combo = save.max_combo;//high_scoreのMaxComboも値を更新しておく
 					}
@@ -314,8 +314,8 @@ void SHOW_RESULT(RESULT res,
 			if (high_score.save_data_version < SAVE_DATA_VERSION_SKY_PERFECT) {//セーブデータバージョンが古かったら(SKY_PERFECT、PERFECT記録するバージョンより前)
 				for (i = 0; i <= 5; i++) {
 					save.max_combo = res.max_combo;
-					if (high_score.score == 10000 && high_score.clear == 5) {//理論値済み(PFC)の曲なら
-						save.clear = 6;//PERFECTにする
+					if (high_score.score == 10000 && high_score.clear == CLEARTYPE_FULL_COMBO) {//PERFECT済み(PFC)の曲なら
+						save.clear = CLEARTYPE_PERFECT;//PERFECTにする
 					}
 				}
 				save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
@@ -323,10 +323,10 @@ void SHOW_RESULT(RESULT res,
 
 			if (high_score.save_data_version < SAVE_DATA_VERSION_MIN_MISS) {//セーブデータバージョンが古かったら(MinMiss記録するバージョンより前)
 				for (i = 0; i <= 5; i++) {					
-					if (high_score.clear == 5 || high_score.clear == 6) {//フルコン済み(FC PFC)の曲なら
+					if (high_score.clear == CLEARTYPE_FULL_COMBO || high_score.clear == CLEARTYPE_PERFECT) {//フルコン済み(FC PFC)の曲なら
 						save.min_miss = 0;//MinMiss0にする
 					}
-					else if(high_score.clear == 2 || high_score.clear == 3 || high_score.clear == 4){//クリア済みの曲
+					else if(high_score.clear == CLEARTYPE_CLEARED || high_score.clear == CLEARTYPE_HARD_CLEARED || high_score.clear == CLEARTYPE_SUPER_HARD_CLEARED){//クリア済みの曲
 						save.min_miss = high_score.miss;
 						high_score.min_miss = high_score.miss;//これまでの最小ミスを暫定で決めておく
 					}
@@ -342,13 +342,13 @@ void SHOW_RESULT(RESULT res,
 			if (res.clear > high_score.clear) {
 
 				save.clear = res.clear;//クリア状態更新
-				if (high_score.clear == -1 && high_score.min_miss == 0) {//段位でしかやっていない曲はクリア状態が記録されていない(-1)ので段位で既にフルコン済みならフルコン状態にする
-					save.clear = 5;
+				if (high_score.clear == CLEARTYPE_PLAY && high_score.min_miss == 0) {//段位でしかやっていない曲はクリア状態が記録されていない(-1)ので段位で既にフルコン済みならフルコン状態にする
+					save.clear = CLEARTYPE_FULL_COMBO;
 				}
-				if (high_score.clear == -1 && high_score.min_miss == 0 && high_score.good == 0) {//段位でしかやっていない曲はクリア状態が記録されていない(-1)ので段位で既にPFC済みならPFC状態にする
-					save.clear = 6;
+				if (high_score.clear == CLEARTYPE_PLAY && high_score.min_miss == 0 && high_score.good == 0) {//段位でしかやっていない曲はクリア状態が記録されていない(-1)ので段位で既にPFC済みならPFC状態にする
+					save.clear = CLEARTYPE_PERFECT;
 				}
-				if (high_score.clear == -1 && (save.clear < res.clear)) {//段位でしかやっておらずFC済みで今回PFCを取ったときはPFCにしておく
+				if (high_score.clear == CLEARTYPE_PLAY && (save.clear < res.clear)) {//段位でしかやっておらずFC済みで今回PFCを取ったときはPFCにしておく
 					save.clear = res.clear;
 				}
 
@@ -402,12 +402,12 @@ void SHOW_RESULT(RESULT res,
 				Option->op.color != Option->OP_COLOR_W_ONLY) {//ONLYオプションを使っていない
 				save = res;//初プレイなら今回のスコアそのまま保存
 
-				if (res.clear >= 2) {//MinMissはクリアしたときだけ保存
+				if (res.clear >= CLEARTYPE_CLEARED) {//MinMissはクリアしたときだけ保存
 					save.min_miss = res.miss;
 				}
 
 				if (SkillTestFlag != 0) {//段位認定モード
-					save.clear = -1;//PLAY状態にする
+					save.clear = CLEARTYPE_PLAY;//PLAY状態にする
 				}
 
 			}
@@ -922,10 +922,12 @@ void SHOW_RESULT(RESULT res,
 			}
 		}
 		
-		if (show_inst_flag == 0) {
+		if (show_inst_flag == 0) {//スクリーンショット
 			show_inst_flag = 1;
 			PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
-			SaveDrawScreenToPNG(0, 0, 1280, 720, ScreenShotFileName, 0);
+			SetDrawScreen(DX_SCREEN_FRONT);// 描画先を表画面にする
+			SaveDrawScreenToJPEG(0, 0, 1280, 720, ScreenShotFileName, 100);
+			SetDrawScreen(DX_SCREEN_BACK);// 描画先を裏画面にする
 			PlaySoundMem(SH_SHUTTER, DX_PLAYTYPE_BACK, TRUE);
 			SccreenShot_ShowWhite_counter = 1;
 		}

@@ -1798,7 +1798,7 @@ int DifficultyRadar::CalcLocal(int Rainbow) {
 
 
 	//BoxTime秒の枠をずらしながら枠に入る音符の密度の最高値をLocal値とする
-	int BoxTime = 4000;//枠の時間(ms)
+	int BoxTime = 8000;//枠の時間(ms)
 	int SlideTime = 250;//枠をスライドする時間
 	int Count[4] = { 0,0,0,0 };//枠の中に入っている音符の数
 	int SlideCount = 0;//スライド回数カウント
@@ -2216,9 +2216,9 @@ int DifficultyRadar::CalcChain() {
 	int firstFlag = 0;
 	double chainBuf = 0;
 
-	int BaseBPM = 150;//16分を縦連とみなす基準BPM
+	int BaseBPM = 180;//16分を縦連とみなす基準BPM
 
-	double make1 = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 4.0));
+	double normalizer = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 4.0));
 	
 
 	for (lane = 0; lane <= 3; lane++) {
@@ -2230,7 +2230,7 @@ int DifficultyRadar::CalcChain() {
 					firstFlag = 1;
 				}
 				else {
-					chainBuf = (double)1 / pow((((double)note[lane][NoteCounter].timing_real - TimingBuf) * make1), 2);//BaseBPMの16分より短いと1からどんどん上がっていく
+					chainBuf = (double)1 / pow((((double)note[lane][NoteCounter].timing_real - TimingBuf) * normalizer), 2);//BaseBPMの16分より短いと1からどんどん上がっていく
 					if (chainBuf >= 1)chainBuf = 1;//1以上にはしない
 					chain[lane] += chainBuf;//
 					TimingBuf = note[lane][NoteCounter].timing_real;

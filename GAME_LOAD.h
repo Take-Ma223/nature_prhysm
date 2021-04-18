@@ -56,7 +56,7 @@ public:
 	int colorMax = 350;
 	int LNMax = 39;
 	int unstabilityMax = 259;
-	int chainMax = 150;
+	int chainMax = 120;
 	double BPM_suggest = 0;
 
 private:

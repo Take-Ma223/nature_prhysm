@@ -1025,18 +1025,28 @@ void SONG_SELECT(int *l_n,
 		    //ソート前のリストのインデックスに変換
 			notSortedIndex = SortList[Option->op.sort][folder->selected_folder][Option->op.color == Option->OP_COLOR_RAINBOW][difficulty - 1][SearchListNumberBase].index;
 
-			//前回選んでいた曲番号と難易度が一致していたらこのソート前のリストのインデックスが正しい
-			if (now_song_number == 
-				folder->folder[folder->selected_folder][notSortedIndex].song_number
-				
-				&&
+			if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY) {//難易度別フォルダを選んでいた時は曲番号と難易度も合っているか確認する
+				//前回選んでいた曲番号と難易度が一致していたらこのソート前のリストのインデックスが正しい
+				if (now_song_number ==
+					folder->folder[folder->selected_folder][notSortedIndex].song_number
 
-				now_difficulty ==
-				folder->folder[folder->selected_folder][notSortedIndex].difficulty
-				) {
-				
+					&&
 
-				list_number_base = SearchListNumberBase;
+					now_difficulty ==
+					folder->folder[folder->selected_folder][notSortedIndex].difficulty
+					) {
+
+
+					list_number_base = SearchListNumberBase;
+				}
+			}else if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_NORMAL) {//通常フォルダを選んでいた時は曲番号だけ合っているか確認する
+				//前回選んでいた曲番号が一致していたらこのソート前のリストのインデックスが正しい
+				if (now_song_number ==
+					folder->folder[folder->selected_folder][notSortedIndex].song_number){
+
+
+					list_number_base = SearchListNumberBase;
+				}
 			}
 		}
 

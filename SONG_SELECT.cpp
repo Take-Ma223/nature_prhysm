@@ -2184,8 +2184,9 @@ void SONG_SELECT(int *l_n,
 						debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config,
 						i + 1, &GaugeVal,
 						&CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ	
-					if (escape == 1) {//プレイの抜け出しはランクをFに
+					if (escape == 1) {//プレイの抜け出しはランクをF、FAILEDに
 						Result[i].rank = 1;
+						Result[i].clear = CLEARTYPE_FAILED;
 					}
 					if (escape == 0) {//抜けだしてない
 						SHOW_RESULT(Result[i], Option, SongNumberList[i], DifficultyList[i], debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
@@ -2194,7 +2195,7 @@ void SONG_SELECT(int *l_n,
 							config,
 							i + 1);//結果発表
 					}
-					if (Result[i].clear == 0) {//この曲でFAILEDの時段位終了
+					if (Result[i].clear == CLEARTYPE_FAILED) {//この曲で抜け出した時段位終了
 						STRes.clear = 0;
 						break;
 					}

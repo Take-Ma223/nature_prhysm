@@ -3,7 +3,7 @@
 
 #define NOTE_MAX_NUMBER 1500//1レーン1500ノーツまで 6500は無理 6000ぐらいまでいけた
 #define SONG_MAX_NUMBER 512//最大曲数 2300までいける
-#define VERSION 1.26        //バージョン
+#define VERSION 1.27        //バージョン
 
 #define SECRET_SONG_APPEAR_CYCLE 3//3曲Aを連続で取れば隠し曲が一回出現
 

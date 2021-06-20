@@ -27,9 +27,12 @@
 #include"ShowFps.h"
 #include "EffekseerForDXLib.h"
 #include"ScreenShot.h"
+#include<string>
+
+using namespace std;
 
 void GAME(int song_number, int difficulty,
-	RESULT *res, int *escape, OPTION *Option, int *retryAble,
+	RESULT *res, int *escape, OPTION *option, int *retryAble,
 	int *debug, Song *Music, int Button[3][4], int Button_Shutter, int *Key, char *Buf,
 	int secret,//隠し曲演出中か(0:通常 1:演出中)
 	ANDROID_CONTROLLER *AC,
@@ -137,7 +140,7 @@ void GAME(int song_number, int difficulty,
 	double cbpm = 120;//現在のBPM
 	double speed = 0.00000000001;//スピード調整
 	double high_speed = 1;//ハイスピ
-	high_speed = Option->op.speed_val;//段位以外ではあらかじめ決めた値を格納
+	high_speed = option->op.speed_val;//段位以外ではあらかじめ決めた値を格納
 	double scale = 1;//判定の横の広がり幅
 						//int lane1 = int(512 - 240 * scale);
 						//int lane2 = int(512 - 80 * scale);
@@ -350,43 +353,43 @@ void GAME(int song_number, int difficulty,
 
 
 	//----Read----
-	if (Option->op.gauge == Option->OP_GAUGE_NORMAL) {
+	if (option->op.gauge == option->OP_GAUGE_NORMAL) {
 		total_base = 375;
 		miss_percent = 0.05;//(250~500コンボの時)一気にミスったらFAILEDになる総ノーツに対する割合(1:100%)
 		gauge_dec_MIN = 3;//ゲージ減少量が4%以下にならないようにする
 		gauge_dec_MAX = 3;//ゲージ減少量が8%以上にならないようにする
 	}
-	if (Option->op.gauge == Option->OP_GAUGE_HARD) {
+	if (option->op.gauge == option->OP_GAUGE_HARD) {
 		total_base = 225;
 		miss_percent = 0.05;//(125~200コンボの時)一気にミスったらFAILEDになる総ノーツに対する割合(1:100%)
 		gauge_dec_MIN = 6;//ゲージ減少量が8%以下にならないようにする
 		gauge_dec_MAX = 6;//ゲージ減少量が10%以上にならないようにする
 	}
-	if (Option->op.gauge == Option->OP_GAUGE_SUPER_HARD) {//10回ミスすると失敗
+	if (option->op.gauge == option->OP_GAUGE_SUPER_HARD) {//10回ミスすると失敗
 		total_base = 100;//ゲージ回復100
 		miss_percent = 0;//(250~500コンボの時)一気にミスったらFAILEDになる総ノーツに対する割合(1:100%)
 		gauge_dec_MIN = 10;//ゲージ減少量が8%以下にならないようにする
 		gauge_dec_MAX = 10;//ゲージ減少量が8%以上にならないようにする
 	}
-	if (Option->op.gauge == Option->OP_GAUGE_FC_ATTACK) {//ミスすると失敗
+	if (option->op.gauge == option->OP_GAUGE_FC_ATTACK) {//ミスすると失敗
 		total_base = 0;//ゲージ回復なし
 		miss_percent = 0;//(250~500コンボの時)一気にミスったらFAILEDになる総ノーツに対する割合(1:100%)
 		gauge_dec_MIN = 100;//ゲージ減少量が8%以下にならないようにする
 		gauge_dec_MAX = 100;//ゲージ減少量が8%以上にならないようにする
 	}
-	if (Option->op.gauge == Option->OP_GAUGE_PFC_ATTACK) {//MISS,GOODすると失敗
+	if (option->op.gauge == option->OP_GAUGE_PFC_ATTACK) {//MISS,GOODすると失敗
 		total_base = 0;//ゲージ回復なし
 		miss_percent = 0;//(250~500コンボの時)一気にミスったらFAILEDになる総ノーツに対する割合(1:100%)
 		gauge_dec_MIN = 100;//ゲージ減少量が8%以下にならないようにする
 		gauge_dec_MAX = 100;//ゲージ減少量が8%以上にならないようにする
 	}
-	if (Option->op.gauge == Option->OP_GAUGE_SKILL_TEST) {//段位ゲージ 24個で1MISS分回復するようにノート数補正をかけるy
+	if (option->op.gauge == option->OP_GAUGE_SKILL_TEST) {//段位ゲージ 24個で1MISS分回復するようにノート数補正をかけるy
 		total_base = 125;
 		miss_percent = 0;//(250~500コンボの時)一気にミスったらFAILEDになる総ノーツに対する割合(1:100%)
 		gauge_dec_MIN = 1.5;//ゲージ減少量
 		gauge_dec_MAX = 1.5;//ゲージ減少量
 
-		if (Option->op.color == Option->OP_COLOR_RAINBOW) {//基本の時は減少量多め
+		if (option->op.color == option->OP_COLOR_RAINBOW) {//基本の時は減少量多め
 			gauge_dec_MIN = 3;//ゲージ減少量
 			gauge_dec_MAX = 3;//ゲージ減少量
 		}
@@ -394,7 +397,7 @@ void GAME(int song_number, int difficulty,
 	}
 
 
-	GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, Option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
+	GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
 	Music[song_number].hash[difficulty] = hash;
 	res->hash = hash;//ハッシュ値を格納
 
@@ -437,12 +440,12 @@ void GAME(int song_number, int difficulty,
 
 	wchar_t* scoreDiff[4] = { L"sunny",L"cloudy",L"rainy",L"thunder" };
 
-	if (Option->op.color != Option->OP_COLOR_RAINBOW) {//通常モードだったら
+	if (option->op.color != option->OP_COLOR_RAINBOW) {//通常モードだったら
 		sprintfDx(filenameHighScore, L"%s/result_%s.dat", Music[song_number].SaveFolder, scoreDiff[difficulty - 1]);
 		sprintfDx(filenameLatest, L"%s/latest_result_%s.dat", Music[song_number].SaveFolder, scoreDiff[difficulty - 1]);
 		sprintfDx(filenameRival, L"%s/result_%s.dat", Music[song_number].RivalSaveFolder, scoreDiff[difficulty - 1]);
 	}
-	if (Option->op.color == Option->OP_COLOR_RAINBOW) {//虹モードだったら
+	if (option->op.color == option->OP_COLOR_RAINBOW) {//虹モードだったら
 		sprintfDx(filenameHighScore, L"%s/result_%s_r.dat", Music[song_number].SaveFolder, scoreDiff[difficulty - 1]);
 		sprintfDx(filenameLatest, L"%s/latest_result_%s_r.dat", Music[song_number].SaveFolder, scoreDiff[difficulty - 1]);
 		sprintfDx(filenameRival, L"%s/result_%s_r.dat", Music[song_number].RivalSaveFolder, scoreDiff[difficulty - 1]);
@@ -473,18 +476,18 @@ void GAME(int song_number, int difficulty,
 
 	for (i = 0; i <= 10; i++) {
 		wchar_t strcash[128];
-		sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[i]);
+		sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[i]);
 
 		H_NOTE[i + 1] = LoadGraph(strcash);
 
 		wchar_t strcash_l[128];
-		sprintfDx(strcash_l, L"img/notes/%s/%sl.png", Option->note[Option->op.note], ReadNameRGB[i]);
+		sprintfDx(strcash_l, L"img/notes/%s/%sl.png", option->note[option->op.note], ReadNameRGB[i]);
 		H_LNOTE[i + 1] = LoadGraph(strcash_l);
 	}
 
 	DeleteGraph(H_LNOTE[8]);//黒ロング画像を削除し、透過加工黒ロング画像を作成
 	wchar_t strcash[128];
-	sprintfDx(strcash, L"img/notes/%s/dl.png", Option->note[Option->op.note]);
+	sprintfDx(strcash, L"img/notes/%s/dl.png", option->note[option->op.note]);
 	int SOFTH_LNOTE_B = LoadSoftImage(strcash);
 	for (int y = 0; y < 256; y++) {//透過グラデーション加工
 		for (int x = 0; x < 256; x++) {
@@ -497,9 +500,9 @@ void GAME(int song_number, int difficulty,
 	H_LNOTE[8]= CreateGraphFromSoftImage(SOFTH_LNOTE_B);
 	DeleteSoftImage(SOFTH_LNOTE_B);
 
-	sprintfDx(strcash, L"img/notes/%s/JudgeArea.png", Option->note[Option->op.note]);
+	sprintfDx(strcash, L"img/notes/%s/JudgeArea.png", option->note[option->op.note]);
 	H_JUDGE_AREA = LoadGraph(strcash);
-	sprintfDx(strcash, L"img/notes/%s/JudgeAreaPaint.png", Option->note[Option->op.note]);
+	sprintfDx(strcash, L"img/notes/%s/JudgeAreaPaint.png", option->note[option->op.note]);
 	H_JUDGE_AREA_PAINT = LoadGraph(strcash);
 
 	int Keylist[3][4] = { { Button[0][0],Button[0][1],Button[0][2],Button[0][3] },
@@ -509,8 +512,6 @@ void GAME(int song_number, int difficulty,
 	{ 2, 4, 1, 5, 3, 7, 6 },
 	{ 1, 4, 2, 6, 3, 7, 5 } };
 
-	
-	H_BG = LoadGraph(L"img/bg_game.png");
 
 	XY pos_cloud;//雲の座標
 	if (secret == 0) {//隠し曲演出中ではない
@@ -524,12 +525,13 @@ void GAME(int song_number, int difficulty,
 	H_GOOD = LoadGraph(L"img/GOOD.png");
 	H_MISS = LoadGraph(L"img/MISS.png");
 	H_GAUGE_BOX = LoadGraph(L"img/gauge_box.png");
-	if (Option->op.gauge == Option->OP_GAUGE_NORMAL)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_normal.png");//(左上95,105)大きさ130*510
-	if (Option->op.gauge == Option->OP_GAUGE_HARD)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_hard.png");//(左上95,105)大きさ130*510
-	if (Option->op.gauge == Option->OP_GAUGE_SUPER_HARD)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_super_hard.png");//(左上95,105)大きさ130*510
-	if (Option->op.gauge == Option->OP_GAUGE_FC_ATTACK)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_fc.png");//(左上95,105)大きさ130*510
-	if (Option->op.gauge == Option->OP_GAUGE_PFC_ATTACK)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_pfc.png");//(左上95,105)大きさ130*510
-	if (Option->op.gauge == Option->OP_GAUGE_SKILL_TEST)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_skill_test.png");//(左上95,105)大きさ130*510
+	if (option->op.gauge == option->OP_GAUGE_NO_FAIL)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_no_fail.png");//(左上95,105)大きさ130*510
+	if (option->op.gauge == option->OP_GAUGE_NORMAL)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_normal.png");//(左上95,105)大きさ130*510
+	if (option->op.gauge == option->OP_GAUGE_HARD)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_hard.png");//(左上95,105)大きさ130*510
+	if (option->op.gauge == option->OP_GAUGE_SUPER_HARD)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_super_hard.png");//(左上95,105)大きさ130*510
+	if (option->op.gauge == option->OP_GAUGE_FC_ATTACK)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_fc.png");//(左上95,105)大きさ130*510
+	if (option->op.gauge == option->OP_GAUGE_PFC_ATTACK)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_pfc.png");//(左上95,105)大きさ130*510
+	if (option->op.gauge == option->OP_GAUGE_SKILL_TEST)H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_skill_test.png");//(左上95,105)大きさ130*510
 
 
 	H_R_IN = LoadGraph(L"img/R_inside.png");
@@ -539,16 +541,23 @@ void GAME(int song_number, int difficulty,
 	LoadDivGraph(L"img/hit_large.png", 20, 4, 5, 300, 300, H_HIT_LARGE);
 	LoadDivGraph(L"img/hit_d.png", 16, 4, 4, 256, 256, H_HIT_D);
 	H_COMBO = LoadGraph(L"img/combo.png");
+
+
+	wstring themeStr1(L"img/themes/");
+	wstring themeStr2(option->theme[option->op.theme]);
+	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg_game.png")).c_str());
+
+
 	if (difficulty == 1) {
-		H_COVER = LoadGraph(L"img/cover_sunny.png");//難易度によってカバー変更
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
 		H_DIFFICULTY = LoadGraph(L"img/sunny.png");
 	}
 	if (difficulty == 2) {
-		H_COVER = LoadGraph(L"img/cover_cloudy.png");
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
 		H_DIFFICULTY = LoadGraph(L"img/cloudy.png");
 	}
 	if (difficulty == 3) {
-		H_COVER = LoadGraph(L"img/cover_rainy.png");
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//雪じゃないとき
 			H_DIFFICULTY = LoadGraph(L"img/rainy.png");
 		}
@@ -557,7 +566,7 @@ void GAME(int song_number, int difficulty,
 		}
 	}
 	if (difficulty == 4) {
-		H_COVER = LoadGraph(L"img/cover_thunder.png");
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//雪じゃないとき		
 			H_DIFFICULTY = LoadGraph(L"img/thunder.png");
 		}
@@ -567,17 +576,17 @@ void GAME(int song_number, int difficulty,
 	}
 
 
-	H_COVER_MIDDLE = LoadGraph(L"img/cover_middle.png");
+	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 	H_FAILED = LoadGraph(L"img/failed.png");
 	H_CLEARED = LoadGraph(L"img/cleared.png");
 
 	H_CLEARED = LoadGraph(L"img/cleared.png");
-	if (Option->op.gauge == Option->OP_GAUGE_NORMAL)H_CLEARED = LoadGraph(L"img/cleared_normal.png");
-	if (Option->op.gauge == Option->OP_GAUGE_HARD)H_CLEARED = LoadGraph(L"img/cleared_hard.png");
-	if (Option->op.gauge == Option->OP_GAUGE_SUPER_HARD)H_CLEARED = LoadGraph(L"img/cleared_super_hard.png");
-	if (Option->op.color == Option->OP_COLOR_RGB_ONLY || 
-		Option->op.color == Option->OP_COLOR_CMY_ONLY ||
-		Option->op.color == Option->OP_COLOR_W_ONLY)H_CLEARED = LoadGraph(L"img/cleared_easy.png");
+	if (option->op.gauge == option->OP_GAUGE_NORMAL)H_CLEARED = LoadGraph(L"img/cleared_normal.png");
+	if (option->op.gauge == option->OP_GAUGE_HARD)H_CLEARED = LoadGraph(L"img/cleared_hard.png");
+	if (option->op.gauge == option->OP_GAUGE_SUPER_HARD)H_CLEARED = LoadGraph(L"img/cleared_super_hard.png");
+	if (option->op.color == option->OP_COLOR_RGB_ONLY || 
+		option->op.color == option->OP_COLOR_CMY_ONLY ||
+		option->op.color == option->OP_COLOR_W_ONLY)H_CLEARED = LoadGraph(L"img/cleared_easy.png");
 
 	LoadDivGraph(L"img/FULL_COMBO.png", 6, 1, 6, 640, 100, H_FULL_COMBO);
 	H_PFC = LoadGraph(L"img/PERFECT_FULLCOMBO.png");
@@ -624,36 +633,36 @@ void GAME(int song_number, int difficulty,
 
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_POP_NUMBER);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_R_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_R_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_R_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_G_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_G_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_G_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_B_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_B_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_B_S = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_K = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/release.wav", Option->hitsound[Option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/release.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_RELEASE = LoadSoundMem(strcash, 1);
 
 
@@ -704,12 +713,12 @@ void GAME(int song_number, int difficulty,
 
 	//ハイスピを計算
 	if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-		Option->op.speed_val = Option->speed_val[Option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+		option->op.speed_val = option->speed_val[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
 	}
 	else {
-		Option->op.speed_val = 1;
+		option->op.speed_val = 1;
 	}
-	high_speed = Option->op.speed_val;
+	high_speed = option->op.speed_val;
 
 	while (1) {
 		if (ProcessMessage() != 0) {
@@ -861,7 +870,7 @@ void GAME(int song_number, int difficulty,
 		//DrawGraph(960, 0, H_COVER_STR, TRUE);//右側の文字
 		DrawGraph(0, 0, H_GAUGE_BOX, TRUE);//ゲージボックス (左上95,105)大きさ130*510
 
-		DrawRectGraph(95, int(105 + ((100 - gauge_draw_hosei) / 100 * 510)), 95, int(105 + ((100 - gauge_draw_hosei) / 100 * 510)), 130, int(510 - ((100 - gauge_draw_hosei) / 100 * 510)), H_GAUGE_BAR, TRUE, FALSE);//ゲージ
+		DrawRectGraph(95, int(105 + ((100 - gauge_draw_hosei) / 100 * 510)), 95, int(105 + ((100 - gauge_draw_hosei) / 100 * 510)), 130, int(511 - ((100 - gauge_draw_hosei) / 100 * 510)), H_GAUGE_BAR, TRUE, FALSE);//ゲージ
 
 		//降水量表示
 		pop = int(100 - gauge_draw_hosei);
@@ -921,20 +930,20 @@ void GAME(int song_number, int difficulty,
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
 
 		//スコア描画
-		if (Option->op.color == Option->OP_COLOR_RAINBOW) {//虹オプションのときR表示
+		if (option->op.color == option->OP_COLOR_RAINBOW) {//虹オプションのときR表示
 								 //SetDrawBright(190, 190, 190);
 			DrawGraph(960, -3, H_R_OUT, TRUE);
 			DrawGraph(960, -3, H_R_IN, TRUE);
 			//SetDrawBright(255, 255, 255);
 		}
 
-		if (Option->op.color != Option->OP_COLOR_RAINBOW) {
+		if (option->op.color != option->OP_COLOR_RAINBOW) {
 			for (i = 0; i <= 4; i++) {
 				DrawExtendGraph(1170 - i * 40, int(0 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 1170 + 64 - i * 40, int(0 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_SCORE_NUMBER[score_digit[i]], TRUE);
 			}
 		}
 
-		if (Option->op.color == Option->OP_COLOR_RAINBOW) {
+		if (option->op.color == option->OP_COLOR_RAINBOW) {
 			for (i = 0; i <= 4; i++) {
 				DrawExtendGraph(1205 - i * 40, int(0 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 1205 + 64 - i * 40, int(0 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_SCORE_NUMBER[score_digit[i]], TRUE);
 			}
@@ -975,17 +984,14 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		if (Option->op.scoretarget != Option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
 			//グラフ名ボックス描画
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//現在のスコア
 			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//ハイスコア
 			DrawBoxWithLine(960 + 160, 482, 960 + 80 + 160, 482 + 40, GetColor(255, 50, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//ターゲットスコア
 			DrawBoxWithLine(960 + 240, 482, 960 + 80 + 240, 482 + 40, GetColor(200, 200, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//前回のスコア
 
-			//スコアグラフ描画
-
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 160);
-
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 160));
 			//ボーダーライン描画
 			for (i = 0; i < 320; i++) {
 				DrawPixel(960 + i, 102, GetRainbowColor(i, 320));//S
@@ -994,6 +1000,25 @@ void GAME(int song_number, int difficulty,
 			DrawLine(960, 162, 1280, 162, GetColor(0, 255, 0));//B
 			DrawLine(960, 202, 1280, 202, GetColor(255, 0, 0));//C
 			DrawLine(960, 242, 1280, 242, GetColor(0, 0, 0));//D
+
+			//スコアグラフ描画
+			//ターゲットスコアを決める
+			int targetScore = 0;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_E)targetScore = 5000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_D)targetScore = 6000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_C)targetScore = 7000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_B)targetScore = 8000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_A)targetScore = 9000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_S)targetScore = 9500;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_10000)targetScore = 10000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_RIVAL)targetScore = rivalScore.score;
+			//グラフ全体
+			DrawBox(960 + 80, 482, 960 + 80 + 80, 482 - 0.04 * highScore.score * (gauge_draw_counter / 100), GetColor(50, 100, 50), TRUE);
+			DrawBox(960 + 160, 482, 960 + 80 + 160, 482 - 0.04 * targetScore * (gauge_draw_counter / 100), GetColor(100, 50, 50), TRUE);
+			DrawBox(960 + 240, 482, 960 + 80 + 240, 482 - 0.04 * latestScore.score * (gauge_draw_counter / 100), GetColor(100, 100, 50), TRUE);
+
+
 		}
 
 		//判定数表示欄
@@ -1012,7 +1037,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
-		if (Option->op.scoretarget != Option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
 			DrawGraph(0, 0, H_GAME_STR_SCORE_GRAPH, TRUE);
 		}
 
@@ -1026,7 +1051,7 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
-		DrawNumber(1216, 656, int(cbpm * Option->op.speed_val + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
+		DrawNumber(1216, 656, int(cbpm * option->op.speed_val + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
 
 
@@ -1040,16 +1065,16 @@ void GAME(int song_number, int difficulty,
 				*/
 				draw_alpha_speed = 1;
 				
-				Option->op.speed--;
-				Option->op.speed = number_ring(Option->op.speed, Option->SPEED_NUM - 1);//0~11に収める
+				option->op.speed--;
+				option->op.speed = number_ring(option->op.speed, option->SPEED_NUM - 1);//0~11に収める
 				//Option->op.speed_val = Option->speed_val[Option->op.speed];//実際の倍率を入れる
 				if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-					Option->op.speed_val = Option->speed_val[Option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+					option->op.speed_val = option->speed_val[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
 				}
 				else {
-					Option->op.speed_val = 1;
+					option->op.speed_val = 1;
 				}
-				high_speed = Option->op.speed_val;
+				high_speed = option->op.speed_val;
 
 			}
 			if (Key[Keylist[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {//→
@@ -1059,16 +1084,16 @@ void GAME(int song_number, int difficulty,
 				*/
 				draw_alpha_speed = 1;
 				
-				Option->op.speed++;
-				Option->op.speed = number_ring(Option->op.speed, Option->SPEED_NUM - 1);//0~11に収める
+				option->op.speed++;
+				option->op.speed = number_ring(option->op.speed, option->SPEED_NUM - 1);//0~11に収める
 				//Option->op.speed_val = Option->speed_val[Option->op.speed];//実際の倍率を入れる
 				if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-					Option->op.speed_val = Option->speed_val[Option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+					option->op.speed_val = option->speed_val[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
 				}
 				else {
-					Option->op.speed_val = 1;
+					option->op.speed_val = 1;
 				}
-				high_speed = Option->op.speed_val;
+				high_speed = option->op.speed_val;
 			}
 
 
@@ -1333,7 +1358,7 @@ void GAME(int song_number, int difficulty,
 
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time / ROOT12_2;//再生位置のずれを補正 GAME_passed_time-GAME_passed_time/ROOT12_2が差 
-					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, Option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 					Music[song_number].hash[difficulty] = hash;
 					res->hash = hash;//ハッシュ値を格納
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1415,7 +1440,7 @@ void GAME(int song_number, int difficulty,
 
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time * ROOT12_2;//再生位置のずれを補正 GAME_passed_time - GAME_passed_time * ROOT12_2が差 
-					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, Option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 					Music[song_number].hash[difficulty] = hash;
 					res->hash = hash;//ハッシュ値を格納
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1525,7 +1550,7 @@ void GAME(int song_number, int difficulty,
 
 			if (Key[KEY_INPUT_F2] == 1) {//譜面再読み込み
 				debug_warp = 1;
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, Option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 				Music[song_number].hash[difficulty] = hash;
 				res->hash = hash;//ハッシュ値を格納
 				score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1644,13 +1669,13 @@ void GAME(int song_number, int difficulty,
 					EDIT_passed_time = 0;
 				}
 
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, Option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1, &score_cell_head);//score_cell_headに譜面情報をロード
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1, &score_cell_head);//score_cell_headに譜面情報をロード
 				
 				double debug_time_passed_in_EDIT_SCORE = debug_time_passed * pitch;//再生速度を変えている分debug_time_passedが変化しているのでEDIT_SCOREに渡すときに補正しておく
 				
 				EDIT_SCORE(&score_cell_head,
 					Music, 
-					Option,
+					option,
 					song_number, 
 					difficulty,
 					scrollchange[0].scroll, 
@@ -1668,7 +1693,7 @@ void GAME(int song_number, int difficulty,
 
 				//譜面再読み込み
 				debug_warp = 1;
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, Option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 				Music[song_number].hash[difficulty] = hash;
 				res->hash = hash;//ハッシュ値を格納
 				score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -2249,12 +2274,12 @@ void GAME(int song_number, int difficulty,
 		
 
 
-		if (Option->op.gauge == Option->OP_GAUGE_FC_ATTACK) {//銀ゲージでMISS出ていたら即失敗
+		if (option->op.gauge == option->OP_GAUGE_FC_ATTACK) {//銀ゲージでMISS出ていたら即失敗
 			if (MISS >= 1) {
 				gauge = 0;
 			}
 		}
-		if (Option->op.gauge == Option->OP_GAUGE_PFC_ATTACK) {//金ゲージでGOOD,MISS出ていたら即失敗
+		if (option->op.gauge == option->OP_GAUGE_PFC_ATTACK) {//金ゲージでGOOD,MISS出ていたら即失敗
 			if (GOOD >= 1 || MISS >= 1) {
 				gauge = 0;
 			}
@@ -2763,14 +2788,15 @@ void GAME(int song_number, int difficulty,
 							   //res->song_number = song_number;
 				res->difficulty = difficulty;
 				if (ClearFlag == 1) {
-					if (Option->op.gauge == Option->OP_GAUGE_NORMAL) res->clear = CLEARTYPE_CLEARED;//NORMAL
-					if (Option->op.gauge == Option->OP_GAUGE_HARD) res->clear = CLEARTYPE_HARD_CLEARED;//HARD
-					if (Option->op.gauge == Option->OP_GAUGE_SUPER_HARD) res->clear = CLEARTYPE_SUPER_HARD_CLEARED;//SUPER HARD
-					if (Option->op.color == Option->OP_COLOR_RGB_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED(Onlyオプション使ってたら灰クリアに塗り替える)
-					if (Option->op.color == Option->OP_COLOR_CMY_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
-					if (Option->op.color == Option->OP_COLOR_W_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
+					if (option->op.gauge == option->OP_GAUGE_NO_FAIL) res->clear = CLEARTYPE_PLAY;//NO_FAIL
+					if (option->op.gauge == option->OP_GAUGE_NORMAL) res->clear = CLEARTYPE_CLEARED;//NORMAL
+					if (option->op.gauge == option->OP_GAUGE_HARD) res->clear = CLEARTYPE_HARD_CLEARED;//HARD
+					if (option->op.gauge == option->OP_GAUGE_SUPER_HARD) res->clear = CLEARTYPE_SUPER_HARD_CLEARED;//SUPER HARD
+					if (option->op.color == option->OP_COLOR_RGB_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED(Onlyオプション使ってたら灰クリアに塗り替える)
+					if (option->op.color == option->OP_COLOR_CMY_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
+					if (option->op.color == option->OP_COLOR_W_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
 
-					if (Option->op.gauge == Option->OP_GAUGE_SKILL_TEST) res->clear = CLEARTYPE_CLEARED;//段位ゲージ
+					if (option->op.gauge == option->OP_GAUGE_SKILL_TEST) res->clear = CLEARTYPE_PLAY;//段位ゲージ
 				}
 
 				if (SkillTestFlag != 0) {
@@ -2779,11 +2805,11 @@ void GAME(int song_number, int difficulty,
 
 				if (ClearFlag == 2)res->clear = CLEARTYPE_FAILED;
 				if (ClearFlag == 1 && MISS == 0 && (
-					Option->op.color == Option->OP_COLOR_NONE ||
-				    Option->op.color == Option->OP_COLOR_RGB_CHANGE ||
-					Option->op.color == Option->OP_COLOR_RGB_RAND ||
-					Option->op.color == Option->OP_COLOR_SUPER_RAND ||
-					Option->op.color == Option->OP_COLOR_RAINBOW)
+					option->op.color == option->OP_COLOR_NONE ||
+				    option->op.color == option->OP_COLOR_RGB_CHANGE ||
+					option->op.color == option->OP_COLOR_RGB_RAND ||
+					option->op.color == option->OP_COLOR_SUPER_RAND ||
+					option->op.color == option->OP_COLOR_RAINBOW)
 					) {//クリアしていてミス0ならフルコンボかPERFECTフルコンボ
 
 					if (GOOD == 0) {
@@ -2849,7 +2875,7 @@ void GAME(int song_number, int difficulty,
 			}
 
 			if (*debug == 1 && pitch_step != 0) {
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, Option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1);//ピッチが変更されているときはこの関数の終わりにピッチ1で読み込みなおして
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1);//ピッチが変更されているときはこの関数の終わりにピッチ1で読み込みなおして
 				Music[song_number].hash[difficulty] = hash; //正しいハッシュ値に戻す
 				res->hash = hash;//ハッシュ値を格納
 			}
@@ -2925,7 +2951,7 @@ void GAME(int song_number, int difficulty,
 		//背景の明るさを抑える黒画像表示
 		int BlendMode = DX_BLENDMODE_ALPHA;
 		int BlendVal = 255;
-		SetDrawBlendMode(BlendMode, int(BlendVal*(double)Option->op.darkness/4));
+		SetDrawBlendMode(BlendMode, int(BlendVal*(double)option->op.darkness/4));
 		DrawGraph(0, 0, H_DARKNESS, TRUE);
 
 		//ボタンを押した時の光
@@ -2972,12 +2998,12 @@ void GAME(int song_number, int difficulty,
 
 		BlendMode = DX_BLENDMODE_ALPHA;
 		BlendVal = 255;
-		if (Option->op.barline == Option->OP_BARLINE_ON) {//小節線を表示するオプションなら
+		if (option->op.barline == option->OP_BARLINE_ON) {//小節線を表示するオプションなら
 			for (i = NOTE_MAX_NUMBER - 1; i >= 0; i--) {//小節線の描画
 				if (barline[i].fall == 1 && barline[i].use == 1) {
 					SetDrawBlendMode(BlendMode, BlendVal);
 					//if (note[j][i].color_init != 0)DrawGraph(note[j][i].x - 32, note[j][i].y, H_NOTE_OR_FRAME, TRUE);//ORノートの場合
-					if (Option->op.darkness >= Option->OP_DARKNESS_50) {//暗さ50%以上のときだけ白で描画
+					if (option->op.darkness >= option->OP_DARKNESS_50) {//暗さ50%以上のときだけ白で描画
 						DrawLineAA(float(320), float(barline[i].y + 128), float(960), float(barline[i].y + 128), GetColor(255, 255, 255), 2.5);
 					}
 					else {
@@ -3045,7 +3071,7 @@ void GAME(int song_number, int difficulty,
 							}
 
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);;//黒終端ロングノートのグラデーション表示
-							if (note[j][i + 1].LN_k == 1 && Option->op.black_gradation == Option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
+							if (note[j][i + 1].LN_k == 1 && option->op.black_gradation == option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
 
 						}
 						else {////始点が終点より上にある場合
@@ -3138,7 +3164,7 @@ void GAME(int song_number, int difficulty,
 							}
 
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);//黒終端ロングノートのグラデーション表示
-							if (note[j][i].LN_k == 1 && Option->op.black_gradation == Option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
+							if (note[j][i].LN_k == 1 && option->op.black_gradation == option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
 
 						}
 					}
@@ -3151,7 +3177,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(960, 0, H_COVER, TRUE);//右側
 
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash* FLASH_COVER_VALUE* (1 - (double)Option->op.darkness / 5)));
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash* FLASH_COVER_VALUE* (1 - (double)option->op.darkness / 5)));
 		DrawGraph(0, 0, H_COVER_FLASH, TRUE);//カバーフラッシュ表示
 		DrawGraph(960, 0, H_COVER_FLASH, TRUE);//右側
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
@@ -3176,8 +3202,8 @@ void GAME(int song_number, int difficulty,
 		gauge_draw_hosei = xtosinx(gauge_draw_counter);
 
 		DrawRectGraph(95, int(105 + ((100 - gauge_draw_hosei) / 100 * 510)),
-			95, int(105 + ((100 - gauge_draw_hosei) / 100 * 510)),
-			130, int(510 - ((100 - gauge_draw_hosei) / 100 * 510)), H_GAUGE_BAR, TRUE, FALSE);//ゲージ
+			          95, int(105 + ((100 - gauge_draw_hosei) / 100 * 510)),
+			130, int(511 - ((100 - gauge_draw_hosei) / 100 * 510)), H_GAUGE_BAR, TRUE, FALSE);//ゲージ
 		for (i = 0; i < CRTBuf; i++) {//ゲージを滑らかに増減
 			if (gauge_draw_counter >= gauge) {
 				gauge_draw_counter -= (gauge_draw_counter - gauge) / 100;
@@ -3265,20 +3291,20 @@ void GAME(int song_number, int difficulty,
 
 
 		//スコア描画
-		if (Option->op.color == Option->OP_COLOR_RAINBOW) {//虹オプションのときR表示
+		if (option->op.color == option->OP_COLOR_RAINBOW) {//虹オプションのときR表示
 								 //SetDrawBright(190, 190, 190);
 			DrawGraph(960, -3, H_R_OUT, TRUE);
 			DrawGraph(960, -3, H_R_IN, TRUE);
 			//SetDrawBright(255, 255, 255);
 		}
 
-		if (Option->op.color != Option->OP_COLOR_RAINBOW) {
+		if (option->op.color != option->OP_COLOR_RAINBOW) {
 			for (i = 0; i <= 4; i++) {
 				DrawExtendGraph(1170 - i * 40, int(0 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 1170 + 64 - i * 40, int(0 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_SCORE_NUMBER[score_digit[i]], TRUE);
 			}
 		}
 
-		if (Option->op.color == Option->OP_COLOR_RAINBOW) {
+		if (option->op.color == option->OP_COLOR_RAINBOW) {
 			for (i = 0; i <= 4; i++) {
 				DrawExtendGraph(1205 - i * 40, int(0 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 1205 + 64 - i * 40, int(0 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_SCORE_NUMBER[score_digit[i]], TRUE);
 			}
@@ -3294,15 +3320,14 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		if (Option->op.scoretarget != Option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
 			//グラフ名ボックス描画
-			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//現在のスコア
-			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//ハイスコア
-			DrawBoxWithLine(960 + 160, 482, 960 + 80 + 160, 482 + 40, GetColor(255, 50, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//ターゲットスコア
-			DrawBoxWithLine(960 + 240, 482, 960 + 80 + 240, 482 + 40, GetColor(200, 200, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//前回のスコア
+			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), 160, 255);//現在のスコア
+			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), 160, 255);//ハイスコア
+			DrawBoxWithLine(960 + 160, 482, 960 + 80 + 160, 482 + 40, GetColor(255, 50, 50), 160, 255);//ターゲットスコア
+			DrawBoxWithLine(960 + 240, 482, 960 + 80 + 240, 482 + 40, GetColor(200, 200, 50), 160, 255);//前回のスコア
 
 			//スコアグラフ描画
-
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 160);
 
 			//ボーダーライン描画
@@ -3314,44 +3339,50 @@ void GAME(int song_number, int difficulty,
 			DrawLine(960, 202, 1280, 202, GetColor(255, 0, 0));//C
 			DrawLine(960, 242, 1280, 242, GetColor(0, 0, 0));//D
 
-			//グラフ描画
-			DrawBox(960, 482, 960 + 80, int(482 - 0.04 * score), GetColor(50, 50, 255), TRUE);
-			DrawBox(960 + 80, 482, 960 + 80 + 80, 482 - 0.04 * highScore.score * ((double)HitingNoteCount / Music[song_number].total_note[difficulty]), GetColor(50, 255, 50), TRUE);
-
 			//ターゲットスコアを決める
 			int targetScore = 0;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_E)targetScore = 5000;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_D)targetScore = 6000;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_C)targetScore = 7000;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_B)targetScore = 8000;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_A)targetScore = 9000;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_S)targetScore = 9500;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_10000)targetScore = 10000;
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
-			if (Option->op.scoretarget == Option->OP_SCORE_TARGET_RIVAL)targetScore = rivalScore.score;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_E)targetScore = 5000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_D)targetScore = 6000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_C)targetScore = 7000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_B)targetScore = 8000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_A)targetScore = 9000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_S)targetScore = 9500;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_10000)targetScore = 10000;
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
+			if (option->op.scoretarget == option->OP_SCORE_TARGET_RIVAL)targetScore = rivalScore.score;
 
-			DrawBox(960 + 160, 482, 960 + 80 + 160, 482 - 0.04 * targetScore * ((double)HitingNoteCount / Music[song_number].total_note[difficulty]), GetColor(255, 50, 50), TRUE);
-			DrawBox(960 + 240, 482, 960 + 80 + 240, 482 - 0.04 * latestScore.score * ((double)HitingNoteCount / Music[song_number].total_note[difficulty]), GetColor(255, 255, 50), TRUE);
-
+			//グラフ描画
+			double noteCountRatio = (double)HitingNoteCount / Music[song_number].total_note[difficulty];//ノートカウント進行率
+			//グラフ全体
+			DrawBox(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482 - 0.04 * highScore.score, GetColor(50, 100, 50), TRUE);
+			DrawBox(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482 - 0.04 * targetScore, GetColor(100, 50, 50), TRUE);
+			DrawBox(960 + 240, 482 - 0.04 * latestScore.score * noteCountRatio, 960 + 80 + 240, 482 - 0.04 * latestScore.score, GetColor(100, 100, 50), TRUE);
+			if (HitingNoteCount != 0) {
+				//リアルタイムグラフ
+				DrawBoxWithLine(960, int(482 - 0.04 * score), 960 + 80, 482, GetColor(50, 50, 255), 160, 255);
+				DrawBoxWithLine(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482, GetColor(50, 255, 50), 160, 255);
+				DrawBoxWithLine(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482, GetColor(255, 50, 50), 160, 255);
+				DrawBoxWithLine(960 + 240, 482 - 0.04 * latestScore.score * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), 160, 255);
+			}
 		}
 
 		//判定数表示欄
-		DrawBoxWithLine(976, 540, 1110, 580, GetColor(50, 255, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//SKY_PERFECT
-		DrawBoxWithLine(976, 580, 1110, 620, GetColor(255, 255, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//PERFECT
-		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//GOOD
-		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MISS
+		DrawBoxWithLine(976, 540, 1110, 580, GetColor(50, 255, 255), 80, 255);//SKY_PERFECT
+		DrawBoxWithLine(976, 580, 1110, 620, GetColor(255, 255, 50), 80, 255);//PERFECT
+		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), 80, 255);//GOOD
+		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), 80, 255);//MISS
 
 		//BPM描画欄
-		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MAXBPM
-		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 255, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//BPM
-		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MINBPM
-		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//SPEED
+		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), 80, 255);//MAXBPM
+		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 255, 50), 80, 255);//BPM
+		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), 80, 255);//MINBPM
+		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), 80, 255);//SPEED
 
 		//判定、BPM文字表示
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
-		if (Option->op.scoretarget != Option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
 			DrawGraph(0, 0, H_GAME_STR_SCORE_GRAPH, TRUE);
 		}
 
@@ -3364,7 +3395,7 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
-		DrawNumber(1216, 656, int(cbpm* Option->op.speed_val + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
+		DrawNumber(1216, 656, int(cbpm* option->op.speed_val + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
 
 
@@ -3438,10 +3469,6 @@ void GAME(int song_number, int difficulty,
 
 
 		if (ClearFlag != 0 && str_draw_counter != -1 && c_m_draw_counter == 0) {
-
-			
-
-
 			if (ClearFlag == 1 && MISS == 0) {//ミスなし
 
 				if (GOOD == 0) {//PERFECT FULLCOMBO
@@ -3456,7 +3483,7 @@ void GAME(int song_number, int difficulty,
 				}
 			}
 
-			if (ClearFlag == 1 && MISS != 0) {
+			if (ClearFlag == 1 && MISS != 0 && option->op.gauge != option->OP_GAUGE_NO_FAIL) {
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - str_draw_counter) * 255));//CLEARED表示
 				DrawGraph(320, 310, H_CLEARED, TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);

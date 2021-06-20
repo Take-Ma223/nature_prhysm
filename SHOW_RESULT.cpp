@@ -16,10 +16,10 @@
 #include"ShowFps.h"
 
 #include <string>
-
+using namespace std;
 
 void SHOW_RESULT(RESULT res,
-	OPTION *Option, 
+	OPTION *option, 
 	int song_number,
 	int difficulty,
 	int *debug, 
@@ -173,7 +173,7 @@ void SHOW_RESULT(RESULT res,
 	wchar_t *Rainbow[2] = { L"",L"_虹" };
 	int RainbowUse = 0;
 
-	if (Option->op.color == Option->OP_COLOR_RAINBOW) {
+	if (option->op.color == option->OP_COLOR_RAINBOW) {
 		RainbowUse = 1;
 	}
 	else {
@@ -228,11 +228,11 @@ void SHOW_RESULT(RESULT res,
 		CreateDirectory(str, NULL);//スコア保存用の種類ディレクトリ(official)作成
 		CreateDirectory(Music[song_number].SaveFolder, NULL);//スコア保存用の曲ディレクトリ作成
 
-		if (Option->op.color != Option->OP_COLOR_RAINBOW) {//通常モードだったら
+		if (option->op.color != option->OP_COLOR_RAINBOW) {//通常モードだったら
 			sprintfDx(filename, L"%s/result_%s.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 			sprintfDx(filenameLatest, L"%s/latest_result_%s.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 		}
-		if (Option->op.color == Option->OP_COLOR_RAINBOW) {//虹モードだったら
+		if (option->op.color == option->OP_COLOR_RAINBOW) {//虹モードだったら
 			sprintfDx(filename, L"%s/result_%s_r.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 			sprintfDx(filenameLatest, L"%s/latest_result_%s_r.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 		}
@@ -340,24 +340,13 @@ void SHOW_RESULT(RESULT res,
 
 
 			if (res.clear > high_score.clear) {
-
 				save.clear = res.clear;//クリア状態更新
-				if (high_score.clear == CLEARTYPE_PLAY && high_score.min_miss == 0) {//段位でしかやっていない曲はクリア状態が記録されていない(-1)ので段位で既にフルコン済みならフルコン状態にする
-					save.clear = CLEARTYPE_FULL_COMBO;
-				}
-				if (high_score.clear == CLEARTYPE_PLAY && high_score.min_miss == 0 && high_score.good == 0) {//段位でしかやっていない曲はクリア状態が記録されていない(-1)ので段位で既にPFC済みならPFC状態にする
-					save.clear = CLEARTYPE_PERFECT;
-				}
-				if (high_score.clear == CLEARTYPE_PLAY && (save.clear < res.clear)) {//段位でしかやっておらずFC済みで今回PFCを取ったときはPFCにしておく
-					save.clear = res.clear;
-				}
-
 			}
 
 			if (res.score > high_score.score &&
-				Option->op.color != Option->OP_COLOR_RGB_ONLY &&
-				Option->op.color != Option->OP_COLOR_CMY_ONLY &&
-				Option->op.color != Option->OP_COLOR_W_ONLY) {//ONLYオプションを付けていなくてハイスコア更新
+				option->op.color != option->OP_COLOR_RGB_ONLY &&
+				option->op.color != option->OP_COLOR_CMY_ONLY &&
+				option->op.color != option->OP_COLOR_W_ONLY) {//ONLYオプションを付けていなくてハイスコア更新
 				
 				
 				save.score = res.score;
@@ -376,38 +365,31 @@ void SHOW_RESULT(RESULT res,
 			if (res.max_combo > high_score.max_combo) {//MaxCombo更新
 				save.max_combo = res.max_combo;
 			}
-			if (res.clear >= 2 && res.miss < high_score.min_miss) {//クリアしたときにMinMiss更新していたら
+			if ((res.clear >= CLEARTYPE_CLEARED || res.clear == CLEARTYPE_PLAY) && (res.miss < high_score.min_miss || high_score.min_miss == -1)) {//クリア、PLAYしたときにMinMiss更新またはMinMISSが保存されていないとき
 				save.min_miss = res.miss;
 			}
-			if (res.clear >= 2 && (high_score.clear == 0)) {//Failedからの 初クリアはMinMiss保存
+			if (res.clear >= CLEARTYPE_CLEARED && (high_score.clear == CLEARTYPE_FAILED)) {//Failedからの 初クリアはMinMiss保存
 				save.min_miss = res.miss;
 			}
 
 
 			if (res.rank > high_score.rank &&
-				Option->op.color != Option->OP_COLOR_RGB_ONLY &&
-				Option->op.color != Option->OP_COLOR_CMY_ONLY &&
-				Option->op.color != Option->OP_COLOR_W_ONLY) {//ONLYモードじゃなくてランク更新
+				option->op.color != option->OP_COLOR_RGB_ONLY &&
+				option->op.color != option->OP_COLOR_CMY_ONLY &&
+				option->op.color != option->OP_COLOR_W_ONLY) {//ONLYモードじゃなくてランク更新
 				save.rank = res.rank;
 			}
 
-			if (SkillTestFlag != 0) {//段位認定モード
-				if (high_score.clear == -1)save.clear = high_score.clear;//段位でしかプレイしていなかったらclear状態は現状維持
-			}
 		}
 
 		if (firstplay == 1) {
-			if (Option->op.color != Option->OP_COLOR_RGB_ONLY &&
-				Option->op.color != Option->OP_COLOR_CMY_ONLY &&
-				Option->op.color != Option->OP_COLOR_W_ONLY) {//ONLYオプションを使っていない
+			if (option->op.color != option->OP_COLOR_RGB_ONLY &&
+				option->op.color != option->OP_COLOR_CMY_ONLY &&
+				option->op.color != option->OP_COLOR_W_ONLY) {//ONLYオプションを使っていない
 				save = res;//初プレイなら今回のスコアそのまま保存
 
-				if (res.clear >= CLEARTYPE_CLEARED) {//MinMissはクリアしたときだけ保存
+				if (res.clear >= CLEARTYPE_CLEARED || res.clear == CLEARTYPE_PLAY) {//クリア、PLAYしたとき　MinMiss保存
 					save.min_miss = res.miss;
-				}
-
-				if (SkillTestFlag != 0) {//段位認定モード
-					save.clear = CLEARTYPE_PLAY;//PLAY状態にする
 				}
 
 			}
@@ -418,7 +400,7 @@ void SHOW_RESULT(RESULT res,
 
 		}
 
-		if (Option->op.color == Option->OP_COLOR_RAINBOW) {//虹オプションなら難易度+4しておく(今はしてない)
+		if (option->op.color == option->OP_COLOR_RAINBOW) {//虹オプションなら難易度+4しておく(今はしてない)
 			save.difficulty = difficulty;
 		}
 
@@ -517,6 +499,8 @@ void SHOW_RESULT(RESULT res,
 	/////////////////////////////////////////////////////////////
 
 
+	wstring themeStr1(L"img/themes/");
+	wstring themeStr2(option->theme[option->op.theme]);
 
 
 	if (SkillTestFlag == SHOW_SKILL_TEST_RESULT) {
@@ -524,7 +508,7 @@ void SHOW_RESULT(RESULT res,
 			H_BG = LoadGraph(L"img/Certificate.png");
 		}
 		else {
-			H_BG = LoadGraph(L"img/bg.png");
+			H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 		}
 	}
 	else {
@@ -613,15 +597,15 @@ void SHOW_RESULT(RESULT res,
 	H_HIGH_SCORE_BANNER_ALLOW = LoadGraph(L"img/HighScoreBannerAllow.png");
 
 	if (difficulty == 1) {
-		H_COVER = LoadGraph(L"img/cover_sunny.png");//難易度によってカバー変更
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
 		H_DIFFICULTY = LoadGraph(L"img/sunny.png");
 	}
 	if (difficulty == 2) {
-		H_COVER = LoadGraph(L"img/cover_cloudy.png");
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
 		H_DIFFICULTY = LoadGraph(L"img/cloudy.png");
 	}
 	if (difficulty == 3) {
-		H_COVER = LoadGraph(L"img/cover_rainy.png");
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//冬じゃないなら
 			H_DIFFICULTY = LoadGraph(L"img/rainy.png");
 		}
@@ -630,7 +614,7 @@ void SHOW_RESULT(RESULT res,
 		}
 	}
 	if (difficulty == 4) {
-		H_COVER = LoadGraph(L"img/cover_thunder.png");
+		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//冬じゃないなら
 			H_DIFFICULTY = LoadGraph(L"img/thunder.png");
 		}
@@ -639,14 +623,17 @@ void SHOW_RESULT(RESULT res,
 		}
 	}
 
-	H_COVER_MIDDLE = LoadGraph(L"img/cover_middle.png");
+	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 
 	if (SkillTestFlag == SHOW_SKILL_TEST_RESULT) {//段位リザルト表示
 		H_FAILED = LoadGraph(L"img/不合格.png");
 		H_CLEARED = LoadGraph(L"img/合格.png");
 	}
 	else {
-		if (res.clear == 0) {
+		if (SkillTestFlag != 0 && res.clear == -1) {//段位各曲のリザルト表示
+			H_CLEARED = LoadGraph(L"img/cleared.png");
+		}
+		else if (res.clear == 0) {
 			H_FAILED = LoadGraph(L"img/failed.png");
 
 		}
@@ -654,13 +641,7 @@ void SHOW_RESULT(RESULT res,
 			H_CLEARED = LoadGraph(L"img/cleared_easy.png");
 		}
 		else if (res.clear == 2) {
-			if (SkillTestFlag != 0) {//段位リザルト表示
-				H_CLEARED = LoadGraph(L"img/cleared.png");
-			}
-			else {
-				H_CLEARED = LoadGraph(L"img/cleared_normal.png");
-			}
-
+			H_CLEARED = LoadGraph(L"img/cleared_normal.png");
 		}
 		else if (res.clear == 3) {
 			H_CLEARED = LoadGraph(L"img/cleared_hard.png");
@@ -826,7 +807,7 @@ void SHOW_RESULT(RESULT res,
 				};
 				
 				if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-					if (Option->op.color == Option->OP_COLOR_RAINBOW) {//RAINBOWモードは「虹」追加
+					if (option->op.color == option->OP_COLOR_RAINBOW) {//RAINBOWモードは「虹」追加
 						sprintfDx(rainbow_sent, L",虹");
 					}
 
@@ -1006,7 +987,7 @@ void SHOW_RESULT(RESULT res,
 		DrawGraph(0, int(0 + (1 - draw_alpha) * 50), H_SCORE_BOARD, TRUE);//ボード
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
 
-		if (Option->op.color == Option->OP_COLOR_RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
+		if (option->op.color == option->OP_COLOR_RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 			//SetDrawBright(brightness2, brightness2, brightness2);
 			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R_OUT, TRUE);//R_out
 			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R_IN, TRUE);//R_in
@@ -1048,7 +1029,7 @@ void SHOW_RESULT(RESULT res,
 						DrawExtendGraph(939 - SkillTestShowSlide.x, int(375 + SkillTestShowSlide.y + (1 - draw_alpha) * 50), int(939 - SkillTestShowSlide.x + 96 * 4.2), int(375 + SkillTestShowSlide.y + 15 * 4.2), H_FAILED, TRUE);//FAILED
 					}
 				}
-				if (res.clear == 1 || res.clear == 2 || res.clear == 3 || res.clear == 4) {
+				if (res.clear == -1 || res.clear == 1 || res.clear == 2 || res.clear == 3 || res.clear == 4) {
 					//DrawGraph(510, int(570 + (1 - draw_alpha) * 50), H_CLEARED, TRUE);//CLEARED
 					if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 						DrawExtendGraph(939, int(375 + (1 - draw_alpha) * 50), int(939 + 96 * 4.2), int(375 + 15 * 4.2), H_CLEARED, TRUE);//CLEARED
@@ -1263,21 +1244,21 @@ void SHOW_RESULT(RESULT res,
 		//オプション名称描画
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 
-		StrLength = GetDrawStringWidth(Option->speed[Option->op.speed], wcslen(Option->speed[Option->op.speed]));
-		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, Option->speed[Option->op.speed], GetColor(0, 0, 0));//speed
-		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, Option->speed[Option->op.speed], GetColor(255, 255, 255));//speed
+		StrLength = GetDrawStringWidth(option->speed[option->op.speed], wcslen(option->speed[option->op.speed]));
+		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, option->speed[option->op.speed], GetColor(0, 0, 0));//speed
+		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, option->speed[option->op.speed], GetColor(255, 255, 255));//speed
 
-		StrLength = GetDrawStringWidth(Option->gauge[Option->op.gauge], wcslen(Option->gauge[Option->op.gauge]));
-		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, Option->gauge[Option->op.gauge], GetColor(0, 0, 0));//gauge
-		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, Option->gauge[Option->op.gauge], GetColor(255, 255, 255));//gauge
+		StrLength = GetDrawStringWidth(option->gauge[option->op.gauge], wcslen(option->gauge[option->op.gauge]));
+		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, option->gauge[option->op.gauge], GetColor(0, 0, 0));//gauge
+		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, option->gauge[option->op.gauge], GetColor(255, 255, 255));//gauge
 
-		StrLength = GetDrawStringWidth(Option->lane[Option->op.lane], wcslen(Option->lane[Option->op.lane]));
-		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, Option->lane[Option->op.lane], GetColor(0, 0, 0));//lane
-		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, Option->lane[Option->op.lane], GetColor(255, 255, 255));//lane
+		StrLength = GetDrawStringWidth(option->lane[option->op.lane], wcslen(option->lane[option->op.lane]));
+		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, option->lane[option->op.lane], GetColor(0, 0, 0));//lane
+		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, option->lane[option->op.lane], GetColor(255, 255, 255));//lane
 
-		StrLength = GetDrawStringWidth(Option->color[Option->op.color], wcslen(Option->color[Option->op.color]));
-		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, Option->color[Option->op.color], GetColor(0, 0, 0));//color
-		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, Option->color[Option->op.color], GetColor(255, 255, 255));//color
+		StrLength = GetDrawStringWidth(option->color[option->op.color], wcslen(option->color[option->op.color]));
+		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, option->color[option->op.color], GetColor(0, 0, 0));//color
+		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, option->color[option->op.color], GetColor(255, 255, 255));//color
 
 
 

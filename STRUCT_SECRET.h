@@ -10,7 +10,7 @@
 typedef struct SECRET {
 	int total = 0;//隠し曲の数
 	int *song_number;//隠し曲番号リスト 隠し曲の個数分だけその曲番号で埋められている配列
-	BOOL *get_song_number;//隠し曲解禁リスト 各局の解禁状況(0:非解禁 1:解禁)
+	BOOL *get_song_number;//隠し曲解禁リスト 各曲の解禁状況(0:非解禁 1:解禁)
 	int all_get = 0;//全曲解禁しているか
 
 	int Color;

@@ -9,8 +9,11 @@
 #include"GetNowCount_d.h"
 #include"ShowFps.h"
 #include"ScreenShot.h"
+#include"STRUCT_OP.h"
+#include<string>
+using namespace std;
 
-void TITLE(int Button[3][4], int Button_Shutter, int *Key, char *Buf, ANDROID_CONTROLLER *AC, CONFIG config) {
+void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, CONFIG config, OPTION *option) {
 	int H_BG;//背景画像
 	int H_CLOUD;//雲画像
 	int H_TITLE_LOGO;//ロゴ画像
@@ -46,7 +49,10 @@ void TITLE(int Button[3][4], int Button_Shutter, int *Key, char *Buf, ANDROID_CO
 	double OtherDrawCounter = 0;
 	BOOL BGMPlay = 0;//BGM再生したかのフラグ(0:してない 1:した)
 
-	H_BG = LoadGraph(L"img/bg.png");
+
+	wstring themeStr1(L"img/themes/");
+	wstring themeStr2(option->theme[option->op.theme]);
+	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 	H_CLOUD = LoadGraph(L"img/cloud.png");
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
@@ -264,7 +270,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int *Key, char *Buf, ANDROID_CO
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 	SetDrawBright(255, 255, 255);
-	CLOSE_COVER(1, config);
+	CLOSE_COVER(1, config, option);
 
 	InitGraph();//メモリ開放
 	InitSoundMem();//
@@ -323,7 +329,7 @@ void OPEN_COVER(int difficulty,CONFIG config) {
 	}
 }
 
-void CLOSE_COVER(int difficulty, CONFIG config) {
+void CLOSE_COVER(int difficulty, CONFIG config, OPTION* option) {
 	int H_COVER = 0;//カバー画像
 	int H_COVER_MIDDLE;//中心カバー
 	int H_BG;
@@ -337,11 +343,14 @@ void CLOSE_COVER(int difficulty, CONFIG config) {
 	double time_cash = 0;
 	int i = 0;
 
-	if (difficulty == 1)H_COVER = LoadGraph(L"img/cover_sunny.png");//難易度によってカバー変更
-	if (difficulty == 2)H_COVER = LoadGraph(L"img/cover_cloudy.png");
-	if (difficulty == 3)H_COVER = LoadGraph(L"img/cover_rainy.png");
-	H_COVER_MIDDLE = LoadGraph(L"img/cover_middle.png");
-	H_BG = LoadGraph(L"img/bg.png");
+	wstring themeStr1(L"img/themes/");
+	wstring themeStr2(option->theme[option->op.theme]);
+	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+	if (difficulty == 1)H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
+	if (difficulty == 2)H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
+	if (difficulty == 3)H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
+	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
 	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");

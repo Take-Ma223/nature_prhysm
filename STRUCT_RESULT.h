@@ -44,7 +44,7 @@ static const int RESULT_WEATHER_THUNDER = 0;//雷
 typedef struct RESULT {//リザルト用構造体
 	int hash = 0;//譜面のハッシュ(譜面やスコアが改ざんされてないか確認する)
 	int difficulty = 0;//難易度
-	int clear = -2;//-1:PLAY 0:FAILED(不合格) 1:EASY_CLEARED(合格) 2:CLEARED 3:HARD_CLEARED 4:SUPER_HARD_CLEARED 5:FULL_COMBO 6:PERFECT
+	int clear = CLEARTYPE_NO_PLAY;//-1:PLAY 0:FAILED(不合格) 1:EASY_CLEARED(合格) 2:CLEARED 3:HARD_CLEARED 4:SUPER_HARD_CLEARED 5:FULL_COMBO 6:PERFECT
 	int score = 0;//
 
 

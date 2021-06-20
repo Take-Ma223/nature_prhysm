@@ -8,6 +8,7 @@
 #define _LOAD
 
 extern void LOAD(LIST *, Song *, int *, SECRET *, SkillTestList *, OPTION *op, CONFIG config);
+extern void SearchThemeSkin(OPTION* op);
 extern void SearchNoteSkin(OPTION *op);
 extern void SearchHitSoundSkin(OPTION *op);
 

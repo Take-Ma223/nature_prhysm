@@ -22,6 +22,8 @@
 #include<vector>
 #include <algorithm>
 #include"ScreenShot.h"
+#include<string>
+
 using namespace std;
 
 void SONG_SELECT(int *l_n, 
@@ -47,6 +49,7 @@ void SONG_SELECT(int *l_n,
 	int H_BG;
 	int H_COVER[10];//カバー画像
 	int H_COVER_SKILL_TEST;//段位認定選択時のカバー
+	int H_COVER_OPTION;
 	int H_OPTION;
 	int H_RESULT;
 	int H_COVER_MIDDLE;//中心カバー
@@ -113,6 +116,8 @@ void SONG_SELECT(int *l_n,
 
 	int H_RADER_NUMBER[10];
 
+	int H_OPTION_NOTE_PREVIEW[2];
+
 	int SH_CLOSE;
 	int SH_CLOSED;
 	int SH_OPEN;
@@ -126,6 +131,7 @@ void SONG_SELECT(int *l_n,
 	int BGM_play = 0;//BGM再生フラグ
 	int SH_SHUTTER_SIGNAL;
 	int SH_SHUTTER;
+	int SH_OPTION_HITSOUND_PREVIEW;
 
 	int FontHandle = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
 	double GAME_passed_time = 0;
@@ -221,8 +227,8 @@ void SONG_SELECT(int *l_n,
 	int ShowResultFlag = 0;//詳細リザルトを表示するか(0:しない 1:する)
 	double option_draw_counter = 0;//オプションカバーのカウンタ(0~1)
 	double result_draw_counter = 0;//リザルトカバーのカウンタ(0~1)
-	int cash = 0;//見た目を簡単にする変数
-	int cash2 = 0;
+	int cache = 0;//見た目を簡単にする変数
+	int cache2 = 0;
 	int option_select = 0;//オプションで今選んでいる対象(0:speed 1:gauge 2:lane 3:color)
 
 	int time_base_str = 1;//下の文字をスクロールする基準時間
@@ -364,29 +370,33 @@ void SONG_SELECT(int *l_n,
 	for (i = 0; i <= 255; i++) {//初期化
 		filename[i] = '\0';
 	}
+	
+	wstring themeStr1(L"img/themes/");
+	wstring themeStr2(Option->theme[Option->op.theme]);
 
-	H_BG = LoadGraph(L"img/bg.png");
-	H_COVER[1] = LoadGraph(L"img/cover_sunny.png");//難易度によってカバー変更
+	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+	H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
 	H_DIFFICULTY[1] = LoadGraph(L"img/sunny.png");
-
-	H_COVER[2] = LoadGraph(L"img/cover_cloudy.png");
+	
+	H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
 	H_DIFFICULTY[2] = LoadGraph(L"img/cloudy.png");
 
-	H_COVER[3] = LoadGraph(L"img/cover_rainy.png");
+	H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
 	H_DIFFICULTY[3] = LoadGraph(L"img/rainy.png");
 
-	H_COVER[4] = LoadGraph(L"img/cover_thunder.png");
+	H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
 	H_DIFFICULTY[4] = LoadGraph(L"img/thunder.png");
 
 	H_DIFFICULTY[5] = LoadGraph(L"img/snowy.png");
 	H_DIFFICULTY[6] = LoadGraph(L"img/snowstorm.png");
 
-	H_COVER_SKILL_TEST = LoadGraph(L"img/cover_skill_test.png");
+	H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
+	H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
 
-	H_OPTION = LoadGraph(L"img/cover_Option.png");
-	H_RESULT = LoadGraph(L"img/cover_result.png");
+	H_OPTION = LoadGraph(L"img/cover_option_str.png");
+	H_RESULT = LoadGraph(L"img/cover_result_obj.png");
 
-	H_COVER_MIDDLE = LoadGraph(L"img/cover_middle.png");
+	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 	H_BANNER_UD = LoadGraph(L"img/banner_ud.png");
 	H_BANNER_AREA = LoadGraph(L"img/banner_Area.png");
 	H_BANNER_ARTIST = LoadGraph(L"img/banner_Artist.png");
@@ -462,6 +472,14 @@ void SONG_SELECT(int *l_n,
 
 	H_CURSOR = LoadGraph(L"img/cursor.png");
 
+	//NOTEプレビュー画像読み込み
+	wchar_t* ReadNameRGB[11] = { L"r",L"g",L"b",L"y",L"c",L"m",L"w",L"d",L"f",L"bright",L"note_Long_hit_b" };
+	wchar_t strcash[128];
+	sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[1]);
+	H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
+	sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[8]);
+	H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
 	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");
 	SH_OPEN = LoadSoundMem(L"sound/open.wav");
@@ -475,6 +493,9 @@ void SONG_SELECT(int *l_n,
 	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
 	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
 
+	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", Option->hitsound[Option->op.hitsound]);
+	SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
+	
 	double bgm_vol = 1;//BGMの音量
 
 
@@ -1707,7 +1728,7 @@ void SONG_SELECT(int *l_n,
 						time_base_str = int(GetNowCount_d(config));
 						OptionValueChange(Option, option_select, -1);
 						DrawOptionSentence(Option, option_select, config, FontHandle);
-						PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						if(option_select != Option->OP_HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 
 						if (option_select == Option->OP_COLOR || option_select == Option->OP_SORT) {
 							//元のlist_numberと同じ番号を指すlist_number_baseを探す
@@ -1719,6 +1740,30 @@ void SONG_SELECT(int *l_n,
 							}
 							widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
 						}
+
+						if (option_select == Option->OP_NOTE) {
+							sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[1]);
+							H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
+							sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[8]);
+							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+						}
+						if (option_select == Option->OP_HITSOUND) {
+							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", Option->hitsound[Option->op.hitsound]);
+							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
+							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
+						}
+						if (option_select == Option->OP_THEME) {
+							wstring themeStr1(L"img/themes/");
+							wstring themeStr2(Option->theme[Option->op.theme]);
+							H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+							H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
+							H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
+							H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
+							H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
+							H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
+							H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
+							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+						}
 					}
 
 					if (Key[Button[1][0]] > PressFrame || Key[KEY_INPUT_LEFT] > PressFrame) {//押し続けたとき
@@ -1726,7 +1771,7 @@ void SONG_SELECT(int *l_n,
 							time_base_str = int(GetNowCount_d(config));
 							OptionValueChange(Option, option_select, -1);
 							DrawOptionSentence(Option, option_select, config, FontHandle);
-							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+							if (option_select != Option->OP_HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							roll_counter = 1;
 
 							if (option_select == Option->OP_COLOR || option_select == Option->OP_SORT) {
@@ -1739,6 +1784,30 @@ void SONG_SELECT(int *l_n,
 								}
 								widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
 							}
+
+							if (option_select == Option->OP_NOTE) {
+								sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[1]);
+								H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
+								sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[8]);
+								H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+							}
+							if (option_select == Option->OP_HITSOUND) {
+								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", Option->hitsound[Option->op.hitsound]);
+								SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
+								PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
+							}
+							if (option_select == Option->OP_THEME) {
+								wstring themeStr1(L"img/themes/");
+								wstring themeStr2(Option->theme[Option->op.theme]);
+								H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+								H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
+								H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
+								H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
+								H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
+								H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
+								H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
+								H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+							}
 						}
 					}
 
@@ -1746,7 +1815,7 @@ void SONG_SELECT(int *l_n,
 						time_base_str = int(GetNowCount_d(config));
 						OptionValueChange(Option, option_select, 1);
 						DrawOptionSentence(Option, option_select, config, FontHandle);
-						PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						if (option_select != Option->OP_HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 
 						if (option_select == Option->OP_COLOR || option_select == Option->OP_SORT) {
 							//元のlist_numberと同じ番号を指すlist_number_baseを探す
@@ -1757,6 +1826,30 @@ void SONG_SELECT(int *l_n,
 								}
 							}
 							widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
+						}
+
+						if (option_select == Option->OP_NOTE) {
+							sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[1]);
+							H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
+							sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[8]);
+							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+						}
+						if (option_select == Option->OP_HITSOUND) {
+							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", Option->hitsound[Option->op.hitsound]);
+							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
+							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
+						}
+						if (option_select == Option->OP_THEME) {
+							wstring themeStr1(L"img/themes/");
+							wstring themeStr2(Option->theme[Option->op.theme]);
+							H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+							H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
+							H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
+							H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
+							H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
+							H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
+							H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
+							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 						}
 					}
 
@@ -1766,7 +1859,7 @@ void SONG_SELECT(int *l_n,
 							time_base_str = int(GetNowCount_d(config));
 							OptionValueChange(Option, option_select, 1);
 							DrawOptionSentence(Option, option_select, config, FontHandle);
-							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+							if (option_select != Option->OP_HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							roll_counter = 1;
 
 							if (option_select == Option->OP_COLOR || option_select == Option->OP_SORT) {
@@ -1778,6 +1871,30 @@ void SONG_SELECT(int *l_n,
 									}
 								}
 								widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
+							}
+
+							if (option_select == Option->OP_NOTE) {
+								sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[1]);
+								H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
+								sprintfDx(strcash, L"img/notes/%s/%s.png", Option->note[Option->op.note], ReadNameRGB[8]);
+								H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+							}
+							if (option_select == Option->OP_HITSOUND) {
+								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", Option->hitsound[Option->op.hitsound]);
+								SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
+								PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
+							}
+							if (option_select == Option->OP_THEME) {
+								wstring themeStr1(L"img/themes/");
+								wstring themeStr2(Option->theme[Option->op.theme]);
+								H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+								H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
+								H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
+								H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
+								H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
+								H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
+								H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
+								H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 							}
 						}
 					}
@@ -2128,7 +2245,7 @@ void SONG_SELECT(int *l_n,
 								result_rank_buf[i] = 0;//ランクバッファを初期化
 							}
 
-							if (res.clear != 0 && song_number == secret->song_appear_number) {//対象曲をクリアしていた
+							if (res.clear >= CLEARTYPE_EASY_CLEARED && song_number == secret->song_appear_number) {//対象曲をクリアしていた
 								//解禁情報を更新
 								secret->get_song_number[secret->secret_song_appear_number] = 1;//解禁済みにする
 								Music[secret->song_appear_number].secret = 2;
@@ -2152,7 +2269,12 @@ void SONG_SELECT(int *l_n,
 				int gauge_buf = Option->op.gauge;//後で戻すためのバッファ
 
 				Option->op.gauge = Option->OP_GAUGE_SKILL_TEST;
-				Option->op.lane = Option->OP_LANE_NONE;
+
+				if (Option->op.lane != Option->OP_LANE_MIRROR) {//MIRROR以外を選んだときは正規にする
+					Option->op.lane = Option->OP_LANE_NONE;
+				}
+
+
 				Option->op.color = Option->OP_COLOR_NONE;
 
 
@@ -2195,6 +2317,22 @@ void SONG_SELECT(int *l_n,
 							config,
 							i + 1);//結果発表
 					}
+
+					if (Result[i].clear >= CLEARTYPE_FULL_COMBO && Music[SongNumberList[i]].secret == 1) {//隠し曲をフルコンボ以上でクリアした
+						//解禁情報を更新
+						int secretSongNnumber = 0;
+						//隠し曲番号の確認
+						for (j = 0; j < secret->total; j++) {
+							if (secret->song_number[j] == SongNumberList[i]) {
+								secretSongNnumber = j;
+							}
+						}
+						secret->get_song_number[secretSongNnumber] = 1;//解禁済みにする
+						Music[SongNumberList[i]].secret = 2;
+						//全解禁したか確認
+						secret_all_get(secret);//全解禁されているならall_getは1
+					}
+
 					if (Result[i].clear == CLEARTYPE_FAILED) {//この曲で抜け出した時段位終了
 						STRes.clear = 0;
 						break;
@@ -3196,18 +3334,19 @@ void SONG_SELECT(int *l_n,
 		int OptionY_Base = 150;
 		int dist = 90;
 		//オプション描画
-		cash = int(cos((3.14159265) / 2 * (option_draw_counter - 1)) * 320 - 320);
+		cache = int(cos((3.14159265) / 2 * (option_draw_counter - 1)) * 320 - 320);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		DrawGraph(cash, 0, H_OPTION, TRUE);//オプションカバー
+		DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
+		DrawGraph(cache, 0, H_OPTION, TRUE);//オプションカバー
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 		for (i = 0; i < OptionShowAmount; i++) {
-			DrawExtendGraph(cash + 35, OptionY_Base + i * dist, cash + 280, OptionY_Base + 53 + i * dist, H_BANNER_BACK, TRUE);
-			DrawExtendGraph(cash + 35, OptionY_Base + i * dist, cash + 280, OptionY_Base + 53 + i * dist, H_BANNER_FLAME, TRUE);
+			DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_BACK, TRUE);
+			DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_FLAME, TRUE);
 		}
 		
 
 		SetDrawBright(brightness, brightness, brightness);
-		DrawExtendGraph(cash + 35, OptionY_Base + (option_select - OptionShowStart) * dist, cash + 280, OptionY_Base + 53 + (option_select - OptionShowStart) * dist, H_BANNER_SELECT, TRUE);//選択枠
+		DrawExtendGraph(cache + 35, OptionY_Base + (option_select - OptionShowStart) * dist, cache + 280, OptionY_Base + 53 + (option_select - OptionShowStart) * dist, H_BANNER_SELECT, TRUE);//選択枠
 		SetDrawBright(255, 255, 255);
 		SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
 
@@ -3216,9 +3355,9 @@ void SONG_SELECT(int *l_n,
 		
 		int index = 0;
 		for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
-			cash2 = GetDrawStringWidth(Option->OptionName[index], wcslen(Option->OptionName[index]));
-			if (config.ShowStrShadow == TRUE)DrawString(cash + 160 - (cash2 / 2) + 2, OptionY_Base - 33 + i * dist + 2, Option->OptionName[index], GetColor(0, 0, 0));
-			DrawString(cash + 160 - (cash2 / 2), OptionY_Base - 33 + i * dist, Option->OptionName[index], GetColor(255, 128, 0));
+			cache2 = GetDrawStringWidth(Option->OptionName[index], wcslen(Option->OptionName[index]));
+			if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base - 33 + i * dist + 2, Option->OptionName[index], GetColor(0, 0, 0));
+			DrawString(cache + 160 - (cache2 / 2), OptionY_Base - 33 + i * dist, Option->OptionName[index], GetColor(255, 128, 0));
 		}
 
 
@@ -3226,38 +3365,48 @@ void SONG_SELECT(int *l_n,
 		for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
 			wchar_t* OptionStrAddress = Option->ArrayOptionKindName[index][*(Option->ArrayValue[index])];//i番目のオプションで現在選んでいる名称を表す文字列の先頭アドレス
 
-			cash2 = GetDrawStringWidth(OptionStrAddress, wcslen(OptionStrAddress));
-			if (config.ShowStrShadow == TRUE)DrawString(cash + 160 - (cash2 / 2) + 2, OptionY_Base + 9 + i * dist + 2, OptionStrAddress, GetColor(0, 0, 0));
-			DrawString(cash + 160 - (cash2 / 2), OptionY_Base + 9 + i * dist, OptionStrAddress, GetColor(255, 255, 255));
+			cache2 = GetDrawStringWidth(OptionStrAddress, wcslen(OptionStrAddress));
+			if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base + 9 + i * dist + 2, OptionStrAddress, GetColor(0, 0, 0));
+			DrawString(cache + 160 - (cache2 / 2), OptionY_Base + 9 + i * dist, OptionStrAddress, GetColor(255, 255, 255));
 		}
 
 		if (SelectingTarget == SELECTING_COURSE) {//段位選択中は使えないオプションを暗くする
 			SetDrawBright(0, 0, 0);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-			i = 1 - OptionShowStart;
-			if (i >= 0)DrawExtendGraph(cash + 35, OptionY_Base + i * dist, cash + 280, OptionY_Base + 53 + i * dist, H_BANNER_BACK, TRUE);
-			i = 2 - OptionShowStart;
-			if (i >= 0)DrawExtendGraph(cash + 35, OptionY_Base + i * dist, cash + 280, OptionY_Base + 53 + i * dist, H_BANNER_BACK, TRUE);
-			i = 3 - OptionShowStart;
-			if (i >= 0)DrawExtendGraph(cash + 35, OptionY_Base + i * dist, cash + 280, OptionY_Base + 53 + i * dist, H_BANNER_BACK, TRUE);
+			int shadowLocateIndex;
+			shadowLocateIndex = 1 - OptionShowStart;//GAUGE
+			if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
+			shadowLocateIndex = 2 - OptionShowStart;//LANE
+			if (shadowLocateIndex >= 0 && 
+				!((Option->op.lane == Option->OP_LANE_NONE) || (Option->op.lane == Option->OP_LANE_MIRROR)))DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
+			shadowLocateIndex = 3 - OptionShowStart;//COLOR
+			if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 			SetDrawBright(255, 255, 255);
 		}									
-		//DrawString(40, int(7 + 336 + (bn_draw_counter + i - Column / 2) * 48 + 2), Music[number_ring(song_number + (i - Column / 2), NumberOfSongs - 1)].title[difficulty], GetColor(0, 0, 0));//タイトル(影)
+
+		//NOTEを選択しているときはプレビュー画像を表示
+		if (OptionOpen == 1 && option_select == Option->OP_NOTE) {
+			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+			DrawExtendGraph(332, 632, 412, 712, H_OPTION_NOTE_PREVIEW[0], TRUE);
+			DrawExtendGraph(868, 632, 948, 712, H_OPTION_NOTE_PREVIEW[1], TRUE);
+			SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+		}
 
 		//オプション欄の上下にカーソルを表示
 		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
 		if (OptionShowEnd != Option->OPTION_NUM - 1) {//表示範囲の下にまだオプションがあるとき↓のカーソル表示
-			DrawGraph(cash, 655 - int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE);
+			DrawGraph(cache, 655 - int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE);
 		}
 		if (OptionShowStart != 0) {//表示範囲の上にまだオプションがあるとき↑のカーソル表示
-			DrawReverseGraph(cash, 92 + int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE, FALSE, TRUE);
+			DrawReverseGraph(cache, 92 + int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE, FALSE, TRUE);
 		}
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
-		cash = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280);//リザルトカバー
+		cache = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280);//リザルトカバー
 
-		DrawGraph(cash, 0, H_RESULT, TRUE);//リザルトカバー
+		DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
+		DrawGraph(cache, 0, H_RESULT, TRUE);//リザルトカバー
 
 
 		if ((Music[song_number].exist[difficulty] == 1 && SelectingTarget == SELECTING_SONG) || SelectingTarget == SELECTING_COURSE) {//曲選択状態で譜面が存在するときか、段位選択のとき
@@ -3300,17 +3449,17 @@ void SONG_SELECT(int *l_n,
 			}
 
 			//数値描画
-			DrawNumber((cash - 960) + 1212, 210, SkyPerfectBuf, 25, 1, 0, H_JUDGE_NUMBER);
-			DrawNumber((cash - 960) + 1212, 262, PerfectBuf, 25, 1, 0, H_JUDGE_NUMBER);
-			DrawNumber((cash - 960) + 1212, 314, GoodBuf, 25, 1, 0, H_JUDGE_NUMBER);
-			DrawNumber((cash - 960) + 1212, 367, MissBuf, 25, 1, 0, H_JUDGE_NUMBER);
+			DrawNumber((cache - 960) + 1212, 210, SkyPerfectBuf, 25, 1, 0, H_JUDGE_NUMBER);
+			DrawNumber((cache - 960) + 1212, 262, PerfectBuf, 25, 1, 0, H_JUDGE_NUMBER);
+			DrawNumber((cache - 960) + 1212, 314, GoodBuf, 25, 1, 0, H_JUDGE_NUMBER);
+			DrawNumber((cache - 960) + 1212, 367, MissBuf, 25, 1, 0, H_JUDGE_NUMBER);
 
 			if (MinMissBuf != -1) {//MinMissが保存されているとき
-				DrawNumber((cash - 960) + 1221, 499, MinMissBuf, 25, 1, 4, H_MIN_MISS_NUMBER);
+				DrawNumber((cache - 960) + 1221, 499, MinMissBuf, 25, 1, 4, H_MIN_MISS_NUMBER);
 			}
 
-			DrawNumber((cash - 960) + 1221, 557, MaxComboBuf, 25, 1, 4, H_MAX_COMBO_NUMBER);
-			DrawNumber((cash - 960) + 1221, 615, PlayCountBuf, 25, 1, 4, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1221, 557, MaxComboBuf, 25, 1, 4, H_MAX_COMBO_NUMBER);
+			DrawNumber((cache - 960) + 1221, 615, PlayCountBuf, 25, 1, 4, H_PLAY_COUNT_NUMBER);
 		}
 
 
@@ -3686,6 +3835,9 @@ void DrawOptionSentence(OPTION* Option, int option_select, CONFIG config, int Fo
 	}
 	else if (option_select == Option->OP_HITSOUND) {
 		StrAddress = Option->ArrayOptionSent[Option->OP_HITSOUND][0];
+	}
+	else if (option_select == Option->OP_THEME) {
+		StrAddress = Option->ArrayOptionSent[Option->OP_THEME][0];
 	}
 	else {
 		StrAddress = Option->ArrayOptionSent[option_select][*(Option->ArrayValue[option_select])];

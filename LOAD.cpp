@@ -432,6 +432,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 		STList->bpmmax[i] = bpmmax;
 	}
 
+	SearchThemeSkin(op);
 	SearchNoteSkin(op);
 	SearchHitSoundSkin(op);
 
@@ -461,10 +462,67 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	return;
 }
 
-void SearchNoteSkin(OPTION *op) {//ノートスキン読み込み
-	HANDLE hFind_Notes = 0;//見つける用ハンドル
+void SearchThemeSkin(OPTION *op) {//テーマスキン読み込み
+	HANDLE hFind_Themes = 0;//見つける用ハンドル
 	WIN32_FIND_DATA lp;
 	
+
+	//まず個数を調べる
+	op->THEME_NUM = 0;
+	hFind_Themes = FindFirstFile(L"img/themes/*", &lp);//notesフォルダの最初の探索
+	do {
+		if (ProcessMessage() != 0) {
+			DxLib_End();
+			return;
+		}
+		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
+			op->THEME_NUM++;
+		}
+	} while (FindNextFile(hFind_Themes, &lp));//何も見つからなかったら0になりループを抜ける
+	if (FindClose(hFind_Themes) == 0) {
+		ShowError(L"テーマ画像フォルダがありません。");
+		DxLib_End();
+		return;
+	}
+
+	//メモリ確保(ノートスキンの種類分)
+	op->theme = new wchar_t*[op->THEME_NUM];
+
+	op->ArrayOptionKindName[op->OP_THEME] = op->theme;//選曲画面で使うオプションの種類→名称の配列にアドレスを格納
+
+
+	//実際の名前を入れていく
+	op->THEME_NUM = 0;
+	hFind_Themes = FindFirstFile(L"img/themes/*", &lp);//notesフォルダの最初の探索
+	do {
+		if (ProcessMessage() != 0) {
+			DxLib_End();
+			return;
+		}
+		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
+			//文字列分のメモリ確保
+			int len = wcslen(lp.cFileName);
+			op->theme[op->THEME_NUM] = new wchar_t[wcslen(lp.cFileName)+1];//終端文字分を考えて文字数+1のメモリを取る
+			//文字列格納
+			sprintfDx(op->theme[op->THEME_NUM], L"%s", lp.cFileName);
+			op->THEME_NUM++;
+		}
+	} while (FindNextFile(hFind_Themes, &lp));//何も見つからなかったら0になりループを抜ける
+
+
+
+
+	if (FindClose(hFind_Themes) == 0) {
+		DxLib_End();
+		return;
+	}
+}
+
+
+void SearchNoteSkin(OPTION* op) {//ノートスキン読み込み
+	HANDLE hFind_Notes = 0;//見つける用ハンドル
+	WIN32_FIND_DATA lp;
+
 
 	//まず個数を調べる
 	op->NOTE_NUM = 0;
@@ -485,7 +543,7 @@ void SearchNoteSkin(OPTION *op) {//ノートスキン読み込み
 	}
 
 	//メモリ確保(ノートスキンの種類分)
-	op->note = new wchar_t*[op->NOTE_NUM];
+	op->note = new wchar_t* [op->NOTE_NUM];
 
 	op->ArrayOptionKindName[op->OP_NOTE] = op->note;//選曲画面で使うオプションの種類→名称の配列にアドレスを格納
 
@@ -501,7 +559,7 @@ void SearchNoteSkin(OPTION *op) {//ノートスキン読み込み
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
 			//文字列分のメモリ確保
 			int len = wcslen(lp.cFileName);
-			op->note[op->NOTE_NUM] = new wchar_t[wcslen(lp.cFileName)+1];//終端文字分を考えて文字数+1のメモリを取る
+			op->note[op->NOTE_NUM] = new wchar_t[wcslen(lp.cFileName) + 1];//終端文字分を考えて文字数+1のメモリを取る
 			//文字列格納
 			sprintfDx(op->note[op->NOTE_NUM], L"%s", lp.cFileName);
 			op->NOTE_NUM++;

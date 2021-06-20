@@ -94,7 +94,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int list_number = 0;
 	int song_number = 0;
 	int difficulty = 1;
-	OPTION OP;//全体オプション構造体
+	OPTION option;//全体オプション構造体
 	LIST folder;
 
 	for (i = 0; i < NUMBER_OF_FOLDERS; i++) {
@@ -225,17 +225,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 
-	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &OP, config);
+	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config);
 
 
 
 	
-	TITLE(Button, Button_Shutter, Key, Buf, &AC, config);
+	TITLE(Button, Button_Shutter, Key, Buf, &AC, config, &option);
 	int StageCount = 0;
 	while (1) {
 		SONG_SELECT(&list_number,
 			&song_number, &difficulty,
-			&OP,
+			&option,
 			&folder,
 			Music,
 			Button, Button_Shutter, Key, Buf,

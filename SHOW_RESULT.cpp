@@ -859,30 +859,32 @@ void SHOW_RESULT(RESULT res,
 					}
 
 					wchar_t clear_state_sent[25] = L"";
-					if (res.clear == 0) {
-						sprintfDx(clear_state_sent, L"FAILED...");
+					if (res.clear == -1) {
+						sprintfDx(clear_state_sent, L"");
+					}else if (res.clear == 0) {
+						sprintfDx(clear_state_sent, L"でFAILED...");
 					}
 					else if (res.clear == 1) {
-						sprintfDx(clear_state_sent, L"EASY_CLEARED!");
+						sprintfDx(clear_state_sent, L"でEASY_CLEARED!");
 					}
 					else if (res.clear == 2) {
-						sprintfDx(clear_state_sent, L"CLEARED!!");
+						sprintfDx(clear_state_sent, L"でCLEARED!!");
 					}
 					else if (res.clear == 3) {
-						sprintfDx(clear_state_sent, L"HARD CLEARED!!!");
+						sprintfDx(clear_state_sent, L"でHARD CLEARED!!!");
 					}
 					else if (res.clear == 4) {
-						sprintfDx(clear_state_sent, L"SUPER HARD CLEARED!!!!");
+						sprintfDx(clear_state_sent, L"でSUPER HARD CLEARED!!!!");
 					}
 					else if (res.clear == 5) {
-						sprintfDx(clear_state_sent, L"FULL COMBO!!!!!");
+						sprintfDx(clear_state_sent, L"でFULL COMBO!!!!!");
 					}
 					else if (res.clear == 6) {
-						sprintfDx(clear_state_sent, L"PERFECT!!!!!!");
+						sprintfDx(clear_state_sent, L"でPERFECT!!!!!!");
 					}
 
 
-					sprintfDx(tweet_sent, L"%s(%s)で%d点、%sランクで%s",
+					sprintfDx(tweet_sent, L"%s(%s)で%d点、%sランク%s",
 						Music[song_number].title[difficulty],
 						difficulty_sent,
 						res.score,

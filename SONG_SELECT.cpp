@@ -894,6 +894,14 @@ void SONG_SELECT(int *l_n,
 								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].score[1 + DifficultyInd + RainbowInd * 4];
 							}
 						}
+						else if (SortKind == Option->OP_SORT_CLEAR_STATE) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].clear_state[folder->folder[FolderInd][ListInd].difficulty + RainbowInd * 4];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].clear_state[1 + DifficultyInd + RainbowInd * 4];
+							}
+						}
 						else if (SortKind == Option->OP_SORT_MIN_MISS) {
 							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
 								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].min_miss[folder->folder[FolderInd][ListInd].difficulty + RainbowInd * 4];

@@ -2301,7 +2301,7 @@ void GAME(int song_number, int difficulty,
 			barline[i].x = 640;
 			barline[i].y = -228;
 
-			QE_x = high_speed * barline[i].bpm * (GAME_passed_time_scroll - barline[i].timing / TIMING_SHOW_RATIO) + sqrt(1 / speed); //放物線のxを算出
+			QE_x = high_speed * barline[i].bpm * (GAME_passed_time_scroll - ((double)barline[i].timing / TIMING_SHOW_RATIO)) + sqrt(1 / speed); //放物線のxを算出
 			if ((QE_x >= 0) && barline[i].fall != 2) {//まだ叩かれてなく落ち切ってなく放物線の半分超えている(x>=0)とき
 				barline[i].fall = 1;//落ちた(表示をする)
 				QE_y = int(((double)judge_area - note_fall) * speed * pow(QE_x, 2) + note_fall);//GAME_passed_time_scroollを変数とした2次関数(値域0~1にnote_fallとjudge_areaで位置調整)
@@ -2788,14 +2788,18 @@ void GAME(int song_number, int difficulty,
 							   //res->song_number = song_number;
 				res->difficulty = difficulty;
 				if (ClearFlag == 1) {
-					if (option->op.gauge == option->OP_GAUGE_NO_FAIL) res->clear = CLEARTYPE_PLAY;//NO_FAIL
 					if (option->op.gauge == option->OP_GAUGE_NORMAL) res->clear = CLEARTYPE_CLEARED;//NORMAL
 					if (option->op.gauge == option->OP_GAUGE_HARD) res->clear = CLEARTYPE_HARD_CLEARED;//HARD
 					if (option->op.gauge == option->OP_GAUGE_SUPER_HARD) res->clear = CLEARTYPE_SUPER_HARD_CLEARED;//SUPER HARD
-					if (option->op.color == option->OP_COLOR_RGB_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED(Onlyオプション使ってたら灰クリアに塗り替える)
-					if (option->op.color == option->OP_COLOR_CMY_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
-					if (option->op.color == option->OP_COLOR_W_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
-
+					
+					if (option->op.gauge == option->OP_GAUGE_NO_FAIL) {
+						res->clear = CLEARTYPE_PLAY;//NO_FAIL
+					}
+					else {
+						if (option->op.color == option->OP_COLOR_RGB_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED(Onlyオプション使ってたら灰クリアに塗り替える)
+						if (option->op.color == option->OP_COLOR_CMY_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
+						if (option->op.color == option->OP_COLOR_W_ONLY) res->clear = CLEARTYPE_EASY_CLEARED;//EASYCLEARED
+					}
 					if (option->op.gauge == option->OP_GAUGE_SKILL_TEST) res->clear = CLEARTYPE_PLAY;//段位ゲージ
 				}
 

@@ -50,7 +50,7 @@ void SHOW_RESULT(RESULT res,
 	int H_COVER_MIDDLE;
 	int H_DIFFICULTY;
 	int H_RANK;//ランク画像
-	int H_CLEARED;//CLEARED画像
+	int H_CLEARED = 0;//CLEARED画像
 	int H_FAILED;//FAILED画像
 	int H_FULL_COMBO[6];//フルコンボ
 	int H_PFC;//PERFECTフルコンボ
@@ -630,29 +630,32 @@ void SHOW_RESULT(RESULT res,
 		H_CLEARED = LoadGraph(L"img/合格.png");
 	}
 	else {
-		if (SkillTestFlag != 0 && res.clear == -1) {//段位各曲のリザルト表示
+		if (SkillTestFlag != 0 && res.clear == CLEARTYPE_EASY_CLEARED) {//段位各曲のリザルト表示
 			H_CLEARED = LoadGraph(L"img/cleared.png");
 		}
-		else if (res.clear == 0) {
+		else if (res.clear == CLEARTYPE_EASY_CLEARED) {
+			H_CLEARED = 0;
+		}
+		else if (res.clear == CLEARTYPE_FAILED) {
 			H_FAILED = LoadGraph(L"img/failed.png");
 
 		}
-		else if (res.clear == 1) {
+		else if (res.clear == CLEARTYPE_EASY_CLEARED) {
 			H_CLEARED = LoadGraph(L"img/cleared_easy.png");
 		}
-		else if (res.clear == 2) {
+		else if (res.clear == CLEARTYPE_CLEARED) {
 			H_CLEARED = LoadGraph(L"img/cleared_normal.png");
 		}
-		else if (res.clear == 3) {
+		else if (res.clear == CLEARTYPE_HARD_CLEARED) {
 			H_CLEARED = LoadGraph(L"img/cleared_hard.png");
 		}
-		else if (res.clear == 4) {
+		else if (res.clear == CLEARTYPE_SUPER_HARD_CLEARED) {
 			H_CLEARED = LoadGraph(L"img/cleared_super_hard.png");
 		}
-		else if (res.clear == 5) {
+		else if (res.clear == CLEARTYPE_FULL_COMBO) {
 			LoadDivGraph(L"img/FULL_COMBO.png", 6, 1, 6, 640, 100, H_FULL_COMBO);
 		}
-		else if (res.clear == 6) {
+		else if (res.clear == CLEARTYPE_PERFECT) {
 			H_PFC = LoadGraph(L"img/PERFECT_FULLCOMBO.png");
 		}
 		else if (res.clear == 7) {

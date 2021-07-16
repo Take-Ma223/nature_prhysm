@@ -400,7 +400,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 
 	//各フォルダの最後に「フォルダ選択へ戻る」要素を追加
 	for (i = 0; i <= song_folder->NumberOfFolders - 1; i++) {
-		song_folder->folder[i][song_folder->folder_c[i]].difficulty = 0;//フォルダ選択へ戻る
+		song_folder->folder[i][song_folder->folder_c[i]].difficulty = 1;//フォルダ選択へ戻る
 		song_folder->folder[i][song_folder->folder_c[i]].kind = 1;//フォルダ選択へ戻る
 		song_folder->folder[i][song_folder->folder_c[i]].song_number = *NumberOfSongs;
 		song_folder->folder_c[i]++;//枠をひとつ追加

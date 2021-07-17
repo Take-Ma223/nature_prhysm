@@ -16,6 +16,7 @@
 #include"ShowFps.h"
 
 #include <string>
+#include "SaveDataSaveLoad.h"
 using namespace std;
 
 void SHOW_RESULT(RESULT res,
@@ -224,7 +225,7 @@ void SHOW_RESULT(RESULT res,
 		//読み込み
 		//セーブファイルの場所決定
 		wchar_t str[256];
-		sprintfDx(str, L"score/%s", Music[song_number].KindFolder);
+		sprintfDx(str, L"save_data/score/%s", Music[song_number].KindFolder);
 		CreateDirectory(str, NULL);//スコア保存用の種類ディレクトリ(official)作成
 		CreateDirectory(Music[song_number].SaveFolder, NULL);//スコア保存用の曲ディレクトリ作成
 
@@ -295,7 +296,7 @@ void SHOW_RESULT(RESULT res,
 
 			save = high_score;
 
-			if (high_score.save_data_version < SAVE_DATA_VERSION_MAX_COMBO) {//セーブデータバージョンが古かったら(最大コンボ記録するバージョンより前)
+			if (high_score.save_data_version < RESULT_DATA_VERSION_MAX_COMBO) {//セーブデータバージョンが古かったら(最大コンボ記録するバージョンより前)
 				//新しく保存することになった記録をとりあえず全て記録する
 				for (i = 0; i <= 5; i++) {
 					save.weather[i] = res.weather[i];
@@ -307,21 +308,21 @@ void SHOW_RESULT(RESULT res,
 						high_score.max_combo = save.max_combo;//high_scoreのMaxComboも値を更新しておく
 					}
 				}
-				save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
+				save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 			}
 
 
-			if (high_score.save_data_version < SAVE_DATA_VERSION_SKY_PERFECT) {//セーブデータバージョンが古かったら(SKY_PERFECT、PERFECT記録するバージョンより前)
+			if (high_score.save_data_version < RESULT_DATA_VERSION_SKY_PERFECT) {//セーブデータバージョンが古かったら(SKY_PERFECT、PERFECT記録するバージョンより前)
 				for (i = 0; i <= 5; i++) {
 					save.max_combo = res.max_combo;
 					if (high_score.score == 10000 && high_score.clear == CLEARTYPE_FULL_COMBO) {//PERFECT済み(PFC)の曲なら
 						save.clear = CLEARTYPE_PERFECT;//PERFECTにする
 					}
 				}
-				save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
+				save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 			}
 
-			if (high_score.save_data_version < SAVE_DATA_VERSION_MIN_MISS) {//セーブデータバージョンが古かったら(MinMiss記録するバージョンより前)
+			if (high_score.save_data_version < RESULT_DATA_VERSION_MIN_MISS) {//セーブデータバージョンが古かったら(MinMiss記録するバージョンより前)
 				for (i = 0; i <= 5; i++) {					
 					if (high_score.clear == CLEARTYPE_FULL_COMBO || high_score.clear == CLEARTYPE_PERFECT) {//フルコン済み(FC PFC)の曲なら
 						save.min_miss = 0;//MinMiss0にする
@@ -334,7 +335,7 @@ void SHOW_RESULT(RESULT res,
 						save.min_miss = -1;
 					}
 				}
-				save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
+				save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 			}
 
 
@@ -396,7 +397,7 @@ void SHOW_RESULT(RESULT res,
 			else {
 				save.clear = res.clear;//灰クリアだけ記録
 			}
-			save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
+			save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 
 		}
 
@@ -406,7 +407,7 @@ void SHOW_RESULT(RESULT res,
 
 		//毎回保存する内容
 
-		save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
+		save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 
 		int PlayCountBuf = high_score.play_counter + TryCount;
 		if (PlayCountBuf >= 9999)PlayCountBuf = 9999;//カンスト処理
@@ -416,10 +417,23 @@ void SHOW_RESULT(RESULT res,
 
 		fwrite(&save, sizeof(save), 1, fp);
 		fclose(fp);
+
+
+
+		//全体セーブデータ読み込み
+		SAVEDATA saveData;
+		loadSaveData(&saveData);
+		saveData.totalHitNotes += res.sky_perfect + res.perfect + res.good;
+		saveData.totalPlayCount++;
+
+		if (saveData.totalHitNotes >= SAVE_DATA_VALUE_LIMIT)saveData.totalHitNotes = SAVE_DATA_VALUE_LIMIT;
+		if (saveData.totalPlayCount >= SAVE_DATA_VALUE_LIMIT)saveData.totalPlayCount = SAVE_DATA_VALUE_LIMIT;
+
+		writeSaveData(saveData);
 	}
 	else if(*debug == 0 && SkillTestFlag == SHOW_SKILL_TEST_RESULT){//段位スコア保存
 		//読み込みファイル名
-		sprintfDx(filename, L"skill_test/score/%s.dat", STList->title[list_number]);
+		sprintfDx(filename, L"save_data/skill_test/score/%s.dat", STList->title[list_number]);
 
 		firstplay = 0;
 		error = _wfopen_s(&fp, filename, L"rb");
@@ -484,11 +498,11 @@ void SHOW_RESULT(RESULT res,
 			if (res.clear == 1) {//MinMissはクリアしたときだけ保存
 				save.min_miss = res.miss;
 			}
-			save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
+			save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 		}
 
 		//毎回保存する内容
-		save.save_data_version = SAVE_DATA_VERSION;//セーブデータバージョン書き込み
+		save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 		int PlayCountBuf = high_score.play_counter + 1;
 		if (PlayCountBuf >= 9999)PlayCountBuf = 9999;//カンスト処理
 		save.play_counter = PlayCountBuf;//プレイ回数を足す

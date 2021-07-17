@@ -23,6 +23,7 @@
 #include <algorithm>
 #include"ScreenShot.h"
 #include<string>
+#include "SaveDataSaveLoad.h"
 
 using namespace std;
 
@@ -68,6 +69,7 @@ void SONG_SELECT(int *l_n,
 	int H_COVER_HIGH_SCORE;
 	int H_COVER_POP;
 	int H_COVER_SKILL_TEST_POP;
+	int H_CPVER_RESULT_STR;
 	int H_SCORE_NUMBER[10];
 	int H_JUDGE_NUMBER[10];
 
@@ -416,6 +418,9 @@ void SONG_SELECT(int *l_n,
 	H_COVER_HIGH_SCORE = LoadGraph(L"img/cover_high_score.png");
 	H_COVER_POP = LoadGraph(L"img/cover_pop.png");
 	H_COVER_SKILL_TEST_POP = LoadGraph(L"img/cover_skill_test_pop.png");
+
+	H_CPVER_RESULT_STR = LoadGraph(L"img/cover_result_str.png");;
+
 	LoadDivGraph(L"img/score_number.png", 10, 10, 1, 64, 100, H_SCORE_NUMBER);
 	LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_BPM_NUMBER_MAX);
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_BPM_NUMBER_MIN);
@@ -504,6 +509,8 @@ void SONG_SELECT(int *l_n,
 
 	int PlayCountSum = 0;//総プレイカウント(初回アナウンス表示に使用)
 
+
+
 	RESULT before_STRes;
 	//段位認定リザルト読み込み
 	for (i = 0; i <= NUMBER_OF_COURSES - 2; i++) {
@@ -514,7 +521,7 @@ void SONG_SELECT(int *l_n,
 		}
 
 		//読み込むファイル名を決定
-		sprintfDx(filename, L"skill_test/score/%s.dat", STList->title[i]);
+		sprintfDx(filename, L"save_data/skill_test/score/%s.dat", STList->title[i]);
 
 		error = _wfopen_s(&fp, filename, L"rb");
 		if (error != 0) {//スコアファイルが見つからなかったら初プレイ
@@ -620,10 +627,10 @@ void SONG_SELECT(int *l_n,
 						Highscore[i].perfect[j] = before.perfect;//PERFECT数
 						Highscore[i].good[j] = before.good;//GOOD数
 						Highscore[i].miss[j] = before.miss;//MISS数
-						if (before.save_data_version >= SAVE_DATA_VERSION_MAX_COMBO) {
+						if (before.save_data_version >= RESULT_DATA_VERSION_MAX_COMBO) {
 							Highscore[i].max_combo[j] = before.max_combo;//最大コンボ数記録バージョン以降のセーブデータなら読み込む
 						}
-						if (before.save_data_version >= SAVE_DATA_VERSION_MIN_MISS) {
+						if (before.save_data_version >= RESULT_DATA_VERSION_MIN_MISS) {
 							Highscore[i].min_miss[j] = before.min_miss;//最小ミス記録バージョン以降のセーブデータなら読み込む
 							if (before.clear == CLEARTYPE_PLAY && Highscore[i].min_miss[j] == 0) {//MISS 0ならPLAY状態でもフルコンボを表示するようにする
 								Highscore[i].clear_state[j] = CLEARTYPE_FULL_COMBO;
@@ -659,11 +666,11 @@ void SONG_SELECT(int *l_n,
 						HighscoreRival[i].perfect[j] = before.perfect;//PERFECT数
 						HighscoreRival[i].good[j] = before.good;//GOOD数
 						HighscoreRival[i].miss[j] = before.miss;//MISS数
-						if (before.save_data_version >= SAVE_DATA_VERSION_MAX_COMBO) {
+						if (before.save_data_version >= RESULT_DATA_VERSION_MAX_COMBO) {
 							HighscoreRival[i].max_combo[j] = before.max_combo;//最大コンボ数記録バージョン以降のセーブデータなら読み込む
 						}
 
-						if (before.save_data_version >= SAVE_DATA_VERSION_MIN_MISS) {
+						if (before.save_data_version >= RESULT_DATA_VERSION_MIN_MISS) {
 							HighscoreRival[i].min_miss[j] = before.min_miss;//最小ミス記録バージョン以降のセーブデータなら読み込む
 							if (HighscoreRival[i].min_miss[j] == 0) {//MISS 0ならPLAY状態でもフルコンボを表示するようにする
 								HighscoreRival[i].clear_state[j] = CLEARTYPE_FULL_COMBO;
@@ -703,8 +710,12 @@ void SONG_SELECT(int *l_n,
 		int Streak = 0;
 		int Color = 0;
 
+		int clearState[9] = { 0,0,0,0,0,0,0,0,0 };
+		int rank[8] = { 0,0,0,0,0,0,0,0 };
+
+
 		int ClearType = CLEARTYPE_PERFECT;//フォルダ全体のクリアタイプ
-		int Rank = 0;//フォルダ全体のランク(平均)
+		int folderRank = 0;//フォルダ全体のランク(平均)
 	}FolderScore;
 		
 	FolderScore FolderScore[2][NUMBER_OF_FOLDERS][5];
@@ -749,6 +760,9 @@ void SONG_SELECT(int *l_n,
 							FolderScore[rainbow][i][diff].Streak      += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
 							FolderScore[rainbow][i][diff].Color       += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].color[rainbow][diff];
 
+
+							FolderScore[rainbow][i][diff].clearState[clearStateConverter(Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4])]++;
+							FolderScore[rainbow][i][diff].rank[Highscore[folder->folder[i][j].song_number].rank[diff + rainbow * 4]]++;
 
 							if (FolderScore[rainbow][i][diff].ClearType > Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4]) {//フォルダにある譜面の中で一番低いクリア状態をそのフォルダのクリア状態にする
 								FolderScore[rainbow][i][diff].ClearType = Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4];
@@ -798,6 +812,9 @@ void SONG_SELECT(int *l_n,
 						FolderScore[rainbow][i][1].Streak += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
 						FolderScore[rainbow][i][1].Color += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].color[rainbow][diff];
 
+						FolderScore[rainbow][i][1].clearState[clearStateConverter(Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4])]++;
+						FolderScore[rainbow][i][1].rank[Highscore[folder->folder[i][j].song_number].rank[diff + rainbow * 4]]++;
+
 						if (FolderScore[rainbow][i][1].ClearType > Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4]) {//フォルダにある譜面の中で一番低いクリア状態をそのフォルダのクリア状態にする
 							FolderScore[rainbow][i][1].ClearType = Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4];
 						}
@@ -826,39 +843,69 @@ void SONG_SELECT(int *l_n,
 					FolderScore[rainbow][i][diff].Color = FolderScore[rainbow][i][1].Color;
 
 					FolderScore[rainbow][i][diff].ClearType = FolderScore[rainbow][i][1].ClearType;
+
+					for (j = 0; j < 9; j++)FolderScore[rainbow][i][diff].clearState[j] = FolderScore[rainbow][i][1].clearState[j];
+					for (j = 0; j < 8; j++)FolderScore[rainbow][i][diff].rank[j] = FolderScore[rainbow][i][1].rank[j];
 				}
 
 			}
 			//フォルダのランク決定 (0:未プレイ 1:F 2:E 3:D 4:C 5:B 6:A 7:S)
 			for (int diff = 1; diff < 5; diff++) {//難易度
 				if (FolderScore[rainbow][i][diff].AverageScore >= RANK_S_SCORE) {
-					FolderScore[rainbow][i][diff].Rank = RANK_S;
+					FolderScore[rainbow][i][diff].folderRank = RANK_S;
 				}
 				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_A_SCORE) {
-					FolderScore[rainbow][i][diff].Rank = RANK_A;
+					FolderScore[rainbow][i][diff].folderRank = RANK_A;
 				}
 				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_B_SCORE) {
-					FolderScore[rainbow][i][diff].Rank = RANK_B;
+					FolderScore[rainbow][i][diff].folderRank = RANK_B;
 				}
 				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_C_SCORE) {
-					FolderScore[rainbow][i][diff].Rank = RANK_C;
+					FolderScore[rainbow][i][diff].folderRank = RANK_C;
 				}
 				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_D_SCORE) {
-					FolderScore[rainbow][i][diff].Rank = RANK_D;
+					FolderScore[rainbow][i][diff].folderRank = RANK_D;
 				}
 				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_E_SCORE) {
-					FolderScore[rainbow][i][diff].Rank = RANK_E;
+					FolderScore[rainbow][i][diff].folderRank = RANK_E;
 				}
 				else {
-					FolderScore[rainbow][i][diff].Rank = RANK_F;
+					FolderScore[rainbow][i][diff].folderRank = RANK_F;
 				}
 				if (FolderScore[rainbow][i][diff].AverageScore == 0) {
-					FolderScore[rainbow][i][diff].Rank = RANK_NONE;
+					FolderScore[rainbow][i][diff].folderRank = RANK_NONE;
 				}
 
 			}
 		}
 	}
+
+
+	//セーブデータ読み込み
+	SAVEDATA saveData;
+	if (loadSaveData(&saveData) == -1) {
+		//初回作成時
+		saveData.totalPlayCount = PlayCountSum;
+		saveData.totalHitNotes = PlayCountSum*500;//暫定で叩いた音符数を格納
+		if (saveData.totalPlayCount >= SAVE_DATA_VALUE_LIMIT)saveData.totalPlayCount = SAVE_DATA_VALUE_LIMIT;
+		if (saveData.totalHitNotes >= SAVE_DATA_VALUE_LIMIT)saveData.totalHitNotes = SAVE_DATA_VALUE_LIMIT;
+	}
+
+
+	saveData.totalHighScore = 0;
+	saveData.totalHighScoreRainbow = 0;
+	for (int diff = 1; diff < 5; diff++) {//難易度
+		for (j = 0; j < folder->folder_c[FOLDERS_ALL_DIFFICULTY]; j++) {
+			if (folder->folder[i][j].kind == 0 && Music[folder->folder[FOLDERS_ALL_DIFFICULTY][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
+				saveData.totalHighScore += Highscore[folder->folder[FOLDERS_ALL_DIFFICULTY][j].song_number].score[diff];
+				saveData.totalHighScoreRainbow += Highscore[folder->folder[FOLDERS_ALL_DIFFICULTY][j].song_number].score[diff + 4];
+			}
+		}
+	}
+	if (saveData.totalHighScore >= SAVE_DATA_VALUE_LIMIT)saveData.totalHighScore = SAVE_DATA_VALUE_LIMIT;
+	if (saveData.totalHighScoreRainbow >= SAVE_DATA_VALUE_LIMIT)saveData.totalHighScoreRainbow = SAVE_DATA_VALUE_LIMIT;
+	writeSaveData(saveData);
+
 
 	for (int rainbow = 0; rainbow < 2; rainbow++) {//自然管理技術者検定フォルダでランク、クリア状態を表示しないようプレイ状態扱いにする
 		for (int diff = 1; diff < 5; diff++) {
@@ -1217,6 +1264,8 @@ void SONG_SELECT(int *l_n,
 			}
 		}
 	}
+
+	
 
 	GAME_start_time = GetNowCount_d(config);
 	int Announse_show_time_base = GetNowCount() + 1500;//アナウンス表示の基準時間
@@ -2349,7 +2398,7 @@ void SONG_SELECT(int *l_n,
 				
 				if (escape == 0) {//抜けだしてない
 				//段位認定リザルトの保存
-					STRes.save_data_version = SAVE_DATA_VERSION;
+					STRes.save_data_version = RESULT_DATA_VERSION;
 					for (i = 0; i <= 3; i++) {
 						STRes.sky_perfect += Result[i].sky_perfect;
 						STRes.perfect += Result[i].perfect;
@@ -3018,10 +3067,10 @@ void SONG_SELECT(int *l_n,
 					DrawCircleAA(float(11 + 960 + (i + 1) * BarWidth - 17), float(720 - ShowLocalNotesGraph[i]), float(4), 32, GetColor(255, 255, 255), TRUE);
 				}
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-			
+				DrawGraph(960, 0, H_COVER_POP, TRUE);//右側の文字
 			}
 
-			DrawGraph(960, 0, H_COVER_POP, TRUE);//右側の文字
+			
 		}
 		else {//段位認定カバー
 			DrawGraph(0, 0, H_COVER_SKILL_TEST, TRUE);//カバー表示
@@ -3196,7 +3245,7 @@ void SONG_SELECT(int *l_n,
 				ExistBuf = 1;
 			}
 			else if (SelectingTarget == SELECTING_FOLDER) {
-				RankBuf = FolderScore[Option->op.color == Option->OP_COLOR_RAINBOW][folder->selected_folder][difficulty].Rank;
+				RankBuf = FolderScore[Option->op.color == Option->OP_COLOR_RAINBOW][folder->selected_folder][difficulty].folderRank;
 				ClearStateBuf = FolderScore[Option->op.color == Option->OP_COLOR_RAINBOW][folder->selected_folder][difficulty].ClearType;
 				PlayCountBuf = 1;
 				ExistBuf = 1;
@@ -3414,7 +3463,7 @@ void SONG_SELECT(int *l_n,
 		cache = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280);//リザルトカバー
 
 		DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
-		DrawGraph(cache, 0, H_RESULT, TRUE);//リザルトカバー
+		if ((SelectingTarget == SELECTING_SONG) || (SelectingTarget == SELECTING_COURSE))DrawGraph(cache, 0, H_RESULT, TRUE);//リザルトカバー
 
 
 		if ((Music[song_number].exist[difficulty] == 1 && SelectingTarget == SELECTING_SONG) || SelectingTarget == SELECTING_COURSE) {//曲選択状態で譜面が存在するときか、段位選択のとき
@@ -3468,6 +3517,89 @@ void SONG_SELECT(int *l_n,
 
 			DrawNumber((cache - 960) + 1221, 557, MaxComboBuf, 25, 1, 4, H_MAX_COMBO_NUMBER);
 			DrawNumber((cache - 960) + 1221, 615, PlayCountBuf, 25, 1, 4, H_PLAY_COUNT_NUMBER);
+		}
+		else if (SelectingTarget == SELECTING_FOLDER){
+			int boxHeight = 40;
+			//枠の表示
+
+			//フォルダ記録
+			//クリア状態
+			DrawBoxWithLine((cache - 960) + 976, 130, (cache - 960) + 1110, 130 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 170, (cache - 960) + 1110, 170 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 210, (cache - 960) + 1110, 210 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 250, (cache - 960) + 1110, 250 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 290, (cache - 960) + 1110, 290 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 330, (cache - 960) + 1110, 330 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 370, (cache - 960) + 1110, 370 + boxHeight, GetColor(50, 50, 50));
+
+			//ランク
+			DrawBoxWithLine((cache - 960) + 1130, 130, (cache - 960) + 1264, 130 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 1130, 170, (cache - 960) + 1264, 170 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 1130, 210, (cache - 960) + 1264, 210 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 1130, 250, (cache - 960) + 1264, 250 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 1130, 290, (cache - 960) + 1264, 290 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 1130, 330, (cache - 960) + 1264, 330 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 1130, 370, (cache - 960) + 1264, 370 + boxHeight, GetColor(50, 50, 50));
+
+
+			DrawBoxWithLine((cache - 960) + 976, 410, (cache - 960) + 1110, 410 + boxHeight, GetColor(50, 50, 50));;//PLAY
+			DrawBoxWithLine((cache - 960) + 976, 450, (cache - 960) + 1264, 450 + boxHeight, GetColor(50, 50, 50));//NO PLAY
+
+			//トータル記録
+			DrawBoxWithLine((cache - 960) + 976, 540, (cache - 960) + 1264, 540 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 580, (cache - 960) + 1264, 580 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 620, (cache - 960) + 1264, 620 + boxHeight, GetColor(50, 50, 50));
+			DrawBoxWithLine((cache - 960) + 976, 660, (cache - 960) + 1264, 660 + boxHeight, GetColor(50, 50, 50));
+
+			//文字
+			DrawGraph((cache - 960), 0, H_CPVER_RESULT_STR, TRUE);
+			//DrawGraph((cache - 960) + 960, 250, H_VERSION_STR, TRUE);
+
+
+			//数値描画
+
+			//フォルダ記録
+			//クリア状態
+			int R = 0;
+			if (Option->op.color == Option->OP_COLOR_RAINBOW)R = 1;
+
+			FolderScore[R][folder->selected_folder][difficulty].clearState[CLEARTYPE_PERFECT];
+
+			DrawNumber((cache - 960) + 1092, 130 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_PERFECT)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1092, 170 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_FULL_COMBO)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1092, 210 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_SUPER_HARD_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1092, 250 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_HARD_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1092, 290 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1092, 330 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_EASY_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1092, 370 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_FAILED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1092, 410 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_PLAY)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1246, 450 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_NO_PLAY)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+
+
+			//ランク
+			DrawNumber((cache - 960) + 1246, 130 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_S], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1246, 170 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_A], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1246, 210 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_B], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1246, 250 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_C], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1246, 290 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_D], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1246, 330 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_E], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1246, 370 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_F], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+
+
+
+			//トータル記録
+			DrawNumber((cache - 960) + 1248, 536, saveData.totalBootCount, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+			DrawNumber((cache - 960) + 1248, 576, saveData.totalPlayCount, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+			if (Option->op.color == Option->OP_COLOR_RAINBOW) {
+				DrawNumber((cache - 960) + 1248, 616, saveData.totalHighScoreRainbow, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+			}
+			else {
+				DrawNumber((cache - 960) + 1248, 616, saveData.totalHighScore, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+
+			}
+			DrawNumber((cache - 960) + 1248, 656, saveData.totalHitNotes, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+
+
 		}
 
 
@@ -3875,3 +4007,40 @@ bool operator>(const SortSongListIndex& left, const SortSongListIndex& right)
 {
 	return left.value > right.value;
 }
+
+
+int clearStateConverter(int clearState) {//クリア状態番号をFolderScore用の数値に変換する関数
+	switch (clearState)
+	{
+	case CLEARTYPE_NO_PLAY:
+		return 0;
+		break;
+	case CLEARTYPE_PLAY:
+		return 1;
+		break;
+	case CLEARTYPE_FAILED:
+		return 2;
+		break;
+	case CLEARTYPE_EASY_CLEARED:
+		return 3;
+		break;
+	case CLEARTYPE_CLEARED:
+		return 4;
+		break;
+	case CLEARTYPE_HARD_CLEARED:
+		return 5;
+		break;
+	case CLEARTYPE_SUPER_HARD_CLEARED:
+		return 6;
+		break;
+	case CLEARTYPE_FULL_COMBO:
+		return 7;
+		break;
+	case CLEARTYPE_PERFECT:
+		return 8;
+		break;
+	default:
+		break;
+	}
+}
+

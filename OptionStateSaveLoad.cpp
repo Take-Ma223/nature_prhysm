@@ -7,9 +7,9 @@ void SaveOptionState(OP option) {
 	FILE *fp = 0;
 	errno_t error = 0;
 
-	error = _wfopen_s(&fp, L"score/OptionState.dat", L"wb");
+	error = _wfopen_s(&fp, L"save_data/OptionState.dat", L"wb");
 	if (error != 0) {
-		printfDx(L"%sのオープンに失敗しました.\n", L"score/OptionState.dat");
+		printfDx(L"%sのオープンに失敗しました.\n", L"save_data/OptionState.dat");
 		printfDx(L"エラー番号:%d", error);
 		ScreenFlip();
 
@@ -27,7 +27,7 @@ void LoadOptionState(OPTION *option) {
 	FILE *fp = 0;
 	errno_t error = 0;
 
-	error = _wfopen_s(&fp, L"score/OptionState.dat", L"rb");
+	error = _wfopen_s(&fp, L"save_data/OptionState.dat", L"rb");
 	if (error != 0) {//ファイル見つからなかったら
 		//何もしない
 	}

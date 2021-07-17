@@ -7,6 +7,7 @@
 #include"STRUCT_OP.h"
 #include"STRUCT_SEQ.h"
 #include"STRUCT_NOTE.h"
+#include"STRUCT_RESULT.h"
 
 #include"GAME_LOAD.h"
 #include"LOAD.h"
@@ -15,6 +16,7 @@
 #include"STRUCT_SECRET.h"
 #include"LoadSkillTestNpsPathList.h"
 #include"OptionStateSaveLoad.h"
+#include"SaveDataSaveLoad.h"
 #include"ShowErrorName.h"
 #include"SongCacheSaveLoad.h"
 
@@ -177,7 +179,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 					//wcscpy_s(Music[i].SaveFolder, L"score/official/");//セーブデータフォルダー名を格納
 					//wcscat_s(Music[i].SaveFolder, folder);
 
-					sprintfDx(strbuf, L"score/%s/%s", folder_lp.cFileName, song_lp.cFileName);
+					sprintfDx(strbuf, L"save_data/score/%s/%s", folder_lp.cFileName, song_lp.cFileName);
 					Music[i].SaveFolder = (wchar_t*)malloc(sizeof(wchar_t) * (strlenDx(strbuf) + 1));
 					sprintfDx(Music[i].SaveFolder, strbuf);
 
@@ -440,6 +442,14 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	//最後のプレーのオプション読み込み
 	LoadOptionState(op);
 
+	//セーブデータ読み込み
+	SAVEDATA saveData;
+	if (loadSaveData(&saveData) == 0) {
+		//2回目以降
+		saveData.totalBootCount++;
+		if (saveData.totalBootCount >= SAVE_DATA_VALUE_LIMIT)saveData.totalBootCount = SAVE_DATA_VALUE_LIMIT;
+		writeSaveData(saveData);
+	}
 
 	printfDx(L"曲数:%d\n", NumberOfSongs);
 	for (i = 0; i <= *NumberOfSongs - 1; i++) {

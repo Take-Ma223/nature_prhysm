@@ -7,7 +7,7 @@ void ConfigLoad(CONFIG *config) {//Configƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
 	wchar_t path[255];
 	int fp;
 
-	sprintfDx(path, L"config.dat");
+	sprintfDx(path, L"save_data/config.dat");
 
 	wchar_t sharp1[255];
 	wchar_t sharp2[255];

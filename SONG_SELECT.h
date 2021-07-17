@@ -28,6 +28,8 @@ extern void DrawHexagon(short, short, short, short, short, short);
 extern void OptionValueChange(OPTION* Option, int option_select, int add);
 extern void DrawOptionSentence(OPTION* Option, int option_select, CONFIG config, int FontHandle);
 
+extern int clearStateConverter(int clearState);
+
 
 typedef struct SortSongListIndex {
 	int index;

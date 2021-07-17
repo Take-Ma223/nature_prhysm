@@ -92,8 +92,8 @@ void DrawNumber(int x, int y, int value, int interval, int showType, int zeroFil
 		digit = zeroFilingDigit;
 	}
 
-	int digitArray[5] = { 0,0,0,0,0 };
-	number_digit(value, digitArray, 5);//数値を桁ごとに格納
+	int digitArray[8] = { 0,0,0,0,0,0,0,0 };
+	number_digit(value, digitArray, 8);//数値を桁ごとに格納
 
 	int i = 0;
 	for (i = 0; i < digit; i++) {//数値を表示

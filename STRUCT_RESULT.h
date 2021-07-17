@@ -1,12 +1,12 @@
 ﻿#ifndef _STRUCT_RESULT
 #define _STRUCT_RESULT
 
-#define SAVE_DATA_VERSION_MAX_COMBO 1.03//MAX_COMBOを保存するようになったバージョン
-#define SAVE_DATA_VERSION_SKY_PERFECT 1.10//SKY_PERFECT数、PERFECTを保存するようになったセーブデータバージョン
-#define SAVE_DATA_VERSION_MIN_MISS 1.11//MIN MISSを保存するようになったセーブデータバージョン
+#define RESULT_DATA_VERSION_MAX_COMBO 1.03//MAX_COMBOを保存するようになったバージョン
+#define RESULT_DATA_VERSION_SKY_PERFECT 1.10//SKY_PERFECT数、PERFECTを保存するようになったセーブデータバージョン
+#define RESULT_DATA_VERSION_MIN_MISS 1.11//MIN MISSを保存するようになったセーブデータバージョン
 
 
-#define SAVE_DATA_VERSION 1.11//現在のセーブデータバージョン
+#define RESULT_DATA_VERSION 1.11//現在のセーブデータバージョン
 
 static const int RANK_S = 7;//Sランク
 static const int RANK_A = 6;//Aランク
@@ -41,6 +41,8 @@ static const int RESULT_WEATHER_CLOUDY = 2;//曇り
 static const int RESULT_WEATHER_RAINY = 1;//雨
 static const int RESULT_WEATHER_THUNDER = 0;//雷
 
+static const int SAVE_DATA_VALUE_LIMIT = 99999999;//セーブデータ値上限
+
 typedef struct RESULT {//リザルト用構造体
 	int hash = 0;//譜面のハッシュ(譜面やスコアが改ざんされてないか確認する)
 	int difficulty = 0;//難易度
@@ -64,6 +66,14 @@ typedef struct RESULT {//リザルト用構造体
 	//int S_perfect = 0;
 
 }RESULT;
+
+typedef struct SAVEDATA {//セーブデータ構造体
+	unsigned int totalBootCount = 1;//総起動回数
+	unsigned int totalPlayCount = 0;//総プレイ曲数
+	unsigned int totalHighScore = 0;//総ハイスコア(正規)
+	unsigned int totalHighScoreRainbow = 0;//総ハイスコア(虹)
+	unsigned int totalHitNotes = 0;//叩いた音符の数
+}SAVEDATA;
 
 /*
 typedef struct SkillTestResult {//段位認定リザルト用構造体

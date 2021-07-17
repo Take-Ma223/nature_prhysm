@@ -16,7 +16,7 @@ void setupSerial(HANDLE *hComm) {//シリアル通信
 							  }
 							  */
 
-	fp = FileRead_open(L"COMport.dat");
+	fp = FileRead_open(L"save_data/COMport.dat");
 	if (fp == 0) {//無かったら戻る
 		return;
 	}

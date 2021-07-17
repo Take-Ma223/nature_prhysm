@@ -11,7 +11,7 @@ void KeyConfig(int Button[3][4],int *Button_Shutter) {
 
 	//_wfopen_s(&fp, L"KeyConfig.dat", L"r");
 
-	fp = FileRead_open(L"KeyConfig.dat");
+	fp = FileRead_open(L"save_data/KeyConfig.dat");
 	if (fp == 0) {//無かったら戻る
 		return;
 	}

@@ -12,5 +12,8 @@
 #define SECRET_GAUGE_CHANGE_OFF 1//隠し曲プレー時のゲージ強制変更をオフ
 
 #define SHOW_DEBUG_MODE 1//DEBUG MODEのときにDEBUG MODEの表示をする
+#define SOCKET_USE_LOCAL_IP 0//ソケット通信でローカルIPを使う
+
+const wchar_t RUN_PASS[] = L"223210";
 
 #endif

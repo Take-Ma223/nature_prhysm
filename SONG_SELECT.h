@@ -4,6 +4,7 @@
 #include"CONSTANT_VALUE.h"
 #include"STRUCT_CONFIG.h"
 #include<vector>
+#include"STRUCT_IR_SETTING.h"
 
 #ifndef _SONG_SELECT
 #define _SONG_SELECT
@@ -16,7 +17,7 @@ extern void SONG_SELECT(int *l_n,
 	int *debug, int *NumberOfSongs,
 	int *result_count, int *result_rank_buf, SECRET *secret,
 	ANDROID_CONTROLLER *AC, int *StageCount, SkillTestList *STList,
-	CONFIG config);
+	CONFIG config, IR_SETTING* ir);
 
 extern wchar_t *announce_str(int StageCount, int PlayCount);
 

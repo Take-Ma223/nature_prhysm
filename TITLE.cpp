@@ -11,9 +11,12 @@
 #include"ScreenShot.h"
 #include"STRUCT_OP.h"
 #include<string>
+#include"IR_process.h"
+#include"KeyConfig.h"
+
 using namespace std;
 
-void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, CONFIG config, OPTION *option) {
+void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, CONFIG config, OPTION *option, IR_SETTING *ir) {
 	int H_BG;//背景画像
 	int H_CLOUD;//雲画像
 	int H_TITLE_LOGO;//ロゴ画像
@@ -50,6 +53,40 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	BOOL BGMPlay = 0;//BGM再生したかのフラグ(0:してない 1:した)
 
 
+	const int STATE_PRESS_ANY_KEY = 0;
+	const int STATE_SELECT_MENU = 1;
+	const int STATE_IR_SETTING = 2;
+	const int STATE_KEY_CONFIG = 3;
+
+
+	int stat = STATE_PRESS_ANY_KEY;//画面状態変数
+
+	const int MENU_GAME_START = 0;
+	const int MENU_IR_SETTING = 1;
+	const int MENU_KEY_CONFIG = 2;
+
+	int menuSelectStat = MENU_GAME_START;
+
+	const int IRMENU_PARTICIPATE = 0;
+	const int IRMENU_PLAYER_NAME = 1;
+	const int IRMENU_EXIT = 2;
+	int IRWarningFlag = 0;//注意書き表示中のフラグ
+	int IRMenuStat = IRMENU_PLAYER_NAME;
+
+	const int KEY_CONFIG_MENU_SETTING = 0;
+	const int KEY_CONFIG_MENU_EXIT = 1;
+	int keyConfigSettingFlag = 0;//キーコンフィグ中かどうかのフラグ
+	struct Position {
+		int x = 0;
+		int y = 0;
+	};
+
+	Position settingKeyPosition;
+	settingKeyPosition.y = 2;
+
+	int KeyConfigMenuStat = KEY_CONFIG_MENU_SETTING;
+
+
 	wstring themeStr1(L"img/themes/");
 	wstring themeStr2(option->theme[option->op.theme]);
 	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
@@ -72,10 +109,9 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 
 	ChangeFont(L"メイリオ");
-	SetFontThickness(1);
-	ChangeFontType(DX_FONTTYPE_EDGE);
+	SetFontThickness(9);
+	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(26);
-	
 
 	GAME_start_time = GetNowCount_d(config);
 	Get_Key_State(Buf, Key, AC);
@@ -100,14 +136,160 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		Get_Key_State(Buf, Key, AC);
 
-		if (start == 0) {
+		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[Button[0][0]] || Key[Button[0][1]] || Key[Button[0][2]] || Key[Button[0][3]] ||
 				Key[Button[1][0]] || Key[Button[1][1]] || Key[Button[1][2]] || Key[Button[1][3]] ||
 				Key[Button[2][0]] || Key[Button[2][1]] || Key[Button[2][2]] || Key[Button[2][3]] || Key[KEY_INPUT_RETURN]) {
-				start = 1;
-				PlaySoundMem(SH_START, DX_PLAYTYPE_BACK, TRUE);
+				stat = STATE_SELECT_MENU;
 			}
 		}
+		else if (stat == STATE_SELECT_MENU) {
+			if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {
+				if (menuSelectStat == MENU_GAME_START) {
+					start = 1;
+					PlaySoundMem(SH_START, DX_PLAYTYPE_BACK, TRUE);
+				}
+				else if(menuSelectStat == MENU_IR_SETTING){
+					stat = STATE_IR_SETTING;
+				}
+				else if (menuSelectStat == MENU_KEY_CONFIG) {
+					stat = STATE_KEY_CONFIG;
+				}
+			}
+			else if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+				menuSelectStat -= 1;
+				if (menuSelectStat < MENU_GAME_START)menuSelectStat = MENU_GAME_START;
+			}
+			else if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+				menuSelectStat += 1;
+				if (menuSelectStat > MENU_KEY_CONFIG)menuSelectStat = MENU_KEY_CONFIG;
+			}
+
+
+		}
+		else if(stat == STATE_IR_SETTING){
+			if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {
+				if (IRMenuStat == IRMENU_PLAYER_NAME) {
+					DrawBoxWithLine(640 - 240, 470, 640 + 240, 510, GetColor(100, 100, 100));
+
+					wchar_t* str1 = L"\"注意:インターネットランキングで公開されるため個人情報は入力しないでください\"";
+					int width1 = GetDrawStringWidth(str1, wcslen(str1));
+					ShowExtendedStrFit(640, 430, str1, width1, 1280, config,GetColor(255, 255, 255), GetColor(0, 0, 0));					
+
+					wchar_t strbuf[17]=L"";
+					KeyInputString(410, 480,
+						16, strbuf,
+						TRUE);
+					stat = STATE_IR_SETTING;
+
+					sprintfDx(ir->plaeyerName, L"%s", strbuf);
+
+					SaveIRSetting(*ir);
+					LoadIRSetting(ir);
+					
+					wchar_t str2[64];
+					sprintfDx(str2, L"%sに変更しました", strbuf);
+					width1 = GetDrawStringWidth(str2, wcslen(str2));
+					ShowExtendedStrFit(640, 530, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+					ScreenFlip();
+					Sleep(2000);
+
+
+
+				}
+				else if (IRMenuStat == IRMENU_PARTICIPATE) {
+					int width1;
+					wchar_t str[64];
+					
+
+					if (ir->IR_Enable == FALSE) {
+						ir->IR_Enable = TRUE;
+						sprintfDx(str, L"\"参加する\"に設定を変更しました");
+					}
+					else {
+						ir->IR_Enable = FALSE;
+						sprintfDx(str, L"\"参加しない\"に設定を変更しました");
+					}
+
+					SaveIRSetting(*ir);
+					LoadIRSetting(ir);
+
+
+					width1 = GetDrawStringWidth(str, wcslen(str));
+					ShowExtendedStrFit(640, 500, str, width1, 1280, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+					ScreenFlip();
+					Sleep(2000);
+				}
+				else if (IRMenuStat == IRMENU_EXIT) {
+					stat = STATE_SELECT_MENU;
+				}
+			}
+			else if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+				IRMenuStat -= 1;
+				if (IRMenuStat < IRMENU_PARTICIPATE)IRMenuStat = IRMENU_PARTICIPATE;
+			}
+			else if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+				IRMenuStat += 1;
+				if (IRMenuStat > IRMENU_EXIT)IRMenuStat = IRMENU_EXIT;
+
+			}
+		}
+		else if (stat == STATE_KEY_CONFIG) {
+			if (keyConfigSettingFlag == 0) {
+				if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {
+					if (KeyConfigMenuStat == KEY_CONFIG_MENU_SETTING) {
+						if (keyConfigSettingFlag == 0) {
+							settingKeyPosition.x = 0;
+							settingKeyPosition.y = 2;
+							keyConfigSettingFlag = 1;
+						}
+					}
+					else if (KeyConfigMenuStat == KEY_CONFIG_MENU_EXIT) {
+						stat = STATE_SELECT_MENU;
+					}
+				}
+				else if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+					KeyConfigMenuStat -= 1;
+					if (KeyConfigMenuStat < KEY_CONFIG_MENU_SETTING)KeyConfigMenuStat = KEY_CONFIG_MENU_SETTING;
+				}
+				else if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+					KeyConfigMenuStat += 1;
+					if (KeyConfigMenuStat > KEY_CONFIG_MENU_EXIT)KeyConfigMenuStat = KEY_CONFIG_MENU_EXIT;
+				}
+			}
+			else {
+				for (i = 0; i < 256; i++) {
+					if (Key[i] == 1) {
+						Button[settingKeyPosition.y][settingKeyPosition.x] = i;
+						settingKeyPosition.x++;
+						if (settingKeyPosition.x >= 4) {
+							settingKeyPosition.x = 0;
+							settingKeyPosition.y--;
+							if (settingKeyPosition.y <= -1) {
+								//キー配置保存
+								KeyConfigSave(Button, &Button_Shutter);
+								KeyConfigLoad(Button, &Button_Shutter);
+
+								SetDrawBright(255, 255, 255);
+								int width1;
+								wchar_t str2[64];
+								sprintfDx(str2, L"キー配置設定を保存しました");
+								width1 = GetDrawStringWidth(str2, wcslen(str2));
+								ShowExtendedStrFit(640, 500, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+								ScreenFlip();
+								Sleep(2000);
+								keyConfigSettingFlag = 0;
+							}
+						}
+						break;
+					}
+				}
+					
+				
+			}
+		}
+
+
 		if (Key[Button_Shutter] == 1) {//スクリーンショット
 			ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
 		}
@@ -206,8 +388,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 			}
 		}
-	
-	
 
 		
 		//printfDx(L"BackDrawCounter:%f\n", BackDrawCounter);
@@ -237,15 +417,105 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		DeleteMaskScreen();
 		*/
 
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if ((int(GAME_passed_time) - 100) % 480 <= 370 && start == 0) {
+				wchar_t* str = L"\"Press Any Key\"";
+				int width = GetDrawStringWidth(str, wcslen(str));
+				ShowExtendedStrFit(640, 590, str, width, 300, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+				//DrawString(502, 622, L"\"Press Any Key\"", GetColor(0, 0, 0));
+				//DrawString(500, 620, L"\"Press Any Key\"", GetColor(255, 255, 255));
+			}
+		}
+		else if(stat == STATE_SELECT_MENU){
+			SetDrawBright(255,255,255);
 
-		if ((int(GAME_passed_time) - 100) % 480 <= 370 && start == 0) {
-			DrawString(502, 622, L"\"Press Any Key\"", GetColor(0, 0, 0));
-			//DrawString(498, 618, "\"Press Any Key\"", GetColor(0, 0, 0));
-			//DrawString(502, 618, "\"Press Any Key\"", GetColor(0, 0, 0));
-			//DrawString(498, 622, "\"Press Any Key\"", GetColor(0, 0, 0));
-			DrawString(500, 620, L"\"Press Any Key\"", GetColor(255, 255, 255));
+			wchar_t* str1 = L"\"GAME START\"";
+			int width1 = GetDrawStringWidth(str1, wcslen(str1));
+			ShowExtendedStrFit(640, 590, str1, width1, 300, config, menuSelectStat == MENU_GAME_START ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+			wchar_t* str2 = L"\"IR SETTING\"";
+			int width2 = GetDrawStringWidth(str2, wcslen(str2));
+			ShowExtendedStrFit(640, 620, str2, width2, 300, config, menuSelectStat == MENU_IR_SETTING ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+			wchar_t* str3 = L"\"KEY CONFIG\"";
+			int width3 = GetDrawStringWidth(str3, wcslen(str3));
+			ShowExtendedStrFit(640, 650, str3, width3, 300, config, menuSelectStat == MENU_KEY_CONFIG ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+
+		}
+		else if (stat == STATE_IR_SETTING) {
+			SetDrawBright(255, 255, 255);
+
+			wchar_t str1[21];
+			if (ir->IR_Enable == TRUE) {
+				sprintfDx(str1, L"\"インターネットランキング参加:する\"");
+			}
+			else {
+				sprintfDx(str1, L"\"インターネットランキング参加:しない\"");
+			}
+
+			int width1 = GetDrawStringWidth(str1, wcslen(str1));
+			ShowExtendedStrFit(640, 590, str1, width1, 500, config, IRMenuStat == IRMENU_PARTICIPATE ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+			wchar_t* str2 = L"\"PLAYER NAME変更\"";
+			int width2 = GetDrawStringWidth(str2, wcslen(str2));
+			ShowExtendedStrFit(640, 620, str2, width2, 300, config, IRMenuStat == IRMENU_PLAYER_NAME ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+			wchar_t* str3 = L"\"戻る\"";
+			int width3 = GetDrawStringWidth(str3, wcslen(str3));
+			ShowExtendedStrFit(640, 650, str3, width3, 300, config, IRMenuStat == IRMENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+
+			wchar_t* str4 = L"―――注意―――";
+			int width4 = GetDrawStringWidth(str4, wcslen(str4));
+			ShowExtendedStrFit(640, 315, str4, width4, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+
+			wchar_t* str5 = L"インターネットランキングに参加すると";
+			int width5 = GetDrawStringWidth(str5, wcslen(str5));
+			ShowExtendedStrFit(640, 345, str5, width5, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+
+			wchar_t* str6 = L"プレイヤー名、プレイした譜面の情報、スコアがサーバーに送信されます";
+			int width6 = GetDrawStringWidth(str6, wcslen(str6));
+			ShowExtendedStrFit(640, 375, str6, width6, 1000, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+
+
+		}
+		else if (stat == STATE_KEY_CONFIG) {
+			SetDrawBright(255, 255, 255);
+
+			wchar_t* str1 = L"\"キー設定を変更する\"";
+			int width1 = GetDrawStringWidth(str1, wcslen(str1));
+			ShowExtendedStrFit(640, 590, str1, width1, 300, config, KeyConfigMenuStat == KEY_CONFIG_MENU_SETTING ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+			wchar_t* str2 = L"\"戻る\"";
+			int width2 = GetDrawStringWidth(str2, wcslen(str2));
+			ShowExtendedStrFit(640, 620, str2, width2, 300, config, KeyConfigMenuStat == KEY_CONFIG_MENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+
+			if (keyConfigSettingFlag == 1) {
+				wchar_t* str1 = L"\"設定するキーを順に押してください\"";
+				int width1 = GetDrawStringWidth(str1, wcslen(str1));
+				ShowExtendedStrFit(640, 400, str1, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+
+				DrawBoxWithLine(640 - 80, 440, 640 - 40, 480,	settingKeyPosition.y == 0 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+				DrawBoxWithLine(640 - 40, 440, 640, 480,		settingKeyPosition.y == 0 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+				DrawBoxWithLine(640, 440, 640 + 40, 480,		settingKeyPosition.y == 0 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+				DrawBoxWithLine(640 + 40, 440, 640 + 80, 480,	settingKeyPosition.y == 0 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+
+				DrawBoxWithLine(640 - 40, 480, 640, 520,		settingKeyPosition.y == 1 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+				DrawBoxWithLine(640, 480, 640 + 40, 520,		settingKeyPosition.y == 1 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+				DrawBoxWithLine(640 + 40, 480, 640 + 80, 520,	settingKeyPosition.y == 1 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+				DrawBoxWithLine(640 - 80, 480, 640 - 40, 520,	settingKeyPosition.y == 1 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+
+				DrawBoxWithLine(640 - 80, 520, 640 - 40, 560,	settingKeyPosition.y == 2 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+				DrawBoxWithLine(640 - 40, 520, 640, 560,		settingKeyPosition.y == 2 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+				DrawBoxWithLine(640, 520, 640 + 40, 560,		settingKeyPosition.y == 2 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+				DrawBoxWithLine(640 + 40, 520, 640 + 80, 560,	settingKeyPosition.y == 2 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+			}
 		}
 
+
+
+		SetDrawBright(brightness, brightness, brightness);
 		if (config.Vsync == 0) {
 			i = 0;
 			while (LOOP_passed_time + i < (double)1000/config.Fps) {//FPSを安定させるため待つ

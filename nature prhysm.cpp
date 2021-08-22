@@ -20,6 +20,10 @@
 #include"CONSTANT_VALUE.h"
 
 #include "EffekseerForDXLib.h"
+#include <sys/stat.h>
+#include "STRUCT_IR_SETTING.h"
+#include "IR_process.h"
+
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
 void EffekseerInitProcess();
@@ -137,7 +141,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		result_rank_buf[i] = 0;
 	}
 
-	KeyConfig(Button, &Button_Shutter);//キー配置変更
+	KeyConfigLoad(Button, &Button_Shutter);//キー配置変更
 	/*
 	char **note;
 	note = (char**)calloc(4, sizeof(char));
@@ -182,6 +186,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	else {
 		//printfDx(L"無線LANに接続するとAndroidコントローラを使用できます\n");
 	}
+
+
+
+	//初回起動時にIR idの取得
+	IRgetID();
+
 	ScreenFlip();
 
 	//NetWorkSendUDP(NetUDPHandle, Ip, 4000, "12345", 6);
@@ -221,16 +231,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		//clsDx();
 		Sleep(1);
 	}
-	*/
+	*/ 
+
+	IR_SETTING ir;
 
 
-
-	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config);
-
-
-
-	
-	TITLE(Button, Button_Shutter, Key, Buf, &AC, config, &option);
+	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config, &ir);
+	TITLE(Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
 	int StageCount = 0;
 	while (1) {
 		SONG_SELECT(&list_number,
@@ -247,7 +254,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			&AC,
 			&StageCount,
 			&STList,
-			config);
+			config,
+			&ir);
 		StageCount++;
 	}
 	//GAME();

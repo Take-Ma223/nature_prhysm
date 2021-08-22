@@ -17,6 +17,7 @@
 
 #include <string>
 #include "SaveDataSaveLoad.h"
+#include "IR_process.h"
 using namespace std;
 
 void SHOW_RESULT(RESULT res,
@@ -34,6 +35,7 @@ void SHOW_RESULT(RESULT res,
 	SkillTestList *STList,
 	int list_number,
 	CONFIG config,
+	IR_SETTING* ir,
 	int SkillTestFlag) {
 	RESULT high_score;//現在のハイスコア
 	RESULT save;//実際に保存するデータ
@@ -411,6 +413,7 @@ void SHOW_RESULT(RESULT res,
 
 		int PlayCountBuf = high_score.play_counter + TryCount;
 		if (PlayCountBuf >= 9999)PlayCountBuf = 9999;//カンスト処理
+		res.play_counter = PlayCountBuf;
 		save.play_counter = PlayCountBuf;//プレイ回数を足す
 														//printfDx(L"保存しました\n");
 		save.hash_result = make_result_hash(save);
@@ -430,6 +433,11 @@ void SHOW_RESULT(RESULT res,
 		if (saveData.totalPlayCount >= SAVE_DATA_VALUE_LIMIT)saveData.totalPlayCount = SAVE_DATA_VALUE_LIMIT;
 
 		writeSaveData(saveData);
+
+		//インターネットランキング送信用スコアの保存、送信
+		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color != option->OP_COLOR_RAINBOW);
+		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color != option->OP_COLOR_RAINBOW);
+
 	}
 	else if(*debug == 0 && SkillTestFlag == SHOW_SKILL_TEST_RESULT){//段位スコア保存
 		//読み込みファイル名

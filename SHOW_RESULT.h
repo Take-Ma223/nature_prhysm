@@ -4,6 +4,7 @@
 #include"STRUCT_ANDROID_CONTROLLER.h"
 #include"STRUCT_LIST.h"
 #include"STRUCT_CONFIG.h"
+#include"STRUCT_IR_SETTING.h"
 
 #ifndef _SHOW_RESULT
 #define _SHOW_RESULT
@@ -12,6 +13,7 @@ extern void SHOW_RESULT(RESULT res, OPTION *option, int song_number, int difficu
 	SkillTestList *STList,
 	int list_number,
 	CONFIG config,
+	IR_SETTING* ir,
 	int SkillTestFlag = 0
 );
 

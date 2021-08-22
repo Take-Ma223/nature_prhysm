@@ -19,8 +19,10 @@
 #include"SaveDataSaveLoad.h"
 #include"ShowErrorName.h"
 #include"SongCacheSaveLoad.h"
+#include"STRUCT_IR_SETTING.h"
+#include"IR_SettingSaveLoad.h"
 
-void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, OPTION *op, CONFIG config) {
+void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, OPTION *op, CONFIG config, IR_SETTING* ir) {
 	int i = 0, j = 0;
 
 	HANDLE hFind_Folders = 0;//songsフォルダからフォルダを見つける用ハンドル
@@ -441,6 +443,9 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 
 	//最後のプレーのオプション読み込み
 	LoadOptionState(op);
+
+	//IR設定読み込み
+	LoadIRSetting(ir);
 
 	//セーブデータ読み込み
 	SAVEDATA saveData;

@@ -190,7 +190,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	//初回起動時にIR idの取得
-	IRgetID();
+	IRgetID(config);
 
 	ScreenFlip();
 

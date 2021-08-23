@@ -139,6 +139,8 @@ def main():
             bestData["play_count"] = data["play_count"]
             save(bestData, path)
         else:  # IDが違う時はそのまま保存
+            if data["clear_type"] == -1 or data["clear_type"] >= 2:  # //クリア、PLAYしたとき　MinMiss保存
+                data["min_miss"] = data["miss"]
             save(data, path)
     else:  # 初回保存の時はそのまま保存
         if data["clear_type"] == -1 or data["clear_type"] >= 2:  # //クリア、PLAYしたとき　MinMiss保存

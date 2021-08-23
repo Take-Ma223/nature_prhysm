@@ -20,7 +20,7 @@
 #include"ShowErrorName.h"
 #include"SongCacheSaveLoad.h"
 #include"STRUCT_IR_SETTING.h"
-#include"IR_SettingSaveLoad.h"
+#include"IR_process.h"
 
 void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, OPTION *op, CONFIG config, IR_SETTING* ir) {
 	int i = 0, j = 0;

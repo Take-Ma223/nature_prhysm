@@ -70,11 +70,12 @@ void EDIT_SCORE(SCORE_CELL *head,
 	int cash3 = 0;//式の見た目を簡単にする仲介3
 	int judge_area = 580, note_fall = -192;//ノートの判定エリアと落ち始める高さ-192~490
 
-	double scale = 0.650;//stepからの補正縮小率
+	double scale = 0.650 / EDITSTEP_SCALE_RATIO;//stepからの補正縮小率
 	
 	double scale_score_draw = *scale_score;//拡大縮小率(表示用)ヌルっと変わる
 	int scale_number = 3;
-	double scale_array[14] = {0.25,0.5,0.75,1,1.5,2,2.5,3,3.5,4,5,6,7,8};
+	const int SCALE_ARRAY_NUMBER = 23;
+	double scale_array[SCALE_ARRAY_NUMBER] = {0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.5,3,3.5,4,5,6,7,8,10,15,20,25,30,40,50};
 
 	int step_count = 0;//現在のステップ値
 	double step_count_draw = 0;//現在のステップ数(表示用)ヌルっと変わる
@@ -88,9 +89,10 @@ void EDIT_SCORE(SCORE_CELL *head,
 	CopyHead.next = NULL;
 	int PasteRange = 0;//現在のstep_countからどの範囲までを消して貼り付けすることになっているか
 
-	const int STEP_INDEX_ARRAY = 17;
-	int step_array[STEP_INDEX_ARRAY] = { EDITSTEP,EDITSTEP / 2,EDITSTEP / 4,EDITSTEP / 6,EDITSTEP / 8,EDITSTEP / 12,EDITSTEP / 16,EDITSTEP / 24,EDITSTEP / 32,EDITSTEP / 48,EDITSTEP / 64,EDITSTEP / 96,EDITSTEP / 128,EDITSTEP / 192,EDITSTEP / 256,EDITSTEP / 384,EDITSTEP / 768 };
-    int step_array_show[STEP_INDEX_ARRAY] = { 1,2,4,6,8,12,16,24,32,48,64,96,128,192,256,384,768 };
+	const int STEP_INDEX_ARRAY = 27;
+	int step_array[STEP_INDEX_ARRAY] = { EDITSTEP,EDITSTEP / 2,EDITSTEP / 4,EDITSTEP / 6,EDITSTEP / 8,EDITSTEP / 12,EDITSTEP / 16,EDITSTEP / 24,EDITSTEP / 32,EDITSTEP / 48,EDITSTEP / 64,EDITSTEP / 96,EDITSTEP / 128,EDITSTEP / 192,EDITSTEP / 256,EDITSTEP / 384,EDITSTEP / 768 ,
+	EDITSTEP / 5,EDITSTEP / 10,EDITSTEP / 20,EDITSTEP / 40,EDITSTEP / 80,EDITSTEP / 160,EDITSTEP / 320,EDITSTEP / 640,EDITSTEP / 1280,EDITSTEP / 3840};
+    int step_array_show[STEP_INDEX_ARRAY] = { 1,2,4,6,8,12,16,24,32,48,64,96,128,192,256,384,768, 5,10,20,40,80,160,320,640,1280,3840 };
 
 	int command_put = 0;//今どの命令について数値を変えているか(0:音符を置いている 1~命令の種類)
 	int cvb_STOPSTEP[2] = {1,1};//command value buf 命令の値を保存し新しく命令を置いた時この値をデフォルトの値に設定する
@@ -663,7 +665,7 @@ void EDIT_SCORE(SCORE_CELL *head,
 		else {//CTRLを押しているとき拡大縮小
 			if (Key[KEY_INPUT_UP] == 1 || (Key[KEY_INPUT_UP] >= PressFrame && push_counter >= PushTimeTh)) {
 				push_counter = 0;
-				if (scale_number <= 12) {
+				if (scale_number < SCALE_ARRAY_NUMBER - 1) {
 					scale_number++;
 					*scale_score = scale_array[scale_number];
 					PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);

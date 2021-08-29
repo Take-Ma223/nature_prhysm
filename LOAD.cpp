@@ -55,7 +55,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	}
 
 	BARLINE *barline;
-	barline = (BARLINE*)calloc(NOTE_MAX_NUMBER, sizeof(BARLINE));
+	barline = (BARLINE*)calloc(BARLINE_MAX_NUMBER, sizeof(BARLINE));
 
 	SongCache Cache;
 

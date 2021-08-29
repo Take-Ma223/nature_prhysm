@@ -3,7 +3,8 @@
 #ifndef _STRUCT_EDIT_SCORE
 #define _STRUCT_EDIT_SCORE
 
-#define EDITSTEP 768//1小節のエディタでの分割数
+#define EDITSTEP 3840//1小節のエディタでの分割数
+#define EDITSTEP_SCALE_RATIO 5//768に対する倍率
 
 typedef struct note_data {
 	char color[4];//音符の種類を数値で格納

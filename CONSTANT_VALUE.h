@@ -1,7 +1,8 @@
 ﻿#ifndef _CONSTANT_VALUE
 #define _CONSTANT_VALUE
 
-#define NOTE_MAX_NUMBER 6500//1レーン1500ノーツまで 6500は無理 6000ぐらいまでいけた
+#define NOTE_MAX_NUMBER 2000//1レーン2000ノーツまで 6500は無理 6000ぐらいまでいけた
+#define BARLINE_MAX_NUMBER 50000//小節線の最大数
 #define SONG_MAX_NUMBER 512//最大曲数 2300までいける
 #define VERSION 1.30        //バージョン
 

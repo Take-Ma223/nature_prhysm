@@ -326,7 +326,7 @@ void GAME(int song_number, int difficulty,
 
 	//小節線構造体メモリ確保
 	BARLINE *barline;
-	barline = (BARLINE*)calloc(NOTE_MAX_NUMBER, sizeof(BARLINE));
+	barline = (BARLINE*)calloc(BARLINE_MAX_NUMBER, sizeof(BARLINE));
 
 	int blc = 0;//barline counter
 
@@ -1255,7 +1255,7 @@ void GAME(int song_number, int difficulty,
 				FullComboFXFrame = 0;
 
 				HitingNoteCount = 0;
-				for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
 					barline[j].fall = 0;
 				}
 				for (i = 0; i <= 3; i++) {
@@ -1324,7 +1324,7 @@ void GAME(int song_number, int difficulty,
 				FullComboFXFrame = 0;
 				
 				HitingNoteCount = 0;
-				for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
 					barline[j].fall = 0;
 				}
 				for (i = 0; i <= 3; i++) {
@@ -1408,7 +1408,7 @@ void GAME(int song_number, int difficulty,
 					FullComboFXFrame = 0;
 
 					HitingNoteCount = 0;
-					for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+					for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
 						barline[j].fall = 0;
 					}
 					for (i = 0; i <= 3; i++) {
@@ -1490,7 +1490,7 @@ void GAME(int song_number, int difficulty,
 					FullComboFXFrame = 0;
 
 					HitingNoteCount = 0;
-					for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+					for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
 						barline[j].fall = 0;
 					}
 					for (i = 0; i <= 3; i++) {
@@ -1600,7 +1600,7 @@ void GAME(int song_number, int difficulty,
 				FullComboFXFrame = 0;
 
 				HitingNoteCount = 0;
-				for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
 					barline[j].fall = 0;
 				}
 				for (i = 0; i <= 3; i++) {
@@ -1742,7 +1742,7 @@ void GAME(int song_number, int difficulty,
 				FullComboFXFrame = 0;
 
 				HitingNoteCount = 0;
-				for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
 					barline[j].fall = 0;
 				}
 				for (i = 0; i <= 3; i++) {
@@ -2295,8 +2295,10 @@ void GAME(int song_number, int difficulty,
 
 		double QE_x = 0;//式の見た目を簡単にする仲介 Quadratic equationのx
 		double QE_y = 0;//式の見た目を簡単にする仲介 Quadratic equationのy
-		for (i = 0; i <= NOTE_MAX_NUMBER - 1; i++) {//ノートの座標計算
 
+
+		
+		for (i = 0; i <= BARLINE_MAX_NUMBER - 1; i++) {//小節線の座標計算
 			//小節線
 			barline[i].x = 640;
 			barline[i].y = -228;
@@ -2316,8 +2318,8 @@ void GAME(int song_number, int difficulty,
 			else {
 				if (barline[i].fall != 2)barline[i].fall = 0;//落ちてない(表示をしない)
 			}
-			
-
+		}
+		for (i = 0; i <= NOTE_MAX_NUMBER - 1; i++) {//ノートの座標計算
 			//音符
 			for (j = 0; j <= 3; j++) {
 				note[j][i].x = lane[j];//レーンのx座標
@@ -3003,7 +3005,7 @@ void GAME(int song_number, int difficulty,
 		BlendMode = DX_BLENDMODE_ALPHA;
 		BlendVal = 255;
 		if (option->op.barline == option->OP_BARLINE_ON) {//小節線を表示するオプションなら
-			for (i = NOTE_MAX_NUMBER - 1; i >= 0; i--) {//小節線の描画
+			for (i = BARLINE_MAX_NUMBER - 1; i >= 0; i--) {//小節線の描画
 				if (barline[i].fall == 1 && barline[i].use == 1) {
 					SetDrawBlendMode(BlendMode, BlendVal);
 					//if (note[j][i].color_init != 0)DrawGraph(note[j][i].x - 32, note[j][i].y, H_NOTE_OR_FRAME, TRUE);//ORノートの場合

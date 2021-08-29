@@ -186,9 +186,8 @@ void GAME_LOAD(int song_number,
 		stopSequence[i].timing = 0;
 		stopSequence[i].timing_real = 0;
 		stopSequence[i].stop_time = 0;
-
-		barline[i].use = 0;
 	}
+	for(i = 0; i <= BARLINE_MAX_NUMBER - 1; i++)barline[i].use = 0;
 
 	Music[song_number].total_note[difficulty] = 0;
 	//wcscpy_s(Music[song_number].jinglepath[difficulty], L"sound/jingle.wav");//デフォルトジングル

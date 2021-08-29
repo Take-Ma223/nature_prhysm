@@ -10,6 +10,8 @@
 #define CONTENTS_NOTE 1
 #define CONTENTS_COMMAND 2
 #define CONTENTS_END 3
+#define CONTENTS_END_EDGE 4
+
 
 void EDIT_SCORE(SCORE_CELL *head, Song *Music, OPTION *Option,
 	int song_number, int difficulty, double init_scroll,

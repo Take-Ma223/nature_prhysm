@@ -435,8 +435,8 @@ void SHOW_RESULT(RESULT res,
 		writeSaveData(saveData);
 
 		//インターネットランキング送信用スコアの保存、送信
-		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color != option->OP_COLOR_RAINBOW, config);
-		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color != option->OP_COLOR_RAINBOW, config);
+		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color == option->OP_COLOR_RAINBOW, config);
+		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
 
 	}
 	else if(*debug == 0 && SkillTestFlag == SHOW_SKILL_TEST_RESULT){//段位スコア保存

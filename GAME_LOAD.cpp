@@ -16,6 +16,7 @@
 //#include <functional>
 
 #include <algorithm>
+#include "EDIT_SCORE.h"
 
 
 void GAME_LOAD(int song_number,
@@ -1084,11 +1085,11 @@ void GAME_LOAD(int song_number,
 	if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
 		score_insert_cell(score_cell_insert, int(step_counter + 0.5));//エディタ用セル挿入
 		score_cell_insert = score_cell_insert->next;
-		score_cell_insert->content = 3;//#ENDを格納
+		score_cell_insert->content = CONTENTS_END;//#ENDを格納
 	
 		score_insert_cell(score_cell_insert, int(step_counter + 0.5));//エディタ用セル挿入
 		score_cell_insert = score_cell_insert->next;
-		score_cell_insert->content = 4;//終端を格納
+		score_cell_insert->content = CONTENTS_END_EDGE;//終端を格納
 	}
 
 	Music[song_number].TimeToEnd[difficulty] = int(time_counter_real + Music[song_number].noteoffset[difficulty] + stopTimeSum * 1000);//演奏終了タイミング

@@ -88,8 +88,9 @@ void EDIT_SCORE(SCORE_CELL *head,
 	CopyHead.next = NULL;
 	int PasteRange = 0;//現在のstep_countからどの範囲までを消して貼り付けすることになっているか
 
-	int step_array[17] = { EDITSTEP,EDITSTEP / 2,EDITSTEP / 4,EDITSTEP / 6,EDITSTEP / 8,EDITSTEP / 12,EDITSTEP / 16,EDITSTEP / 24,EDITSTEP / 32,EDITSTEP / 48,EDITSTEP / 64,EDITSTEP / 96,EDITSTEP / 128,EDITSTEP / 192,EDITSTEP / 256,EDITSTEP / 384,EDITSTEP / 768 };
-    int step_array_show[17] = { 1,2,4,6,8,12,16,24,32,48,64,96,128,192,256,384,768 };
+	const int STEP_INDEX_ARRAY = 17;
+	int step_array[STEP_INDEX_ARRAY] = { EDITSTEP,EDITSTEP / 2,EDITSTEP / 4,EDITSTEP / 6,EDITSTEP / 8,EDITSTEP / 12,EDITSTEP / 16,EDITSTEP / 24,EDITSTEP / 32,EDITSTEP / 48,EDITSTEP / 64,EDITSTEP / 96,EDITSTEP / 128,EDITSTEP / 192,EDITSTEP / 256,EDITSTEP / 384,EDITSTEP / 768 };
+    int step_array_show[STEP_INDEX_ARRAY] = { 1,2,4,6,8,12,16,24,32,48,64,96,128,192,256,384,768 };
 
 	int command_put = 0;//今どの命令について数値を変えているか(0:音符を置いている 1~命令の種類)
 	int cvb_STOPSTEP[2] = {1,1};//command value buf 命令の値を保存し新しく命令を置いた時この値をデフォルトの値に設定する
@@ -673,7 +674,7 @@ void EDIT_SCORE(SCORE_CELL *head,
 		if (Key[KEY_INPUT_LCONTROL] == 0 && Key[KEY_INPUT_RCONTROL] == 0) {//CTRLを押していない
 			if (Key[KEY_INPUT_RIGHT] == 1 || (Key[KEY_INPUT_RIGHT] >= PressFrame && push_LR_counter >= PushTimeTh)) {
 				push_LR_counter = 0;
-				if (*step_array_number <= 15) {
+				if (*step_array_number < STEP_INDEX_ARRAY - 1) {
 					(*step_array_number)++;
 					PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 				}
@@ -1923,7 +1924,7 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 		measure_p = score_cell_p;
 
 		buf_number= 0;//バッファの格納個数
-		while (measure_put_step > score_cell_p->step && score_cell_p->next->content != 4) {//1小節分
+		while (measure_put_step > score_cell_p->step && score_cell_p->next->content != CONTENTS_END_EDGE) {//1小節分
 			if (score_cell_p->content == CONTENTS_COMMAND) {//命令のMEASUREあったら
 				if (score_cell_p->data.command.kind == COMMAND_KIND_MEASURE) {
 					//fprintf_s(fp, "#MEASURE:%d/%d\n", (int)score_cell_p->data.command.value[0], (int)score_cell_p->data.command.value[1]);

@@ -76,11 +76,11 @@ void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, i
 	wchar_t passbuf[512];
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/save.py --local \"%s\" \"%s\" %d %d %s %d %d %d %d %d %d %d %d %d %d --run %s",
-			npsPath, folderPath, difficulty, season, rainbow ? "" : "--rainbow", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
+			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
 	}
 	else {
 		sprintfDx(passbuf, L"python3 util/save.py         \"%s\" \"%s\" %d %d %s %d %d %d %d %d %d %d %d %d %d --run %s",
-			npsPath, folderPath, difficulty, season, rainbow ? "" : "--rainbow", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
+			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };
@@ -99,11 +99,11 @@ void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficult
 	wchar_t passbuf[256];
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/send.py --local \"%s\" \"%s/IRdata/%d%s\" --run %s", 
-			npsPath, folderPath, difficulty, rainbow ? "" : "_r", RUN_PASS);
+			npsPath, folderPath, difficulty, rainbow ? L"_r" : L"", RUN_PASS);
 	}
 	else {
 		sprintfDx(passbuf, L"python3 util/send.py         \"%s\" \"%s/IRdata/%d%s\" --run %s",
-			npsPath, folderPath, difficulty, rainbow ? "" : "_r", RUN_PASS);
+			npsPath, folderPath, difficulty, rainbow ? L"_r" : L"", RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };
@@ -119,11 +119,11 @@ void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config) 
 	wchar_t passbuf[256];
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/view.py --local \"%s\" %s --run %s",
-			npsPath, rainbow ? "" : "--rainbow", RUN_PASS);
+			npsPath, rainbow ? L"--rainbow" : L"", RUN_PASS);
 	}
 	else {
 		sprintfDx(passbuf, L"python3 util/view.py         \"%s\" %s --run %s",
-			npsPath, rainbow ? "" : "--rainbow", RUN_PASS);
+			npsPath, rainbow ? L"--rainbow" : L"", RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };

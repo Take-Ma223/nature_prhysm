@@ -1320,8 +1320,8 @@ void SONG_SELECT(int *l_n,
 			if (Key[KEY_INPUT_F2] == 1) {//スコア再送信&ランキング表示
 				if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {//存在する譜面を選んでいる時
 					PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
-					IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color != option->OP_COLOR_RAINBOW, config);
-					IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color != option->OP_COLOR_RAINBOW, config);
+					IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
+					IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, config);
 				}
 				//if (ScoreShowMode == 0) {
 				//	ScoreShowMode = 1;

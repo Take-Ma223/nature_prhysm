@@ -13,7 +13,7 @@ typedef struct note_data {
 }note_data;
 
 
-#define COMMAND_KIND_MEASURE 0
+#define COMMAND_KIND_MEASURE 8
 #define COMMAND_KIND_BPM 1
 #define COMMAND_KIND_SCROLL 2
 #define COMMAND_KIND_SCROLL_BPM 3
@@ -21,6 +21,7 @@ typedef struct note_data {
 #define COMMAND_KIND_STOPSTEP 5
 #define COMMAND_KIND_HS 6
 #define COMMAND_KIND_LETBPM 7
+#define CONTENTS_KIND_DUMMY 10 //出力時に小節の先頭を指すセルとして使用
 
 typedef struct command_data {
 	char kind;//命令の種類

@@ -100,6 +100,7 @@ void EDIT_SCORE(SCORE_CELL *head,
 	double cvb_LETBPM = Music[song_number].bpm[difficulty];
 	double cvb_SCROLL = 1;
 	double cvb_SCROLL_BPM = Music[song_number].bpm[difficulty];
+	int cvb_MEASURE[2] = { 4,4 };
 
 	int push_counter = 0;//ボタン長押しカウンタ
 	int push_LR_counter = 0;
@@ -124,6 +125,8 @@ void EDIT_SCORE(SCORE_CELL *head,
 	int line_draw_step = 0;//補助線表示用カウンタ
 	SCORE_CELL *show;//表示するとき用ポインタ
 	show = head->next;
+
+	BOOL isInstructionAppear = 1;//操作説明表示フラグ
 
 	//画像音ハンドル値代入
 	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"y",L"c",L"m",L"w",L"d",L"f",
@@ -388,6 +391,12 @@ void EDIT_SCORE(SCORE_CELL *head,
 			score_delete_cell_all(&CopyHead);
 			break;
 			//PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+		}
+
+		if (Key[KEY_INPUT_F1] == 1) {//操作説明の表示非表示
+			if (isInstructionAppear == 0)isInstructionAppear = 1;
+			else isInstructionAppear = 0;
+			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 
 		if (Key[KEY_INPUT_Z] == 1 || (Key[KEY_INPUT_Z] >= PressFrame && push_counter >= PushTimeTh)) {//step_countをinsertにフィットさせる 前の音符に移動
@@ -1154,6 +1163,9 @@ void EDIT_SCORE(SCORE_CELL *head,
 									else if (command_put == COMMAND_KIND_SCROLL_BPM) {
 										score_cell_write_command(insert_command, command_put, cvb_SCROLL_BPM, 1, 1, 1);//初期化
 									}
+									else if (command_put == COMMAND_KIND_MEASURE) {
+										score_cell_write_command(insert_command, command_put, cvb_MEASURE[0], cvb_MEASURE[1], 1, 1);//初期化
+									}
 
 								}
 
@@ -1202,6 +1214,7 @@ void EDIT_SCORE(SCORE_CELL *head,
 										cvb_BPM;
 										cvb_SCROLL;
 										cvb_SCROLL_BPM;
+										cvb_MEASURE;
 
 										if (command_put == COMMAND_KIND_STOPSTEP) {
 											if (j == 0 || j == 1)insert_command->data.command.value[0] += inc;
@@ -1233,18 +1246,24 @@ void EDIT_SCORE(SCORE_CELL *head,
 											insert_command->data.command.value[0] += inc;
 											cvb_SCROLL_BPM = insert_command->data.command.value[0];
 										}
+										else if (command_put == COMMAND_KIND_MEASURE) {
+											if (j == 0 || j == 1)insert_command->data.command.value[0] += inc;
+											if (j == 2 || j == 3)insert_command->data.command.value[1] += inc;
+											cvb_STOPSTEP[0] = int(insert_command->data.command.value[0]);
+											cvb_STOPSTEP[1] = int(insert_command->data.command.value[1]);
+										}
 
-										if (insert_command->data.command.value[0] < 0) {
-											insert_command->data.command.value[0] = 0;
-										}
-										if (insert_command->data.command.value[1] < 0) {
-											insert_command->data.command.value[1] = 0;
-										}
-										if (insert_command->data.command.value[2] < 0) {
-											insert_command->data.command.value[2] = 0;
-										}
-										if (insert_command->data.command.value[3] < 0) {
-											insert_command->data.command.value[3] = 0;
+										for (int k = 0; k < 4; k++) {//コマンドの値の下限処理
+											if (command_put == COMMAND_KIND_MEASURE) {
+												if (insert_command->data.command.value[k] < 1) {
+														insert_command->data.command.value[k] = 1;
+												}
+											}
+											else {
+												if (insert_command->data.command.value[k] < 0) {
+													insert_command->data.command.value[k] = 0;
+												}
+											}
 										}
 									}
 								}
@@ -1291,33 +1310,38 @@ void EDIT_SCORE(SCORE_CELL *head,
 		}
 
 		if (Key[KEY_INPUT_1] == 1) {
-			command_put = COMMAND_KIND_STOPSTEP;
+			command_put = COMMAND_KIND_MEASURE;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_2] == 1) {
-			command_put = COMMAND_KIND_STOP;
+			command_put = COMMAND_KIND_STOPSTEP;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_3] == 1) {
-			command_put = COMMAND_KIND_HS;
+			command_put = COMMAND_KIND_STOP;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_4] == 1) {
-			command_put = COMMAND_KIND_BPM;
+			command_put = COMMAND_KIND_HS;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_5] == 1) {
-			command_put = COMMAND_KIND_LETBPM;
+			command_put = COMMAND_KIND_BPM;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_6] == 1) {
-			command_put = COMMAND_KIND_SCROLL;
+			command_put = COMMAND_KIND_LETBPM;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_7] == 1) {
+			command_put = COMMAND_KIND_SCROLL;
+			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
+		}
+		if (Key[KEY_INPUT_8] == 1) {
 			command_put = COMMAND_KIND_SCROLL_BPM;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
+
 
 		//カウンタ処理
 		for (i = 0; i < CRTBuf; i++) {
@@ -1576,8 +1600,8 @@ void EDIT_SCORE(SCORE_CELL *head,
 		//命令描画
 		//下に命令種類描画
 
-		DrawLine(150, 0, 150, 720, GetColor(0, 0, 0));
-		DrawLine(300, 0, 300, 720, GetColor(0, 0, 0));
+		DrawLine(229, 0, 229, 720, GetColor(0, 0, 0));
+		DrawLine(342, 0, 342, 720, GetColor(0, 0, 0));
 		DrawLine(455, 0, 455, 720, GetColor(0, 0, 0));
 		DrawLine(824, 0, 824, 720, GetColor(0, 0, 0));
 		DrawLine(937, 0, 937, 720, GetColor(0, 0, 0));
@@ -1585,13 +1609,13 @@ void EDIT_SCORE(SCORE_CELL *head,
 		DrawLine(1163, 0, 1163, 720, GetColor(0, 0, 0));
 
 		sprintfDx(command_show_str, L"MEASURE");
-		DrawString(30, 700, command_show_str, GetColor(255, 255, 255));
+		DrawString(123, 700, command_show_str, GetColor(255, 255, 255));
 
 		sprintfDx(command_show_str, L"STOPSTEP");
-		DrawString(175, 700, command_show_str, GetColor(255, 255, 255));
+		DrawString(237, 700, command_show_str, GetColor(255, 255, 255));
 
 		sprintfDx(command_show_str, L"STOP");
-		DrawString(352, 700, command_show_str, GetColor(255, 255, 255));
+		DrawString(375, 700, command_show_str, GetColor(255, 255, 255));
 
 		sprintfDx(command_show_str, L"BPM");
 		DrawString(860, 700, command_show_str, GetColor(255, 255, 255));
@@ -1626,15 +1650,15 @@ void EDIT_SCORE(SCORE_CELL *head,
 				}
 				if (show->data.command.kind == COMMAND_KIND_STOP) {
 					sprintfDx(command_show_str, L"%.2f", show->data.command.value[0]);
-					DrawString(355, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
+					DrawString(375, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
 				}
 				if (show->data.command.kind == COMMAND_KIND_STOPSTEP) {
 					sprintfDx(command_show_str, L"%d/%d", int(show->data.command.value[0]), int(show->data.command.value[1]));
-					DrawString(205, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
+					DrawString(266, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
 				}
 				if (show->data.command.kind == COMMAND_KIND_MEASURE) {
 					sprintfDx(command_show_str, L"%d/%d", int(show->data.command.value[0]), int(show->data.command.value[1]));
-					DrawString(58, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
+					DrawString(150, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
 				}
 				if (show->data.command.kind == COMMAND_KIND_BPM) {
 					sprintfDx(command_show_str, L"%.2f", show->data.command.value[0]);
@@ -1678,163 +1702,179 @@ void EDIT_SCORE(SCORE_CELL *head,
 		printfDx("bpm:%f\n", bpm);
 		printfDx("insert_passed_time:%f\n", insert_passed_time);
 		*/
-		
-		printfDx(L"F11:保存せず戻る return\n");
-		printfDx(L"ESC:保存して戻る SAVE & return\n");
-		printfDx(L"\n");
-		printfDx(L"↑↓:移動\n");
-		printfDx(L"Shift+↑↓:範囲選択\n");
-		printfDx(L"Ctrl+↑↓:拡大縮小 %f\n",*scale_score);
-		printfDx(L"←→:移動幅変更\n");
-		printfDx(L"note value:1/%d\n", step_array_show[*step_array_number]);
-		printfDx(L"Ctrl+←→:スウィング比変更\n");
-		printfDx(L"1");
-		for (i = 0; i < *SwingBackBeatTime - 1; i++) {
-			printfDx(L"0");
-		}
-		printfDx(L"1");
-		for (i = 0; i < SWING_DIVISION - *SwingBackBeatTime - 1; i++) {
-			printfDx(L"0");
-		}
-		printfDx(L"\n");
 
+		if (isInstructionAppear) {
+			printfDx(L"F1:操作説明を非表示\n");
 
-		printfDx(L"\n");
+			printfDx(L"F11:保存せず戻る return\n");
+			printfDx(L"ESC:保存して戻る SAVE & return\n");
 
-
-		printfDx(L"step:%d\n",step_array[*step_array_number]);
-		printfDx(L"step_count:%d\n", step_count);
-
-		printfDx(L"\n");
-
-		if (command_put == 0) {
-
-			if (note_kind == 0) {
-				printfDx(L"RTYU:青音符\n");
-				printfDx(L"FGHJ:緑音符\n");
-				printfDx(L"VBNM:赤音符\n");
-			
-				if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {
-					printfDx(L"SHIFT:光る音符ON\n");
-				}
-				else {
-					printfDx(L"SHIFT:光る音符OFF\n");
-				}
-			}
-			else if (note_kind == 1) {
-				if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {
-					printfDx(L"RTYU:ロングノート黒終端\n");
-				}
-				else {
-					printfDx(L"RTYU:ロングノート終端\n");
-				}
-				
-				printfDx(L"FGHJ:虹音符\n");
-				printfDx(L"VBNM:黒音符\n");
-			
-				if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {
-					printfDx(L"SHIFT:光る音符,LN黒終端ON\n");
-				}
-				else {
-					printfDx(L"SHIFT:光る音符,LN黒終端OFF\n");
-				}
-			}
-			
-
-
-			printfDx(L"SPACE:音符種類変更\n");
-
-		}
-		else {//命令を置くモード
-			printfDx(L"RTYU:値を増やす\n");
-			printfDx(L"FGHJ:命令を置く\n");
-			printfDx(L"VBNM:値を減らす\n");
-			printfDx(L"Alt押しながらで値を細かく調整");
 			printfDx(L"\n");
+			printfDx(L"↑↓:移動\n");
+			printfDx(L"Shift+↑↓:範囲選択\n");
+			printfDx(L"Ctrl+↑↓:拡大縮小 %f\n", *scale_score);
+			printfDx(L"←→:移動幅変更\n");
+			printfDx(L"note value:1/%d\n", step_array_show[*step_array_number]);
+			printfDx(L"Ctrl+←→:スウィング比変更\n");
+			printfDx(L"1");
+			for (i = 0; i < *SwingBackBeatTime - 1; i++) {
+				printfDx(L"0");
+			}
+			printfDx(L"1");
+			for (i = 0; i < SWING_DIVISION - *SwingBackBeatTime - 1; i++) {
+				printfDx(L"0");
+			}
 			printfDx(L"\n");
-		}
 
-		printfDx(L"\n");
 
-		if (command_put == 0) {
-			
-			if (area.StartCell != NULL && area.EndCell != NULL) {
-				printfDx(L"BackSpace:選択範囲の音符を消去\n");
+			printfDx(L"\n");
+
+
+			printfDx(L"step:%d\n", step_array[*step_array_number]);
+			printfDx(L"step_count:%d\n", step_count);
+
+			printfDx(L"\n");
+
+			if (command_put == 0) {
+
+				if (note_kind == 0) {
+					printfDx(L"RTYU:青音符\n");
+					printfDx(L"FGHJ:緑音符\n");
+					printfDx(L"VBNM:赤音符\n");
+
+					if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {
+						printfDx(L"SHIFT:光る音符ON\n");
+					}
+					else {
+						printfDx(L"SHIFT:光る音符OFF\n");
+					}
+				}
+				else if (note_kind == 1) {
+					if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {
+						printfDx(L"RTYU:ロングノート黒終端\n");
+					}
+					else {
+						printfDx(L"RTYU:ロングノート終端\n");
+					}
+
+					printfDx(L"FGHJ:虹音符\n");
+					printfDx(L"VBNM:黒音符\n");
+
+					if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {
+						printfDx(L"SHIFT:光る音符,LN黒終端ON\n");
+					}
+					else {
+						printfDx(L"SHIFT:光る音符,LN黒終端OFF\n");
+					}
+				}
+
+
+
+				printfDx(L"SPACE:音符種類変更\n");
+
+			}
+			else {//命令を置くモード
+				printfDx(L"RTYU:値を増やす\n");
+				printfDx(L"FGHJ:命令を置く\n");
+				printfDx(L"VBNM:値を減らす\n");
+				printfDx(L"Alt押しながらで値を細かく調整");
+				printfDx(L"\n");
+				printfDx(L"\n");
+			}
+
+			printfDx(L"\n");
+
+			if (command_put == 0) {
+
+				if (area.StartCell != NULL && area.EndCell != NULL) {
+					printfDx(L"BackSpace:選択範囲の音符を消去\n");
+				}
+				else {
+					printfDx(L"BackSpace:音符を消去\n");
+				}
 			}
 			else {
-				printfDx(L"BackSpace:音符を消去\n");
+				printfDx(L"BackSpace:選択した命令を消去\n");
 			}
-		}
-		else {
-			printfDx(L"BackSpace:選択した命令を消去\n");
-		}
 
-		printfDx(L"Q:グリッド位置変更\n");
+			printfDx(L"Q:グリッド位置変更\n");
 
-		/*
-		if (AutoMove == 0) {
-			printfDx(L"A:AutoMove OFF\n");
-		}
-		else if (AutoMove == 1) {
-			printfDx(L"A:AutoMove ON\n");
-		}
-		*/
-		printfDx(L"A:上の音符,命令に移動\n");
-		printfDx(L"Z:下の音符,命令に移動\n");
+			/*
+			if (AutoMove == 0) {
+				printfDx(L"A:AutoMove OFF\n");
+			}
+			else if (AutoMove == 1) {
+				printfDx(L"A:AutoMove ON\n");
+			}
+			*/
+			printfDx(L"A:上の音符,命令に移動\n");
+			printfDx(L"Z:下の音符,命令に移動\n");
 
-		if (area.StartCell != NULL && area.EndCell != NULL) {
-			printfDx(L"Ctrl+M:選択範囲(赤)を反転\n");
-		}
-		else {
+			if (area.StartCell != NULL && area.EndCell != NULL) {
+				printfDx(L"Ctrl+M:選択範囲(赤)を反転\n");
+			}
+			else {
+				printfDx(L"\n");
+			}
+			if (area.StartCell != NULL && area.EndCell != NULL) {
+				printfDx(L"Ctrl+C:コピー対象範囲(青)をコピー\n");
+			}
+			else {
+				printfDx(L"\n");
+			}
+			if (CopyHead.next != NULL) {
+				printfDx(L"Ctrl+V:コピー範囲を緑領域に貼り付け\n");
+			}
+			else {
+				printfDx(L"\n");
+			}
+
 			printfDx(L"\n");
-		}
-		if (area.StartCell != NULL && area.EndCell != NULL) {
-			printfDx(L"Ctrl+C:コピー対象範囲(青)をコピー\n");
+			printfDx(L"数字キーで配置モード変更\n");
+			if (command_put == 0) {
+				printfDx(L"配置モード:#NOTE\n");
+			}
+			else if (command_put == COMMAND_KIND_STOPSTEP) {
+				printfDx(L"配置モード:#STOPSTEP\n");
+			}
+			else if (command_put == COMMAND_KIND_STOP) {
+				printfDx(L"配置モード:#STOP\n");
+			}
+			else if (command_put == COMMAND_KIND_HS) {
+				printfDx(L"配置モード:#HS\n");
+			}
+			else if (command_put == COMMAND_KIND_BPM) {
+				printfDx(L"配置モード:#BPM\n");
+			}
+			else if (command_put == COMMAND_KIND_LETBPM) {
+				printfDx(L"配置モード:#LETBPM\n");
+			}
+			else if (command_put == COMMAND_KIND_SCROLL) {
+				printfDx(L"配置モード:#SCROLL\n");
+			}
+			else if (command_put == COMMAND_KIND_SCROLL_BPM) {
+				printfDx(L"配置モード:#SCROLL_BPM\n");
+			}
+			else if (command_put == COMMAND_KIND_MEASURE) {
+				printfDx(L"配置モード:#MEASURE\n");
+			}
+
+			printfDx(L"0:#NOTE\n");
+			printfDx(L"1:#MEASURE\n");
+			printfDx(L"2:#STOPSTEP\n");
+			printfDx(L"3:#STOP\n");
+			printfDx(L"4:#HS\n");
+			printfDx(L"5:#BPM\n");
+			printfDx(L"6:#LETBPM\n");
+			printfDx(L"7:#SCROLL\n");
+			printfDx(L"8:#SCROLLBPM\n");
 		}
 		else {
-			printfDx(L"\n");
-		}
-		if (CopyHead.next != NULL) {
-			printfDx(L"Ctrl+V:コピー範囲を緑領域に貼り付け\n");
-		}
-		else {
-			printfDx(L"\n");
+			printfDx(L"F1:操作説明を表示\n");
 		}
 
-		printfDx(L"\n");
-		if (command_put == 0) {
-			printfDx(L"Put mode:#NOTE\n");
-		}
-		else if (command_put == COMMAND_KIND_STOPSTEP) {
-			printfDx(L"Put mode:#STOPSTEP\n");
-		}
-		else if (command_put == COMMAND_KIND_STOP) {
-			printfDx(L"Put mode:#STOP\n");
-		}
-		else if (command_put == COMMAND_KIND_HS) {
-			printfDx(L"Put mode:#HS\n");
-		}
-		else if (command_put == COMMAND_KIND_BPM) {
-			printfDx(L"Put mode:#BPM\n");
-		}
-		else if (command_put == COMMAND_KIND_LETBPM) {
-			printfDx(L"Put mode:#LETBPM\n");
-		}
-		else if (command_put == COMMAND_KIND_SCROLL) {
-			printfDx(L"Put mode:#SCROLL\n");
-		}
-		else if (command_put == COMMAND_KIND_SCROLL_BPM) {
-			printfDx(L"Put mode:#SCROLL_BPM\n");
-		}
+		
 
-		printfDx(L"0:#NOTE\n");
-		printfDx(L"1:#STOPSTEP\n");
-		printfDx(L"2:#STOP\n");
-		printfDx(L"3:#HS\n");
-		printfDx(L"4:#BPM\n");
-		printfDx(L"5:#LETBPM\n");
-		printfDx(L"6:#SCROLL\n");
-		printfDx(L"7:#SCROLLBPM\n");
 
 
 		//printfDx(L"start:%d\n", area.start);
@@ -1846,6 +1886,37 @@ void EDIT_SCORE(SCORE_CELL *head,
 		clsDx();
 
 	}
+
+	//メモリ解放
+
+	//画像データ
+	for (i = 0; i < 12; i++) {
+		DeleteGraph(H_NOTE[i]);
+		DeleteGraph(H_LNOTE[i]);
+	}
+	DeleteGraph(H_JUDGE_AREA);
+	DeleteGraph(H_BG);
+
+	//音声データ
+	DeleteSoundMem(SH.SH_HIT_N);
+	DeleteSoundMem(SH.SH_HIT_L);
+	DeleteSoundMem(SH.SH_HIT_S);
+	DeleteSoundMem(SH.SH_HIT_R_N);
+	DeleteSoundMem(SH.SH_HIT_R_L);
+	DeleteSoundMem(SH.SH_HIT_R_S);
+	DeleteSoundMem(SH.SH_HIT_G_N);
+	DeleteSoundMem(SH.SH_HIT_G_L);
+	DeleteSoundMem(SH.SH_HIT_G_S);
+	DeleteSoundMem(SH.SH_HIT_B_N);
+	DeleteSoundMem(SH.SH_HIT_B_L);
+	DeleteSoundMem(SH.SH_HIT_B_S);
+	DeleteSoundMem(SH.SH_HIT_K);
+	DeleteSoundMem(SH_STEP_CHANGE);
+	DeleteSoundMem(SH_STEP_INC_DEC);
+	DeleteSoundMem(SH_SAVE);
+	DeleteSoundMem(SH_NO);
+	DeleteSoundMem(SH_SHUTTER);
+	DeleteSoundMem(SH_SHUTTER_SIGNAL);
 
 	return;
 }
@@ -1921,32 +1992,60 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 	while (score_cell_p->content != CONTENTS_END) {//終端まで
 		
 		//1小節の最小単位を検出
+		if (score_cell_p->step != measure_step) {//小節の先頭にセルが無い時はダミーを挿入
+			score_insert_cell(score_cell_p->before, measure_step);
+			score_cell_p = score_cell_p->before;
+			score_cell_write_command(score_cell_p, CONTENTS_KIND_DUMMY);
+		}
 		measure_p = score_cell_p;
 
 		buf_number= 0;//バッファの格納個数
-		while (measure_put_step > score_cell_p->step && score_cell_p->next->content != CONTENTS_END_EDGE) {//1小節分
+		BOOL isNextMeasure = 0;
+		while (measure_put_step > score_cell_p->step && isNextMeasure == 0 && score_cell_p->next->content != CONTENTS_END_EDGE) {//1小節分
 			if (score_cell_p->content == CONTENTS_COMMAND) {//命令のMEASUREあったら
 				if (score_cell_p->data.command.kind == COMMAND_KIND_MEASURE) {
 					//fprintf_s(fp, "#MEASURE:%d/%d\n", (int)score_cell_p->data.command.value[0], (int)score_cell_p->data.command.value[1]);
+
 					measure = (double)score_cell_p->data.command.value[0] / (double)score_cell_p->data.command.value[1];
 					DN = int(measure*EDITSTEP+0.5);
 					measure_put_step = measure_step + int(DN);
 				}
 			}
 
-			if (score_cell_p->next->step < measure_put_step) {//この小節の最後ではない
-				if (buf_number == 0) {
-					if (score_cell_p->step - measure_step != 0) {//この小節の最初の音符、命令が小節の先頭に無いとき
-						row_buf[buf_number] = score_cell_p->step - measure_step;//バッファにタイミング差分格納(0なら入れない)
-						buf_number++;
+			//小節内に小節線変更コマンドがあるかどうか
+			if (score_cell_p->next->content == CONTENTS_COMMAND && score_cell_p->next->step != measure_p->step) {
+				if (score_cell_p->next->data.command.kind == COMMAND_KIND_MEASURE) {
+					isNextMeasure = 1;
+
+					//小節線を変更
+					int measureLength = score_cell_p->next->step - measure_step;
+
+					if (measureLength < DN) {//次の#MEASUREコマンドまでの長さが現在の小節長より短い場合に小節の先頭に小節線コマンド変更
+						measure = (double)measureLength / EDITSTEP;
+						DN = measureLength;
+						measure_put_step = measure_step + int(DN);
+
+						int gcdVal = gcd(measureLength, EDITSTEP);
+						int numerator = measureLength / gcdVal;
+						int denominator = EDITSTEP / gcdVal;
+
+						SCORE_CELL* measure_command = score_cell_find_command(measure_p, COMMAND_KIND_MEASURE);
+						if (measure_command == NULL) {//既に小節線変更コマンドが無ければ挿入
+							SCORE_CELL* insert = measure_p->before;
+							score_insert_cell(insert, measure_p->step);
+							measure_p = insert->next;
+							score_cell_write_command(measure_p, COMMAND_KIND_MEASURE, numerator, denominator, 0, 0);
+							measure_command = measure_p;
+						}
+						else {
+							measure_command->data.command.value[0] = numerator;
+							measure_command->data.command.value[1] = denominator;
+						}
 					}
 				}
-				if (score_cell_p->next->step - score_cell_p->step != 0) {
-					row_buf[buf_number] = score_cell_p->next->step - score_cell_p->step;//バッファに(1つ下の行-今の行)のタイミング差分格納(0なら入れない)
-					buf_number++;
-				}
 			}
-			else {//小節内の最後の音符、命令は次の小節の先頭との差分を取る
+
+			if (score_cell_p->next->step >= measure_put_step || isNextMeasure) {//小節内の最後の音符(または小節内に小節変更命令があった)のとき　　音符間隔の値は"音符または命令"と次の小節の先頭との差分とする
 				if (buf_number == 0) {//最後で最初の音符 小節に1つしかない
 					if (score_cell_p->step - measure_step != 0) {
 						row_buf[buf_number] = score_cell_p->step - measure_step;//バッファにタイミング差分格納(0なら入れない)
@@ -1958,9 +2057,20 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 				buf_number++;
 			
 			}
+			else {//この小節の最後ではない
+				if (buf_number == 0) {
+					if (score_cell_p->step - measure_step != 0) {//この小節の最初の音符、命令が小節の先頭に無いとき
+						row_buf[buf_number] = score_cell_p->step - measure_step;//バッファにタイミング差分格納(0なら入れない)
+						buf_number++;
+					}
+				}
+				if (score_cell_p->next->step - score_cell_p->step != 0) {
+					row_buf[buf_number] = score_cell_p->next->step - score_cell_p->step;//バッファに(1つ下の行-今の行)のタイミング差分格納(0なら入れない)
+					buf_number++;
+				}
+			}
 
-
-			if (score_cell_p->next->content != 4) {//次の音符がある
+			if (score_cell_p->next->content != CONTENTS_END_EDGE) {//次に音符、または#ENDがある
 				score_cell_p = score_cell_p->next;//1つ進める
 			}
 			else {
@@ -2093,6 +2203,7 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 		return 1;
 	}
 	_wrename(filename_save, filename_save_final);//一時保存ファイルを.npsにリネーム
+
 	return 0;
 }
 

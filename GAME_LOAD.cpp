@@ -46,7 +46,7 @@ void GAME_LOAD(int song_number,
 	*hash = 0;//譜面ハッシュ値初期化
 	int hash_M = 99999999;//譜面ハッシュ値の最大値
 
-	int i = 0, j = 0, k = 0, n = 0, m = 0;
+	int i = 0, j = 0, k = 0, n = 0, dataArrayLength = 0;
 	int fp = 0;
 	errno_t error = 0;
 	//NOTE copy[4][NOTE_MAX_NUMBER];
@@ -79,19 +79,7 @@ void GAME_LOAD(int song_number,
 	double time_counter = 0;//単位はミリ秒
 	double time_counter_real = 0;//実際の(GAME_time_passed)経過時間
 
-	const int CASH_ROW = 2048;
-	const int CASH_COLUMN = 256;
-	wchar_t** cash;//一小節分記憶用(00rb\0)とかが入る
-	wchar_t** cash2;//:の右側記憶用
-	//wchar_t cash[CASH_ROW][CASH_COLUMN];//一小節分記憶用(00rb\0)とかが入る
-	//wchar_t cash2[CASH_ROW][CASH_COLUMN];//:の右側記憶用
 
-	cash = new wchar_t*[CASH_ROW];
-	cash2 = new wchar_t* [CASH_ROW];
-	for (i = 0; i < CASH_ROW; i++) {
-		cash[i] = new wchar_t [CASH_COLUMN];
-		cash2[i] = new wchar_t [CASH_COLUMN];
-	}
 
 	int DN = 0;//Division Number一小節の分割数
 
@@ -446,14 +434,6 @@ void GAME_LOAD(int song_number,
 		//ScreenFlip();
 	}
 	if (readflag == 1) {
-		for (i = 0; i < CASH_ROW; i++) {
-			delete[] cash[i];
-			delete[] cash2[i];
-		}
-		delete[] cash;
-		delete[] cash2;
-
-
 		free(bpmList);
 		free(timing_same);
 
@@ -494,7 +474,8 @@ void GAME_LOAD(int song_number,
 	}
 
 	//time_counter_real = config.VsyncOffsetCompensation;
-
+	int file_p_first = 0;//小節先頭ファイルポインタ(読み込んでいる小節の先頭を指す)
+	file_p_first = FileRead_tell(fp);//最初に読み込む小節の先頭を指す
 	i = 0;
 	while (wcscmp(L"#END", sharp1) != 0) {//譜面読み込み部
 		if (ProcessMessage() != 0) {
@@ -510,8 +491,7 @@ void GAME_LOAD(int song_number,
 		} while (wcscmp(str, L"") == 0);
 
 		swscanf_s(str, L"%[^:\n]:%[^:\n]", sharp1, _countof(sharp1), sharp2, _countof(sharp2));
-		printfDx(L"%s\n", sharp1);
-
+		dataArrayLength++;//データの行数を数える
 
 		if (wcscmp(L"#MEASURE", sharp1) == 0) {
 			swscanf_s(sharp2, L"%[^/\n]/%[^/\n]", nume_c, _countof(nume_c), deno_c, _countof(deno_c));
@@ -529,59 +509,36 @@ void GAME_LOAD(int song_number,
 			//printfDx(L"%f\n", measure);
 			//textLine++;
 		}
-		/*if (wcscmp(L"#BPM", sharp1) == 0) {
-		bpm = _wtof(sharp2);
-		note[0][bcc].timing = int(time_counter + Music[song_number].noteoffset[difficulty]);
-		note[0][bcc].bpm = bpm;
-		note[0][bcc].color = 1;//このノートを使っているとするためのフラグ
-		bcc++;
-		//printfDx(L"%f\n", bpm);
-		}*/
-
 
 		if ((wcslen(sharp1) >= 1) && sharp1[wcslen(sharp1) - 1] != L',') {//最後がカンマではない1文字以上の行(#命令も含めて複数行になる所)を見つけた
-			//printfDx(L"複数行!\n");
-			strcpyDx(cash[m], sharp1);
-			strcpyDx(cash2[m], sharp2);
-			//wcscpy_s(cash[m], sharp1);
-			//wcscpy_s(cash2[m], sharp2);
-			if (cash[m][0] != L'#') {//命令じゃないときに
-				for (n = 1; n <= int(4 - wcslen(sharp1)); n++) {//途中までしか書かれてなかったら0で埋める
-					//wcscat_s(cash[m], L"0");
-					strcatDx(cash[m], L"0");
-				}
-			}
-			//printfDx(L"cash=%s\n", cash[i]);
-			m++;//データの行数を数える
-
 			if (sharp1[0] != L'#') {//先頭が#じゃないなら分割数を数える
 				i++;//一小節の分割数を数える
 			}
 		}
 
-		if (wcsrchr(sharp1, L',') != NULL) {//「,」がある行を見つけた→一小節分読み込んだのでnoteにデータを入れる
-		    //printfDx(L"カンマ\n");
-			strcpyDx(cash[m], sharp1);
-			//wcscpy_s(cash[m], sharp1);
-			for (n = 1; n <= int(5 - wcslen(sharp1)); n++) {
-				//wcscat_s(cash[m], L"0");
-				strcatDx(cash[m], L"0");
-			}
+
+		if (wcsrchr(sharp1, L',') != NULL) {//「,」がある行を見つけた → 1小節分読み込んだので分割数を決めnoteにデータを入れる
 			i++;//「,」行分の分割数を足す
-			m++;
 			DN = i;//DN分音符単位になる
 			i = 0;
 
+			FileRead_seek(fp, file_p_first, SEEK_SET);//読み込む小節の先頭にファイルポインタを合わせる
+
 			BOOL PutBarline = 1;//このキャッシュ内で小節線をまだ置いていないというフラグ
-			for (i = 0; i <= m - 1; i++) {//キャッシュの0行目からm-1行目まで探す
-				if (wcscmp(L"#BPM", cash[i]) == 0) {//BPM変更点を見つけた
-					bpm = _wtof(cash2[i])*pitch;
+			while (1) {
+				do {//空行は無視
+					FileRead_gets(str, 256, fp);//一行取得(\nは入らない)
+				} while (wcscmp(str, L"") == 0);
+				swscanf_s(str, L"%[^:\n]:%[^:\n]", sharp1, _countof(sharp1), sharp2, _countof(sharp2));
+
+				if (wcscmp(L"#BPM", sharp1) == 0) {//BPM変更点を見つけた
+					bpm = _wtof(sharp2) * pitch;
 					bpm_change_add(bpm, bpmchange, &bcc, time_counter, note_offset_scroll, &bc_timing_real, &bc_timing, scroll, stopTimeSum);
 
-                    
+
 					*hash = (*hash + int(bpm * 73087)) % hash_M;
 					//printfDx(L"%f\n", bpm);
-					
+
 					//エディタ用処理
 					if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
 						score_insert_cell(score_cell_insert, int(step_counter + 0.5));//エディタ用セル挿入
@@ -591,8 +548,8 @@ void GAME_LOAD(int song_number,
 					}
 				}
 
-				if (wcscmp(L"#LETBPM", cash[i]) == 0) {//SCROLLを考慮したBPM変更点を見つけた
-					bpm = _wtof(cash2[i]) * pitch / scroll;
+				if (wcscmp(L"#LETBPM", sharp1) == 0) {//SCROLLを考慮したBPM変更点を見つけた
+					bpm = _wtof(sharp2) * pitch / scroll;
 					bpm_change_add(bpm, bpmchange, &bcc, time_counter, note_offset_scroll, &bc_timing_real, &bc_timing, scroll, stopTimeSum);
 
 
@@ -604,11 +561,11 @@ void GAME_LOAD(int song_number,
 						score_insert_cell(score_cell_insert, int(step_counter + 0.5));//エディタ用セル挿入
 						score_cell_insert = score_cell_insert->next;
 
-						score_cell_write_command(score_cell_insert, COMMAND_KIND_LETBPM, _wtof(cash2[i])* pitch);//コマンド挿入
+						score_cell_write_command(score_cell_insert, COMMAND_KIND_LETBPM, _wtof(sharp2) * pitch);//コマンド挿入
 					}
 				}
 
-				if (wcscmp(L"#SCROLL", cash[i]) == 0 || wcscmp(L"#SC", cash[i]) == 0) {//スクロールスピード変更点を見つけた(倍率指定)
+				if (wcscmp(L"#SCROLL", sharp1) == 0 || wcscmp(L"#SC", sharp1) == 0) {//スクロールスピード変更点を見つけた(倍率指定)
 					double time_buf = time_counter + note_offset_scroll;
 
 					scrollchange[scc].timing = time_buf;
@@ -617,7 +574,7 @@ void GAME_LOAD(int song_number,
 					scrollchange[scc].timing_real = sc_timing_real
 						+ stopTimeSum * 1000;
 					sc_timing = time_buf;
-					scroll = _wtof(cash2[i]);
+					scroll = _wtof(sharp2);
 					scrollchange[scc].scroll = scroll;
 
 					//BPM
@@ -629,7 +586,7 @@ void GAME_LOAD(int song_number,
 					bpmchange[bcc].bpm = (bpm * scroll);
 					bpmchange[bcc].use = 1;//このノートを使っているとするためのフラグ
 					bcc++;
-					
+
 					if (scc == 0) {
 						//Music[song_number].songoffset[difficulty] /= scroll;
 						//Music[song_number].noteoffset[difficulty] /= scroll;
@@ -650,7 +607,7 @@ void GAME_LOAD(int song_number,
 
 				}
 
-				if (wcscmp(L"#SCROLLBPM", cash[i]) == 0 || wcscmp(L"#SCBPM", cash[i]) == 0) {//スクロールスピード変更点を見つけた(BPM値指定)
+				if (wcscmp(L"#SCROLLBPM", sharp1) == 0 || wcscmp(L"#SCBPM", sharp1) == 0) {//スクロールスピード変更点を見つけた(BPM値指定)
 					double time_buf = time_counter + note_offset_scroll;
 
 					scrollchange[scc].timing = time_buf + 0.5;
@@ -659,7 +616,7 @@ void GAME_LOAD(int song_number,
 					scrollchange[scc].timing_real = sc_timing_real
 						+ stopTimeSum * 1000;
 					sc_timing = time_buf;
-					scroll = pitch*_wtof(cash2[i]) / bpm;//指定されたBPM/現在のBPMの割合で速度を変える
+					scroll = pitch * _wtof(sharp2) / bpm;//指定されたBPM/現在のBPMの割合で速度を変える
 					scrollchange[scc].scroll = scroll;
 
 					//BPM
@@ -686,16 +643,16 @@ void GAME_LOAD(int song_number,
 						score_insert_cell(score_cell_insert, int(step_counter + 0.5));//エディタ用セル挿入
 						score_cell_insert = score_cell_insert->next;
 
-						score_cell_write_command(score_cell_insert, COMMAND_KIND_SCROLL_BPM, _wtof(cash2[i]));//コマンド挿入
+						score_cell_write_command(score_cell_insert, COMMAND_KIND_SCROLL_BPM, _wtof(sharp2));//コマンド挿入
 					}
 
 				}
 
-				if (wcscmp(L"#STOP", cash[i]) == 0) {//停止地点を見つけた(数値指定)
-					stopSequence[stop_se_c].timing = int(time_counter + note_offset_scroll +0.5);
+				if (wcscmp(L"#STOP", sharp1) == 0) {//停止地点を見つけた(数値指定)
+					stopSequence[stop_se_c].timing = int(time_counter + note_offset_scroll + 0.5);
 					stopSequence[stop_se_c].timing_real = time_counter_real + Music[song_number].noteoffset[difficulty]
 						+ stopTimeSum * 1000;//停止地点のタイミング
-					stopSequence[stop_se_c].stop_time = _wtof(cash2[i])/pitch;//停止時間(s)
+					stopSequence[stop_se_c].stop_time = _wtof(sharp2) / pitch;//停止時間(s)
 					stopSequence[stop_se_c].use = 1;
 
 
@@ -708,26 +665,26 @@ void GAME_LOAD(int song_number,
 
 					ignoreFlag = 1;//次のノートにはタイミングずらしを適用しない
 
-	     			//エディタ用処理
+					//エディタ用処理
 					if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
 						score_insert_cell(score_cell_insert, int(step_counter + 0.5));//エディタ用セル挿入
 						score_cell_insert = score_cell_insert->next;
 
-						score_cell_write_command(score_cell_insert, COMMAND_KIND_STOP, _wtof(cash2[i]));//コマンド挿入
+						score_cell_write_command(score_cell_insert, COMMAND_KIND_STOP, _wtof(sharp2));//コマンド挿入
 					}
 				}
 
-				if (wcscmp(L"#STOPSTEP", cash[i]) == 0) {//停止地点を見つけた(音価指定)
-					swscanf_s(cash2[i], L"%[^/\n]/%[^/\n]", nume_c, _countof(nume_c), deno_c, _countof(deno_c));
+				if (wcscmp(L"#STOPSTEP", sharp1) == 0) {//停止地点を見つけた(音価指定)
+					swscanf_s(sharp2, L"%[^/\n]/%[^/\n]", nume_c, _countof(nume_c), deno_c, _countof(deno_c));
 					//nume_c, _countof(nume_c), deno_c, _countof(deno_c));
 
 
 					stopSequence[stop_se_c].timing = int(time_counter + note_offset_scroll + 0.5);
 					stopSequence[stop_se_c].timing_real = time_counter_real + Music[song_number].noteoffset[difficulty]
 						+ stopTimeSum * 1000;//停止地点のタイミング
-											  //stopSequence[stop_se_c].stop_time = _wtof(cash2[i]);//停止時間(s)
+											  //stopSequence[stop_se_c].stop_time = _wtof(sharp2);//停止時間(s)
 
-					stopSequence[stop_se_c].stop_time = (((double)60 * 4) / (bpm*scroll)) * ((double)_wtof(nume_c) / (double)_wtof(deno_c));//停止時間(s)
+					stopSequence[stop_se_c].stop_time = (((double)60 * 4) / (bpm * scroll)) * ((double)_wtof(nume_c) / (double)_wtof(deno_c));//停止時間(s)
 
 					stopSequence[stop_se_c].use = 1;
 
@@ -750,12 +707,12 @@ void GAME_LOAD(int song_number,
 					}
 				}
 
-				if ((wcscmp(L"#HIGHSPEED", cash[i]) == 0) || (wcscmp(L"#HS", cash[i]) == 0)) {//ハイスピード変更点を見つけた
-																							//high_speed[0] = _wtof(cash2[i]);
+				if ((wcscmp(L"#HIGHSPEED", sharp1) == 0) || (wcscmp(L"#HS", sharp1) == 0)) {//ハイスピード変更点を見つけた
+																							//high_speed[0] = _wtof(sharp2);
 																							//printf();
 																							//clsDx();
-																							//printfDx(L"%s\n", cash[i]);
-					swscanf_s(cash2[i], L"%[^,\n],%[^,\n],%[^,\n],%[^,\n]", high_speed_s[0], _countof(high_speed_s[0]),
+																							//printfDx(L"%s\n", sharp1);
+					swscanf_s(sharp2, L"%[^,\n],%[^,\n],%[^,\n],%[^,\n]", high_speed_s[0], _countof(high_speed_s[0]),
 						high_speed_s[1], _countof(high_speed_s[1]),
 						high_speed_s[2], _countof(high_speed_s[2]),
 						high_speed_s[3], _countof(high_speed_s[3]));
@@ -768,8 +725,8 @@ void GAME_LOAD(int song_number,
 
 					//_wtofを使う
 					//measure = (double)_wtof(nume_c) / (double)_wtof(deno_c);
-					//printfDx(L"%s\n", cash2[i]);
-					if (wcschr(cash2[i], L',') != NULL) {//,があるので1行ごとにハイスピ設定
+					//printfDx(L"%s\n", sharp2);
+					if (wcschr(sharp2, L',') != NULL) {//,があるので1行ごとにハイスピ設定
 						for (j = 0; j <= 3; j++) {
 							//printfDx(L"%d:%s\n", j, high_speed_s[j]);
 							//ScreenFlip();
@@ -779,10 +736,10 @@ void GAME_LOAD(int song_number,
 
 						high_speed[4] = (std::min)({ high_speed[0],high_speed[1],high_speed[2],high_speed[3], });
 					}
-				
 
 
-					if (wcschr(cash2[i], L',') == NULL) {//,がないときは全てのレーンに適用する(小節線も)
+
+					if (wcschr(sharp2, L',') == NULL) {//,がないときは全てのレーンに適用する(小節線も)
 
 						for (j = 0; j <= 4; j++) {
 							//ScreenFlip();
@@ -810,10 +767,10 @@ void GAME_LOAD(int song_number,
 
 				}
 
-				
+
 
 				int insert_flag = 0;//エディタ用のセルを挿入したフラグ
-				if (cash[i][0] != L'#') {//命令ではない行、つまり譜面が書かれている行
+				if (sharp1[0] != L'#') {//命令ではない行、つまり譜面が書かれている行
 
 					if (PutBarline == 1) {//最初の譜面が描かれている行に来たら小節線のタイミング情報格納
 						barline[blc].timing = int((time_counter + note_offset_scroll) * TIMING_SHOW_RATIO + 0.5);//表示用タイミング
@@ -825,9 +782,12 @@ void GAME_LOAD(int song_number,
 						PutBarline = 0;
 					}
 
-					for (k = 0; k <= 3; k++) {//レーン
+					int length = wcslen(sharp1);//左端から何列探索するか
+					if (length > 4)length = 4;
+
+					for (k = 0; k < length; k++) {//レーン
 						for (j = 1; j <= 10; j++) {//rからdまでの色を探す(ロングノート終端も探す)
-							if (color_list[j] == cash[i][k] || color_list_CAP[j] == cash[i][k]) {//キャッシュの[i]行[k-1]列目の色が何色か(大文字だと音は長く鳴る)
+							if (color_list[j] == sharp1[k] || color_list_CAP[j] == sharp1[k]) {//キャッシュの[i]行[k-1]列目の色が何色か(大文字だと音は長く鳴る)
 								//printfDx(L"レーン番号:%d\n", k);
 								//printfDx(L"time:%f\n", time_counter);
 								//printfDx(L"DN:%d\n", DN);
@@ -845,7 +805,7 @@ void GAME_LOAD(int song_number,
 									}
 								}
 
-								note[k][nc[k]].timing = int((time_counter + note_offset_scroll)* TIMING_SHOW_RATIO + 0.5);//表示用タイミング
+								note[k][nc[k]].timing = int((time_counter + note_offset_scroll) * TIMING_SHOW_RATIO + 0.5);//表示用タイミング
 								note[k][nc[k]].timing_init = note[k][nc[k]].timing;//表示用タイミング(保存用)
 								note[k][nc[k]].timing_real = int(time_counter_real + Music[song_number].noteoffset[difficulty]
 									+ stopTimeSum * 1000 + 0.5 + config.VsyncOffsetCompensation);//実際に叩くタイミング
@@ -856,7 +816,7 @@ void GAME_LOAD(int song_number,
 
 								note[k][nc[k]].x = lane[k];
 								note[k][nc[k]].bpm = float(high_speed[k] * (bpm));
-								if (color_list_CAP[j] == cash[i][k] && color_list_CAP[10] != cash[i][k]) {//LN終端以外で大文字で書かれていたら
+								if (color_list_CAP[j] == sharp1[k] && color_list_CAP[10] != sharp1[k]) {//LN終端以外で大文字で書かれていたら
 
 									note[k][nc[k]].snd = 1;//長く音を鳴らすようにする
 									cp_CAP = 1.333;//難易度ポイントを1.333倍にする
@@ -893,26 +853,26 @@ void GAME_LOAD(int song_number,
 								}
 								if (k >= 1) {//2列目以降について
 									if (note[k][nc[k]].color == NearColorBuf) {//左にある音符と同じ色だったらポイント下げる
-										diff_point += BeforeSamePoint*0.900*color_point[j] * cp_CAP;//難易度ポイント算出
+										diff_point += BeforeSamePoint * 0.900 * color_point[j] * cp_CAP;//難易度ポイント算出
 																						   //1/3として加算
 
 																						   //難易度ポイントバッファに格納していく
-										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint*color_point[j] * cp_CAP;
+										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint * color_point[j] * cp_CAP;
 										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
 									}
 									else {//違う色だった
-										diff_point += BeforeSamePoint*color_point[j] * cp_CAP;//難易度ポイント普通に加算
+										diff_point += BeforeSamePoint * color_point[j] * cp_CAP;//難易度ポイント普通に加算
 
 																					 //難易度ポイントバッファに格納していく
-										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint*color_point[j] * cp_CAP;
+										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint * color_point[j] * cp_CAP;
 										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
 									}
 								}
 								else {//1列目について
-									diff_point += BeforeSamePoint*color_point[j] * cp_CAP;//難易度ポイント加算
+									diff_point += BeforeSamePoint * color_point[j] * cp_CAP;//難易度ポイント加算
 
 																				 //難易度ポイントバッファに格納していく
-									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint*color_point[j] * cp_CAP;
+									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint * color_point[j] * cp_CAP;
 									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
 								}
 								NearColorBuf = j;//この音符の色を保存(後に左の音符扱い)
@@ -925,12 +885,12 @@ void GAME_LOAD(int song_number,
 
 								*hash = (*hash + int(note[k][nc[k]].color * 61463)) % hash_M;
 								*hash = (*hash + int(k * 897649)) % hash_M;
-								if (color_list[0] != cash[i][k]) {//0以外の時
+								if (color_list[0] != sharp1[k]) {//0以外の時
 									if (timing_same[tc] == -1) {//音符のタイミング格納
 										timing_same[tc] = note[k][nc[k]].timing;
 										*hash = (*hash + int(timing_same[tc] * 1963)) % hash_M;
 
-										//sprintf_s(Cdiff_buf[Cdiff_count],"%s",cash[i]);//難易度算出用バッファに格納
+										//sprintf_s(Cdiff_buf[Cdiff_count],"%s",sharp1);//難易度算出用バッファに格納
 										//Cdiff_count++;
 									}
 
@@ -941,14 +901,14 @@ void GAME_LOAD(int song_number,
 									end_time = note[k][nc[k]].timing_real;
 								}
 								//printfDx(L"レーン:%d 色:%d\n", k, j);
-								if (color_list[10] == cash[i][k] || color_list_CAP[10] == cash[i][k]) {//'e'または'E'だったら前のノートをLN始点にしてここでLN終点にする
+								if (color_list[10] == sharp1[k] || color_list_CAP[10] == sharp1[k]) {//'e'または'E'だったら前のノートをLN始点にしてここでLN終点にする
 									note[k][nc[k] - 1].group = 1;//始点
 									note[k][nc[k]].group = 2;//終点
 
-									if (color_list[10] == cash[i][k]) {//eなら
+									if (color_list[10] == sharp1[k]) {//eなら
 										note[k][nc[k]].LN_k = 0;//通常終点
 									}
-									else if (color_list_CAP[10] == cash[i][k]) {//Eなら
+									else if (color_list_CAP[10] == sharp1[k]) {//Eなら
 										note[k][nc[k]].LN_k = 1;//黒終点
 									}
 
@@ -960,8 +920,8 @@ void GAME_LOAD(int song_number,
 									//難易度ポイントバッファに格納していく
 									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = (double)cp_CAP * ((double)note[k][nc[k]].timing_real - note[k][nc[k] - 1].timing_real) / (LN_point);
 									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
-									
-									
+
+
 									//エディタ用処理
 									if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
 										score_cell_find_before_note(score_cell_insert, k)->data.note.group[k] = 1;//k列目のこのLN終端のbeforeにあるノートのグループをLN始点にする
@@ -995,7 +955,7 @@ void GAME_LOAD(int song_number,
 
 									}
 
-									diff_point_local = int(((0.9230283911671924*diff_point_local_sum * ((double)120000 / ((double)diff_buf[number_ring(total_diff_point_notes - 1, LOCAL_DIFF_AMOUNT - 1)].timing - diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing))) / 10) + 0.5);
+									diff_point_local = int(((0.9230283911671924 * diff_point_local_sum * ((double)120000 / ((double)diff_buf[number_ring(total_diff_point_notes - 1, LOCAL_DIFF_AMOUNT - 1)].timing - diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing))) / 10) + 0.5);
 									if (diff_point_local >= Cdiff->level_local) {
 										Cdiff->level_local = int(diff_point_local);
 									}
@@ -1009,7 +969,7 @@ void GAME_LOAD(int song_number,
 					if (ignoreFlag == 1) {//#STOPの後の最初の譜面行だったら
 						ignoreFlag = 0;
 						stopTimeSum += stopSequence[stop_se_c].stop_time;//総停止時間にさっきの#STOP時間を足す(ここから全体のタイミングがずれる)
-						
+
 						//マイナスでワープする場合はここから無視区間スタート
 						if (stopSequence[stop_se_c].stop_time < 0) {
 							IgnoreArea = 1;
@@ -1020,7 +980,7 @@ void GAME_LOAD(int song_number,
 
 						stop_se_c++;//カウンタインクリメント
 
-						
+
 					}
 				}
 
@@ -1028,8 +988,8 @@ void GAME_LOAD(int song_number,
 					tc++;
 
 				}
-				if (cash[i][0] != L'#') {
-					time_counter      += double((double)1000 * ((60 / bpm)            * 4 * measure) / DN);//分割単位分の時間プラスする
+				if (sharp1[0] != L'#') {
+					time_counter += double((double)1000 * ((60 / bpm) * 4 * measure) / DN);//分割単位分の時間プラスする
 					time_counter_real += double((double)1000 * ((60 / (bpm * scroll)) * 4 * measure) / DN);//分割単位分の実際の時間プラスする
 
 					if (IgnoreArea == 1) {//今無視区間のどこにいるか逐次計算
@@ -1038,16 +998,20 @@ void GAME_LOAD(int song_number,
 							IgnoreArea = 0;
 						}
 					}
-				
-					step_counter += (double)EDITSTEP*measure / (double)DN;
+
+					step_counter += (double)EDITSTEP * measure / (double)DN;
 
 				}
 				textLine++;//テキスト行数を数える
+
+				if (wcsrchr(sharp1, L',') != NULL) {//「,」がある行を見つけた → 1小節分読み込んだので次の小節の読み込みに移る
+					file_p_first = FileRead_tell(fp);//次に読み込む小節の先頭を指す
+					break;
+				}
 			}
 
-
 			i = 0;//また使うのでiを0に戻しておく
-			m = 0;
+			dataArrayLength = 0;
 		}
 		//Music[song_number].total_note[difficulty] = nc[1] + nc[2] + nc[3] + nc[4];//黒も含めた総ノーツ数
 
@@ -1478,14 +1442,6 @@ void GAME_LOAD(int song_number,
 	//printfDx(L"ハッシュ値:%d\n", *hash);
 	//ScreenFlip();
 	//Sleep(1000);
-
-	for (i = 0; i < CASH_ROW; i++) {
-		delete[] cash[i];
-		delete[] cash2[i];
-	}
-	delete[] cash;
-	delete[] cash2;
-
 
 	free(bpmList);
 	free(timing_same);

@@ -817,6 +817,12 @@ void SHOW_RESULT(RESULT res,
 				PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 			}
 
+			if (Key[KEY_INPUT_F2] == 1) {//スコア再送信&ランキング表示
+				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
+				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
+				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, config);
+			}
+
 			if (Key[KEY_INPUT_F11] == 1 && *debug == 0 && config.FullScreen == FALSE) {//ツイート
 				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
 			
@@ -1353,8 +1359,14 @@ void SHOW_RESULT(RESULT res,
 
 		if (*debug == 1 && config.ShowDebug == 1) {
 			printfDx(L"DEBUG MODE\n");
+			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE) {
+				printfDx(L"F2:スコアランキング表示\n");
+			}
 		}
 		else {
+			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE) {
+				printfDx(L"F2:スコアランキング表示\n");
+			}
 			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE) {
 				printfDx(L"F11:Twitterに投稿\n");
 			}
@@ -1362,6 +1374,8 @@ void SHOW_RESULT(RESULT res,
 		if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300) {
 			printfDx(L"PrtSc:スクリーンショット\n");
 		}
+
+
 
 		if (openflag == 0) {
 			PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);

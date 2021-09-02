@@ -11,6 +11,7 @@ parser.add_argument('nps_folder_path', type=str)
 parser.add_argument('difficulty', type=int)
 parser.add_argument('season', type=int)
 parser.add_argument('--rainbow', action="store_true")
+parser.add_argument('--onlyOption', action="store_true")
 parser.add_argument('clear_type', type=int)  # 数値で渡す
 parser.add_argument('rank', type=int)  # 数値で渡す
 parser.add_argument('score', type=int)
@@ -26,8 +27,13 @@ args = parser.parse_args()
 
 
 def get_nps_information():
+
     with open(args.nps_file_path, "r", encoding="utf-16") as f:
         datalist = f.readlines()
+        title = ""
+        artist = ""
+        genre = ""
+
         for data in datalist:
             split = data.split(":", 1)
             if split[0] == "#TITLE":
@@ -111,6 +117,18 @@ def main():
     else:
         path = os.path.join(args.nps_folder_path, "IRdata", str(args.difficulty))
 
+    # ONLYオプションを使っていた場合の前処理 スコアを更新しないようにする
+    if args.onlyOption:
+        data["rank"] = 0
+        data["score"] = 0
+        data["sky_perfect"] = 0
+        data["perfect"] = 0
+        data["good"] = 0
+        data["miss"] = 0
+        # data["clear_type"] = 0
+        data["max_combo"] = 0
+        data["min_miss"] = -1
+
     # データ確認
     isExistFile = os.path.exists(path)
     if isExistFile:  # 2回目以降の保存の時は更新して保存
@@ -127,7 +145,7 @@ def main():
                 bestData["perfect"] = data["perfect"]
                 bestData["good"] = data["good"]
                 bestData["miss"] = data["miss"]
-            if data["clear_type"] == -1 or data["clear_type"] >= 2:  # //クリア、PLAYしたとき
+            if (data["clear_type"] == -1 or data["clear_type"] >= 2) and not args.onlyOption:  # ONLYオプション無しでクリア、PLAYしたとき
                 if bestData["min_miss"] == -1:  # 最初の最小ミス保存
                     bestData["min_miss"] = data["miss"]
                 if bestData["min_miss"] > data["miss"]:  # 最小ミス更新
@@ -139,11 +157,11 @@ def main():
             bestData["play_count"] = data["play_count"]
             save(bestData, path)
         else:  # IDが違う時はそのまま保存
-            if data["clear_type"] == -1 or data["clear_type"] >= 2:  # //クリア、PLAYしたとき　MinMiss保存
+            if (data["clear_type"] == -1 or data["clear_type"] >= 2) and not args.onlyOption:  # ONLYオプション無しでクリア、PLAYしたとき　MinMiss保存
                 data["min_miss"] = data["miss"]
             save(data, path)
     else:  # 初回保存の時はそのまま保存
-        if data["clear_type"] == -1 or data["clear_type"] >= 2:  # //クリア、PLAYしたとき　MinMiss保存
+        if (data["clear_type"] == -1 or data["clear_type"] >= 2) and not args.onlyOption:  # ONLYオプション無しでクリア、PLAYしたとき　MinMiss保存
             data["min_miss"] = data["miss"]
         save(data, path)
 

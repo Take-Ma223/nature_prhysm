@@ -10,7 +10,7 @@
 void SaveIRSetting(IR_SETTING ir);
 void LoadIRSetting(IR_SETTING* ir);
 void IRgetID(CONFIG config);
-void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, CONFIG config);
+void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, BOOL onlyOption, CONFIG config);
 void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficulty, int rainbow, CONFIG config);
 void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config);
 

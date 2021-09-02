@@ -70,17 +70,17 @@ void IRgetID(CONFIG config) {
 	}
 }
 
-void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, CONFIG config) {
+void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, BOOL onlyOption, CONFIG config) {
 	//送信用スコアの保存
 	struct stat statBuf;
 	wchar_t passbuf[512];
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/save.py --local \"%s\" \"%s\" %d %d %s %d %d %d %d %d %d %d %d %d %d --run %s",
-			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
+		sprintfDx(passbuf, L"python3 util/save.py --local \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s",
+			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/save.py         \"%s\" \"%s\" %d %d %s %d %d %d %d %d %d %d %d %d %d --run %s",
-			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
+		sprintfDx(passbuf, L"python3 util/save.py         \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s",
+			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };
@@ -94,6 +94,8 @@ void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, i
 }
 
 void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficulty, int rainbow, CONFIG config) {
+	if (ir->IR_Enable == FALSE)return;//IRに参加しない場合は送信しない
+
 	//スコアの送信
 	struct stat statBuf;
 	wchar_t passbuf[256];

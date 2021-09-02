@@ -82,21 +82,21 @@ def load(path):
 
 def number_to_clear_type(number):
     if number == -2:
-        return "NO_PLAY"
+        return "NO PLAY"
     if number == -1:
         return "PLAY"
     if number == 0:
         return "FAILED"
     if number == 1:
-        return "EASY_CLEARED"
+        return "EASY CLEARED"
     if number == 2:
         return "CLEARED"
     if number == 3:
-        return "HARD_CLEARED"
+        return "HARD CLEARED"
     if number == 4:
-        return "SUPER_HARD_CLEARED"
+        return "SUPER HARD CLEARED"
     if number == 5:
-        return "FULL_COMBO"
+        return "FULL COMBO"
     if number == 6:
         return "PERFECT"
 

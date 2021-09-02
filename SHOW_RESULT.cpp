@@ -294,6 +294,12 @@ void SHOW_RESULT(RESULT res,
 			Sleep(100000);
 			exit(EXIT_FAILURE);
 		}
+
+		//ONLYオプションを使用しているかどうか
+		BOOL isOnlyOption = option->op.color == option->OP_COLOR_RGB_ONLY || 
+			option->op.color == option->OP_COLOR_CMY_ONLY ||
+			option->op.color == option->OP_COLOR_W_ONLY;
+
 		if (firstplay == 0) {//2回目以降のプレイ
 
 			save = high_score;
@@ -346,10 +352,7 @@ void SHOW_RESULT(RESULT res,
 				save.clear = res.clear;//クリア状態更新
 			}
 
-			if (res.score > high_score.score &&
-				option->op.color != option->OP_COLOR_RGB_ONLY &&
-				option->op.color != option->OP_COLOR_CMY_ONLY &&
-				option->op.color != option->OP_COLOR_W_ONLY) {//ONLYオプションを付けていなくてハイスコア更新
+			if (res.score > high_score.score && !isOnlyOption) {//ONLYオプションを付けていなくてハイスコア更新
 				
 				
 				save.score = res.score;
@@ -376,19 +379,14 @@ void SHOW_RESULT(RESULT res,
 			}
 
 
-			if (res.rank > high_score.rank &&
-				option->op.color != option->OP_COLOR_RGB_ONLY &&
-				option->op.color != option->OP_COLOR_CMY_ONLY &&
-				option->op.color != option->OP_COLOR_W_ONLY) {//ONLYモードじゃなくてランク更新
+			if (res.rank > high_score.rank && !isOnlyOption) {//ONLYモードじゃなくてランク更新
 				save.rank = res.rank;
 			}
 
 		}
 
 		if (firstplay == 1) {
-			if (option->op.color != option->OP_COLOR_RGB_ONLY &&
-				option->op.color != option->OP_COLOR_CMY_ONLY &&
-				option->op.color != option->OP_COLOR_W_ONLY) {//ONLYオプションを使っていない
+			if (!isOnlyOption) {//ONLYオプションを使っていない
 				save = res;//初プレイなら今回のスコアそのまま保存
 
 				if (res.clear >= CLEARTYPE_CLEARED || res.clear == CLEARTYPE_PLAY) {//クリア、PLAYしたとき　MinMiss保存
@@ -435,7 +433,7 @@ void SHOW_RESULT(RESULT res,
 		writeSaveData(saveData);
 
 		//インターネットランキング送信用スコアの保存、送信
-		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color == option->OP_COLOR_RAINBOW, config);
+		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color == option->OP_COLOR_RAINBOW, isOnlyOption, config);
 		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
 
 	}
@@ -647,23 +645,25 @@ void SHOW_RESULT(RESULT res,
 
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 
-	if (SkillTestFlag == SHOW_SKILL_TEST_RESULT) {//段位リザルト表示
+	if (SkillTestFlag == SHOW_SKILL_TEST_RESULT) {//段位総合リザルト表示
 		H_FAILED = LoadGraph(L"img/不合格.png");
 		H_CLEARED = LoadGraph(L"img/合格.png");
 	}
 	else {
-		if (SkillTestFlag != 0 && res.clear == CLEARTYPE_EASY_CLEARED) {//段位各曲のリザルト表示
-			H_CLEARED = LoadGraph(L"img/cleared.png");
+		if (res.clear == CLEARTYPE_PLAY) {
+			if (option->op.gauge == option->OP_GAUGE_SKILL_TEST) {//段位認定ゲージ
+				H_CLEARED = LoadGraph(L"img/cleared.png");
+			}
+			else {
+				H_CLEARED = 0;
+			}
 		}
-		else if (res.clear == CLEARTYPE_EASY_CLEARED) {
-			H_CLEARED = 0;
+		else if (res.clear == CLEARTYPE_EASY_CLEARED) {//段位各曲のリザルト表示
+			H_CLEARED = LoadGraph(L"img/cleared_easy.png");
 		}
 		else if (res.clear == CLEARTYPE_FAILED) {
 			H_FAILED = LoadGraph(L"img/failed.png");
 
-		}
-		else if (res.clear == CLEARTYPE_EASY_CLEARED) {
-			H_CLEARED = LoadGraph(L"img/cleared_easy.png");
 		}
 		else if (res.clear == CLEARTYPE_CLEARED) {
 			H_CLEARED = LoadGraph(L"img/cleared_normal.png");

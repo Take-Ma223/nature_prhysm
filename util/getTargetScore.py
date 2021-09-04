@@ -8,6 +8,7 @@ import hashlib
 parser = argparse.ArgumentParser()
 parser.add_argument('--local', action="store_true")
 parser.add_argument('nps_file_path', type=str)
+parser.add_argument('nps_folder_path', type=str)  # IRdataまでのパス
 parser.add_argument('--rainbow', action="store_true")
 parser.add_argument('mode', type=int)  # 0:RIVAL 1:平均 2:次の順位のスコア 3:全一スコア
 parser.add_argument('score', type=int)  # プレイヤーのハイスコア 次の順位のスコアを表示するときに使用
@@ -69,13 +70,15 @@ def recv_data():
 
 
 def write(data):
-    os.makedirs(os.path.join("save_data", "tmp"), exist_ok=True)
-    with open(os.path.join("save_data", "tmp", "TargetScore.dat"), "wb") as f:
+    # フォルダ作成
+    os.makedirs(os.path.join(args.nps_folder_path, "IRdata"), exist_ok=True)
+    with open(os.path.join(args.nps_folder_path, "IRdata", "TargetScore"), "wb") as f:
         f.write(DataStructure(data))
         print(DataStructure(data))
 
 
 def main():
+    socket.setdefaulttimeout(0.1)
     data = recv_data()
     print("data:", data)
     write(int(data))

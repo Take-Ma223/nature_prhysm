@@ -7,7 +7,7 @@ import os
 parser = argparse.ArgumentParser()
 parser.add_argument('--local', action="store_true")
 parser.add_argument('nps_file_path', type=str)
-parser.add_argument('nps_folder_path', type=str)
+parser.add_argument('nps_folder_path', type=str)  # IRdataまでのパス
 parser.add_argument('difficulty', type=int)
 parser.add_argument('season', type=int)
 parser.add_argument('--rainbow', action="store_true")

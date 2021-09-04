@@ -748,8 +748,8 @@ void GAME(int song_number, int difficulty,
 			option->op.targetscore2 == option->OP_TARGET_SCORE2_NEXTRANK ||
 			option->op.targetscore2 == option->OP_TARGET_SCORE2_RIVAL ||
 			option->op.targetscore2 == option->OP_TARGET_SCORE2_TOP)) {
-		getTargetScore(Music[song_number].SongPath[difficulty], Music[song_number].FolderPath, option->op.color == option->OP_COLOR_RAINBOW, option->op.targetscore2, highScore.score, ir->rivalID, config);
-		targetScore2 = LoadTargetScore();
+		getTargetScore(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, option->op.targetscore2, highScore.score, ir->rivalID, config);
+		targetScore2 = LoadTargetScore(Music[song_number].SaveFolder);
 	}
 
 

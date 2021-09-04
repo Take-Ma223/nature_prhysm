@@ -46,12 +46,16 @@ void LoadIRSetting(IR_SETTING* ir) {
 }
 
 
-int LoadTargetScore() {
+int LoadTargetScore(wchar_t* saveFolderPass) {
 	int targetScore = 0;
 	FILE* fp = 0;
 	errno_t error = 0;
 
-	error = _wfopen_s(&fp, L"save_data/tmp/TargetScore.dat", L"rb");
+	wchar_t passStr[512] = L"";
+	sprintfDx(passStr, L"%s/IRdata/TargetScore", saveFolderPass);
+
+
+	error = _wfopen_s(&fp, passStr, L"rb");
 	if (error != 0) {//ƒtƒ@ƒCƒ‹Œ©‚Â‚©‚ç‚È‚©‚Á‚½‚ç
 		//‰½‚à‚µ‚È‚¢
 	}
@@ -159,12 +163,12 @@ void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mod
 	struct stat statBuf;
 	wchar_t passbuf[256];
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/getTargetScore.py --local \"%s\" %s %d %d %d --run %s",
-			npsPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
+		sprintfDx(passbuf, L"python3 util/getTargetScore.py --local \"%s\" \"%s\" %s %d %d %d --run %s",
+			npsPath, folderPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/getTargetScore.py         \"%s\" %s %d %d %d --run %s",
-			npsPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
+		sprintfDx(passbuf, L"python3 util/getTargetScore.py         \"%s\" \"%s\" %s %d %d %d --run %s",
+			npsPath, folderPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };

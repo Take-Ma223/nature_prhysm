@@ -28,6 +28,7 @@
 #include "EffekseerForDXLib.h"
 #include"ScreenShot.h"
 #include<string>
+#include "IR_process.h"
 
 using namespace std;
 
@@ -37,6 +38,7 @@ void GAME(int song_number, int difficulty,
 	int secret,//隠し曲演出中か(0:通常 1:演出中)
 	ANDROID_CONTROLLER *AC,
 	CONFIG config,
+	IR_SETTING* ir,
 	int SkillTestFlag,//段位認定モードか(0:通常 1~4:段位認定モード ステージ数を示す)
 	double *GaugeVal,
 	int *CourseCombo,
@@ -720,6 +722,37 @@ void GAME(int song_number, int difficulty,
 	}
 	high_speed = option->op.speed_val;
 
+
+	//ターゲットスコアを決める
+	int targetScore = 0;
+	int targetScore2 = 0;
+
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_E)targetScore = 5000;
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_D)targetScore = 6000;
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_C)targetScore = 7000;
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_B)targetScore = 8000;
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_A)targetScore = 9000;
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_S)targetScore = 9500;
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_10000)targetScore = 10000;
+	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
+
+	if (option->op.targetscore2 == option->OP_TARGET_SCORE2_LATEST) {
+		targetScore2 = latestScore.score;
+	}
+	else {
+
+	}
+	//必要な場合 IRランキングからスコアを取得
+	if (option->op.scoregraph == option->OP_SCORE_GRAPH_ON &&
+		(option->op.targetscore2 == option->OP_TARGET_SCORE2_AVERAGE ||
+			option->op.targetscore2 == option->OP_TARGET_SCORE2_NEXTRANK ||
+			option->op.targetscore2 == option->OP_TARGET_SCORE2_RIVAL ||
+			option->op.targetscore2 == option->OP_TARGET_SCORE2_TOP)) {
+		getTargetScore(Music[song_number].SongPath[difficulty], Music[song_number].FolderPath, option->op.color == option->OP_COLOR_RAINBOW, option->op.targetscore2, highScore.score, ir->rivalID, config);
+		targetScore2 = LoadTargetScore();
+	}
+
+
 	while (1) {
 		if (ProcessMessage() != 0) {
 			DxLib_End();
@@ -984,7 +1017,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
 			//グラフ名ボックス描画
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//現在のスコア
 			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//ハイスコア
@@ -1002,21 +1035,13 @@ void GAME(int song_number, int difficulty,
 			DrawLine(960, 242, 1280, 242, GetColor(0, 0, 0));//D
 
 			//スコアグラフ描画
-			//ターゲットスコアを決める
-			int targetScore = 0;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_E)targetScore = 5000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_D)targetScore = 6000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_C)targetScore = 7000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_B)targetScore = 8000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_A)targetScore = 9000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_S)targetScore = 9500;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_10000)targetScore = 10000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_RIVAL)targetScore = rivalScore.score;
+			
+
+
 			//グラフ全体
 			DrawBox(960 + 80, 482, 960 + 80 + 80, 482 - 0.04 * highScore.score * (gauge_draw_counter / 100), GetColor(50, 100, 50), TRUE);
 			DrawBox(960 + 160, 482, 960 + 80 + 160, 482 - 0.04 * targetScore * (gauge_draw_counter / 100), GetColor(100, 50, 50), TRUE);
-			DrawBox(960 + 240, 482, 960 + 80 + 240, 482 - 0.04 * latestScore.score * (gauge_draw_counter / 100), GetColor(100, 100, 50), TRUE);
+			DrawBox(960 + 240, 482, 960 + 80 + 240, 482 - 0.04 * targetScore2 * (gauge_draw_counter / 100), GetColor(100, 100, 50), TRUE);
 
 
 		}
@@ -1037,7 +1062,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
-		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
 			DrawGraph(0, 0, H_GAME_STR_SCORE_GRAPH, TRUE);
 		}
 
@@ -3326,7 +3351,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
 			//グラフ名ボックス描画
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), 160, 255);//現在のスコア
 			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), 160, 255);//ハイスコア
@@ -3345,30 +3370,18 @@ void GAME(int song_number, int difficulty,
 			DrawLine(960, 202, 1280, 202, GetColor(255, 0, 0));//C
 			DrawLine(960, 242, 1280, 242, GetColor(0, 0, 0));//D
 
-			//ターゲットスコアを決める
-			int targetScore = 0;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_E)targetScore = 5000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_D)targetScore = 6000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_C)targetScore = 7000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_B)targetScore = 8000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_A)targetScore = 9000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_S)targetScore = 9500;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_10000)targetScore = 10000;
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
-			if (option->op.scoretarget == option->OP_SCORE_TARGET_RIVAL)targetScore = rivalScore.score;
-
 			//グラフ描画
 			double noteCountRatio = (double)HitingNoteCount / Music[song_number].total_note[difficulty];//ノートカウント進行率
 			//グラフ全体
 			DrawBox(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482 - 0.04 * highScore.score, GetColor(50, 100, 50), TRUE);
 			DrawBox(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482 - 0.04 * targetScore, GetColor(100, 50, 50), TRUE);
-			DrawBox(960 + 240, 482 - 0.04 * latestScore.score * noteCountRatio, 960 + 80 + 240, 482 - 0.04 * latestScore.score, GetColor(100, 100, 50), TRUE);
+			DrawBox(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482 - 0.04 * targetScore2, GetColor(100, 100, 50), TRUE);
 			if (HitingNoteCount != 0) {
 				//リアルタイムグラフ
 				DrawBoxWithLine(960, int(482 - 0.04 * score), 960 + 80, 482, GetColor(50, 50, 255), 160, 255);
 				DrawBoxWithLine(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482, GetColor(50, 255, 50), 160, 255);
 				DrawBoxWithLine(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482, GetColor(255, 50, 50), 160, 255);
-				DrawBoxWithLine(960 + 240, 482 - 0.04 * latestScore.score * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), 160, 255);
+				DrawBoxWithLine(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), 160, 255);
 			}
 		}
 
@@ -3388,7 +3401,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
-		if (option->op.scoretarget != option->OP_SCORE_TARGET_OFF) {
+		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
 			DrawGraph(0, 0, H_GAME_STR_SCORE_GRAPH, TRUE);
 		}
 

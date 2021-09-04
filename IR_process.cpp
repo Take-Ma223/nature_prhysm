@@ -46,6 +46,24 @@ void LoadIRSetting(IR_SETTING* ir) {
 }
 
 
+int LoadTargetScore() {
+	int targetScore = 0;
+	FILE* fp = 0;
+	errno_t error = 0;
+
+	error = _wfopen_s(&fp, L"save_data/tmp/TargetScore.dat", L"rb");
+	if (error != 0) {//ファイル見つからなかったら
+		//何もしない
+	}
+	else {
+		fread(&targetScore, sizeof(targetScore), 1, fp);//TargetScore読み込み
+		fclose(fp);
+	}
+
+	return targetScore;
+}
+
+
 void IRgetID(CONFIG config) {
 	//初回起動時にIR idの取得
 	struct stat statBuf;
@@ -131,6 +149,28 @@ void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config) 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };
 	PROCESS_INFORMATION pi;
 	BOOL CPres = ::CreateProcessW(NULL, passbuf, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+	//WaitForSingleObject(pi.hProcess, INFINITE);//終了を待つ
+	::CloseHandle(pi.hProcess);
+	::CloseHandle(pi.hThread);
+}
+
+void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mode, int score, int rivalID, CONFIG config) {
+	//スコアの送信
+	struct stat statBuf;
+	wchar_t passbuf[256];
+	if (config.Local == 1) {
+		sprintfDx(passbuf, L"python3 util/getTargetScore.py --local \"%s\" %s %d %d %d --run %s",
+			npsPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
+	}
+	else {
+		sprintfDx(passbuf, L"python3 util/getTargetScore.py         \"%s\" %s %d %d %d --run %s",
+			npsPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
+	}
+
+	STARTUPINFO si = { sizeof(STARTUPINFO) };
+	PROCESS_INFORMATION pi;
+	BOOL CPres = ::CreateProcessW(NULL, passbuf, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+	WaitForSingleObject(pi.hProcess, INFINITE);//終了を待つ
 	::CloseHandle(pi.hProcess);
 	::CloseHandle(pi.hThread);
 }

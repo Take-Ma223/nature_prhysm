@@ -2269,7 +2269,7 @@ void SONG_SELECT(int *l_n,
 					GAME(song_number, difficulty,
 						&res, &escape, option, &retryAble,
 						debug, Music, Button, Button_Shutter, Key, Buf, secret->song_appear_number != -1, AC,
-						config,
+						config, ir,
 						0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ
 					Get_Key_State(Buf, Key, AC);
 				} while ((Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
@@ -2367,7 +2367,7 @@ void SONG_SELECT(int *l_n,
 					int TryCount = 1;//トライ数
 					GAME(SongNumberList[i], DifficultyList[i],
 						&Result[i], &escape, option, &retryAble,
-						debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config,
+						debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config, ir,
 						i + 1, &GaugeVal,
 						&CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ	
 					if (escape == 1) {//プレイの抜け出しはランクをF、FAILEDに

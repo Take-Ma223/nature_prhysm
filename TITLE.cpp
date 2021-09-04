@@ -69,9 +69,10 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	const int IRMENU_PARTICIPATE = 0;
 	const int IRMENU_PLAYER_NAME = 1;
-	const int IRMENU_EXIT = 2;
+	const int IRMENU_SET_RIVAL_ID = 2;
+	const int IRMENU_EXIT = 3;
 	int IRWarningFlag = 0;//注意書き表示中のフラグ
-	int IRMenuStat = IRMENU_PLAYER_NAME;
+	int IRMenuStat = IRMENU_PARTICIPATE;
 
 	const int KEY_CONFIG_MENU_SETTING = 0;
 	const int KEY_CONFIG_MENU_EXIT = 1;
@@ -196,6 +197,31 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 
 
+				}
+				else if (IRMenuStat == IRMENU_SET_RIVAL_ID) {
+					DrawBoxWithLine(640 - 240, 470, 640 + 240, 510, GetColor(100, 100, 100));
+
+					wchar_t* str1 = L"\"ライバルに設定したいプレーヤーのIDを半角数字で入力してください\"";
+					int width1 = GetDrawStringWidth(str1, wcslen(str1));
+					ShowExtendedStrFit(640, 430, str1, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+
+					wchar_t strbuf[17] = L"";
+					KeyInputString(410, 480,
+						16, strbuf,
+						TRUE);
+					stat = STATE_IR_SETTING;
+
+					ir->rivalID = atoiDx(strbuf);
+
+					SaveIRSetting(*ir);
+					LoadIRSetting(ir);
+
+					wchar_t str2[64];
+					sprintfDx(str2, L"RIVAL ID:%dに設定しました", ir->rivalID);
+					width1 = GetDrawStringWidth(str2, wcslen(str2));
+					ShowExtendedStrFit(640, 530, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+					ScreenFlip();
+					Sleep(2000);
 				}
 				else if (IRMenuStat == IRMENU_PARTICIPATE) {
 					int width1;
@@ -461,22 +487,26 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			int width2 = GetDrawStringWidth(str2, wcslen(str2));
 			ShowExtendedStrFit(640, 620, str2, width2, 300, config, IRMenuStat == IRMENU_PLAYER_NAME ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
-			wchar_t* str3 = L"\"戻る\"";
+			wchar_t* str3 = L"\"RIVAL ID 設定\"";
 			int width3 = GetDrawStringWidth(str3, wcslen(str3));
-			ShowExtendedStrFit(640, 650, str3, width3, 300, config, IRMenuStat == IRMENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			ShowExtendedStrFit(640, 650, str3, width3, 300, config, IRMenuStat == IRMENU_SET_RIVAL_ID ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
-
-			wchar_t* str4 = L"―――注意―――";
+			wchar_t* str4 = L"\"戻る\"";
 			int width4 = GetDrawStringWidth(str4, wcslen(str4));
-			ShowExtendedStrFit(640, 315, str4, width4, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+			ShowExtendedStrFit(640, 680, str4, width4, 300, config, IRMenuStat == IRMENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
-			wchar_t* str5 = L"インターネットランキングに参加すると";
+
+			wchar_t* str5 = L"―――注意―――";
 			int width5 = GetDrawStringWidth(str5, wcslen(str5));
-			ShowExtendedStrFit(640, 345, str5, width5, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+			ShowExtendedStrFit(640, 315, str5, width5, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
 
-			wchar_t* str6 = L"プレイヤー名、プレイした譜面の情報、スコアがサーバーに送信されます";
+			wchar_t* str6 = L"インターネットランキングに参加すると";
 			int width6 = GetDrawStringWidth(str6, wcslen(str6));
-			ShowExtendedStrFit(640, 375, str6, width6, 1000, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+			ShowExtendedStrFit(640, 345, str6, width6, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+
+			wchar_t* str7 = L"プレイヤー名、プレイした譜面の情報、スコアがサーバーに送信されます";
+			int width7 = GetDrawStringWidth(str7, wcslen(str7));
+			ShowExtendedStrFit(640, 375, str7, width7, 1000, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 
 		}

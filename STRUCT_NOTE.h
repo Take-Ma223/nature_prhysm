@@ -18,7 +18,8 @@ typedef struct NOTE {
 	char fall = 0;//0なら落ちてない,1なら落下中,2なら落ち切った
 	char color_init = 0;//ノートの元の色
 	char color = 0;//ノートの色(1~9の数字)(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K 9:F(FullColor) 10:ロングノート終点)0ならこのノートは使ってない
-	float bpm = 1;//このノート時点のBPM
+	float bpm = 1;//このノートのSCROLL抜きの速さ(BPM)
+	float bpm_real = 1;//SCROLLの影響を考慮したこのノートの実際の速さ(BPM基準)
 	BOOL hit = 0;//1:叩いた 0:叩いてない
 	char group = 0;//ノートの種類(0:単ノート 1:ロングノート始点 2:ロングノート終点)
 	BOOL LN_k = 0;//LNの終端で離すべきか(0:離さなくても良い 1:離さないといけない黒終点)

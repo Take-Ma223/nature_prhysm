@@ -815,7 +815,8 @@ void GAME_LOAD(int song_number,
 								note[k][nc[k]].color_init = j;
 
 								note[k][nc[k]].x = lane[k];
-								note[k][nc[k]].bpm = float(high_speed[k] * (bpm));
+								note[k][nc[k]].bpm = float(high_speed[k] * bpm );
+								note[k][nc[k]].bpm_real = float(high_speed[k] * bpm * scroll);
 								if (color_list_CAP[j] == sharp1[k] && color_list_CAP[10] != sharp1[k]) {//LN終端以外で大文字で書かれていたら
 
 									note[k][nc[k]].snd = 1;//長く音を鳴らすようにする
@@ -1948,7 +1949,7 @@ int DifficultyRadar::index(NOTE** note, int* nc, int *ncMax) {//探索を終え�
 	return index;
 }
 
-int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//Localの算出にも使う
+int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//色難易度
 	double ColorChangeCount = 0;
 	int lane = 0, NoteCounter = 0;
 	int ColorBuf[4] = { 0,0,0,0 };
@@ -2079,9 +2080,10 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 	}
 
 	double LNSum = LN[0] + LN[1] + LN[2] + LN[3];//総LN秒数を計算
-
+	LNSum *= 0.015;
+	LNSum = (log(LNSum + 1) / log(2));
+	LNSum *= 70;
 	LNSum = (LNSum / ((double)time / 1000)) * 60;//1分あたりのLN密度にする
-
 	return (int)(LNSum * 100 / LNMax);
 }
 int DifficultyRadar::CalcUnstability() {
@@ -2091,15 +2093,19 @@ int DifficultyRadar::CalcUnstability() {
 
 	BpmCount = 0;
 	double BpmBuf = bpmchange[BpmCount].bpm;
+	double BPMChangeSum = 0;//BPM変化量
 
+	/*
 	while (bpmchange[BpmCount].use == 1) {
 		if (BpmBuf != bpmchange[BpmCount].bpm) {//BPM変化があった
-			Unstability += fabs((log(bpmchange[BpmCount].bpm + 0.1) / log(2)) - (log(BpmBuf + 0.1) / log(2))) * 2;//BPM変化の重みは2倍
+			BPMChangeSum += fabs((log(bpmchange[BpmCount].bpm + 0.1) / log(2)) - (log(BpmBuf + 0.1) / log(2))) * 2;//BPM変化の重みは2倍
 			//2の対数をとりBPMを比較 倍の関係になっていたら1加算
 			BpmBuf = bpmchange[BpmCount].bpm;
 		}
 		BpmCount++;
 	}
+	BPMChangeSum = 0;//不使用
+	*/
 
 	//Stopについて算出
 	int StopCount = 0;
@@ -2110,7 +2116,7 @@ int DifficultyRadar::CalcUnstability() {
 		StopCount++;
 	}
 
-	Unstability += stopSum*0.5 + (double)StopCount*4;//BPM,HSとの重みバランス調節
+	Unstability = BPMChangeSum + stopSum*0.5 + (double)StopCount*4;//BPM,HSとの重みバランス調節
 
 
 	//HS,瞬間風速から離れた速さの音符について算出
@@ -2124,41 +2130,44 @@ int DifficultyRadar::CalcUnstability() {
 
 	double OutlierAmount = 0;//瞬間風速から外れた音符の度合い
 
+	//レーン毎の音符速度変化を見る
 	for (lane = 0; lane <= 3; lane++) {
 		firstFlag = 0;
 		for (NoteCounter = 0; NoteCounter <= nc[lane] - 1; NoteCounter++) {
-			//HS
-			if (firstFlag == 0) {
-				BpmBuf = note[lane][NoteCounter].bpm;
-				firstFlag = 1;
-			}
-			else if (BpmBuf != note[lane][NoteCounter].bpm) {//BPM変化(HS変化)があった
-				HS[lane] += fabs((log(note[lane][NoteCounter].bpm+0.1) / log(2)) - (log(BpmBuf+0.1) / log(2)));
-				//2の対数をとりBPMを比較 倍の関係になっていたら1加算
-				BpmBuf = note[lane][NoteCounter].bpm;
-			}		
+			if (note[lane][NoteCounter].color != 8) {//黒は除外
+				//HS,BPM変化について
+				if (firstFlag == 0) {
+					BpmBuf = note[lane][NoteCounter].bpm_real;
+					firstFlag = 1;
+				}
+				else if (BpmBuf != note[lane][NoteCounter].bpm_real) {//BPM変化(HS変化)があった
+					HS[lane] += fabs((log(note[lane][NoteCounter].bpm_real + 0.1) / log(2)) - (log(BpmBuf + 0.1) / log(2)));
+					//2の対数をとりBPMを比較 倍の関係になっていたら1加算
+					BpmBuf = note[lane][NoteCounter].bpm_real;
+				}
 
-			//瞬間風速から外れた音符の度合いについて
-			OutlierAmount += abs(log((note[lane][NoteCounter].bpm+0.1)/(BPM_suggest+0.1))/log(2));//瞬間風速から外れた速さの音符に重みを付けて加算
-			
+				//瞬間風速から外れた音符の度合いについて
+				OutlierAmount += abs(log((note[lane][NoteCounter].bpm_real + 0.1) / (BPM_suggest + 0.1)) / log(2));//瞬間風速から外れた速さの音符に重みを付けて加算
+			}
 		}
 	}
 
+	double HS_sum = (HS[0] + HS[1] + HS[2] + HS[3]);//BPM変化度
+
+	//値の大きさを調整
+	OutlierAmount = OutlierAmount * 16 / ((double)time / 1000);
 	//一秒あたりにどれだけ重み付け瞬間風速外れ音符があるかを計算
-	OutlierAmount = OutlierAmount / ((double)time / 1000);
+	//OutlierAmount = OutlierAmount / ((double)time / 1000);
 
+	Unstability += OutlierAmount;//重み付け瞬間風速外れ音符密度を足す
 
-
-
-	Unstability += (HS[0] + HS[1] + HS[2] + HS[3]) / 4;//BPM変化と釣り合いをとるため4で割る
+	Unstability += HS_sum;//BPM変化と釣り合いをとるため4で割る
 
 	Unstability *= (7.0 / unstabilityMax);//0~7ぐらいに収める
 
 	Unstability = (log(Unstability + 1) / log(2));//0~7が0~3に対応する対数 変化数が少ないうちは値が多く上がるようにする
 
 	Unstability *= 51.666 * 0.7;
-
-	Unstability += OutlierAmount*3;//重み付け瞬間風速外れ音符密度を足す
 
 	//Unstability = (Unstability / ((double)time / 1000)) * 60;//1分あたりの対数BPM変化密度にする
 	return (int)(Unstability);

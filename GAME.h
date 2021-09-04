@@ -4,6 +4,7 @@
 #include"STRUCT_NOTE.h"
 #include"STRUCT_ANDROID_CONTROLLER.h"
 #include"STRUCT_CONFIG.h"
+#include"STRUCT_IR_SETTING.h"
 
 #ifndef _GAME
 #define _GAME
@@ -23,6 +24,7 @@ extern void GAME(int song_number,
 	int secret,
 	ANDROID_CONTROLLER* AC,
 	CONFIG config,
+	IR_SETTING *ir,
 	int SkillTestFlag = 0,
 	double* GaugeVal = NULL,
 	int* CourseCombo = 0,

@@ -699,7 +699,6 @@ void GAME(int song_number, int difficulty,
 
 	//----曲名表示----
 	gauge_draw_counter = 0;
-	GAME_start_time = GetNowCount_d(config);
 
 	int FontHandle = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
 	ChangeFont(L"メイリオ");
@@ -752,7 +751,7 @@ void GAME(int song_number, int difficulty,
 		targetScore2 = LoadTargetScore(Music[song_number].SaveFolder);
 	}
 
-
+	GAME_start_time = GetNowCount_d(config);
 	while (1) {
 		if (ProcessMessage() != 0) {
 			DxLib_End();

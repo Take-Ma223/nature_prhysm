@@ -134,7 +134,8 @@ def main():
     if isExistFile:  # 2回目以降の保存の時は更新して保存
         bestData = load(path)
         isSameID = bestData["id"] == data["id"]
-        if isSameID:
+        isSameHash = bestData["hash"] == data["hash"]
+        if isSameID and isSameHash:
             if bestData["clear_type"] < data["clear_type"]:  # クリア状態更新していたとき
                 bestData["clear_type"] = data["clear_type"]
             if bestData["rank"] < data["rank"]:  # ランク更新していたとき
@@ -156,7 +157,7 @@ def main():
             bestData["authorization_key"] = data["authorization_key"]
             bestData["play_count"] = data["play_count"]
             save(bestData, path)
-        else:  # IDが違う時はそのまま保存
+        else:  # IDが違う または 譜面が変更された時はそのまま保存
             if (data["clear_type"] == -1 or data["clear_type"] >= 2) and not args.onlyOption:  # ONLYオプション無しでクリア、PLAYしたとき　MinMiss保存
                 data["min_miss"] = data["miss"]
             save(data, path)

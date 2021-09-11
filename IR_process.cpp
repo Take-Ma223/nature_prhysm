@@ -71,7 +71,7 @@ int LoadTargetScore(wchar_t* saveFolderPass) {
 void IRgetID(CONFIG config) {
 	//初回起動時にIR idの取得
 	struct stat statBuf;
-	wchar_t passbuf[256];
+	wchar_t passbuf[512] = L"";
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/getid.py --local --run %s", RUN_PASS);
 	}
@@ -95,7 +95,7 @@ void IRgetID(CONFIG config) {
 void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, BOOL onlyOption, CONFIG config) {
 	//送信用スコアの保存
 	struct stat statBuf;
-	wchar_t passbuf[512];
+	wchar_t passbuf[512] = L"";
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/save.py --local \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s",
 			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
@@ -120,7 +120,7 @@ void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficult
 
 	//スコアの送信
 	struct stat statBuf;
-	wchar_t passbuf[256];
+	wchar_t passbuf[512] = L"";
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/send.py --local \"%s\" \"%s/IRdata/%d%s\" --run %s", 
 			npsPath, folderPath, difficulty, rainbow ? L"_r" : L"", RUN_PASS);
@@ -138,9 +138,9 @@ void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficult
 }
 
 void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config) {
-	//スコアの送信
+	//スコアランキングの表示
 	struct stat statBuf;
-	wchar_t passbuf[256];
+	wchar_t passbuf[512] = L"";
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/view.py --local \"%s\" %s --run %s",
 			npsPath, rainbow ? L"--rainbow" : L"", RUN_PASS);
@@ -159,9 +159,9 @@ void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config) 
 }
 
 void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mode, int score, int rivalID, CONFIG config) {
-	//スコアの送信
+	//ターゲットスコアの取得
 	struct stat statBuf;
-	wchar_t passbuf[256];
+	wchar_t passbuf[512] = L"";
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/getTargetScore.py --local \"%s\" \"%s\" %s %d %d %d --run %s",
 			npsPath, folderPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);

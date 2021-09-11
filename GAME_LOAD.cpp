@@ -2173,6 +2173,10 @@ int DifficultyRadar::CalcUnstability() {
 	return (int)(Unstability);
 }
 int DifficultyRadar::CalcChain() {
+	int time_use = time;
+	int time_limit = 12000;//これ以下の時間で密度を出さない
+	if (time_use <= time_limit)time_use = time_limit;
+
 	int lane = 0;
 	double chain[4] = { 0,0,0,0 };//各レーンの縦連度
 	int NoteCounter = 0;
@@ -2181,9 +2185,9 @@ int DifficultyRadar::CalcChain() {
 	int firstFlag = 0;
 	double chainBuf = 0;
 
-	int BaseBPM = 180;//16分を縦連とみなす基準BPM
+	int BaseBPM = 150;//16分を縦連とみなす基準BPM
 
-	double normalizer = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 4.0));
+	double normalizer = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 4.0));//基準BPMでの16分音符の時間間隔
 	
 
 	for (lane = 0; lane <= 3; lane++) {
@@ -2195,7 +2199,7 @@ int DifficultyRadar::CalcChain() {
 					firstFlag = 1;
 				}
 				else {
-					chainBuf = (double)1 / pow((((double)note[lane][NoteCounter].timing_real - TimingBuf) * normalizer), 2);//BaseBPMの16分より短いと1からどんどん上がっていく
+					chainBuf = (double)1 / pow((((double)note[lane][NoteCounter].timing_real - TimingBuf) * normalizer), 8);//BaseBPMの16分より短いと1からどんどん上がっていく
 					if (chainBuf >= 1)chainBuf = 1;//1以上にはしない
 					chain[lane] += chainBuf;//
 					TimingBuf = note[lane][NoteCounter].timing_real;
@@ -2206,7 +2210,13 @@ int DifficultyRadar::CalcChain() {
 
 	double chainSum = chain[0] + chain[1] + chain[2] + chain[3];
 
-	chainSum = (chainSum / ((double)time / 1000)) * 60;//1分あたりの縦連密度にする
+	chainSum *= 0.0222;//316を7に収める
+	chainSum = (log(chainSum + 1) / log(2));//7が2.75に圧縮される
+	chainSum *= 2.54;//もとのスケールに戻す
+	chainSum *= 45;//もとのスケールに戻す
+	chainSum *= 1.05;//大きさ調整
+
+	chainSum = (chainSum / ((double)time_use / 1000)) * 60;//1分あたりの縦連密度にする
 
 	return (int)(chainSum * 100 / chainMax);
 }

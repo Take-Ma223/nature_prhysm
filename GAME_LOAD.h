@@ -54,7 +54,7 @@ public:
 	int globalMax = 552;
 	int localMax = 850;
 	int colorMax = 350;
-	int LNMax = 39;
+	int LNMax = 33;
 	int unstabilityMax = 259;
 	int chainMax = 120;
 	double BPM_suggest = 0;

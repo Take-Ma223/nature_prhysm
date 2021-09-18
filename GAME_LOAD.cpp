@@ -2063,7 +2063,161 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 		WeightOfColor[W] = 1;
 	}
 
+	int noteIndex[4] = { 0,0,0,0 };
+	int minTiming = 0;
+	double lnDegrees = 0;
+	class lnCount {
+	private:
+		int lnCountEachLane[4] = { 0,0,0,0 };
+	public:
+		int getLnCountWithoutThisLane(int lane) {
+			int lnCount = 0;
+			for (int i = 0; i < 4; i++) {
+				if (lane != i)lnCount += lnCountEachLane[i];
+			}
+			return lnCount;
+		}
+		void setLnCount(int lane, int count) {
+			lnCountEachLane[lane] = count;
+		}
+		void deleteLnCount(int lane) {
+			lnCountEachLane[lane] = 0;
+		}
+		int getLnCountSum() {
+			int sum = 0;
+			for (int i = 0; i < 4; i++) {
+				sum += lnCountEachLane[i];
+			}
+			return sum;
+		}
+	}lnCount;
 
+	auto color2weight = [](int colorNumber) {
+		switch (colorNumber)
+		{
+		case 0:
+			return 0;
+		case 1:
+			return 1;
+			break;
+		case 2:
+			return 1;
+			break;
+		case 3:
+			return 1;
+			break;
+		case 4:
+			return 2;
+			break;
+		case 5:
+			return 2;
+			break;
+		case 6:
+			return 2;
+			break;
+		case 7:
+			return 3;
+			break;
+		case 8:
+			return 0;
+			break;
+		case 9:
+			return 1;
+		case 10:
+			return 0;
+			break;
+		}
+	};
+
+	while (1) {
+		//全ての音符を見たら終了
+		if ((noteIndex[0] == nc[0]) &&
+			(noteIndex[1] == nc[1]) &&
+			(noteIndex[2] == nc[2]) &&
+			(noteIndex[3] == nc[3])) {
+			break;
+		}
+
+		//探索終わったレーン以外で音符最小タイミング探索
+		int first = 1;
+		for (lane = 0; lane < 4; lane++) {
+			if (noteIndex[lane] < nc[lane]) {
+				if (first) {
+					minTiming = note[lane][noteIndex[lane]].timing;
+					first = 0;
+				}
+				else if (minTiming > note[lane][noteIndex[lane]].timing)minTiming = note[lane][noteIndex[lane]].timing;
+			}
+		}
+
+		//音符最小タイミングと同じノートを探索
+		BOOL existNote[4] = { 0,0,0,0 };
+		for (lane = 0; lane < 4; lane++) {
+			if (note[lane][noteIndex[lane]].timing == minTiming)existNote[lane] = 1;
+		}
+
+		//レーン毎のLN数(色重み付き)を加算
+		int lnFindCount = 0;//今回加算した分
+		for (lane = 0; lane < 4; lane++) {
+			if (existNote[lane]) {
+				if (note[lane][noteIndex[lane]].group == 1) {
+					int color = note[lane][noteIndex[lane]].color;
+					lnFindCount += color2weight(color);
+					lnCount.setLnCount(lane, color2weight(color));
+				}
+			}
+		}
+
+		//LN数(色重み付き)をLN度に加算
+		lnDegrees += lnFindCount;
+
+		//各レーンの音符の指拘束押し度合いをLN度に加算
+		for (lane = 0; lane < 4; lane++) {
+			if (existNote[lane]) {
+				int color;
+
+				if (note[lane][noteIndex[lane]].LN_k) {//黒終端なら1 (赤扱い)
+					color = 1;
+				}else if(note[lane][noteIndex[lane]].group != 2){
+					color = note[lane][noteIndex[lane]].color;
+				}
+				else {//通常の終点は除外
+					continue;
+				}
+				
+				lnDegrees += sqrt(color2weight(color) * lnCount.getLnCountWithoutThisLane(lane));
+			}
+		}
+
+		//レーン毎のLN数(色重み付き)を引く
+		for (lane = 0; lane < 4; lane++) {
+			if (existNote[lane]) {
+				if (note[lane][noteIndex[lane]].group == 2) {
+					lnCount.deleteLnCount(lane);
+				}
+			}
+		}
+
+		//音符の存在するレーンのindexをインクリメント
+		for (lane = 0; lane < 4; lane++) {
+			if (existNote[lane]) {
+				if (noteIndex[lane] < nc[lane]) {
+					noteIndex[lane]++;
+				}
+			}
+		}
+	}
+
+
+	lnDegrees = (lnDegrees / ((double)time / 1000)) * 60;//1分あたりのLN密度にする
+	lnDegrees *= 0.005;
+	lnDegrees = (log(lnDegrees + 1) / log(2));//
+	lnDegrees *= 2;
+	lnDegrees *= 130;
+
+	lnDegrees = lnDegrees * 0.35;//大きさ調整
+	return lnDegrees;
+	/*
 	for (lane = 0; lane <= 3; lane++) {
 		firstFlag = 0;
 		for (NoteCounter = 0; NoteCounter <= nc[lane] - 1; NoteCounter++) {
@@ -2078,13 +2232,13 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 			}
 		}
 	}
-
 	double LNSum = LN[0] + LN[1] + LN[2] + LN[3];//総LN秒数を計算
 	LNSum *= 0.015;
 	LNSum = (log(LNSum + 1) / log(2));
 	LNSum *= 70;
 	LNSum = (LNSum / ((double)time / 1000)) * 60;//1分あたりのLN密度にする
 	return (int)(LNSum * 100 / LNMax);
+	*/
 }
 int DifficultyRadar::CalcUnstability() {
 	//BPMについて算出
@@ -2209,14 +2363,13 @@ int DifficultyRadar::CalcChain() {
 	}
 
 	double chainSum = chain[0] + chain[1] + chain[2] + chain[3];
+	chainSum = (chainSum / ((double)time_use / 1000)) * 60;//1分あたりの縦連密度にする
 
-	chainSum *= 0.0222;//316を7に収める
+	chainSum *= 0.0444;//316を7に収める
 	chainSum = (log(chainSum + 1) / log(2));//7が2.75に圧縮される
 	chainSum *= 2.54;//もとのスケールに戻す
 	chainSum *= 45;//もとのスケールに戻す
-	chainSum *= 1.05;//大きさ調整
-
-	chainSum = (chainSum / ((double)time_use / 1000)) * 60;//1分あたりの縦連密度にする
+	chainSum *= 0.5518;//大きさ調整
 
 	return (int)(chainSum * 100 / chainMax);
 }

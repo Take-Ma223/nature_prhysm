@@ -12,9 +12,6 @@
 #include"STRUCT_EDIT_SCORE.h"
 #include"STRUCT_CONFIG.h"
 #include"score_cell_operation.h"
-//#include <initializer_list>
-//#include <functional>
-
 #include <algorithm>
 #include "EDIT_SCORE.h"
 
@@ -1955,6 +1952,78 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//色�
 	int ColorBuf[4] = { 0,0,0,0 };
 	int LocalTime = EndTime - StartTime;
 	
+	//前の音符の色保存用バッファ
+	class colorRingBuf {
+	private:
+		const int BUF_NUMBER = 6;
+		int colorBuf[4][6];
+		int index[4] = { 0,0,0,0 };
+
+		void indexInc(int* index) {
+			(*index)++;
+			if (*index >= BUF_NUMBER)*index = 0;
+		}
+		void indexDec(int* index) {
+			(*index)--;
+			if (*index < 0)*index = BUF_NUMBER - 1;
+		}
+
+		double forgettingWeight(int distance) {//色忘却重み
+			switch (distance)
+			{
+			case 0:
+				return 0;
+				break;
+			case 1:
+				return 0.5;
+				break;
+			case 2:
+				return 0.75;
+				break;
+			case 3:
+				return 0.875;
+				break;
+			case 4:
+				return 0.9375;
+				break;
+			case 5:
+				return 1;
+				break;
+			default:
+				return 1;
+				break;
+			}
+		}
+
+	public:
+		colorRingBuf() {//バッファ初期化
+			for (int lane = 0; lane < 4; lane++) {
+				for (int ind = 0; ind < BUF_NUMBER; ind++) {
+					colorBuf[lane][ind] = 0;
+				}
+			}
+		}
+
+		void setThisLaneColor(int lane, int color) {
+			colorBuf[lane][index[lane]] = color;
+			indexInc(&index[lane]);
+		}
+
+		double getThisLaneColorForgettingWeight(int lane, int color) {//バッファに同じ色が無いか探索し色忘却重みを返す
+			int searchIndex = index[lane];//探し始めるインデックス位置
+			indexDec(&searchIndex);//indexは挿入する位置なので2つ前の値にする
+			indexDec(&searchIndex);
+
+			int distance = 0;
+			for (distance = 0; distance < BUF_NUMBER - 1; distance++) {
+				if (colorBuf[lane][searchIndex] == color) {
+					return forgettingWeight(distance);
+				}
+				indexDec(&searchIndex);
+			}
+			return forgettingWeight(distance);//見つからなかった場合はデフォルト値を返す
+		}
+	}colorRingBuf;
 
 	ColorBuf[0] = note[0][0].color;
 	ColorBuf[1] = note[1][0].color;
@@ -1990,7 +2059,6 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//色�
 		IndexEnd[lane]--;
 	}
 
-
 	for (lane = 0; lane <= 3; lane++) {
 		for (NoteCounter = IndexStart[lane]; NoteCounter <= IndexEnd[lane]; NoteCounter++) {
 			if ((note[lane][NoteCounter].group == 0 || note[lane][NoteCounter].group == 1)) {//単ノートかLN始点
@@ -2001,16 +2069,20 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//色�
 					}
 				}
 
+				if (NoteColor != 8) {//k以外でバッファに色保存
+					colorRingBuf.setThisLaneColor(lane, NoteColor);
+				}
+
 				if (ColorBuf[lane] != NoteColor) {//前の音符と色が違う
 					if (NoteColor == 4 ||
 						NoteColor == 5 ||
 						NoteColor == 6) {//cmyなら4倍の重み
-						ColorChangeCount += 4;
+						ColorChangeCount += 4 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor);
 						ColorBuf[lane] = NoteColor;
 						k_flag = 0;
 					}
 					else if (NoteColor == 7) {//wなら2倍の重み
-						ColorChangeCount += 2;
+						ColorChangeCount += 2 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor);
 						ColorBuf[lane] = NoteColor;
 						k_flag = 0;
 					}
@@ -2018,14 +2090,16 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//色�
 						ColorChangeCount += 0.5;
 						k_flag = 1;
 					}
-					else if (NoteColor == 9) {//fなら0.75倍の重み
-						ColorChangeCount += 0.75;
+					else if (NoteColor == 9) {//fなら1倍の重み
+						ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor);
 						ColorBuf[lane] = NoteColor;
 						k_flag = 0;
 					}
-					else {//RGBの場合は1倍の重み
+					else if(NoteColor == 1 ||
+						NoteColor == 2 ||
+						NoteColor == 3) {//RGBの場合は1倍の重み
 						ColorBuf[lane] = NoteColor;
-						ColorChangeCount += 1;
+						ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor);
 						k_flag = 0;
 					}
 				}
@@ -2039,6 +2113,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//色�
 
 
 	ColorChangeCount = (ColorChangeCount / ((double)LocalTime / 1000)) * 60;
+	ColorChangeCount *= 1.2;//大きさ調整
 	//ColorChangeCount = ColorChangeCount / TotalNotesK;//譜面単位でどれだけ色が複雑か
 
 	return (int)(ColorChangeCount * 100 / colorMax);

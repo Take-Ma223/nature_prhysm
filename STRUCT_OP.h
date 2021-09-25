@@ -36,7 +36,7 @@ typedef struct OPTION {//オプション構造体(全体)
 	static const int DARKNESS_NUM = 5;//黒背景オプションの数
 	static const int SCORE_GRAPH_NUM = 2;//スコアグラフオプションの数
 	static const int TARGET_SCORE1_NUM = 8;//スコアグラフターゲットオプションの数
-	static const int TARGET_SCORE2_NUM = 5;//スコアグラフターゲットオプションの数
+	static const int TARGET_SCORE2_NUM = 6;//スコアグラフターゲットオプションの数
 	static const int SORT_NUM = 24;//曲ソート種類の数
 	static const int BLACK_GRADATION_NUM = 2;//黒終端ロング表示オプションの数
 	int THEME_NUM = 0;//テーマオプションの数
@@ -103,9 +103,10 @@ typedef struct OPTION {//オプション構造体(全体)
 
 	const int OP_TARGET_SCORE2_RIVAL = 0;
 	const int OP_TARGET_SCORE2_AVERAGE = 1;
-	const int OP_TARGET_SCORE2_NEXTRANK = 2;
-	const int OP_TARGET_SCORE2_TOP = 3;
-	const int OP_TARGET_SCORE2_LATEST = 4;
+	const int OP_TARGET_SCORE2_MEDIAN = 2;
+	const int OP_TARGET_SCORE2_NEXTRANK = 3;
+	const int OP_TARGET_SCORE2_TOP = 4;
+	const int OP_TARGET_SCORE2_LATEST = 5;
 
 	const int OP_SORT_NAME = 0;
 	const int OP_SORT_SCORE = 1;
@@ -303,7 +304,8 @@ typedef struct OPTION {//オプション構造体(全体)
 	wchar_t* darkness[DARKNESS_NUM] = { L"0%",L"25%",L"50%",L"75%",L"100%" };
 	wchar_t* scoretarget[SCORE_GRAPH_NUM] = { L"OFF", L"ON"};
 	wchar_t* targetscore1[TARGET_SCORE1_NUM] = { L"E", L"D", L"C", L"B", L"A", L"S", L"10000", L"MAX"};
-	wchar_t* targetscore2[TARGET_SCORE2_NUM] = { L"RIVAL", L"AVERAGE", L"NEXT RANK", L"TOP", L"LATEST" };
+	wchar_t* targetscore2[TARGET_SCORE2_NUM] = { L"RIVAL", L"AVERAGE", L"MEDIAN", L"NEXT RANK", L"TOP", L"LATEST"
+};
 
 	wchar_t* sort[SORT_NUM] = { L"NAME", L"SCORE", L"CLEAR STATE",L"MIN MISS", L"PLAY COUNT",L"RADAR",L"GLOBAL",L"LOCAL",L"CHAIN",L"UNSTABILITY",L"STREAK",L"COLOR",
 		L"RED",L"GREEN",L"BLUE",L"CYAN",L"MAGENTA",L"YELLOW",L"WHITE",L"BLACK",L"RAINBOW",
@@ -451,7 +453,8 @@ typedef struct OPTION {//オプション構造体(全体)
 	wchar_t* sent_targetscore2[TARGET_SCORE2_NUM] =
 	{ L"RIVALスコアに設定します(指定するRIVAL IDはタイトルで設定)"
 	 ,L"ランキングの平均スコアに設定します"
-	 ,L"ランキングの1つ上の順位のスコアに設定します"
+	 ,L"ランキングの中央値スコアに設定します"
+	 ,L"ランキングで自分の1つ上の順位のスコアに設定します"
 	 ,L"ランキング1位のスコアに設定します"
 	 ,L"前回プレーしたときのスコアに設定します"
 	};//説明文

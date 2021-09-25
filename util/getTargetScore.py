@@ -10,7 +10,7 @@ parser.add_argument('--local', action="store_true")
 parser.add_argument('nps_file_path', type=str)
 parser.add_argument('nps_folder_path', type=str)  # IRdataまでのパス
 parser.add_argument('--rainbow', action="store_true")
-parser.add_argument('mode', type=int)  # 0:RIVAL 1:平均 2:次の順位のスコア 3:全一スコア
+parser.add_argument('mode', type=int)  # 0:RIVAL 1:平均 2:中央値スコア 3:次の順位のスコア 4:全一スコア
 parser.add_argument('score', type=int)  # プレイヤーのハイスコア 次の順位のスコアを表示するときに使用
 parser.add_argument('rivalID', type=int)  # Riavlに指定したプレイヤーのスコアを表示するときに使用
 parser.add_argument('--run')

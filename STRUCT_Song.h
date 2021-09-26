@@ -48,6 +48,7 @@ typedef struct Song {
 	short chain[2][5];//縦連度
 
 	unsigned short version[5];//追加されたバージョン(小数を100倍して保存)
+	char editable[5] = { 0,0,0,0,0 };//編集可能
 
 }Song;
 

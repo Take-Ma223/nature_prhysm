@@ -112,6 +112,8 @@ void EDIT_SCORE(SCORE_CELL *head,
 	int AutoMove = 0;//音符を置いた後自動で動くかどうかのフラグ
 	int FrameButtonFlag = 0;//前のフレームで音符配置ボタンをどれか一つでも押していたかどうかのフラグ
 
+	BOOL saveErrorTextShowFlag = 0;//保存できなかったときのエラーメッセージを表示するフラグ
+
 	SCORE_CELL *insert;	//insert今の行から下にある一番stepが近いセル(音符or命令 どちらもあるときは音符を指す) または現在挿入中のセルを指すポインタ
 	insert = head;//headのsteoは-1
 
@@ -357,22 +359,27 @@ void EDIT_SCORE(SCORE_CELL *head,
 		int PushTimeTh = 35;//長押し閾値
 
 		if (Key[KEY_INPUT_ESCAPE] == 1) {
-			if (SAVE_EDIT_SCORE(head, Music, song_number, difficulty, 1) == 0) {//正常に保存出来たら戻る
-				double insert_p_time = calc_insert_passed_time(Music[song_number].bpm[difficulty], init_scroll, head, insert);
+			if (Music[song_number].editable[difficulty] == 1) {//編集可能
+				if (SAVE_EDIT_SCORE(head, Music, song_number, difficulty, 1) == 0) {//正常に保存出来たら戻る
+					double insert_p_time = calc_insert_passed_time(Music[song_number].bpm[difficulty], init_scroll, head, insert);
 
-				double passed_time_difference = insert_p_time - passed_time;//insert-passed_timeまでの時間の差
+					double passed_time_difference = insert_p_time - passed_time;//insert-passed_timeまでの時間の差
 
-				*debug_time_passed += passed_time_difference;
+					*debug_time_passed += passed_time_difference;
 
-				score_delete_cell_all(head);
-				//copyのメモリ解放
-				score_delete_cell_all(&CopyHead);
-				break;
+					score_delete_cell_all(head);
+					//copyのメモリ解放
+					score_delete_cell_all(&CopyHead);
+					break;
+				}
+				else {
+					saveErrorTextShowFlag = 1;
+					PlaySoundMem(SH_NO, DX_PLAYTYPE_BACK, TRUE);
+				}
 			}
 			else {
 				PlaySoundMem(SH_NO, DX_PLAYTYPE_BACK, TRUE);
 			}
-			
 			
 			
 			//PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
@@ -1704,6 +1711,17 @@ void EDIT_SCORE(SCORE_CELL *head,
 		printfDx("bpm:%f\n", bpm);
 		printfDx("insert_passed_time:%f\n", insert_passed_time);
 		*/
+
+		if (saveErrorTextShowFlag) {
+			printfDx(L"保存できません　別のプログラムでnpsファイルが開かれている可能性があります\n");
+		}
+
+		if (Music[song_number].editable[difficulty] != 1) {
+			printfDx(L"この譜面は編集できません\n");
+			printfDx(L"編集するには #EDITABLE:1 を\n");
+			printfDx(L"npsファイルに追加してください\n");
+			printfDx(L"\n");
+		}
 
 		if (isInstructionAppear) {
 			printfDx(L"F1:操作説明を非表示\n");

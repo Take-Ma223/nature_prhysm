@@ -26,7 +26,7 @@ def recv_data():
     if args.local:  # ローカル
         s.connect(('192.168.3.6', 50001))
     else:  # グローバル
-        s.connect(('126.89.71.177', 50001))
+        s.connect(('nature-prhysm.f5.si', 50001))
 
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 

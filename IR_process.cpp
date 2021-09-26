@@ -91,11 +91,17 @@ void IRgetID(CONFIG config) {
 	//初回起動時にIR idの取得
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
+
+	wchar_t* command[2] = {
+	L"util/getid.exe",
+	L"python3 util/getid.py"
+	};
+
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/getid.py --local --run %s", RUN_PASS);
+		sprintfDx(passbuf, L"%s --local --run %s", command[config.UsePy], RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/getid.py --run %s", RUN_PASS);
+		sprintfDx(passbuf, L"%s         --run %s", command[config.UsePy], RUN_PASS);
 	}
 
 	if (stat("save_data/IR_id.dat", &statBuf) == 0) {//ファイル存在確認
@@ -115,12 +121,18 @@ void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, i
 	//送信用スコアの保存
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
+
+	wchar_t* command[2] = {
+	L"util/save.exe",
+	L"python3 util/save.py"
+	};
+
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/save.py --local \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s",
+		sprintfDx(passbuf, L"%s --local \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s", command[config.UsePy],
 			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_count, RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/save.py         \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s",
+		sprintfDx(passbuf, L"%s         \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s", command[config.UsePy],
 			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_count, RUN_PASS);
 	}
 
@@ -140,12 +152,18 @@ void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficult
 	//スコアの送信
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
+
+	wchar_t* command[2] = {
+	L"util/send.exe",
+	L"python3 util/send.py"
+	};
+
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/send.py --local \"%s\" \"%s/IRdata/%d%s\" --run %s", 
+		sprintfDx(passbuf, L"%s --local \"%s\" \"%s/IRdata/%d%s\" --run %s", command[config.UsePy],
 			npsPath, folderPath, difficulty, rainbow ? L"_r" : L"", RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/send.py         \"%s\" \"%s/IRdata/%d%s\" --run %s",
+		sprintfDx(passbuf, L"%s         \"%s\" \"%s/IRdata/%d%s\" --run %s", command[config.UsePy],
 			npsPath, folderPath, difficulty, rainbow ? L"_r" : L"", RUN_PASS);
 	}
 
@@ -160,12 +178,18 @@ void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config) 
 	//スコアランキングの表示
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
+
+	wchar_t* command[2] = {
+	L"util/view.exe",
+	L"python3 util/view.py"
+	};
+
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/view.py --local \"%s\" %s --run %s",
+		sprintfDx(passbuf, L"%s --local \"%s\" %s --run %s", command[config.UsePy],
 			npsPath, rainbow ? L"--rainbow" : L"", RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/view.py         \"%s\" %s --run %s",
+		sprintfDx(passbuf, L"%s         \"%s\" %s --run %s", command[config.UsePy],
 			npsPath, rainbow ? L"--rainbow" : L"", RUN_PASS);
 	}
 
@@ -181,12 +205,18 @@ void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mod
 	//ターゲットスコアの取得
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
+
+	wchar_t* command[2] = {
+	L"util/getTargetScore.exe",
+	L"python3 util/getTargetScore.py"
+	};
+
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/getTargetScore.py --local \"%s\" \"%s\" %s %d %d %d --run %s",
+		sprintfDx(passbuf, L"%s --local \"%s\" \"%s\" %s %d %d %d --run %s", command[config.UsePy],
 			npsPath, folderPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/getTargetScore.py         \"%s\" \"%s\" %s %d %d %d --run %s",
+		sprintfDx(passbuf, L"%s         \"%s\" \"%s\" %s %d %d %d --run %s", command[config.UsePy],
 			npsPath, folderPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
 	}
 
@@ -202,11 +232,17 @@ void connectionConfirm(CONFIG config) {
 	//サーバー接続状態の取得
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
+
+	wchar_t* command[2] = { 
+	L"util/connectionConfirm.exe",
+	L"python3 util/connectionConfirm.py"
+	};
+
 	if (config.Local == 1) {
-		sprintfDx(passbuf, L"python3 util/connectionConfirm.py --local --run %s", RUN_PASS);
+		sprintfDx(passbuf, L"%s --local --run %s", command[config.UsePy], RUN_PASS);
 	}
 	else {
-		sprintfDx(passbuf, L"python3 util/connectionConfirm.py         --run %s", RUN_PASS);
+		sprintfDx(passbuf, L"%s         --run %s", command[config.UsePy], RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };

@@ -34,7 +34,7 @@ def main():
     if args.local:  # ローカル
         webbrowser.open("http://192.168.3.6"  +"/ranking/"+str(hash_sha3_256)+"/score_ranking"+rainbow+".html",new=0)
     else:  # グローバル
-        webbrowser.open("http://126.89.71.177"+"/ranking/"+str(hash_sha3_256)+"/score_ranking"+rainbow+".html")
+        webbrowser.open("http://nature-prhysm.f5.si"+"/ranking/"+str(hash_sha3_256)+"/score_ranking"+rainbow+".html")
 
 
 if __name__ == "__main__":

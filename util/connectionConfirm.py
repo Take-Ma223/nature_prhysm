@@ -30,7 +30,7 @@ def authorization_password():
         if args.local:  # ローカル
             s.connect(('192.168.3.6', 50001))
         else:  # グローバル
-            s.connect(('126.89.71.177', 50001))
+            s.connect(('nature-prhysm.f5.si', 50001))
     except socket.timeout:
         write(CONNECTION_SERVER_NOT_FOUND)
         return

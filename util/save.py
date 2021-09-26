@@ -103,7 +103,7 @@ def main():
             "perfect": args.perfect,
             "good": args.good,
             "miss": args.miss,
-            "min_miss": -1,
+            "min_miss": args.min_miss,
             "max_combo": args.max_combo,
             "play_count": args.play_count
             }
@@ -151,6 +151,8 @@ def main():
                     bestData["min_miss"] = data["miss"]
                 if bestData["min_miss"] > data["miss"]:  # 最小ミス更新
                     bestData["min_miss"] = data["miss"]
+                if data["min_miss"] != -1:  # 既存スコア送信の場合
+                    bestData["min_miss"] = data["min_miss"]
             if bestData["max_combo"] < data["max_combo"]:  # 最大コンボ更新
                 bestData["max_combo"] = data["max_combo"]
             bestData["id"] = data["id"]
@@ -159,11 +161,19 @@ def main():
             save(bestData, path)
         else:  # IDが違う または 譜面が変更された時はそのまま保存
             if (data["clear_type"] == -1 or data["clear_type"] >= 2) and not args.onlyOption:  # ONLYオプション無しでクリア、PLAYしたとき　MinMiss保存
-                data["min_miss"] = data["miss"]
+                if data["min_miss"] == -1:  # 通常は必ず-1
+                    data["min_miss"] = data["miss"]
+                else:
+                    # 既存スコア送信の場合
+                    data["min_miss"] = data["min_miss"]
             save(data, path)
     else:  # 初回保存の時はそのまま保存
         if (data["clear_type"] == -1 or data["clear_type"] >= 2) and not args.onlyOption:  # ONLYオプション無しでクリア、PLAYしたとき　MinMiss保存
-            data["min_miss"] = data["miss"]
+            if data["min_miss"] == -1:  # 通常は必ず-1
+                data["min_miss"] = data["miss"]
+            else:
+                # 既存スコア送信の場合
+                data["min_miss"] = data["min_miss"]
         save(data, path)
 
 

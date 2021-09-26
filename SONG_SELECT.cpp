@@ -544,7 +544,7 @@ void SONG_SELECT(int *l_n,
 			STscore[i] = before_STRes.score;
 			STrank[i] = before_STRes.rank;
 			STclear_state[i] = before_STRes.clear;
-			STplay_count[i] = before_STRes.play_counter;
+			STplay_count[i] = before_STRes.play_count;
 			STsky_perfect[i] = before_STRes.sky_perfect;//SKY_PERFECT数
 			STperfect[i] = before_STRes.perfect;//PERFECT数
 			STgood[i] = before_STRes.good;//GOOD数
@@ -552,7 +552,7 @@ void SONG_SELECT(int *l_n,
 			STmax_combo[i] = before_STRes.max_combo;//最大コンボ
 			STmin_miss[i] = before_STRes.min_miss;//最小ミス
 
-			PlayCountSum += before.play_counter;//プレイヤーデータの総プレイカウント
+			PlayCountSum += before.play_count;//プレイヤーデータの総プレイカウント
 			fclose(fp);
 		}
 	}
@@ -624,7 +624,7 @@ void SONG_SELECT(int *l_n,
 						Highscore[i].rank[j] = before.rank;
 						Highscore[i].clear_state[j] = before.clear;
 
-						Highscore[i].play_count[j] = before.play_counter;
+						Highscore[i].play_count[j] = before.play_count;
 						Highscore[i].sky_perfect[j] = before.sky_perfect;//SKY_PERFECT数
 						Highscore[i].perfect[j] = before.perfect;//PERFECT数
 						Highscore[i].good[j] = before.good;//GOOD数
@@ -656,14 +656,14 @@ void SONG_SELECT(int *l_n,
 							}
 						}
 
-						PlayCountSum += before.play_counter;//プレイヤーデータの総プレイカウント
+						PlayCountSum += before.play_count;//プレイヤーデータの総プレイカウント
 						fclose(fp);
 					}
 					else if (side == 1) {
 						HighscoreRival[i].score[j] = before.score;
 						HighscoreRival[i].rank[j] = before.rank;
 						HighscoreRival[i].clear_state[j] = before.clear;
-						HighscoreRival[i].play_count[j] = before.play_counter;
+						HighscoreRival[i].play_count[j] = before.play_count;
 						HighscoreRival[i].sky_perfect[j] = before.sky_perfect;//SKY_PERFECT数
 						HighscoreRival[i].perfect[j] = before.perfect;//PERFECT数
 						HighscoreRival[i].good[j] = before.good;//GOOD数
@@ -1332,6 +1332,25 @@ void SONG_SELECT(int *l_n,
 				//	PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 				//}
 			}
+
+			if (Key[KEY_INPUT_F3] == 1 && SEND_EXIST_SCORE_TO_IR) {//既存スコアを送信
+				RESULT IrScore;
+				IrScore.difficulty = difficulty;
+				IrScore.clear = Highscore[song_number].clear_state[difficulty + select_rainbow];
+				IrScore.rank = Highscore[song_number].rank[difficulty + select_rainbow];
+				IrScore.score = Highscore[song_number].score[difficulty + select_rainbow];
+				IrScore.sky_perfect = Highscore[song_number].sky_perfect[difficulty + select_rainbow];
+				IrScore.perfect = Highscore[song_number].perfect[difficulty + select_rainbow];
+				IrScore.good = Highscore[song_number].good[difficulty + select_rainbow];
+				IrScore.miss = Highscore[song_number].miss[difficulty + select_rainbow];
+				IrScore.min_miss = Highscore[song_number].min_miss[difficulty + select_rainbow];
+				IrScore.max_combo = Highscore[song_number].max_combo[difficulty + select_rainbow];
+				IrScore.play_count = Highscore[song_number].play_count[difficulty + select_rainbow];
+
+				IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, IrScore, difficulty, Music[song_number].season[difficulty], option->op.color == option->OP_COLOR_RAINBOW, 0, config);
+				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
+			}
+
 			if (Key[Button_Shutter] == 1) {//スクリーンショット
 				ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
 			}

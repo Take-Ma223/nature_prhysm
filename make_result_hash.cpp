@@ -13,7 +13,7 @@ int make_result_hash(RESULT res) {//リザルトデータのハッシュ作成
 	hash += (6739052 * res.hash) % hash_MAX;
 	hash += (5075147 * res.miss) % hash_MAX;
 	hash += (1325445 * res.perfect) % hash_MAX;
-	hash += (8883535 * res.play_counter) % hash_MAX;
+	hash += (8883535 * res.play_count) % hash_MAX;
 	hash += (1357338 * res.rank) % hash_MAX;
 	hash += (1335529 * res.score) % hash_MAX;
 	return hash;

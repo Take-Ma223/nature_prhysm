@@ -10,8 +10,9 @@ parser.add_argument('--local', action="store_true")
 parser.add_argument('nps_file_path', type=str)
 parser.add_argument('IRdata_path', type=str)
 parser.add_argument('--run')
-
 args = parser.parse_args()
+
+password = "natureprhysmserver1.00"
 
 
 class DataStructure(Structure):
@@ -42,6 +43,15 @@ def get_hash():
         return hash_sha3_256
 
 
+def authorization_password(s):
+    s.send(bytes(password, 'utf-8'))
+    # 応答を受け取る
+    recv = s.recv(1024)
+    print(recv.decode("utf-8"))
+    if recv == b"ok":
+        return
+
+
 def send_data(data):
     print(data)
     msg = pickle.dumps(data)
@@ -55,6 +65,9 @@ def send_data(data):
         s.connect(('126.89.71.177', 50001))
 
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    # パスワード送信
+    authorization_password(s)
 
     # サーバに送信
     s.send(bytes("send", 'utf-8'))

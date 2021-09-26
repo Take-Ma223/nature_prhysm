@@ -409,10 +409,10 @@ void SHOW_RESULT(RESULT res,
 
 		save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 
-		int PlayCountBuf = high_score.play_counter + TryCount;
+		int PlayCountBuf = high_score.play_count + TryCount;
 		if (PlayCountBuf >= 9999)PlayCountBuf = 9999;//カンスト処理
-		res.play_counter = PlayCountBuf;
-		save.play_counter = PlayCountBuf;//プレイ回数を足す
+		res.play_count = PlayCountBuf;
+		save.play_count = PlayCountBuf;//プレイ回数を足す
 														//printfDx(L"保存しました\n");
 		save.hash_result = make_result_hash(save);
 
@@ -509,9 +509,9 @@ void SHOW_RESULT(RESULT res,
 
 		//毎回保存する内容
 		save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
-		int PlayCountBuf = high_score.play_counter + 1;
+		int PlayCountBuf = high_score.play_count + 1;
 		if (PlayCountBuf >= 9999)PlayCountBuf = 9999;//カンスト処理
-		save.play_counter = PlayCountBuf;//プレイ回数を足す
+		save.play_count = PlayCountBuf;//プレイ回数を足す
 		fwrite(&save, sizeof(save), 1, fp);
 		fclose(fp);
 	}

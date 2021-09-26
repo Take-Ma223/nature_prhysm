@@ -59,6 +59,22 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 
 	SongCache Cache;
 
+	//サーバー接続確認
+	int connectionState = LoadConnectionState();
+	wchar_t connectionStateMessage[128];
+	switch (connectionState)
+	{
+	case CONNECTION_SUCCESS:
+		sprintfDx(connectionStateMessage, L"スコアランキングが利用可能です");
+		break;
+	case CONNECTION_SERVER_NOT_FOUND:
+		sprintfDx(connectionStateMessage, L"スコアランキングサーバーに接続できません　インターネット接続の問題か、サーバーメンテナンス中の可能性があります");
+		break;
+	case CONNECTION_VERSION_ERROR:
+		sprintfDx(connectionStateMessage, L"スコアランキングサーバーに接続できません　本体のバージョンが古いため、最新版をダウンロードしてください");
+		break;
+	}
+
 	//曲構造体のNULLを\0でデータ格納
 	for (i = 0; i < SONG_MAX_NUMBER; i++) {
 		for (j = 0; j < 5; j++) {
@@ -282,7 +298,8 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 					ClearDrawScreen();
 					clsDx();
 					printfDx(L"loading(%d曲目)\n", i);
-					printfDx(L"無線LANに接続するとAndroidコントローラを使用できます\n");
+					//printfDx(L"無線LANに接続するとAndroidコントローラを使用できます\n");
+					printfDx(connectionStateMessage);
 					ScreenFlip();
 
 					if (FindClose(hFind_nps) == 0) {

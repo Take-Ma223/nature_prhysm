@@ -67,6 +67,25 @@ int LoadTargetScore(wchar_t* saveFolderPass) {
 	return targetScore;
 }
 
+int LoadConnectionState() {
+	int ConnectState = 0;
+	FILE* fp = 0;
+	errno_t error = 0;
+
+	wchar_t passStr[512] = L"save_data/tmp/ConnectState";
+
+	error = _wfopen_s(&fp, passStr, L"rb");
+	if (error != 0) {//ファイル見つからなかったら
+		//何もしない
+	}
+	else {
+		fread(&ConnectState, sizeof(ConnectState), 1, fp);//ConnectState読み込み
+		fclose(fp);
+	}
+
+	return ConnectState;
+}
+
 
 void IRgetID(CONFIG config) {
 	//初回起動時にIR idの取得
@@ -79,7 +98,7 @@ void IRgetID(CONFIG config) {
 		sprintfDx(passbuf, L"python3 util/getid.py --run %s", RUN_PASS);
 	}
 
-	if (stat("save_data/IR_id.dat", &statBuf) == 0) {
+	if (stat("save_data/IR_id.dat", &statBuf) == 0) {//ファイル存在確認
 		//_wsystem(passbuf);
 	}
 	else {
@@ -98,11 +117,11 @@ void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, i
 	wchar_t passbuf[512] = L"";
 	if (config.Local == 1) {
 		sprintfDx(passbuf, L"python3 util/save.py --local \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s",
-			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
+			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_count, RUN_PASS);
 	}
 	else {
 		sprintfDx(passbuf, L"python3 util/save.py         \"%s\" \"%s\" %d %d %s %s %d %d %d %d %d %d %d %d %d %d --run %s",
-			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_counter, RUN_PASS);
+			npsPath, folderPath, difficulty, season, rainbow ? L"--rainbow" : L"", onlyOption ? L"--onlyOption" : L"", res.clear, res.rank, res.score, res.sky_perfect, res.perfect, res.good, res.miss, res.min_miss, res.max_combo, res.play_count, RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };
@@ -169,6 +188,25 @@ void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mod
 	else {
 		sprintfDx(passbuf, L"python3 util/getTargetScore.py         \"%s\" \"%s\" %s %d %d %d --run %s",
 			npsPath, folderPath, rainbow ? L"--rainbow" : L"", mode, score, rivalID, RUN_PASS);
+	}
+
+	STARTUPINFO si = { sizeof(STARTUPINFO) };
+	PROCESS_INFORMATION pi;
+	BOOL CPres = ::CreateProcessW(NULL, passbuf, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+	WaitForSingleObject(pi.hProcess, INFINITE);//終了を待つ
+	::CloseHandle(pi.hProcess);
+	::CloseHandle(pi.hThread);
+}
+
+void connectionConfirm(CONFIG config) {
+	//サーバー接続状態の取得
+	struct stat statBuf;
+	wchar_t passbuf[512] = L"";
+	if (config.Local == 1) {
+		sprintfDx(passbuf, L"python3 util/connectionConfirm.py --local --run %s", RUN_PASS);
+	}
+	else {
+		sprintfDx(passbuf, L"python3 util/connectionConfirm.py         --run %s", RUN_PASS);
 	}
 
 	STARTUPINFO si = { sizeof(STARTUPINFO) };

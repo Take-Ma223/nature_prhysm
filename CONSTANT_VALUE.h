@@ -14,6 +14,9 @@
 
 #define SHOW_DEBUG_MODE 1//DEBUG MODEのときにDEBUG MODEの表示をする
 
+#define SEND_EXIST_SCORE_TO_IR 0//F3で既存スコアをIRに送信
+
+
 const wchar_t RUN_PASS[] = L"223210";
 
 #endif

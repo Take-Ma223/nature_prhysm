@@ -54,7 +54,7 @@ typedef struct RESULT {//リザルト用構造体
 	int good = 0;//
 	int miss = 0;//
 	int rank = 0;//ランク(0:未プレイ 1:F 2:E 3:D 4:C 5:B 6:A 7:S)
-	int play_counter = 0;//何回遊んだか
+	int play_count = 0;//何回遊んだか
 	int hash_result = 0;//リザルトデータ自体のハッシュ
 	int weather[6] = {0,0,0,0,0,0};//3時間毎の精度(0,1,2,3で良くなっていく 雷、雨、曇り、晴れ)
 	int pop[6] = {100,100,100,100,100,100};//3時間毎の(100-ゲージ量)

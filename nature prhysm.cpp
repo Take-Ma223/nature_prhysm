@@ -188,6 +188,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 
+	//サーバー接続確認
+	connectionConfirm(config);
+
 
 	//初回起動時にIR idの取得
 	IRgetID(config);
@@ -283,7 +286,7 @@ void MakeScoreDate(wchar_t *title,int difficulty,int score,int Perfect,int Good,
 	res.miss = Miss;
 	res.max_combo = MaxCombo;
 	res.min_miss = MinMiss;
-	res.play_counter = 32;
+	res.play_count = 32;
 	res.save_data_version = RESULT_DATA_VERSION_MIN_MISS;
 
 	if (score >= 5000)res.rank = 2;

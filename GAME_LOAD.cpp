@@ -510,7 +510,7 @@ void GAME_LOAD(int song_number,
 			//textLine++;
 		}
 
-		if ((wcslen(sharp1) >= 1) && sharp1[wcslen(sharp1) - 1] != L',') {//最後がカンマではない1文字以上の行(#命令も含めて複数行になる所)を見つけた
+		if ((wcslen(sharp1) >= 1) && wcsrchr(sharp1, L',') == NULL) {//最後にカンマがない1文字以上の行(#命令も含めて複数行になる所)を見つけた
 			if (sharp1[0] != L'#') {//先頭が#じゃないなら分割数を数える
 				i++;//一小節の分割数を数える
 			}
@@ -2293,7 +2293,7 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 	lnDegrees *= 2;
 	lnDegrees *= 130;
 
-	lnDegrees = lnDegrees * 0.35;//大きさ調整
+	lnDegrees = lnDegrees * 0.315;//大きさ調整
 	return lnDegrees;
 	/*
 	for (lane = 0; lane <= 3; lane++) {

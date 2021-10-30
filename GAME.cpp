@@ -183,9 +183,9 @@ void GAME(int song_number, int difficulty,
 	double note_hit_large_flash[NOTE_HIT_LARGE_FLASH_NUMBER][4] = { 0,0,0,0 };//光るノートを叩いた時のフラッシュを表示するためのカウンタ
 	int note_hit_large_flash_rounder = 0;//4個以内で順々にフラッシュを表示するためのカウンタ(0~3で回る)
 	double dnote_hit_flash[4] = { 0,0,0,0 };//黒ノートを叩いた時のフラッシュを表示するためのカウンタ
-	const int FLASH_VALUE = 90;//長音ノートの点滅輝度
-	const int FLASH_VALUE_ALWAYS = 60;//長音ノートの常時点滅輝度
-	const int FLASH_COVER_VALUE = 33;//カバーの点滅輝度
+	const int FLASH_VALUE = 100;//長音ノートの点滅輝度
+	const int FLASH_VALUE_ALWAYS = 70;//長音ノートの常時点滅輝度
+	const int FLASH_COVER_VALUE = 15;//カバーの点滅輝度
 
 	double hit_sky_perfect[4] = { 0,0,0,0 };//判定画像のSKY_PERFECTを表示するカウンタ
 	double hit_perfect[4] = { 0,0,0,0 };//判定画像のPERFECTを表示するカウンタ

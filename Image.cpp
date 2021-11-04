@@ -126,6 +126,18 @@ Image::~Image() {
 	DeleteGraph(handle);
 }
 
+void Image::reset() {
+	clearEvent(visible);
+	clearEvent(moveXEvent);
+	clearEvent(moveYEvent);
+	clearEvent(alpha);
+}
+
+void Image::clearEvent(std::queue<event> &eventQueue) {
+	std::queue<event> empty;
+	std::swap(eventQueue, empty);
+}
+
 void Image::move(int xStart, int yStart, int xEnd, int yEnd, Specify specify, ConvertMode mode, double nowTime, double time, double base) {//éwíËÇµÇΩç¿ïWä‘Çà⁄ìÆ		
 	Image::moveXEvent.push(
 		event(absRel(specify, x, xStart), absRel(specify, x, xEnd), mode, base, nowTime, nowTime + time)
@@ -160,12 +172,12 @@ void Image::disappear(double nowTime, double time) {
 }
 
 void Image::changeAlpha(int startVal, int endVal, Specify specify, ConvertMode mode, double nowTime, double time, double base) {
-	Image::moveXEvent.push(
+	Image::alpha.push(
 		event(absRel(specify, alphaVal, startVal), absRel(specify, alphaVal, endVal), mode, base, nowTime, nowTime + time)
 	);
 }
 void Image::changeAlphaTo(int val, Specify specify, ConvertMode mode, double nowTime, double time, double base) {
-	Image::moveXEvent.push(
+	Image::alpha.push(
 		event(alphaVal, absRel(specify, alphaVal,  val), mode, base, nowTime, nowTime + time)
 	);
 }

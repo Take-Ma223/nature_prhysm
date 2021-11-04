@@ -636,20 +636,45 @@ void GAME(int song_number, int difficulty,
 
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_POP_NUMBER);
 
-	Image I_Fast[4] = {
-	Image(L"img/judge/fast_c.png", lane[0],judge_area,0),
-	Image(L"img/judge/fast_c.png", lane[1],judge_area,0),
-	Image(L"img/judge/fast_c.png", lane[2],judge_area,0),
-	Image(L"img/judge/fast_c.png", lane[3],judge_area,0)
-	};
-	Image I_Slow[4] = {
-	Image(L"img/judge/slow_r.png", lane[0],judge_area,0),
-	Image(L"img/judge/slow_r.png", lane[1],judge_area,0),
-	Image(L"img/judge/slow_r.png", lane[2],judge_area,0),
-	Image(L"img/judge/slow_r.png", lane[3],judge_area,0)
-	};
 	int fastSlowY = -130;
 	int fastSlowYMove = 10;
+	Image I_Fast[4] = {
+	Image(L"img/judge/fast_c.png", lane[0],judge_area+ fastSlowY,0),
+	Image(L"img/judge/fast_c.png", lane[1],judge_area+ fastSlowY,0),
+	Image(L"img/judge/fast_c.png", lane[2],judge_area+ fastSlowY,0),
+	Image(L"img/judge/fast_c.png", lane[3],judge_area+ fastSlowY,0)
+	};
+	Image I_Slow[4] = {
+	Image(L"img/judge/slow_r.png", lane[0],judge_area+ fastSlowY,0),
+	Image(L"img/judge/slow_r.png", lane[1],judge_area+ fastSlowY,0),
+	Image(L"img/judge/slow_r.png", lane[2],judge_area+ fastSlowY,0),
+	Image(L"img/judge/slow_r.png", lane[3],judge_area+ fastSlowY,0)
+	};
+
+
+	//出現アニメーション
+	auto fastSlowAppear = [&] {
+		if (timingDifference < 0) {
+			I_Fast[i].reset();
+			I_Fast[i].appear(GAME_passed_time);
+			//I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
+			I_Fast[i].changeAlpha(255, 0, Abs, Linear, GAME_passed_time + 200, 100);
+			I_Fast[i].disappear(GAME_passed_time, 300);
+			
+			I_Slow[i].reset();
+			I_Slow[i].disappear();
+		}
+		else {
+			I_Slow[i].reset();
+			I_Slow[i].appear(GAME_passed_time);
+			//I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
+			I_Slow[i].changeAlpha(255, 0, Abs, Linear, GAME_passed_time + 200, 100);
+			I_Slow[i].disappear(GAME_passed_time, 300);
+
+			I_Fast[i].reset();
+			I_Fast[i].disappear();
+		}
+	};
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitsound[option->op.hitsound]);
 	SH.SH_HIT_N = LoadSoundMem(strcash, 1);
@@ -1927,18 +1952,8 @@ void GAME(int song_number, int difficulty,
 									score += score_note - 1;
 									PERFECT++;
 
-									if (timingDifference < 0) {
-										I_Fast[i].appear(GAME_passed_time);
-										I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-										I_Fast[i].disappear(GAME_passed_time, 200);
-									}
-									else {
-										I_Slow[i].appear(GAME_passed_time);
-										I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-										I_Slow[i].disappear(GAME_passed_time, 200);
-									}
+									fastSlowAppear();
 									
-
 								}
 								TimePerfect++;
 
@@ -1971,16 +1986,7 @@ void GAME(int song_number, int difficulty,
 								GOOD++;
 								TimeGood++;
 
-								if (timingDifference < 0) {
-									I_Fast[i].appear(GAME_passed_time);
-									I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-									I_Fast[i].disappear(GAME_passed_time, 200);
-								}
-								else {
-									I_Slow[i].appear(GAME_passed_time);
-									I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-									I_Slow[i].disappear(GAME_passed_time, 200);
-								}
+								fastSlowAppear();
 
 								if (debug_sound == 1) {
 									PlayHitSound(1, note[i][searching].color_init, note[i][searching].snd, SH);
@@ -2030,16 +2036,7 @@ void GAME(int song_number, int difficulty,
 								TimeMiss++;
 								AllowSound[j][i] = 0;//j行i列のスイッチからの音を出さない
 
-								if (timingDifference < 0) {
-									I_Fast[i].appear(GAME_passed_time);
-									I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-									I_Fast[i].disappear(GAME_passed_time, 200);
-								}
-								else {
-									I_Slow[i].appear(GAME_passed_time);
-									I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-									I_Slow[i].disappear(GAME_passed_time, 200);
-								}
+								fastSlowAppear();
 							}
 						}
 
@@ -2052,16 +2049,7 @@ void GAME(int song_number, int difficulty,
 								else {
 									LN_judge[i] = 2;
 
-									if (timingDifference < 0) {
-										I_Fast[i].appear(GAME_passed_time);
-										I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-										I_Fast[i].disappear(GAME_passed_time, 200);
-									}
-									else {
-										I_Slow[i].appear(GAME_passed_time);
-										I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-										I_Slow[i].disappear(GAME_passed_time, 200);
-									}
+									fastSlowAppear();
 								}
 
 								//PlaySoundMem(SH_HIT, DX_PLAYTYPE_BACK, TRUE);
@@ -2078,16 +2066,7 @@ void GAME(int song_number, int difficulty,
 								if (abs(timingDifference) <= judge_time_good) {
 									LN_judge[i] = 1;
 
-									if (timingDifference < 0) {
-										I_Fast[i].appear(GAME_passed_time);
-										I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-										I_Fast[i].disappear(GAME_passed_time, 200);
-									}
-									else {
-										I_Slow[i].appear(GAME_passed_time);
-										I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-										I_Slow[i].disappear(GAME_passed_time, 200);
-									}
+									fastSlowAppear();
 
 									if (debug_sound == 1) {
 										PlayHitSound(1, note[i][searching].color_init, note[i][searching].snd, SH);
@@ -2102,16 +2081,7 @@ void GAME(int song_number, int difficulty,
 								LN_judge[i] = 0;
 								LN_flag[i] = 1;
 								
-								if (timingDifference < 0) {
-									I_Fast[i].appear(GAME_passed_time);
-									I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-									I_Fast[i].disappear(GAME_passed_time, 200);
-								}
-								else {
-									I_Slow[i].appear(GAME_passed_time);
-									I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-									I_Slow[i].disappear(GAME_passed_time, 200);
-								}
+								fastSlowAppear();
 							}
 
 
@@ -3527,7 +3497,7 @@ void GAME(int song_number, int difficulty,
 
 			I_Slow[i].draw(GAME_passed_time);
 			I_Fast[i].draw(GAME_passed_time);
-
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		}
 
 		if (ClearFlag != 0) {//演奏終了していたら中心カバーの表示

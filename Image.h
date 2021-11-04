@@ -75,10 +75,13 @@ class Image
 	int absRel(Specify specify, int now, int target);//â‘Î‘Š‘Î”»•Ê‚µ‚Ä’l‚ğŠi”[
 	int calculateVal(double nowTime, event event);
 	void pop(std::queue<event>* eventQueue, double time);
+	void clearEvent(std::queue<event> &eventQueue);
 public:
 	Image(wchar_t*, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
 	~Image();
 	
+	void reset();
+
 	void move(int xStart, int yStart, int xEnd, int yEnd, Specify specify = Abs, ConvertMode mode = Teleportation, double nowTime = 0, double time = 0, double base = 4);
 	void moveTo(int x, int y, Specify = Abs, ConvertMode mode = Teleportation, double nowTime = 0, double time = 0, double base = 4);
 	void appear(double nowTime = 0, double time = 0);

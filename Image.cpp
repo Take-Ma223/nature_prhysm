@@ -98,8 +98,9 @@ double event::getTimeStart() { return timeStart; }
 double event::getTimeEnd() { return timeEnd; }
 
 
-Image::Image(wchar_t* path, int x, int y, BOOL visible, int alpha) {
-	handle = LoadGraph(path);
+Image::Image(int handle, int x, int y, BOOL visible, int alpha) {
+	Image::handle = handle;
+
 	Image::visible.push(
 		event(visible, visible)
 	);
@@ -123,7 +124,7 @@ Image::Image(wchar_t* path, int x, int y, BOOL visible, int alpha) {
 }
 
 Image::~Image() {
-	DeleteGraph(handle);
+	//DeleteGraph(handle);
 }
 
 void Image::reset() {

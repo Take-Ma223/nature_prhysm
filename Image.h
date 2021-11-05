@@ -1,5 +1,6 @@
 #include"DxLib.h"
 #include <queue>
+#include"ImageSet.h"
 
 #pragma once
 enum ConvertMode {
@@ -58,8 +59,7 @@ public:
 
 };
 
-class Image
-{
+class Image{
 	int handle = 0;//“Ç‚İ‚ñ‚¾‰æ‘œƒnƒ“ƒhƒ‹
 
 	std::queue<event> visible;
@@ -77,7 +77,7 @@ class Image
 	void pop(std::queue<event>* eventQueue, double time);
 	void clearEvent(std::queue<event> &eventQueue);
 public:
-	Image(wchar_t*, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
+	Image(int handle, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
 	~Image();
 	
 	void reset();

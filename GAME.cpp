@@ -68,6 +68,9 @@ void GAME(int song_number, int difficulty,
 	double CounterRemainTime = 0;////カウンターの値を1msずつ変動するための時間　1msずつ引かれて小数以下は蓄積する
 	double time_cash = 0;//LOOP_passed_timeを算出するための記憶変数
 	double TimePerFrame = 1000.0 / config.Fps;//1フレームの時間
+
+	ImageSet imageSet;//使う画像セット
+
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
 	//int H_NOTE_OR_FRAME;//ORノートの枠
 
@@ -639,16 +642,16 @@ void GAME(int song_number, int difficulty,
 	int fastSlowY = -130;
 	int fastSlowYMove = 10;
 	Image I_Fast[4] = {
-	Image(L"img/judge/fast_c.png", lane[0],judge_area+ fastSlowY,0),
-	Image(L"img/judge/fast_c.png", lane[1],judge_area+ fastSlowY,0),
-	Image(L"img/judge/fast_c.png", lane[2],judge_area+ fastSlowY,0),
-	Image(L"img/judge/fast_c.png", lane[3],judge_area+ fastSlowY,0)
+	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[0],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[1],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[2],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[3],judge_area + fastSlowY, 0)
 	};
 	Image I_Slow[4] = {
-	Image(L"img/judge/slow_r.png", lane[0],judge_area+ fastSlowY,0),
-	Image(L"img/judge/slow_r.png", lane[1],judge_area+ fastSlowY,0),
-	Image(L"img/judge/slow_r.png", lane[2],judge_area+ fastSlowY,0),
-	Image(L"img/judge/slow_r.png", lane[3],judge_area+ fastSlowY,0)
+	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[0],judge_area+ fastSlowY, 0),
+	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[1],judge_area+ fastSlowY, 0),
+	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[2],judge_area+ fastSlowY, 0),
+	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[3],judge_area+ fastSlowY, 0)
 	};
 
 
@@ -656,20 +659,20 @@ void GAME(int song_number, int difficulty,
 	auto fastSlowAppear = [&] {
 		if (timingDifference < 0) {
 			I_Fast[i].reset();
-			I_Fast[i].appear(GAME_passed_time);
-			//I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-			I_Fast[i].changeAlpha(255, 0, Abs, Linear, GAME_passed_time + 200, 100);
-			I_Fast[i].disappear(GAME_passed_time, 300);
+			I_Fast[i].appear(GetNowCount_d(config));
+			//I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GetNowCount_d(config), 200);
+			I_Fast[i].changeAlpha(255, 0, Abs, Linear, GetNowCount_d(config) + 200, 100);
+			I_Fast[i].disappear(GetNowCount_d(config), 300);
 			
 			I_Slow[i].reset();
 			I_Slow[i].disappear();
 		}
 		else {
 			I_Slow[i].reset();
-			I_Slow[i].appear(GAME_passed_time);
-			//I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GAME_passed_time, 200);
-			I_Slow[i].changeAlpha(255, 0, Abs, Linear, GAME_passed_time + 200, 100);
-			I_Slow[i].disappear(GAME_passed_time, 300);
+			I_Slow[i].appear(GetNowCount_d(config));
+			//I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GetNowCount_d(config), 200);
+			I_Slow[i].changeAlpha(255, 0, Abs, Linear, GetNowCount_d(config) + 200, 100);
+			I_Slow[i].disappear(GetNowCount_d(config), 300);
 
 			I_Fast[i].reset();
 			I_Fast[i].disappear();
@@ -737,8 +740,91 @@ void GAME(int song_number, int difficulty,
 	//printfDx("%s\n", Music[song_number].jinglepath[difficulty]);
 	SH_JINGLE = LoadSoundMem(Music[song_number].jinglepath[difficulty]);
 
+	//重複処理ラムダ式
 
-	//----曲名表示----
+	//変数初期化
+	auto initVariableProcess = [&] {
+		combo = 0;
+		*CourseCombo = 0;
+		*CourseMaxCombo = 0;
+		score = 0;
+		SKY_PERFECT = 0;
+		PERFECT = 0;
+		GOOD = 0;
+		MISS = 0;
+		TimePerfect = 0;
+		TimeGood = 0;
+		TimeMiss = 0;
+		TimeNextHour = 7;
+		MAX_COMBO = 0;
+		gauge = 100;
+		bgmplay = 0;
+		bcc = 0;
+		scc = 0;
+		cscroll = scrollchange[0].scroll;
+		sc_timing = 0;
+		real_timing = 0;
+
+		stop_se_c = 0;
+		stop_time_sum = 0;
+		stop_time = 0;
+		stopFlag = 0;
+
+		FullComboFXPlayFlag = 1;
+		FullComboFXFrame = 0;
+
+		HitingNoteCount = 0;
+		for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
+			barline[j].fall = 0;
+		}
+		for (i = 0; i <= 3; i++) {
+			j_n_n[i] = 0;
+			j_dn_n[i] = 0;
+			j_dn_push_n[i] = 0;
+			LN_flag[i] = 0;
+			LN_flash[i] = 0;
+			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				note[i][j].hit = 0;
+				note[i][j].fall = 0;
+				note[i][j].color = note[i][j].color_init;
+				note[i][j].timing = note[i][j].timing_init;
+				note[i][j].timing_real = note[i][j].timing_init_real;
+				//if (i != 0)note[i][j].color = note[i][j].color_init;
+				//note[i][j].timing -= 240000 / cbpm;
+			}
+		}
+		bcc = 1;
+		StopSoundMem(SH_SONG);
+		GAME_passed_time = (GetNowCount_d(config) - GAME_start_time) + (debug_time_passed - debug_stop_time);
+		GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+	};
+
+	//ボタン音再生
+	auto soundHitSound = [&] {
+		for (i = 0; i <= 3; i++) {//4列分
+			if (Key[Button[2][i]] == 1 && AllowSound[2][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
+				PlaySoundMem(SH.SH_HIT_R_N, DX_PLAYTYPE_BACK, TRUE);
+			}
+		}
+		for (i = 0; i <= 3; i++) {//4列分
+			if (Key[Button[1][i]] == 1 && AllowSound[1][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
+				PlaySoundMem(SH.SH_HIT_G_N, DX_PLAYTYPE_BACK, TRUE);
+			}
+		}
+		for (i = 0; i <= 3; i++) {//4列分
+			if (Key[Button[0][i]] == 1 && AllowSound[0][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
+				PlaySoundMem(SH.SH_HIT_B_N, DX_PLAYTYPE_BACK, TRUE);
+			}
+		}
+
+		for (i = 0; i <= 3; i++) {
+			AllowSound[0][i] = 1;
+			AllowSound[1][i] = 1;
+			AllowSound[2][i] = 1;
+		}
+	};
+
+	//----曲名表示前処理----
 	gauge_draw_counter = 0;
 
 	int FontHandle = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
@@ -880,16 +966,6 @@ void GAME(int song_number, int difficulty,
 				}
 			}
 
-			/*
-			//中心カバー
-			if ((c_m_draw_counter <= 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
-			c_m_draw_counter += 0.001;
-			}
-			if ((c_m_draw_counter > 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
-			c_m_draw_counter = 1;
-			}
-			*/
-
 		}
 
 		if ((gauge_draw_counter >= gauge - 0.001) && (CheckHandleASyncLoad(SH_SONG) != TRUE) && draw_alpha_speed == 0) {//ゲージが上まで描写されて曲の読み込みが完了して(エラーでも続行)段位ようspeed表示が消えたら演奏開始
@@ -986,17 +1062,6 @@ void GAME(int song_number, int difficulty,
 		ShowExtendedStrFit(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config);//ジャンル
 		SetDrawMode(DX_DRAWMODE_NEAREST);
 
-		//DrawExtendString(int(640 - ((double)640 / 2)) + 2, 350 + 2, (double)640/title_width, 1, Music[song_number].title[difficulty], GetColor(0, 0, 0));
-
-		//DrawString(int(640 - ((double)title_width / 2)) + 2, 350 + 2, Music[song_number].title[difficulty], GetColor(0, 0, 0));//曲名表示(影)
-		//DrawString(int(640 - ((double)artist_width / 2)) + 2, 450 + 2, Music[song_number].artist[difficulty], GetColor(0, 0, 0));//アーティスト表示(影)
-		//DrawString(int(640 - ((double)genre_width / 2)) + 2, 260 + 2, Music[song_number].genre[difficulty], GetColor(0, 0, 0));//ジャンル表示(影)
-
-		//DrawExtendString(int(640 - ((double)640 / 2)) , 350 , (double)640 / title_width, 1, Music[song_number].title[difficulty], GetColor(255, 255, 255));
-
-		//DrawString(int(640 - ((double)title_width / 2)), 350, Music[song_number].title[difficulty], GetColor(255, 255, 255));//曲名表示
-		//DrawString(int(640 - ((double)artist_width / 2)), 450, Music[song_number].artist[difficulty], GetColor(255, 255, 255));//アーティスト表示
-		//DrawString(int(640 - ((double)genre_width / 2)), 260, Music[song_number].genre[difficulty], GetColor(255, 255, 255));//ジャンル表示
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
 
 		//スコア描画
@@ -1180,21 +1245,7 @@ void GAME(int song_number, int difficulty,
 			jingleflag = 1;
 		}
 
-		for (i = 0; i <= 3; i++) {//4列分
-			if (Key[Button[2][i]] == 1 && AllowSound[2][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
-				PlaySoundMem(SH.SH_HIT_R_N, DX_PLAYTYPE_BACK, TRUE);
-			}
-		}
-		for (i = 0; i <= 3; i++) {//4列分
-			if (Key[Button[1][i]] == 1 && AllowSound[1][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
-				PlaySoundMem(SH.SH_HIT_G_N, DX_PLAYTYPE_BACK, TRUE);
-			}
-		}
-		for (i = 0; i <= 3; i++) {//4列分
-			if (Key[Button[0][i]] == 1 && AllowSound[0][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
-				PlaySoundMem(SH.SH_HIT_B_N, DX_PLAYTYPE_BACK, TRUE);
-			}
-		}
+		soundHitSound();
 
 		if ((gauge_draw_counter >= gauge - 0.001) && openflag == 0) {
 
@@ -1211,9 +1262,6 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 	}
-
-
-
 
 	//演奏開始
 	time_cash = 0;//最初のLOOP_passed_timeが負の値に(-5000とか)にならないように初期化
@@ -1280,66 +1328,7 @@ void GAME(int song_number, int difficulty,
 				}
 				debug_time_passed += debug_warp_time;
 
-
-				combo = 0;
-				*CourseCombo = 0;
-				*CourseMaxCombo = 0;
-				score = 0;
-				SKY_PERFECT = 0;
-				PERFECT = 0;
-				GOOD = 0;
-				MISS = 0;
-				TimePerfect = 0;
-				TimeGood = 0;
-				TimeMiss = 0;
-				TimeNextHour = 7;
-				MAX_COMBO = 0;
-				gauge = 100;
-
-				beat = 0;
-				beat_time = 0;
-				beat_time_cash = 0;
-				beat_percent = 0;
-				bgmplay = 0;
-
-				bcc = 0;
-				scc = 0;
-				cscroll = scrollchange[0].scroll;
-				sc_timing = 0;
-				real_timing = 0;
-
-				stop_se_c = 0;
-				stop_time_sum = 0;
-				stop_time = 0;
-				stopFlag = 0;
-
-				FullComboFXPlayFlag = 1;
-				FullComboFXFrame = 0;
-
-				HitingNoteCount = 0;
-				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
-					barline[j].fall = 0;
-				}
-				for (i = 0; i <= 3; i++) {
-					j_n_n[i] = 0;
-					j_dn_n[i] = 0;
-					j_dn_push_n[i] = 0;
-					LN_flag[i] = 0;
-					LN_flash[i] = 0;
-					for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-						note[i][j].hit = 0;
-						note[i][j].fall = 0;
-						note[i][j].color = note[i][j].color_init;
-						note[i][j].timing = note[i][j].timing_init;
-						note[i][j].timing_real = note[i][j].timing_init_real;
-						//note[i][j].timing += 240000 / cbpm;
-					}
-					bcc = 1;
-				}
-				//printfDx("color:%d,color_init%d\n", note[3][0].color, note[3][0].color_init);
-				StopSoundMem(SH_SONG);
-				GAME_passed_time = (GetNowCount_d(config) - GAME_start_time) + (debug_time_passed - debug_stop_time);
-				GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+				initVariableProcess();
 			}
 			if ((Key[KEY_INPUT_DOWN] == 1 || (Key[KEY_INPUT_DOWN] >= PressFrame && debug_warp_counter >= 20)) && GAME_passed_time >= 0) {//一拍戻る(GAME_passed_time >= 0で戻りすぎ防止)
 				debug_warp_counter = 0;
@@ -1350,65 +1339,7 @@ void GAME(int song_number, int difficulty,
 				}
 				debug_time_passed -= debug_warp_time;
 				
-				combo = 0;
-				*CourseCombo = 0;
-				*CourseMaxCombo = 0;
-				score = 0;
-				SKY_PERFECT = 0;
-				PERFECT = 0;
-				GOOD = 0;
-				MISS = 0;
-				TimePerfect = 0;
-				TimeGood = 0;
-				TimeMiss = 0;
-				TimeNextHour = 7;
-				MAX_COMBO = 0;
-				gauge = 100;
-
-				beat = 0;
-				beat_time = 0;
-				beat_time_cash = 0;
-				beat_percent = 0;
-
-				bgmplay = 0;
-				bcc = 0;
-				scc = 0;
-				cscroll = scrollchange[0].scroll;
-				sc_timing = 0;
-				real_timing = 0;
-
-				stop_se_c = 0;
-				stop_time_sum = 0;
-				stop_time = 0;
-				stopFlag = 0;
-
-				FullComboFXPlayFlag = 1;
-				FullComboFXFrame = 0;
-				
-				HitingNoteCount = 0;
-				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
-					barline[j].fall = 0;
-				}
-				for (i = 0; i <= 3; i++) {
-					j_n_n[i] = 0;
-					j_dn_n[i] = 0;
-					j_dn_push_n[i] = 0;
-					LN_flag[i] = 0;
-					LN_flash[i] = 0;
-					for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-						note[i][j].hit = 0;
-						note[i][j].fall = 0;
-						note[i][j].color = note[i][j].color_init;
-						note[i][j].timing = note[i][j].timing_init;
-						note[i][j].timing_real = note[i][j].timing_init_real;
-						//if (i != 0)note[i][j].color = note[i][j].color_init;
-						//note[i][j].timing -= 240000 / cbpm;
-					}
-				}
-				bcc = 1;
-				StopSoundMem(SH_SONG);
-				GAME_passed_time = (GetNowCount_d(config) - GAME_start_time) + (debug_time_passed - debug_stop_time);
-				GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+				initVariableProcess();
 			}
 
 			if (Key[KEY_INPUT_RIGHT] == 1 || (Key[KEY_INPUT_RIGHT] >= PressFrame && debug_warp_counter >= 40)) {//ピッチを上げる
@@ -1439,58 +1370,8 @@ void GAME(int song_number, int difficulty,
 					if (gauge_dec >= gauge_dec_MAX)gauge_dec = gauge_dec_MAX;
 					if (gauge_dec <= gauge_dec_MIN)gauge_dec = gauge_dec_MIN;
 					cbpm = Music[song_number].bpm[difficulty];//最初のBPM
-					
-					combo = 0;
-					*CourseCombo = 0;
-					*CourseMaxCombo = 0;
-					score = 0;
-					SKY_PERFECT = 0;
-					PERFECT = 0;
-					GOOD = 0;
-					MISS = 0;
-					TimePerfect = 0;
-					TimeGood = 0;
-					TimeMiss = 0;
-					TimeNextHour = 7;
-					MAX_COMBO = 0;
-					gauge = 100;
-					bgmplay = 0;
-					bcc = 0;
-					scc = 0;
-					cscroll = scrollchange[0].scroll;
-					sc_timing = 0;
-					real_timing = 0;
 
-					stop_se_c = 0;
-					stop_time_sum = 0;
-					stop_time = 0;
-					stopFlag = 0;
-
-					FullComboFXPlayFlag = 1;
-					FullComboFXFrame = 0;
-
-					HitingNoteCount = 0;
-					for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
-						barline[j].fall = 0;
-					}
-					for (i = 0; i <= 3; i++) {
-						j_n_n[i] = 0;
-						j_dn_n[i] = 0;
-						j_dn_push_n[i] = 0;
-						LN_flag[i] = 0;
-						LN_flash[i] = 0;
-						for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-							note[i][j].hit = 0;
-							note[i][j].fall = 0;
-							note[i][j].color = note[i][j].color_init;
-							//if (i != 0)note[i][j].color = note[i][j].color_init;
-							//note[i][j].timing -= 240000 / cbpm;
-						}
-					}
-					bcc = 1;
-					StopSoundMem(SH_SONG);
-					GAME_passed_time = (GetNowCount_d(config) - GAME_start_time) + (debug_time_passed - debug_stop_time);
-					GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+					initVariableProcess();
 				}
 			}
 			if (Key[KEY_INPUT_LEFT] == 1 || (Key[KEY_INPUT_LEFT] >= PressFrame && debug_warp_counter >= 40)) {//ピッチを下げる
@@ -1521,58 +1402,8 @@ void GAME(int song_number, int difficulty,
 					if (gauge_dec >= gauge_dec_MAX)gauge_dec = gauge_dec_MAX;
 					if (gauge_dec <= gauge_dec_MIN)gauge_dec = gauge_dec_MIN;
 					cbpm = Music[song_number].bpm[difficulty];//最初のBPM
-					
-					combo = 0;
-					*CourseCombo = 0;
-					*CourseMaxCombo = 0;
-					score = 0;
-					SKY_PERFECT = 0;
-					PERFECT = 0;
-					GOOD = 0;
-					MISS = 0;
-					TimePerfect = 0;
-					TimeGood = 0;
-					TimeMiss = 0;
-					TimeNextHour = 7;
-					MAX_COMBO = 0;
-					gauge = 100;
-					bgmplay = 0;
-					bcc = 0;
-					scc = 0;
-					cscroll = scrollchange[0].scroll;
-					sc_timing = 0;
-					real_timing = 0;
 
-					stop_se_c = 0;
-					stop_time_sum = 0;
-					stop_time = 0;
-					stopFlag = 0;
-
-					FullComboFXPlayFlag = 1;
-					FullComboFXFrame = 0;
-
-					HitingNoteCount = 0;
-					for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
-						barline[j].fall = 0;
-					}
-					for (i = 0; i <= 3; i++) {
-						j_n_n[i] = 0;
-						j_dn_n[i] = 0;
-						j_dn_push_n[i] = 0;
-						LN_flag[i] = 0;
-						LN_flash[i] = 0;
-						for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-							note[i][j].hit = 0;
-							note[i][j].fall = 0;
-							note[i][j].color = note[i][j].color_init;
-							//if (i != 0)note[i][j].color = note[i][j].color_init;
-							//note[i][j].timing -= 240000 / cbpm;
-						}
-					}
-					bcc = 1;
-					StopSoundMem(SH_SONG);
-					GAME_passed_time = (GetNowCount_d(config) - GAME_start_time) + (debug_time_passed - debug_stop_time);
-					GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+					initVariableProcess();
 				}
 			}
 
@@ -1631,58 +1462,8 @@ void GAME(int song_number, int difficulty,
 				if (gauge_dec >= gauge_dec_MAX)gauge_dec = gauge_dec_MAX;
 				if (gauge_dec <= gauge_dec_MIN)gauge_dec = gauge_dec_MIN;
 				cbpm = Music[song_number].bpm[difficulty];//最初のBPM
-				
-				combo = 0;
-				*CourseCombo = 0;
-				*CourseMaxCombo = 0;
-				score = 0;
-				SKY_PERFECT = 0;
-				PERFECT = 0;
-				GOOD = 0;
-				MISS = 0;
-				TimePerfect = 0;
-				TimeGood = 0;
-				TimeMiss = 0;
-				TimeNextHour = 7;
-				MAX_COMBO = 0;
-				gauge = 100;
-				bgmplay = 0;
-				bcc = 0;
-				scc = 0;
-				cscroll = scrollchange[0].scroll;
-				sc_timing = 0;
-				real_timing = 0;
 
-				stop_se_c = 0;
-				stop_time_sum = 0;
-				stop_time = 0;
-				stopFlag = 0;
-
-				FullComboFXPlayFlag = 1;
-				FullComboFXFrame = 0;
-
-				HitingNoteCount = 0;
-				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
-					barline[j].fall = 0;
-				}
-				for (i = 0; i <= 3; i++) {
-					j_n_n[i] = 0;
-					j_dn_n[i] = 0;
-					j_dn_push_n[i] = 0;
-					LN_flag[i] = 0;
-					LN_flash[i] = 0;
-					for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-						note[i][j].hit = 0;
-						note[i][j].fall = 0;
-						note[i][j].color = note[i][j].color_init;
-						//if (i != 0)note[i][j].color = note[i][j].color_init;
-						//note[i][j].timing -= 240000 / cbpm;
-					}
-				}
-				bcc = 1;
-				StopSoundMem(SH_SONG);
-				GAME_passed_time = (GetNowCount_d(config) - GAME_start_time) + (debug_time_passed - debug_stop_time);
-				GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+				initVariableProcess();
 			}
 
 			if (Key[KEY_INPUT_F3] == 1) {//叩いた音を鳴らさない
@@ -1774,57 +1555,8 @@ void GAME(int song_number, int difficulty,
 				if (gauge_dec >= gauge_dec_MAX)gauge_dec = gauge_dec_MAX;
 				if (gauge_dec <= gauge_dec_MIN)gauge_dec = gauge_dec_MIN;
 				cbpm = Music[song_number].bpm[difficulty];//最初のBPM
-				combo = 0;
-				*CourseCombo = 0;
-				*CourseMaxCombo = 0;
-				score = 0;
-				SKY_PERFECT = 0;
-				PERFECT = 0;
-				GOOD = 0;
-				MISS = 0;
-				TimePerfect = 0;
-				TimeGood = 0;
-				TimeMiss = 0;
-				TimeNextHour = 7;
-				MAX_COMBO = 0;
-				gauge = 100;
-				bgmplay = 0;
-				bcc = 0;
-				scc = 0;
-				cscroll = scrollchange[0].scroll;
-				sc_timing = 0;
-				real_timing = 0;
 
-				stop_se_c = 0;
-				stop_time_sum = 0;
-				stop_time = 0;
-				stopFlag = 0;
-
-				FullComboFXPlayFlag = 1;
-				FullComboFXFrame = 0;
-
-				HitingNoteCount = 0;
-				for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
-					barline[j].fall = 0;
-				}
-				for (i = 0; i <= 3; i++) {
-					j_n_n[i] = 0;
-					j_dn_n[i] = 0;
-					j_dn_push_n[i] = 0;
-					LN_flag[i] = 0;
-					LN_flash[i] = 0;
-					for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-						note[i][j].hit = 0;
-						note[i][j].fall = 0;
-						note[i][j].color = note[i][j].color_init;
-						//if (i != 0)note[i][j].color = note[i][j].color_init;
-						//note[i][j].timing -= 240000 / cbpm;
-					}
-				}
-				bcc = 1;
-
-				GAME_passed_time = (((double)GetNowCount_d(config) - (double)GAME_start_time) + ((double)debug_time_passed - (double)debug_stop_time));//経過時間計算
-				GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+				initVariableProcess();
 				LOOP_passed_time = ((double)GetNowCount_d(config) - GAME_start_time) - time_cash;//1ループにかかった時間を算出
 				time_cash = ((double)GetNowCount_d(config) - GAME_start_time);
 				GAME_passed_time_scroll = (sc_timing + ((GAME_passed_time_for_draw - stop_time - stop_time_sum) - real_timing)*(cscroll));
@@ -2626,40 +2358,6 @@ void GAME(int song_number, int difficulty,
 										if (debug_sound == 1)PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].snd, SH);
 									}
 
-									/*
-									if (note[i][j_n_n[i]].group != 2 && note[i][j_n_n[i]].color_init == 9)PlaySoundMem(SH_HIT, DX_PLAYTYPE_BACK, TRUE);//LN終点じゃないとき音を鳴らす
-									if (note[i][j_n_n[i]].color_init == 1 || note[i][j_n_n[i]].color_init == 4 || note[i][j_n_n[i]].color_init == 6 || note[i][j_n_n[i]].color_init == 7) {
-									if (note[i][j_n_n[i]].group != 2) {
-									ChangeVolumeSoundMem(int(255), SH_R[i-1]);
-									//PlaySoundMem(SH_R[i - 1], DX_PLAYTYPE_BACK, TRUE);
-									}
-									if (note[i][j_n_n[i]].group == 0 || note[i][j_n_n[i]].group == 2) {//LN始点以外は離すことにする
-									release_time[2][i - 1] = GetNowCount_d(config)+70;
-									}
-
-									}
-									if (note[i][j_n_n[i]].color_init == 2 || note[i][j_n_n[i]].color_init == 4 || note[i][j_n_n[i]].color_init == 5 || note[i][j_n_n[i]].color_init == 7) {
-									if (note[i][j_n_n[i]].group != 2) {
-									ChangeVolumeSoundMem(int(255), SH_G[i - 1]);
-									//PlaySoundMem(SH_G[i - 1], DX_PLAYTYPE_BACK, TRUE);
-									}
-									if (note[i][j_n_n[i]].group == 0 || note[i][j_n_n[i]].group == 2) {
-									release_time[1][i - 1] = GetNowCount_d(config)+70;
-									}
-
-									}
-									if (note[i][j_n_n[i]].color_init == 3 || note[i][j_n_n[i]].color_init == 5 || note[i][j_n_n[i]].color_init == 6 || note[i][j_n_n[i]].color_init == 7) {
-									if (note[i][j_n_n[i]].group != 2) {
-									ChangeVolumeSoundMem(int(255), SH_B[i - 1]);
-									//PlaySoundMem(SH_B[i - 1], DX_PLAYTYPE_BACK, TRUE);
-									}
-									if (note[i][j_n_n[i]].group == 0 || note[i][j_n_n[i]].group == 2) {
-									release_time[0][i - 1] = GetNowCount_d(config)+70;
-									}
-									}
-									*/
-									///////////////
-
 									//後ろに落ちるものの処理
 									if (note[i][j_n_n[i]].group != 1) {
 										insert_cell(insert, img_num(Music[song_number].season[difficulty]),
@@ -3015,17 +2713,6 @@ void GAME(int song_number, int difficulty,
 			//printfDx("insert:%d\n", insert);
 			//ScreenFlip();
 		}
-		/*
-		fall_y += 0.4;
-		DrawRotaGraph2(500 + 80 * sin(0.001*GAME_passed_time+1), int(fall_y-320), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[0], TRUE, FALSE);
-		DrawRotaGraph2(600 + 80 * sin(0.001*GAME_passed_time+3), int(fall_y-400), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[1], TRUE, FALSE);
-		DrawRotaGraph2(750 + 80 * sin(0.001*GAME_passed_time+2), int(fall_y - 590), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[2], TRUE, FALSE);
-		DrawRotaGraph2(820 + 80 * sin(0.001*GAME_passed_time+5), int(fall_y-100), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[3], TRUE, FALSE);
-		DrawRotaGraph2(500 + 80 * sin(0.001*GAME_passed_time + 7.5), int(fall_y - 770), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[4], TRUE, FALSE);
-		DrawRotaGraph2(630 + 80 * sin(0.001*GAME_passed_time + 8.5), int(fall_y - 890), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[5], TRUE, FALSE);
-		DrawRotaGraph2(730 + 80 * sin(0.001*GAME_passed_time + 9.5), int(fall_y - 1207), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[6], TRUE, FALSE);
-		DrawRotaGraph2(8000 + 80 * sin(0.001*GAME_passed_time + 10.5), int(fall_y-1100), 50, 50, 1, 0.002*GAME_passed_time, H_FALL[7], TRUE, FALSE);
-		*/
 
 		//背景の明るさを抑える黒画像表示
 		int BlendMode = DX_BLENDMODE_ALPHA;
@@ -3495,8 +3182,8 @@ void GAME(int song_number, int difficulty,
 				if (hit_miss[i] >= 0)hit_miss[i] -= 0.006;
 			}
 
-			I_Slow[i].draw(GAME_passed_time);
-			I_Fast[i].draw(GAME_passed_time);
+			I_Slow[i].draw(GetNowCount_d(config));
+			I_Fast[i].draw(GetNowCount_d(config));
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		}
 
@@ -3685,93 +3372,7 @@ void GAME(int song_number, int difficulty,
 
 
 		//----Sound----
-
-		/*
-		for (i = 0; i <= 2;i++) {//BGR
-		for (j = 0; j <= 3; j++) {
-		if (Key[Button[i][j]] == 1) {
-		if (i == 0) {
-		ChangeVolumeSoundMem(int(255), SH_B[j]);
-		PlaySoundMem(SH_B[j], DX_PLAYTYPE_BACK, TRUE);
-		}
-		if (i == 1) {
-		ChangeVolumeSoundMem(int(255), SH_G[j]);
-		PlaySoundMem(SH_G[j], DX_PLAYTYPE_BACK, TRUE);
-		}
-		if (i == 2) {
-		ChangeVolumeSoundMem(int(255), SH_R[j]);
-		PlaySoundMem(SH_R[j], DX_PLAYTYPE_BACK, TRUE);
-		}
-		}
-		}
-		}
-
-		for (i = 0; i <= 2; i++) {//BGR
-		for (j = 0; j <= 3; j++) {
-		if (Key[Button[i][j]] == -1) {
-		release_time[i][j] = GetNowCount_d(config);
-		}
-		}
-		}
-
-		for (i = 0; i <= 2; i++) {//BGR
-		for (j = 0; j <= 3; j++) {
-		if (Key[Button[i][j]] == 0 && !(debug_auto == 1 && LN_flag[j + 1] != 0)) {//(オートでLN中)じゃないときに離したら音ストップ
-
-		if (i == 0)ChangeVolumeSoundMem(int((((double)150 + release_time[i][j] - GetNowCount_d(config)) / (double)150) * 255), SH_B[j]);
-		if (i == 1)ChangeVolumeSoundMem(int((((double)150 + release_time[i][j] - GetNowCount_d(config)) / (double)150) * 255), SH_G[j]);
-		if (i == 2)ChangeVolumeSoundMem(int((((double)150 + release_time[i][j] - GetNowCount_d(config)) / (double)150) * 255), SH_R[j]);
-
-
-
-		if (GetNowCount_d(config) - release_time[i][j] >= 150) {
-		if (i == 0)StopSoundMem(SH_B[j]);
-		if (i == 1)StopSoundMem(SH_G[j]);
-		if (i == 2)StopSoundMem(SH_R[j]);
-		}
-		}
-		//ChangeVolumeSoundMem(int(((double)1 - cos(volume*(3.1415 / 2))) * 255), SH_);
-
-		}
-		}
-
-		*/
-
-
-
-		for (i = 0; i <= 3; i++) {//4列分
-			if (Key[Button[2][i]] == 1 && AllowSound[2][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
-				PlaySoundMem(SH.SH_HIT_R_N, DX_PLAYTYPE_BACK, TRUE);
-			}
-		}
-		for (i = 0; i <= 3; i++) {//4列分
-			if (Key[Button[1][i]] == 1 && AllowSound[1][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
-				PlaySoundMem(SH.SH_HIT_G_N, DX_PLAYTYPE_BACK, TRUE);
-			}
-		}
-		for (i = 0; i <= 3; i++) {//4列分
-			if (Key[Button[0][i]] == 1 && AllowSound[0][i] == 1) {//スイッチが押された瞬間でそこから音を鳴らすのが許可されているとき
-				PlaySoundMem(SH.SH_HIT_B_N, DX_PLAYTYPE_BACK, TRUE);
-			}
-		}
-
-		for (i = 0; i <= 3; i++) {
-			AllowSound[0][i] = 1;
-			AllowSound[1][i] = 1;
-			AllowSound[2][i] = 1;
-		}
-
-		/*
-		if (Key[Button[2][0]] == -1 || Key[Button[2][1]] == -1 || Key[Button[2][2]] == -1 || Key[Button[2][3]] == -1) {
-		StopSoundMem(SH_R);
-		}
-		if (Key[Button[1][0]] == -1 || Key[Button[1][1]] == -1 || Key[Button[1][2]] == -1 || Key[Button[1][3]] == -1) {
-		StopSoundMem(SH_G);
-		}
-		if (Key[Button[0][0]] == -1 || Key[Button[0][1]] == -1 || Key[Button[0][2]] == -1 || Key[Button[0][3]] == -1) {
-		StopSoundMem(SH_B);
-		}
-		*/
+		soundHitSound();
 
 		double BGM_VolTowardResult = 1;
 		if (ClearFlag != 0) {//クリア表示4秒後にゲームの終了(結果発表へ)
@@ -3781,10 +3382,7 @@ void GAME(int song_number, int difficulty,
 
 		ChangeVolumeSoundMem(int(((double)1 - cos(volume * (3.1415 / 2))) * BGM_VolTowardResult * 255 * debug_music), SH_SONG);//曲の音量セット
 
-
-
 		//printfDx("%d\n", int(((double)44100 * (GAME_passed_time - Music[song_number].songoffset[difficulty])) / 1000));
-
 
 
 		if ((GAME_passed_time + LOOP_passed_time > Music[song_number].songoffset[difficulty]) && (CheckSoundMem(SH_SONG) == 0 && debug_stop == 0) && (ClearFlag == 0) && (bgmplay == 0)) {
@@ -3806,10 +3404,6 @@ void GAME(int song_number, int difficulty,
 				i++;
 			}
 		}
-
-		//printfDx("frames:%d\n", (int)LOOP_passed_time+i);
-		//Sleep(3);//s 負荷が大きいので長めに待つ
-
 
 		ScreenFlip();//画面の反映
 		clsDx();
@@ -4006,91 +3600,3 @@ void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effe
 }
 
 
-void DebugInitializeProcess(
-	int* combo,
-	int* CourseCombo,
-	int* CourseMaxCombo,
-	double* score,
-	int* SKY_PERFECT,
-	int* PERFECT,
-	int* GOOD,
-	int* MISS,
-	int* TimePerfect,
-	int* TimeGood,
-	int* TimeMiss,
-	int* TimeNextHour,
-	int* MAX_COMBO,
-	double* gauge,
-	int* bgmplay,
-	int* bcc,
-	int* scc,
-	double* cscroll,
-	double scrollchange_scroll,
-	double* sc_timing,
-	double* real_timing,
-
-	int* stop_se_c,
-	double* stop_time_sum,
-	double* stop_time,
-	int* stopFlag,
-
-
-	int* j_n_n,
-	int* j_dn_n,
-	int* j_dn_push_n,
-	int* LN_flag,
-	int* LN_flash,
-	BARLINE* barline,
-	NOTE** note
-
-
-
-) {//デバッグ時の移動処理などの共通処理
-	int i = 0;
-	int j = 0;
-
-	combo = 0;
-	*CourseCombo = 0;
-	*CourseMaxCombo = 0;
-	*score = 0;
-	*SKY_PERFECT = 0;
-	*PERFECT = 0;
-	*GOOD = 0;
-	*MISS = 0;
-	*TimePerfect = 0;
-	*TimeGood = 0;
-	*TimeMiss = 0;
-	*TimeNextHour = 7;
-	*MAX_COMBO = 0;
-	*gauge = 100;
-	*bgmplay = 0;
-	*bcc = 0;
-	*scc = 0;
-	*cscroll = scrollchange_scroll;
-	*sc_timing = 0;
-	*real_timing = 0;
-
-	*stop_se_c = 0;
-	*stop_time_sum = 0;
-	*stop_time = 0;
-	*stopFlag = 0;
-
-	for (i = 0; i <= 3; i++) {
-		j_n_n[i] = 0;
-		j_dn_n[i] = 0;
-		j_dn_push_n[i] = 0;
-		LN_flag[i] = 0;
-		LN_flash[i] = 0;
-		barline[i].fall = 0;
-		for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-			note[i][j].hit = 0;
-			note[i][j].fall = 0;
-			note[i][j].color = note[i][j].color_init;
-			//if (i != 0)note[i][j].color = note[i][j].color_init;
-			//note[i][j].timing -= 240000 / cbpm;
-		}
-	}
-	*bcc = 1;
-
-	return;
-}

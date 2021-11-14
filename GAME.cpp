@@ -1529,7 +1529,7 @@ void GAME(int song_number, int difficulty,
 					&step_array_number,
 					&measure_start_step,
 					&SwingBackBeatTime,
-					AC, config);
+					AC, config, SH_SONG);
 	
 				debug_time_passed = debug_time_passed_in_EDIT_SCORE / pitch;//今の再生速度での時間に戻す
 				debug_stop_time = GetNowCount_d(config) - debug_stoped_time;//debug_stop_timeの更新ができていなかったのでする
@@ -3384,15 +3384,25 @@ void GAME(int song_number, int difficulty,
 
 		//printfDx("%d\n", int(((double)44100 * (GAME_passed_time - Music[song_number].songoffset[difficulty])) / 1000));
 
-
-		if ((GAME_passed_time + LOOP_passed_time > Music[song_number].songoffset[difficulty]) && (CheckSoundMem(SH_SONG) == 0 && debug_stop == 0) && (ClearFlag == 0) && (bgmplay == 0)) {
+		BOOL isOverSongPlayTiming = (GAME_passed_time + LOOP_passed_time > Music[song_number].songoffset[difficulty]);
+		if (isOverSongPlayTiming
+			&& (CheckSoundMem(SH_SONG) == 0 && debug_stop == 0)
+			&& (ClearFlag == 0) 
+			&& (bgmplay == 0)) {
 			// 1/60sの後ろずれを防ぐためフレーム時間分前倒しで再生
 			if (FirstBgmPlay == 0) {//最初のBGM再生でないときのみ再生位置変更処理を行う(先頭が削れて再生されるのを防ぐため)
 				SetCurrentPositionSoundMem(int(((double)44100 * pitch * ((GAME_passed_time + TimePerFrame) - Music[song_number].songoffset[difficulty])) / 1000), SH_SONG);
 			}
+
 			PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);//曲の再生開始
 			bgmplay = 1;
 			FirstBgmPlay = 0;
+		}
+		if (!isOverSongPlayTiming){
+			if (FirstBgmPlay == 0) {
+				FirstBgmPlay = 1;
+				SetCurrentPositionSoundMem(0, SH_SONG);
+			}
 		}
 
 		//printfDx("%f\n",LOOP_passed_time);

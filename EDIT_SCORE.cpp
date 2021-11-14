@@ -32,7 +32,8 @@ void EDIT_SCORE(SCORE_CELL *head,
     int *measure_start_step,//小節線を表示する起点
 	int *SwingBackBeatTime,//裏拍のSwingDivisionに対する位置
 	ANDROID_CONTROLLER *AC,
-	CONFIG config
+	CONFIG config,
+	int SH_SONG
 ) {
 	//headのstepは-1
 	
@@ -407,6 +408,18 @@ void EDIT_SCORE(SCORE_CELL *head,
 			else isInstructionAppear = 0;
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
+
+		/*
+		if (Key[KEY_INPUT_F2] == 1) {//曲を流す
+			if (CheckSoundMem(SH_SONG)) {
+				StopSoundMem(SH_SONG);
+			}
+			else {
+				SetCurrentPositionSoundMem(int(((double)44100 * 1 * (insert_passed_time)) / 1000), SH_SONG);
+				PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);
+			}
+		}
+		*/
 
 		if (Key[KEY_INPUT_Z] == 1 || (Key[KEY_INPUT_Z] >= PressFrame && push_counter >= PushTimeTh)) {//step_countをinsertにフィットさせる 前の音符に移動
 			push_counter = 0;

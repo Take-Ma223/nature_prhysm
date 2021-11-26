@@ -322,15 +322,13 @@ void GAME(int song_number, int difficulty,
 	int stopFlag = 0;//譜面停止中どうかのフラグ(1:停止中)
 
 	
-
-
 	NOTE **note;
 	note = (NOTE**)calloc(4, sizeof(NOTE));
 
 	for (i = 0; i <= 3; i++) {
 		note[i] = (NOTE*)calloc(NOTE_MAX_NUMBER, sizeof(NOTE));
 	}
-
+	
 	//小節線構造体メモリ確保
 	BARLINE *barline;
 	barline = (BARLINE*)calloc(BARLINE_MAX_NUMBER, sizeof(BARLINE));
@@ -641,41 +639,52 @@ void GAME(int song_number, int difficulty,
 
 	int fastSlowY = -130;
 	int fastSlowYMove = 10;
+
+	std::wstring fast = L"img/judge/fast_c.png";
+	std::wstring slow = L"img/judge/slow_r.png";
+
+	if (option->op.fastSlow == option->OP_FAST_SLOW_ON_FAST_RED) {
+		fast = L"img/judge/fast_r.png";
+		slow = L"img/judge/slow_c.png";
+	}
+
 	Image I_Fast[4] = {
-	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[0],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[1],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[2],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(L"img/judge/fast_c.png"), lane[3],judge_area + fastSlowY, 0)
+	Image(imageSet.getHandle(fast.c_str()), lane[0],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(fast.c_str()), lane[1],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(fast.c_str()), lane[2],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(fast.c_str()), lane[3],judge_area + fastSlowY, 0)
 	};
 	Image I_Slow[4] = {
-	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[0],judge_area+ fastSlowY, 0),
-	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[1],judge_area+ fastSlowY, 0),
-	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[2],judge_area+ fastSlowY, 0),
-	Image(imageSet.getHandle(L"img/judge/slow_r.png"), lane[3],judge_area+ fastSlowY, 0)
+	Image(imageSet.getHandle(slow.c_str()), lane[0],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(slow.c_str()), lane[1],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(slow.c_str()), lane[2],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(slow.c_str()), lane[3],judge_area+ fastSlowY, 0)
 	};
 
 
 	//出現アニメーション
 	auto fastSlowAppear = [&] {
-		if (timingDifference < 0) {
-			I_Fast[i].reset();
-			I_Fast[i].appear(GetNowCount_d(config));
-			//I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GetNowCount_d(config), 200);
-			I_Fast[i].changeAlpha(255, 0, Abs, Linear, GetNowCount_d(config) + 200, 100);
-			I_Fast[i].disappear(GetNowCount_d(config), 300);
-			
-			I_Slow[i].reset();
-			I_Slow[i].disappear();
-		}
-		else {
-			I_Slow[i].reset();
-			I_Slow[i].appear(GetNowCount_d(config));
-			//I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GetNowCount_d(config), 200);
-			I_Slow[i].changeAlpha(255, 0, Abs, Linear, GetNowCount_d(config) + 200, 100);
-			I_Slow[i].disappear(GetNowCount_d(config), 300);
+		if (option->op.fastSlow != option->OP_FAST_SLOW_OFF) {
+			if (timingDifference < 0) {
+				I_Fast[i].reset();
+				I_Fast[i].appear(GetNowCount_d(config));
+				//I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GetNowCount_d(config), 200);
+				I_Fast[i].changeAlpha(255, 0, Abs, Linear, GetNowCount_d(config) + 200, 100);
+				I_Fast[i].disappear(GetNowCount_d(config), 300);
 
-			I_Fast[i].reset();
-			I_Fast[i].disappear();
+				I_Slow[i].reset();
+				I_Slow[i].disappear();
+			}
+			else {
+				I_Slow[i].reset();
+				I_Slow[i].appear(GetNowCount_d(config));
+				//I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, GetNowCount_d(config), 200);
+				I_Slow[i].changeAlpha(255, 0, Abs, Linear, GetNowCount_d(config) + 200, 100);
+				I_Slow[i].disappear(GetNowCount_d(config), 300);
+
+				I_Fast[i].reset();
+				I_Fast[i].disappear();
+			}
 		}
 	};
 
@@ -774,7 +783,7 @@ void GAME(int song_number, int difficulty,
 		FullComboFXFrame = 0;
 
 		HitingNoteCount = 0;
-		for (j = 0; j <= BARLINE_MAX_NUMBER - 1; j++) {
+		for (j = 0; j <= Music[song_number].totalMeasures[difficulty] - 1; j++) {
 			barline[j].fall = 0;
 		}
 		for (i = 0; i <= 3; i++) {
@@ -783,7 +792,7 @@ void GAME(int song_number, int difficulty,
 			j_dn_push_n[i] = 0;
 			LN_flag[i] = 0;
 			LN_flash[i] = 0;
-			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+			for (j = 0; j <= Music[song_number].objOfLane[difficulty][i] - 1; j++) {
 				note[i][j].hit = 0;
 				note[i][j].fall = 0;
 				note[i][j].color = note[i][j].color_init;
@@ -2103,7 +2112,7 @@ void GAME(int song_number, int difficulty,
 
 
 		
-		for (i = 0; i <= BARLINE_MAX_NUMBER - 1; i++) {//小節線の座標計算
+		for (i = 0; i <= Music[song_number].totalMeasures[difficulty] - 1; i++) {//小節線の座標計算
 			//小節線
 			barline[i].x = 640;
 			barline[i].y = -228;
@@ -2124,15 +2133,16 @@ void GAME(int song_number, int difficulty,
 				if (barline[i].fall != 2)barline[i].fall = 0;//落ちてない(表示をしない)
 			}
 		}
-		for (i = 0; i <= NOTE_MAX_NUMBER - 1; i++) {//ノートの座標計算
-			//音符
-			for (j = 0; j <= 3; j++) {
+		for (j = 0; j <= 3; j++) {
+			for (i = 0; i <= Music[song_number].objOfLane[difficulty][j] - 1; i++) {//ノートの座標計算
+				//音符
+
 				note[j][i].x = lane[j];//レーンのx座標
 				note[j][i].y = -228;
-				QE_x = high_speed*note[j][i].bpm*(GAME_passed_time_scroll-((double)note[j][i].timing / TIMING_SHOW_RATIO)) + sqrt(1 / speed); //放物線のx座標を算出
+				QE_x = high_speed * note[j][i].bpm * (GAME_passed_time_scroll - ((double)note[j][i].timing / TIMING_SHOW_RATIO)) + sqrt(1 / speed); //放物線のx座標を算出
 				if ((QE_x >= 0) && (note[j][i].hit == 0) && note[j][i].fall != 2) {//まだ叩かれてなく落ち切ってなく放物線の半分超えている(x>=0)とき
 					note[j][i].fall = 1;//落ちた(表示をする)
-					QE_y = int(((double)judge_area - note_fall)*speed*pow(QE_x, 2) + note_fall);//GAME_passed_time_scroollを変数とした2次関数(値域0~1にnote_fallとjudge_areaで位置調整)
+					QE_y = int(((double)judge_area - note_fall) * speed * pow(QE_x, 2) + note_fall);//GAME_passed_time_scroollを変数とした2次関数(値域0~1にnote_fallとjudge_areaで位置調整)
 					if (QE_y >= 720) {//落ち切ったとき
 						note[j][i].y = 720;
 					}
@@ -2282,7 +2292,7 @@ void GAME(int song_number, int difficulty,
 					}
 
 					j_n_n[i]++;
-					if (j_n_n[i] >= NOTE_MAX_NUMBER)break;
+					if (j_n_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
 				}
 
 			}
@@ -2290,7 +2300,7 @@ void GAME(int song_number, int difficulty,
 			if (debug_auto == 1) {//オートプレイ中
 				for (i = 0; i <= 3; i++) {
 					if (debug_warp == 0) {
-						if (j_n_n[i] <= NOTE_MAX_NUMBER - 1) {
+						if (j_n_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {
 							while ((GAME_passed_time - (note[i][j_n_n[i]].timing_real - config.VsyncOffsetCompensation) >= 0 - TimePerFrame) && (note[i][j_n_n[i]].color != 0)) {//ノートが判定枠に来た
 								if (8 != note[i][j_n_n[i]].color) {//黒以外のとき叩く(単ノート LN始点 LN終点)
 
@@ -2376,7 +2386,7 @@ void GAME(int song_number, int difficulty,
 							}
 							while ((note[i][j_n_n[i]].hit == 1 || note[i][j_n_n[i]].color == 8) && (note[i][j_n_n[i]].color != 0)) {//叩かれているか黒ならそれ以外になるまでカウンタを進める()
 								j_n_n[i]++;
-								if (j_n_n[i] >= NOTE_MAX_NUMBER)break;
+								if (j_n_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
 							}
 						}
 					}
@@ -2385,7 +2395,7 @@ void GAME(int song_number, int difficulty,
 
 			for (i = 0; i <= 3; i++) {//通常時
 				if (debug_warp == 0) {
-					if (j_n_n[i] <= NOTE_MAX_NUMBER - 1) {
+					if (j_n_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {
 						if ((GAME_passed_time - note[i][j_n_n[i]].timing_real > judge_time_through) && (note[i][j_n_n[i]].color != 0)//through時間を過ぎていった、または
 							|| ((GAME_passed_time - note[i][j_n_n[i]].timing_real > judge_time_good) && (fabs(note[i][j_n_n[i] + 1].timing_real - GAME_passed_time) < judge_time_good))) {//(good判定を通り過ぎて次のノートがgood判定内にいるとき)ノートの見逃し(コンボが途切れる MISS)
 							if (8 != note[i][j_n_n[i]].color && note[i][j_n_n[i]].group != 2) {//黒とLN終点以外のときミスにする
@@ -2413,27 +2423,27 @@ void GAME(int song_number, int difficulty,
 						}
 						while ((note[i][j_n_n[i]].hit == 1 || note[i][j_n_n[i]].color == 8) && (note[i][j_n_n[i]].color != 0)) {//叩かれているか黒ならそれ以外になるまでカウンタを進める()
 							j_n_n[i]++;
-							if (j_n_n[i] >= NOTE_MAX_NUMBER)break;
+							if (j_n_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
 						}
 					}
 				}
 
-				if (j_dn_n[i] <= NOTE_MAX_NUMBER - 1) {//黒カウンタ(叩き)
+				if (j_dn_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {//黒カウンタ(叩き)
 					while ((GAME_passed_time - note[i][j_dn_n[i]].timing_real >  judge_time_dark) && (note[i][j_dn_n[i]].color != 0)) {
 						j_dn_n[i]++;
 					}
 					while ((note[i][j_dn_n[i]].hit == 1 || note[i][j_dn_n[i]].color != 8) && (note[i][j_dn_n[i]].color != 0)) {//叩かれているか黒じゃないか
 						j_dn_n[i]++;
-						if (j_dn_n[i] >= NOTE_MAX_NUMBER)break;
+						if (j_dn_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
 					}
 				}
-				if (j_dn_push_n[i] <= NOTE_MAX_NUMBER - 1) {//黒カウンタ(押し込み)
+				if (j_dn_push_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {//黒カウンタ(押し込み)
 					while ((GAME_passed_time - note[i][j_dn_push_n[i]].timing_real >  con_jd) && (note[i][j_dn_push_n[i]].color != 0)) {
 						j_dn_push_n[i]++;
 					}
 					while ((note[i][j_dn_push_n[i]].hit == 1 || note[i][j_dn_push_n[i]].color != 8) && (note[i][j_dn_push_n[i]].color != 0)) {//叩かれているか黒じゃないか
 						j_dn_push_n[i]++;
-						if (j_dn_push_n[i] >= NOTE_MAX_NUMBER)break;
+						if (j_dn_push_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
 					}
 				}
 			}
@@ -2765,7 +2775,7 @@ void GAME(int song_number, int difficulty,
 		BlendMode = DX_BLENDMODE_ALPHA;
 		BlendVal = 255;
 		if (option->op.barline == option->OP_BARLINE_ON) {//小節線を表示するオプションなら
-			for (i = BARLINE_MAX_NUMBER - 1; i >= 0; i--) {//小節線の描画
+			for (i = Music[song_number].totalMeasures[difficulty] - 1; i >= 0; i--) {//小節線の描画
 				if (barline[i].fall == 1 && barline[i].use == 1) {
 					SetDrawBlendMode(BlendMode, BlendVal);
 					//if (note[j][i].color_init != 0)DrawGraph(note[j][i].x - 32, note[j][i].y, H_NOTE_OR_FRAME, TRUE);//ORノートの場合
@@ -2780,9 +2790,10 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
-		for (i = NOTE_MAX_NUMBER - 1; i >= 0; i--) {//ノーツの描画
+		for (j = 0; j <= 3; j++) {
+			for (i = Music[song_number].objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツの描画
 
-			for (j = 0; j <= 3; j++) {
+
 				if (note[j][i].fall == 1) {
 					if (note[j][i].group == 0) {
 						SetDrawBlendMode(BlendMode, BlendVal);
@@ -2823,12 +2834,12 @@ void GAME(int song_number, int difficulty,
 							SetDrawBlendMode(BlendMode, BlendVal);
 							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[note[j][i].color_init], TRUE);
 
-							
+
 							if (LN_flash[j] == 1 && j_n_n[j] - 1 == i && note[j][i].group == 1) {//LNを叩いているとき
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
 								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);//白く光らせる
 							}
-							
+
 							if (note[j][i].snd != 0) {//光るノートは点滅させる(flashに合わせて)
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE));
 								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
@@ -2894,13 +2905,13 @@ void GAME(int song_number, int difficulty,
 						else {//始点が終点より上にある場合
 							SetDrawBlendMode(BlendMode, BlendVal);
 							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[note[j][i].color], TRUE, FALSE);//下半分表示
-							
-							
+
+
 							if (LN_flash[j] == 1 && j_n_n[j] == i && note[j][i].group == 2) {//LNを叩いているとき
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
 								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//下半分表示
 							}
-							
+
 
 							if (note[j][i - 1].snd != 0) {//光るノートは点滅させる(flashに合わせて)
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE));
@@ -2913,8 +2924,8 @@ void GAME(int song_number, int difficulty,
 
 							//LN中間表示
 							SetDrawBlendMode(BlendMode, BlendVal);
-						    DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[note[j][i].color_init], TRUE);
-							
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[note[j][i].color_init], TRUE);
+
 							//DrawRectExtendGraph
 							//DrawRect
 							if (LN_flash[j] == 1 && j_n_n[j] == i && note[j][i].group == 2) {//LNを叩いているとき
@@ -3395,11 +3406,12 @@ void GAME(int song_number, int difficulty,
 			}
 
 			PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);//曲の再生開始
+
 			bgmplay = 1;
 			FirstBgmPlay = 0;
 		}
 		if (!isOverSongPlayTiming){
-			if (FirstBgmPlay == 0) {
+			if (FirstBgmPlay == 0 && CheckSoundMem(SH_SONG) == 0) {
 				FirstBgmPlay = 1;
 				SetCurrentPositionSoundMem(0, SH_SONG);
 			}

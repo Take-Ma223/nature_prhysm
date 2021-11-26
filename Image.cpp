@@ -30,7 +30,7 @@ double event::calculateTimeRatio(double now) {
 	return ratio;
 }
 
-double event::convert(double input) {
+double event::easing(double input) {
 	double output = 0;
 	switch (mode) {
 	case ConvertMode::Teleportation:
@@ -213,7 +213,7 @@ int Image::calculateVal(double nowTime, event event) {
 	double timeRatio = event.calculateTimeRatio(nowTime);
 
 	//‹——£‚É‚©‚¯‚é’l(‚±‚Ì’l‚Ì•Ï‰»‹ï‡‚ÅˆÚ“®‚Ìd•û‚ª•Ï‚í‚é)
-	double multipleRatio = event.convert(timeRatio);
+	double multipleRatio = event.easing(timeRatio);
 
 	double distance = (double)event.getEndVal() - event.getStartVal();
 

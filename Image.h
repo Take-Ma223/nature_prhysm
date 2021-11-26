@@ -22,12 +22,12 @@ struct position{
 	int y = 0;
 };
 
-class event {
+class event {//’l‚Ì•Ï‰»î•ñ‚ğ•Û‚·‚éƒNƒ‰ƒX
 	int startVal = 0;
 	int endVal = 0;
 
 	ConvertMode mode = Linear;
-	double base = 1;
+	double base = 1;//mode‚ªExponential‚Ì‚Æ‚«‚Ì’ê
 
 	double timeStart = 0;
 	double timeEnd = 0;
@@ -37,7 +37,7 @@ public:
 
 
 	double calculateTimeRatio(double now);
-	double convert(double input);
+	double easing(double input);
 
 	//setter
 	void setStartVal(int start);

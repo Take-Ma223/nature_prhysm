@@ -35,6 +35,10 @@ typedef struct Song {
 	int demostart[5];//テキストでは秒で指定するが内部ではミリ秒で指定
 	int TimeToEnd[5];//演奏終了タイミング
 	unsigned short total_note[5];//総ノート数
+	unsigned short objOfLane[5][4];//レーン毎の要素数
+	unsigned short totalMeasures[5];//小節数
+
+
 	char season[5] = { 0,0,0,0,0};//この曲の季節(0:無季節,1:春,2:夏,3:秋,4:冬)
 
 	short LocalNotesAmount[5][9] = { {0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0}, {0,0,0,0,0,0,0,0,0} };//密度変化グラフ
@@ -49,6 +53,8 @@ typedef struct Song {
 
 	unsigned short version[5];//追加されたバージョン(小数を100倍して保存)
 	char editable[5] = { 0,0,0,0,0 };//編集可能
+
+
 
 }Song;
 

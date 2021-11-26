@@ -17,14 +17,15 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	int theme = 0;//テーマスキン
 	int targetscore1 = 0;//TARGET SCORE1
 	int targetscore2 = 0;//TARGET SCORE2
+	int fastSlow = 1;//FAST/SLOW
 }OP;
 
 typedef struct OPTION {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 14;//オプションの数
+	static const int OPTION_NUM = 15;//オプションの数
 
-	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"NOTE",L"HIT SOUND",L"BARLINE",L"NIGHT",L"GRADATION",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"SORT" };
+	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"NOTE",L"HIT SOUND",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"SORT"};
 
 	static const int SPEED_NUM = 78;//ハイスピの数
 	static const int GAUGE_NUM = 6;//ゲージ種類の数
@@ -32,6 +33,7 @@ typedef struct OPTION {//オプション構造体(全体)
 	static const int COLOR_NUM = 8;//色オプションの数
 	int NOTE_NUM = 0;//ノートスキンオプションの数
 	int HITSOUND_NUM = 0;//ヒット音オプションの数
+	static const int FAST_SLOW_NUM = 3;//FAST/SLOWオプションの数
 	static const int BARLINE_NUM = 2;//小節線オプションの数
 	static const int DARKNESS_NUM = 5;//黒背景オプションの数
 	static const int SCORE_GRAPH_NUM = 2;//スコアグラフオプションの数
@@ -47,14 +49,15 @@ typedef struct OPTION {//オプション構造体(全体)
 	const int OP_COLOR = 3;
 	const int OP_NOTE = 4;
 	const int OP_HITSOUND = 5;
-	const int OP_BARLINE = 6;
-	const int OP_DARKNESS = 7;
-	const int OP_GRADATION = 8;
-	const int OP_SCORETARGET = 9;
-	const int OP_TARGETSCORE1 = 10;
-	const int OP_TARGETSCORE2 = 11;
-	const int OP_THEME = 12;
-	const int OP_SORT = 13;
+	const int OP_FAST_SLOW = 6;
+	const int OP_BARLINE = 7;
+	const int OP_DARKNESS = 8;
+	const int OP_GRADATION = 9;
+	const int OP_SCORETARGET = 10;
+	const int OP_TARGETSCORE1 = 11;
+	const int OP_TARGETSCORE2 = 12;
+	const int OP_THEME = 13;
+	const int OP_SORT = 14;
 
 	const int OP_GAUGE_NORMAL = 0;
 	const int OP_GAUGE_HARD = 1;
@@ -78,6 +81,10 @@ typedef struct OPTION {//オプション構造体(全体)
 	const int OP_COLOR_CMY_ONLY = 5;
 	const int OP_COLOR_W_ONLY = 6;
 	const int OP_COLOR_RAINBOW = 7;
+
+	const int OP_FAST_SLOW_OFF = 0;
+	const int OP_FAST_SLOW_ON_FAST_CYAN = 1;
+	const int OP_FAST_SLOW_ON_FAST_RED = 2;
 
 	const int OP_BARLINE_ON = 0;
 	const int OP_BARLINE_OFF = 1;
@@ -300,6 +307,7 @@ typedef struct OPTION {//オプション構造体(全体)
 	wchar_t* color[COLOR_NUM] = { L"NONE",L"RGB CHANGE",L"RGB RAND",L"SUPER RAND",L"RGB ONLY",L"CMY ONLY",L"W ONLY",L"RAINBOW" };
 	wchar_t** note = 0;//名前はフォルダ名から取る パスの役割も果たす
 	wchar_t** hitsound = 0;//名前はフォルダ名から取る パスの役割も果たす
+	wchar_t* fastSlow[FAST_SLOW_NUM] = { L"OFF",L"ON:C/R",L"ON:R/C" };
 	wchar_t* barline[BARLINE_NUM] = { L"ON",L"OFF"};
 	wchar_t* darkness[DARKNESS_NUM] = { L"0%",L"25%",L"50%",L"75%",L"100%" };
 	wchar_t* scoretarget[SCORE_GRAPH_NUM] = { L"OFF", L"ON"};
@@ -419,6 +427,10 @@ typedef struct OPTION {//オプション構造体(全体)
 
 	wchar_t *sent_hitsound = L"音符を叩いた時の音を変更します";
 
+	wchar_t* sent_fastSlow[FAST_SLOW_NUM] = { L"タイミングのズレを表示しません"
+	,L"タイミングのズレを表示します(FAST:水色,SLOW:赤色)"
+	,L"タイミングのズレを表示します(FAST:赤色,SLOW:水色)" };//説明文
+
 	wchar_t* sent_barline[BARLINE_NUM] = { L"小節線を表示します"
 		,L"小節線を表示しません"};//説明文
 
@@ -492,10 +504,10 @@ typedef struct OPTION {//オプション構造体(全体)
 	int H_SENT;//画像ハンドル
 
 	//選曲画面で使うオプション名称配列
-	const int* ArrayOptionNum[OPTION_NUM] = { &SPEED_NUM,&GAUGE_NUM,&LANE_NUM,&COLOR_NUM,&NOTE_NUM,&HITSOUND_NUM,&BARLINE_NUM,&DARKNESS_NUM,&BLACK_GRADATION_NUM,&SCORE_GRAPH_NUM,&TARGET_SCORE1_NUM,&TARGET_SCORE2_NUM,&THEME_NUM,&SORT_NUM };//各オプションの数
-	wchar_t** ArrayOptionSent[OPTION_NUM] = { sent_speed,sent_gauge,sent_lane,sent_color,&sent_note,&sent_hitsound,sent_barline ,sent_darkness,sent_black_gradation,sent_scoretarget,sent_targetscore1,sent_targetscore2,&sent_theme,sent_sort };//説明文
-	wchar_t** ArrayOptionKindName[OPTION_NUM] = { speed,gauge,lane,color,note,hitsound,barline,darkness,black_gradation,scoretarget,targetscore1,targetscore2,theme,sort };//オプション名称
-	int* ArrayValue[OPTION_NUM] = { &(op.speed),&(op.gauge),&(op.lane),&(op.color),&(op.note),&(op.hitsound),&(op.barline),&(op.darkness),&(op.black_gradation),&(op.scoregraph),&(op.targetscore1),&(op.targetscore2),&(op.theme),&(op.sort) };//選んでいるオプションの値
+	const int* ArrayOptionNum[OPTION_NUM] = { &SPEED_NUM,&GAUGE_NUM,&LANE_NUM,&COLOR_NUM,&NOTE_NUM,&HITSOUND_NUM,&FAST_SLOW_NUM,&BARLINE_NUM,&DARKNESS_NUM,&BLACK_GRADATION_NUM,&SCORE_GRAPH_NUM,&TARGET_SCORE1_NUM,&TARGET_SCORE2_NUM,&THEME_NUM,&SORT_NUM };//各オプションの数
+	wchar_t** ArrayOptionSent[OPTION_NUM] = { sent_speed,sent_gauge,sent_lane,sent_color,&sent_note,&sent_hitsound,sent_fastSlow,sent_barline,sent_darkness,sent_black_gradation,sent_scoretarget,sent_targetscore1,sent_targetscore2,&sent_theme,sent_sort };//説明文
+	wchar_t** ArrayOptionKindName[OPTION_NUM] = { speed,gauge,lane,color,note,hitsound,fastSlow,barline,darkness,black_gradation,scoretarget,targetscore1,targetscore2,theme,sort };//オプション名称
+	int* ArrayValue[OPTION_NUM] = { &(op.speed),&(op.gauge),&(op.lane),&(op.color),&(op.note),&(op.hitsound),&(op.fastSlow),&(op.barline),&(op.darkness),&(op.black_gradation),&(op.scoregraph),&(op.targetscore1),&(op.targetscore2),&(op.theme),&(op.sort) };//選んでいるオプションの値
 
 
 }OPTION;

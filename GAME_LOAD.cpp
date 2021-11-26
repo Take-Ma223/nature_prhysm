@@ -452,7 +452,7 @@ void GAME_LOAD(int song_number,
 			note[i][j].timing = 0;//叩くタイミング(ミリ秒)
 			note[i][j].fall = 0;//0なら落ちてない,1なら落下中
 			if (i != 0)note[i][j].color_init = 0;//ノートの元の色
-			if (i != 0) note[i][j].color = 0;//ノートの色(画像ハンドルが入る)(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
+			if (i != 0)note[i][j].color = 0;//ノートの色(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
 			note[i][j].hit = 0;//1:叩いた 0:叩いてない
 			note[i][j].group = 0;//
 			note[i][j].textLine = 0;
@@ -464,7 +464,7 @@ void GAME_LOAD(int song_number,
 			copy[i][j].timing = 0;//叩くタイミング(ミリ秒)
 			copy[i][j].fall = 0;//0なら落ちてない,1なら落下中
 			if (i != 0)copy[i][j].color_init = 0;//ノートの元の色
-			if (i != 0)copy[i][j].color = 0;//ノートの色(画像ハンドルが入る)(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
+			if (i != 0)copy[i][j].color = 0;//ノートの色(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
 			copy[i][j].hit = 0;//1:叩いた 0:叩いてない
 			copy[i][j].group = 0;//
 			note[i][j].textLine = 0;
@@ -1014,9 +1014,6 @@ void GAME_LOAD(int song_number,
 			i = 0;//また使うのでiを0に戻しておく
 			dataArrayLength = 0;
 		}
-		//Music[song_number].total_note[difficulty] = nc[1] + nc[2] + nc[3] + nc[4];//黒も含めた総ノーツ数
-
-
 
 		//Sleep(200);
 	}
@@ -1029,7 +1026,13 @@ void GAME_LOAD(int song_number,
 		barline[blc].bpm = float(high_speed[4] * (bpm));
 		barline[blc].use = 1;
 		blc++;
+		Music[song_number].totalMeasures[difficulty] = blc;
 	}
+	Music[song_number].objOfLane[difficulty][0] = nc[0];
+	Music[song_number].objOfLane[difficulty][1] = nc[1];
+	Music[song_number].objOfLane[difficulty][2] = nc[2];
+	Music[song_number].objOfLane[difficulty][3] = nc[3];
+
 
 	//瞬間BPM算出
 	double BPM_SuggestCalcRatio = 0.1;//瞬間BPMを算出するのに使うノーツ数の割合

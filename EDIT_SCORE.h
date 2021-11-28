@@ -12,7 +12,7 @@
 #define CONTENTS_END 3
 #define CONTENTS_END_EDGE 4 //#ENDの後ろでリスト構造の最後
 
-void EDIT_SCORE(SCORE_CELL *head, Song *Music, OPTION *Option,
+void EDIT_SCORE(SCORE_CELL *head, Song *Music, SongSub* MusicSub, OPTION *Option,
 	int song_number, int difficulty, double init_scroll,
 	int Button[3][4], int Button_Shutter, int* Key, char* Buf, double, double*,
 	double* scale_score, int* step_array_number, int* measure_start_step, int* SwingBackBeatTime, ANDROID_CONTROLLER *AC, CONFIG config, int SH_SONG);

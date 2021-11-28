@@ -29,6 +29,7 @@ void GAME_LOAD(int song_number,
 	STOP_SE *stopSequence,
 	int *hash,
 	Song *Music,
+	SongSub *MusicSub,
 	int *TimeToEndScroll,
 	int *playing_time,
 	CONFIG config,
@@ -428,7 +429,7 @@ void GAME_LOAD(int song_number,
 			Music[song_number].version[difficulty] = int(_wtof(sharp2)*100 + 0.005);
 		}
 		if (wcscmp(L"#EDITABLE", sharp1) == 0) {
-			Music[song_number].editable[difficulty] = _wtoi(sharp2);
+			MusicSub->editable[difficulty] = _wtoi(sharp2);
 		}
 
 		//ScreenFlip();
@@ -1026,12 +1027,9 @@ void GAME_LOAD(int song_number,
 		barline[blc].bpm = float(high_speed[4] * (bpm));
 		barline[blc].use = 1;
 		blc++;
-		Music[song_number].totalMeasures[difficulty] = blc;
+		MusicSub->totalMeasures[difficulty] = blc;
 	}
-	Music[song_number].objOfLane[difficulty][0] = nc[0];
-	Music[song_number].objOfLane[difficulty][1] = nc[1];
-	Music[song_number].objOfLane[difficulty][2] = nc[2];
-	Music[song_number].objOfLane[difficulty][3] = nc[3];
+
 
 
 	//瞬間BPM算出
@@ -1199,6 +1197,18 @@ void GAME_LOAD(int song_number,
 			note[i][j] = copy[i][j];
 		}
 	}
+
+	[&] {
+		for (i = 0; i <= 3; i++) {
+			j = 0;
+			while (note[i][j].color != 0) {
+				j++;
+			}
+			MusicSub->objOfLane[difficulty][i] = j;
+		}
+	}();
+
+
 
 
 	/*

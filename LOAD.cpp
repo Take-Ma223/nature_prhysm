@@ -43,6 +43,8 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	BPMC bpmchange[NOTE_MAX_NUMBER];
 	SC scrollchange[NOTE_MAX_NUMBER];
 	STOP_SE stopSequence[NOTE_MAX_NUMBER];
+	SongSub MusicSub;//ダミー
+
 	int hash = 0;
 	int TimeToEndScrollDummy=0;
 	int playing_time_dummy = 0;
@@ -265,7 +267,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 								writeCacheToMusic(&Cache, Music, i, j);
 							}
 						}
-						GAME_LOAD(i, j, note, barline, lane_dummy, readHeaderOnly, &Cdiff_dummy, &opt_dummy, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScrollDummy, &playing_time_dummy, config);
+						GAME_LOAD(i, j, note, barline, lane_dummy, readHeaderOnly, &Cdiff_dummy, &opt_dummy, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScrollDummy, &playing_time_dummy, config);
 						if (readHeaderOnly == 0) {
 							Cache.writeTime = file_lp.ftLastWriteTime;
 							writeMusicToCache(&Cache, Music, i, j);

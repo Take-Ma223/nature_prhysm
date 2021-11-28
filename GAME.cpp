@@ -401,8 +401,9 @@ void GAME(int song_number, int difficulty,
 
 	}
 
+	SongSub MusicSub;
 
-	GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
+	GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
 	Music[song_number].hash[difficulty] = hash;
 	res->hash = hash;//ハッシュ値を格納
 
@@ -783,7 +784,7 @@ void GAME(int song_number, int difficulty,
 		FullComboFXFrame = 0;
 
 		HitingNoteCount = 0;
-		for (j = 0; j <= Music[song_number].totalMeasures[difficulty] - 1; j++) {
+		for (j = 0; j <= MusicSub.totalMeasures[difficulty] - 1; j++) {
 			barline[j].fall = 0;
 		}
 		for (i = 0; i <= 3; i++) {
@@ -792,7 +793,7 @@ void GAME(int song_number, int difficulty,
 			j_dn_push_n[i] = 0;
 			LN_flag[i] = 0;
 			LN_flash[i] = 0;
-			for (j = 0; j <= Music[song_number].objOfLane[difficulty][i] - 1; j++) {
+			for (j = 0; j <= MusicSub.objOfLane[difficulty][i] - 1; j++) {
 				note[i][j].hit = 0;
 				note[i][j].fall = 0;
 				note[i][j].color = note[i][j].color_init;
@@ -1360,7 +1361,7 @@ void GAME(int song_number, int difficulty,
 
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time / ROOT12_2;//再生位置のずれを補正 GAME_passed_time-GAME_passed_time/ROOT12_2が差 
-					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 					Music[song_number].hash[difficulty] = hash;
 					res->hash = hash;//ハッシュ値を格納
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1392,7 +1393,7 @@ void GAME(int song_number, int difficulty,
 
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time * ROOT12_2;//再生位置のずれを補正 GAME_passed_time - GAME_passed_time * ROOT12_2が差 
-					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 					Music[song_number].hash[difficulty] = hash;
 					res->hash = hash;//ハッシュ値を格納
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1452,7 +1453,7 @@ void GAME(int song_number, int difficulty,
 
 			if (Key[KEY_INPUT_F2] == 1) {//譜面再読み込み
 				debug_warp = 1;
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 				Music[song_number].hash[difficulty] = hash;
 				res->hash = hash;//ハッシュ値を格納
 				score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1521,12 +1522,13 @@ void GAME(int song_number, int difficulty,
 					EDIT_passed_time = 0;
 				}
 
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1, &score_cell_head);//score_cell_headに譜面情報をロード
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1, &score_cell_head);//score_cell_headに譜面情報をロード
 				
 				double debug_time_passed_in_EDIT_SCORE = debug_time_passed * pitch;//再生速度を変えている分debug_time_passedが変化しているのでEDIT_SCOREに渡すときに補正しておく
 				
 				EDIT_SCORE(&score_cell_head,
 					Music, 
+					&MusicSub,
 					option,
 					song_number, 
 					difficulty,
@@ -1545,7 +1547,7 @@ void GAME(int song_number, int difficulty,
 
 				//譜面再読み込み
 				debug_warp = 1;
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 				Music[song_number].hash[difficulty] = hash;
 				res->hash = hash;//ハッシュ値を格納
 				score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -2112,7 +2114,7 @@ void GAME(int song_number, int difficulty,
 
 
 		
-		for (i = 0; i <= Music[song_number].totalMeasures[difficulty] - 1; i++) {//小節線の座標計算
+		for (i = 0; i <= MusicSub.totalMeasures[difficulty] - 1; i++) {//小節線の座標計算
 			//小節線
 			barline[i].x = 640;
 			barline[i].y = -228;
@@ -2134,7 +2136,7 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 		for (j = 0; j <= 3; j++) {
-			for (i = 0; i <= Music[song_number].objOfLane[difficulty][j] - 1; i++) {//ノートの座標計算
+			for (i = 0; i <= MusicSub.objOfLane[difficulty][j] - 1; i++) {//ノートの座標計算
 				//音符
 
 				note[j][i].x = lane[j];//レーンのx座標
@@ -2292,7 +2294,7 @@ void GAME(int song_number, int difficulty,
 					}
 
 					j_n_n[i]++;
-					if (j_n_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
+					if (j_n_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 				}
 
 			}
@@ -2300,7 +2302,7 @@ void GAME(int song_number, int difficulty,
 			if (debug_auto == 1) {//オートプレイ中
 				for (i = 0; i <= 3; i++) {
 					if (debug_warp == 0) {
-						if (j_n_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {
+						if (j_n_n[i] <= MusicSub.objOfLane[difficulty][i] - 1) {
 							while ((GAME_passed_time - (note[i][j_n_n[i]].timing_real - config.VsyncOffsetCompensation) >= 0 - TimePerFrame) && (note[i][j_n_n[i]].color != 0)) {//ノートが判定枠に来た
 								if (8 != note[i][j_n_n[i]].color) {//黒以外のとき叩く(単ノート LN始点 LN終点)
 
@@ -2386,7 +2388,7 @@ void GAME(int song_number, int difficulty,
 							}
 							while ((note[i][j_n_n[i]].hit == 1 || note[i][j_n_n[i]].color == 8) && (note[i][j_n_n[i]].color != 0)) {//叩かれているか黒ならそれ以外になるまでカウンタを進める()
 								j_n_n[i]++;
-								if (j_n_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
+								if (j_n_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 							}
 						}
 					}
@@ -2395,7 +2397,7 @@ void GAME(int song_number, int difficulty,
 
 			for (i = 0; i <= 3; i++) {//通常時
 				if (debug_warp == 0) {
-					if (j_n_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {
+					if (j_n_n[i] <= MusicSub.objOfLane[difficulty][i] - 1) {
 						if ((GAME_passed_time - note[i][j_n_n[i]].timing_real > judge_time_through) && (note[i][j_n_n[i]].color != 0)//through時間を過ぎていった、または
 							|| ((GAME_passed_time - note[i][j_n_n[i]].timing_real > judge_time_good) && (fabs(note[i][j_n_n[i] + 1].timing_real - GAME_passed_time) < judge_time_good))) {//(good判定を通り過ぎて次のノートがgood判定内にいるとき)ノートの見逃し(コンボが途切れる MISS)
 							if (8 != note[i][j_n_n[i]].color && note[i][j_n_n[i]].group != 2) {//黒とLN終点以外のときミスにする
@@ -2423,27 +2425,27 @@ void GAME(int song_number, int difficulty,
 						}
 						while ((note[i][j_n_n[i]].hit == 1 || note[i][j_n_n[i]].color == 8) && (note[i][j_n_n[i]].color != 0)) {//叩かれているか黒ならそれ以外になるまでカウンタを進める()
 							j_n_n[i]++;
-							if (j_n_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
+							if (j_n_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 						}
 					}
 				}
 
-				if (j_dn_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {//黒カウンタ(叩き)
+				if (j_dn_n[i] <= MusicSub.objOfLane[difficulty][i] - 1) {//黒カウンタ(叩き)
 					while ((GAME_passed_time - note[i][j_dn_n[i]].timing_real >  judge_time_dark) && (note[i][j_dn_n[i]].color != 0)) {
 						j_dn_n[i]++;
 					}
 					while ((note[i][j_dn_n[i]].hit == 1 || note[i][j_dn_n[i]].color != 8) && (note[i][j_dn_n[i]].color != 0)) {//叩かれているか黒じゃないか
 						j_dn_n[i]++;
-						if (j_dn_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
+						if (j_dn_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 					}
 				}
-				if (j_dn_push_n[i] <= Music[song_number].objOfLane[difficulty][i] - 1) {//黒カウンタ(押し込み)
+				if (j_dn_push_n[i] <= MusicSub.objOfLane[difficulty][i] - 1) {//黒カウンタ(押し込み)
 					while ((GAME_passed_time - note[i][j_dn_push_n[i]].timing_real >  con_jd) && (note[i][j_dn_push_n[i]].color != 0)) {
 						j_dn_push_n[i]++;
 					}
 					while ((note[i][j_dn_push_n[i]].hit == 1 || note[i][j_dn_push_n[i]].color != 8) && (note[i][j_dn_push_n[i]].color != 0)) {//叩かれているか黒じゃないか
 						j_dn_push_n[i]++;
-						if (j_dn_push_n[i] >= Music[song_number].objOfLane[difficulty][i])break;
+						if (j_dn_push_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 					}
 				}
 			}
@@ -2662,7 +2664,7 @@ void GAME(int song_number, int difficulty,
 			}
 
 			if (*debug == 1 && pitch_step != 0) {
-				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScroll, &playing_time, config, 1);//ピッチが変更されているときはこの関数の終わりにピッチ1で読み込みなおして
+				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1);//ピッチが変更されているときはこの関数の終わりにピッチ1で読み込みなおして
 				Music[song_number].hash[difficulty] = hash; //正しいハッシュ値に戻す
 				res->hash = hash;//ハッシュ値を格納
 			}
@@ -2775,7 +2777,7 @@ void GAME(int song_number, int difficulty,
 		BlendMode = DX_BLENDMODE_ALPHA;
 		BlendVal = 255;
 		if (option->op.barline == option->OP_BARLINE_ON) {//小節線を表示するオプションなら
-			for (i = Music[song_number].totalMeasures[difficulty] - 1; i >= 0; i--) {//小節線の描画
+			for (i = MusicSub.totalMeasures[difficulty] - 1; i >= 0; i--) {//小節線の描画
 				if (barline[i].fall == 1 && barline[i].use == 1) {
 					SetDrawBlendMode(BlendMode, BlendVal);
 					//if (note[j][i].color_init != 0)DrawGraph(note[j][i].x - 32, note[j][i].y, H_NOTE_OR_FRAME, TRUE);//ORノートの場合
@@ -2791,7 +2793,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		for (j = 0; j <= 3; j++) {
-			for (i = Music[song_number].objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツの描画
+			for (i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツの描画
 
 
 				if (note[j][i].fall == 1) {

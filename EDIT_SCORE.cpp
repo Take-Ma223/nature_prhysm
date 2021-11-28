@@ -15,8 +15,9 @@
 
 using namespace std;
 
-void EDIT_SCORE(SCORE_CELL *head,
-	Song *Music,
+void EDIT_SCORE(SCORE_CELL* head,
+	Song* Music,
+	SongSub* MusicSub,
 	OPTION *option,
 	int song_number,
 	int difficulty,
@@ -360,7 +361,7 @@ void EDIT_SCORE(SCORE_CELL *head,
 		int PushTimeTh = 35;//長押し閾値
 
 		if (Key[KEY_INPUT_ESCAPE] == 1) {
-			if (Music[song_number].editable[difficulty] == 1) {//編集可能
+			if (MusicSub->editable[difficulty] == 1) {//編集可能
 				if (SAVE_EDIT_SCORE(head, Music, song_number, difficulty, 1) == 0) {//正常に保存出来たら戻る
 					double insert_p_time = calc_insert_passed_time(Music[song_number].bpm[difficulty], init_scroll, head, insert);
 
@@ -1729,7 +1730,7 @@ void EDIT_SCORE(SCORE_CELL *head,
 			printfDx(L"保存できません　別のプログラムでnpsファイルが開かれている可能性があります\n");
 		}
 
-		if (Music[song_number].editable[difficulty] != 1) {
+		if (MusicSub->editable[difficulty] != 1) {
 			printfDx(L"この譜面は編集できません\n");
 			printfDx(L"編集するには #EDITABLE:1 を\n");
 			printfDx(L"npsファイルに追加してください\n");

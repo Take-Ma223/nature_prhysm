@@ -2456,11 +2456,10 @@ int DifficultyRadar::CalcChain() {
 	double chainSum = chain[0] + chain[1] + chain[2] + chain[3];
 	chainSum = (chainSum / ((double)time_use / 1000)) * 60;//1分あたりの縦連密度にする
 
-	chainSum *= 0.0444;//316を7に収める
-	chainSum = (log(chainSum + 1) / log(2));//7が2.75に圧縮される
-	chainSum *= 2.54;//もとのスケールに戻す
-	chainSum *= 45;//もとのスケールに戻す
-	chainSum *= 0.5518;//大きさ調整
+	chainSum *= 0.07992;//316を12に収める
+	chainSum = (log(chainSum + 1) / log(2));//12が3.5に圧縮される
+
+	chainSum *= 49.723;//大きさ調整
 
 	return (int)(chainSum * 100 / chainMax);
 }

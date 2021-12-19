@@ -51,6 +51,8 @@ typedef struct Song {
 
 	unsigned short version[5];//追加されたバージョン(小数を100倍して保存)
 
+	short maxChords[2][5];//最大同時押し数
+
 
 }Song;
 

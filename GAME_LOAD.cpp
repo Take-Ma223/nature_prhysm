@@ -151,6 +151,107 @@ void GAME_LOAD(int song_number,
 	int NearColorBuf = 0;//その行でそのレーンに一番近い左の方にあるノートの色を保存するための変数
 	int BeforeColorBuf[4] = { 0,0,0,0 };//レーンごとの前のノートの色を保存するための配列
 
+	//最大同時押し数算出クラス
+	class MaxChords {
+	private:
+		int maxChords = 0;
+		int maxChordsRainbow = 0;
+
+		int chords[4] = { 0,0,0,0 };//レーン毎の必要同時押し数
+		int isLongNote[4] = { 0,0,0,0 };//ロング中かどうか
+
+
+
+		void reset() {
+			chords[0] = 0;
+			chords[1] = 0;
+			chords[2] = 0;
+			chords[3] = 0;
+		}
+
+		int color2chords(int color, int previousChords) {
+			switch (color)
+			{
+			case NOTE_COLOR_RED:
+				return 1;
+				break;
+			case NOTE_COLOR_GREEN:
+				return 1;
+				break;
+			case NOTE_COLOR_BLUE:
+				return 1;
+				break;
+			case NOTE_COLOR_YELLOW:
+				return 2;
+				break;
+			case NOTE_COLOR_CYAN:
+				return 2;
+				break;
+			case NOTE_COLOR_MAGENTA:
+				return 2;
+				break;
+			case NOTE_COLOR_WHITE:
+				return 3;
+				break;
+			case NOTE_COLOR_RAINBOW:
+				return 1;
+				break;
+			case 10:
+				return previousChords;
+				break;
+			default:
+				return 0;
+				break;
+			}
+		}
+	public:
+		//音符を見つけるたびに呼び出す
+		//isLongNote:ロングノート始点の時だけTRUEを入れる
+		void setChords(int lane, int color, BOOL isLongStart) {
+			chords[lane] = color2chords(color, chords[lane]);
+			if (isLongStart) {
+				isLongNote[lane] = TRUE;
+			}
+			else {
+				isLongNote[lane] = FALSE;
+			}
+		}
+
+		//必ず一行分setChords()を行った後に呼び出す
+		void updateMaxChord() {
+			int max = chords[0] + chords[1] + chords[2] + chords[3];
+
+			if (max > maxChords) {
+				maxChords = max;
+			}
+
+			max = (chords[0] > 0) + (chords[1] > 0) + (chords[2] > 0) + (chords[3] > 0);
+
+			if (max > maxChordsRainbow) {
+				maxChordsRainbow = max;
+			}
+
+			//ロング中のレーン以外の同時押し数を消しておく
+			for (int i = 0; i < 4; i++) {
+				if (isLongNote[i]) {
+					//そのまま
+				}
+				else {
+					chords[i] = 0;
+				}
+			}
+		}
+
+		//譜面読み込み処理が終わった後に呼び出す
+		int getMaxChords() {
+			return maxChords;
+		}
+		int getMaxChordsRainbow() {
+			return maxChordsRainbow;
+		}
+
+	}MaxChords;
+
 	for (i = 0; i <= 255; i++) {//初期化
 		filename[i] = L'\0';
 		str[i] = L'\0';
@@ -376,7 +477,7 @@ void GAME_LOAD(int song_number,
 
 		}
 		if (wcscmp(L"#NOTEOFFSET", sharp1) == 0) {
-			Music[song_number].noteoffset[difficulty] = int((double)_wtoi(sharp2)/pitch);
+			Music[song_number].noteoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + Option->noteOffsetVal[Option->op.noteOffset];
 			note_offset_scroll = Music[song_number].noteoffset[difficulty] * scroll;//表示用オフセット
 			//printfDx(L"%f\n", Music[song_number].noteoffset[difficulty]);
 
@@ -474,7 +575,6 @@ void GAME_LOAD(int song_number,
 
 	}
 
-	//time_counter_real = config.VsyncOffsetCompensation;
 	int file_p_first = 0;//小節先頭ファイルポインタ(読み込んでいる小節の先頭を指す)
 	file_p_first = FileRead_tell(fp);//最初に読み込む小節の先頭を指す
 	i = 0;
@@ -991,7 +1091,7 @@ void GAME_LOAD(int song_number,
 
 				}
 				if (sharp1[0] != L'#') {
-					time_counter += double((double)1000 * ((60 / bpm) * 4 * measure) / DN);//分割単位分の時間プラスする
+					time_counter      += double((double)1000 * ((60 /  bpm          ) * 4 * measure) / DN);//分割単位分の時間プラスする
 					time_counter_real += double((double)1000 * ((60 / (bpm * scroll)) * 4 * measure) / DN);//分割単位分の実際の時間プラスする
 
 					if (IgnoreArea == 1) {//今無視区間のどこにいるか逐次計算
@@ -1068,6 +1168,33 @@ void GAME_LOAD(int song_number,
     		//printf(L"%d\n", song_time);
 		Cdiff->level = (Cdiff->level);
 	}
+
+
+	//最大同時押し数算出
+	int ncChords[4] = { 0,0,0,0 };
+	int timingSameIndex = 0;
+
+	while (ncChords[0] < nc[0] &&
+		ncChords[1] < nc[1] &&
+		ncChords[2] < nc[2] &&
+		ncChords[3] < nc[3]) {
+
+		for (i = 0; i < 4; i++) {
+			if (note[i][ncChords[i] + 1].timing == timing_same[timingSameIndex]) {
+				ncChords[i]++;
+				MaxChords.setChords(i, note[i][ncChords[i]].color, note[i][ncChords[i]].group == 1);
+			}
+		}
+		MaxChords.updateMaxChord();
+		timingSameIndex++;
+	}
+
+	Music[song_number].maxChords[0][difficulty] = MaxChords.getMaxChords();
+	Music[song_number].maxChords[1][difficulty] = MaxChords.getMaxChordsRainbow();
+	
+	
+
+
 
 	//DIFFICULTY_RADAR,NotesAmount算出
 	DifficultyRadar DR(note, nc, bpmchange, stopSequence, end_time - start_time, start_time, end_time, timing_same, Music[song_number].ColorNotesAmount[difficulty], BPM_suggest);

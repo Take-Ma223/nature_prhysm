@@ -86,8 +86,10 @@ void SONG_SELECT(int *l_n,
 
 	int H_VERSION_NUMBER[10];
 	int H_VERSION_DECIMAL;
-	int H_VERSION_STR;
+	//int H_VERSION_STR;
 
+	int H_MAX_CHORDS_NUMBER[10];
+	int H_VER_MAX_CHORDS_STR;
 
 	int H_PERCENT;
 	int H_NO_PLAY;
@@ -427,6 +429,8 @@ void SONG_SELECT(int *l_n,
 	LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_BPM_NUMBER_MAX);
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_BPM_NUMBER_MIN);
 	LoadDivGraph(L"img/SmallNumberGreen.png", 10, 10, 1, 25, 50, H_VERSION_NUMBER);
+	LoadDivGraph(L"img/SmallNumberBlack.png", 10, 10, 1, 25, 50, H_MAX_CHORDS_NUMBER);
+
 
 	LoadDivGraph(L"img/RaderNumber.png", 10, 10, 1, 20, 20, H_RADER_NUMBER);
 
@@ -471,7 +475,7 @@ void SONG_SELECT(int *l_n,
 
 
 	H_BPM_MINMAX_STR = LoadGraph(L"img/BPM_minmax_str.png");
-	H_VERSION_STR = LoadGraph(L"img/VERSION_str.png");
+	H_VER_MAX_CHORDS_STR = LoadGraph(L"img/VER_MAX_CHORDS_str.png");
 
 	H_BPM_SLASH = LoadGraph(L"img/slash.png");
 
@@ -500,7 +504,7 @@ void SONG_SELECT(int *l_n,
 	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
 	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 	SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
 	
 	double bgm_vol = 1;//BGMの音量
@@ -1060,6 +1064,14 @@ void SONG_SELECT(int *l_n,
 							}
 							else {
 								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].bpmmin[DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == option->OP_SORT_MAX_CHORDS) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].maxChords[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].maxChords[RainbowInd][DifficultyInd + 1];
 							}
 						}
 						else if (SortKind == option->OP_SORT_VERSION) {
@@ -1831,7 +1843,7 @@ void SONG_SELECT(int *l_n,
 							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 						}
 						if (option_select == option->OP_HITSOUND) {
-							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
+							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
 							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
 						}
@@ -1875,7 +1887,7 @@ void SONG_SELECT(int *l_n,
 								H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 							}
 							if (option_select == option->OP_HITSOUND) {
-								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
+								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 								SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
 								PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
 							}
@@ -1918,7 +1930,7 @@ void SONG_SELECT(int *l_n,
 							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 						}
 						if (option_select == option->OP_HITSOUND) {
-							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
+							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
 							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
 						}
@@ -1963,7 +1975,7 @@ void SONG_SELECT(int *l_n,
 								H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 							}
 							if (option_select == option->OP_HITSOUND) {
-								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
+								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 								SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
 								PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
 							}
@@ -2978,10 +2990,10 @@ void SONG_SELECT(int *l_n,
 
 		//実際のハイスピを決める
 		if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-			option->op.speed_val = option->speed_val[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+			option->op.speedVal = option->speedVal[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
 		}
 		else {
-			option->op.speed_val = 1;
+			option->op.speedVal = 1;
 		}
 
 		oi_counter = int(0.0004*GetNowCount_d(config)) % OPERATION_INSTRUCTION_NUMBER;//操作説明表示用のカウンタ
@@ -2996,14 +3008,14 @@ void SONG_SELECT(int *l_n,
 					//速さ表示
 					if (SelectingTarget == SELECTING_SONG) {
 						sprintfDx(SpeedStr, L"(%d～%d,瞬間風速%d)",
-							int(Music[song_number].bpmmin[difficulty] * option->op.speed_val + 0.5),
-							int(Music[song_number].bpmmax[difficulty] * option->op.speed_val + 0.5),
-							int(Music[song_number].bpm_suggested[difficulty] * option->op.speed_val + 0.5));
+							int(Music[song_number].bpmmin[difficulty] * option->op.speedVal + 0.5),
+							int(Music[song_number].bpmmax[difficulty] * option->op.speedVal + 0.5),
+							int(Music[song_number].bpm_suggested[difficulty] * option->op.speedVal + 0.5));
 					}
 					else if (SelectingTarget == SELECTING_COURSE) {
 						sprintfDx(SpeedStr, L"(%d～%d)",
-							int(STList->bpmmin[list_number] * option->op.speed_val + 0.5),
-							int(STList->bpmmax[list_number] * option->op.speed_val + 0.5));
+							int(STList->bpmmin[list_number] * option->op.speedVal + 0.5),
+							int(STList->bpmmax[list_number] * option->op.speedVal + 0.5));
 					}
 					SpeedStrWidth = GetDrawStringWidth(SpeedStr, wcslen(SpeedStr));
 					ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandle);
@@ -3185,10 +3197,13 @@ void SONG_SELECT(int *l_n,
 			DrawBoxWithLine(1130, 200, 1264, 240, GetColor(255, 50, 50));
 
 			//バージョン用表示枠
-			DrawBoxWithLine(976, 250, 1264, 290, GetColor(50, 255, 50));
+			DrawBoxWithLine(976, 250, 1110, 290, GetColor(50, 255, 50));
+
+			//最大同時押し数用表示枠
+			DrawBoxWithLine(1130, 250, 1264, 290, GetColor(255, 255, 255));
 
 			DrawGraph(960, 200, H_BPM_MINMAX_STR, TRUE);
-			DrawGraph(960, 250, H_VERSION_STR, TRUE);
+			DrawGraph(960, 250, H_VER_MAX_CHORDS_STR, TRUE);
 		}
 		else if (SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2) {//段位
 			DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255));
@@ -3202,7 +3217,10 @@ void SONG_SELECT(int *l_n,
 
 			DrawNumber(1062, 196, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_BPM_NUMBER_MIN);
 			DrawNumber(1216, 196, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_BPM_NUMBER_MAX);
-			DrawFloatNumber(1228, 246, Music[song_number].version[difficulty], 25, 3, 1, H_VERSION_NUMBER, H_VERSION_DECIMAL);
+			DrawFloatNumber(1090, 246, Music[song_number].version[difficulty], 20, 3, 0.5, H_VERSION_NUMBER, H_VERSION_DECIMAL);
+
+			DrawNumber(1235, 246, Music[song_number].maxChords[option->op.color == option->OP_COLOR_RAINBOW][difficulty], 25, 0, 0, H_MAX_CHORDS_NUMBER);
+
 
 			/*
 			cash = int(log10(Music[song_number].bpmmax[difficulty]));//桁を格納

@@ -106,7 +106,7 @@ void DrawNumber(int x, int y, int value, int interval, int showType, int zeroFil
 	}
 }
 
-void DrawFloatNumber(int x, int y, int value, int interval, int zeroFilingDigit, int decimalShift, int* NUMBER_IMAGE_HANDLE, int NUMBER_DECIMAL_HANDLE) {//下2桁 小数表示 右揃え
+void DrawFloatNumber(int x, int y, int value, int interval, int zeroFilingDigit, double decimalShift, int* NUMBER_IMAGE_HANDLE, int NUMBER_DECIMAL_HANDLE) {//下2桁 小数表示 右揃え
 	//正の整数数値を画像で表示(5桁まで)
 	//interval:数値の間隔
 	//zeroFilingDigit:0で埋める桁数 0を指定すると0で埋めない

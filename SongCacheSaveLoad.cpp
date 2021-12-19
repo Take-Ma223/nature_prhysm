@@ -22,6 +22,9 @@ void writeCacheToMusic(SongCache* Cache, Song* Music, int song_number, int diffi
 		Music[song_number].longNote[i][difficulty] = Cache->longNote[i];//LN率
 		Music[song_number].unstability[i][difficulty] = Cache->unstability[i];//大気不安定度(ソフラン度)
 		Music[song_number].chain[i][difficulty] = Cache->chain[i];//縦連度
+
+		Music[song_number].maxChords[i][difficulty] = Cache->maxChords[i];//最大同時押し数
+
 	}
 
 	return;
@@ -44,6 +47,8 @@ void writeMusicToCache(SongCache *Cache, Song* Music, int song_number, int diffi
 		Cache->longNote[i] = Music[song_number].longNote[i][difficulty];//LN率
 		Cache->unstability[i] = Music[song_number].unstability[i][difficulty];//大気不安定度(ソフラン度)
 		Cache->chain[i] = Music[song_number].chain[i][difficulty];//縦連度
+
+		Cache->maxChords[i] = Music[song_number].maxChords[i][difficulty];//最大同時押し数
 	}
 	
 	return;
@@ -96,6 +101,8 @@ int LoadSongCache(SongCache* Cache, Song* Music, int song_number, int difficulty
 		Cache->longNote[i] = 0;//LN率
 		Cache->unstability[i] = 0;//大気不安定度(ソフラン度)
 		Cache->chain[i] = 0;//縦連度
+
+		Cache->maxChords[i] = 0;//最大同時押し数
 	}
 
 

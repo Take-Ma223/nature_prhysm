@@ -635,9 +635,9 @@ void SearchHitSoundSkin(OPTION *op) {//ヒット音スキン読み込み
 	}
 
 	//メモリ確保(ノートスキンの種類分)
-	op->hitsound = new wchar_t*[op->HITSOUND_NUM];
+	op->hitSound = new wchar_t*[op->HITSOUND_NUM];
 
-	op->ArrayOptionKindName[op->OP_HITSOUND] = op->hitsound;
+	op->ArrayOptionKindName[op->OP_HITSOUND] = op->hitSound;
 
 	//実際の名前を入れていく
 	op->HITSOUND_NUM = 0;
@@ -650,9 +650,9 @@ void SearchHitSoundSkin(OPTION *op) {//ヒット音スキン読み込み
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
 																																		   //文字列分のメモリ確保
 			int len = wcslen(lp.cFileName);
-			op->hitsound[op->HITSOUND_NUM] = new wchar_t[wcslen(lp.cFileName) + 1];//終端文字分を考えて文字数+1のメモリを取る
+			op->hitSound[op->HITSOUND_NUM] = new wchar_t[wcslen(lp.cFileName) + 1];//終端文字分を考えて文字数+1のメモリを取る
 																		   //文字列格納
-			sprintfDx(op->hitsound[op->HITSOUND_NUM], L"%s", lp.cFileName);
+			sprintfDx(op->hitSound[op->HITSOUND_NUM], L"%s", lp.cFileName);
 			op->HITSOUND_NUM++;
 		}
 	} while (FindNextFile(hFind_HitSounds, &lp));//何も見つからなかったら0になりループを抜ける

@@ -6,6 +6,8 @@
 #ifndef _SONGCACHESAVELOAD
 #define _SONGCACHESAVELOAD
 
+//譜面を読み込まなければ得られない情報のキャッシュを作る
+
 typedef struct SongCache {//譜面キャッシュ構造体
 	FILETIME writeTime;//npsファイルの更新時間
 
@@ -21,6 +23,8 @@ typedef struct SongCache {//譜面キャッシュ構造体
 	short longNote[2];//LN率
 	short unstability[2];//大気不安定度(ソフラン度)
 	short chain[2];//縦連度
+
+	short maxChords[2];//最大同時押し数
 
 }SongCache;
 

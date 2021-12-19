@@ -192,34 +192,34 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 	
 	
-	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_R_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_R_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_R_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_G_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_G_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_G_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_B_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_B_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_B_S = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_K = LoadSoundMem(strcash, 1);
 
 
@@ -1604,7 +1604,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 							}
 
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);//黒終端ロングノートのグラデーション表示
-							if (show->data.note.LN_k[i] == 1 && option->op.black_gradation == option->OP_BLACK_GRADATION_ON) {
+							if (show->data.note.LN_k[i] == 1 && option->op.blackGradation == option->OP_BLACK_GRADATION_ON) {
 								DrawRectExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (score_cell_find_before_note(show, i)->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
 									0, 0, 256, 256, H_LNOTE[8], TRUE);
 							}

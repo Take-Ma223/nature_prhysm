@@ -146,7 +146,7 @@ void GAME(int song_number, int difficulty,
 	double cbpm = 120;//現在のBPM
 	double speed = 0.00000000001;//スピード調整
 	double high_speed = 1;//ハイスピ
-	high_speed = option->op.speed_val;//段位以外ではあらかじめ決めた値を格納
+	high_speed = option->op.speedVal;//段位以外ではあらかじめ決めた値を格納
 	double scale = 1;//判定の横の広がり幅
 						//int lane1 = int(512 - 240 * scale);
 						//int lane2 = int(512 - 80 * scale);
@@ -689,36 +689,36 @@ void GAME(int song_number, int difficulty,
 		}
 	};
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_R_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_R_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_R_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_G_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_G_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_G_S = LoadSoundMem(strcash, 1);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_B_N = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_B_L = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_B_S = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_HIT_K = LoadSoundMem(strcash, 1);
-	sprintfDx(strcash, L"sound/hit_sound/%s/release.wav", option->hitsound[option->op.hitsound]);
+	sprintfDx(strcash, L"sound/hit_sound/%s/release.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_RELEASE = LoadSoundMem(strcash, 1);
 
 
@@ -851,37 +851,37 @@ void GAME(int song_number, int difficulty,
 
 	//ハイスピを計算
 	if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-		option->op.speed_val = option->speed_val[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+		option->op.speedVal = option->speedVal[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
 	}
 	else {
-		option->op.speed_val = 1;
+		option->op.speedVal = 1;
 	}
-	high_speed = option->op.speed_val;
+	high_speed = option->op.speedVal;
 
 
 	//ターゲットスコアを決める
 	int targetScore = 0;
 	int targetScore2 = 0;
 
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_E)targetScore = 5000;
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_D)targetScore = 6000;
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_C)targetScore = 7000;
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_B)targetScore = 8000;
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_A)targetScore = 9000;
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_S)targetScore = 9500;
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_10000)targetScore = 10000;
-	if (option->op.targetscore1 == option->OP_TARGET_SCORE1_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_E)targetScore = 5000;
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_D)targetScore = 6000;
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_C)targetScore = 7000;
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_B)targetScore = 8000;
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_A)targetScore = 9000;
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_S)targetScore = 9500;
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_10000)targetScore = 10000;
+	if (option->op.targetScore1 == option->OP_TARGET_SCORE1_MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
 
-	if (option->op.targetscore2 == option->OP_TARGET_SCORE2_LATEST) {
+	if (option->op.targetScore2 == option->OP_TARGET_SCORE2_LATEST) {
 		targetScore2 = latestScore.score;
 	}
 	else {
 
 	}
 	//必要な場合 IRランキングからスコアを取得
-	if (option->op.scoregraph == option->OP_SCORE_GRAPH_ON &&
-		(option->op.targetscore2 != option->OP_TARGET_SCORE2_LATEST)) {
-		getTargetScore(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, option->op.targetscore2, highScore.score, ir->rivalID, config);
+	if (option->op.scoreGraph == option->OP_SCORE_GRAPH_ON &&
+		(option->op.targetScore2 != option->OP_TARGET_SCORE2_LATEST)) {
+		getTargetScore(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, option->op.targetScore2, highScore.score, ir->rivalID, config);
 		targetScore2 = LoadTargetScore(Music[song_number].SaveFolder);
 	}
 
@@ -1129,7 +1129,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
+		if (option->op.scoreGraph != option->OP_SCORE_GRAPH_OFF) {
 			//グラフ名ボックス描画
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//現在のスコア
 			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), int((double)draw_alpha * 160), int((double)draw_alpha * 255));//ハイスコア
@@ -1174,7 +1174,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
-		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
+		if (option->op.scoreGraph != option->OP_SCORE_GRAPH_OFF) {
 			DrawGraph(0, 0, H_GAME_STR_SCORE_GRAPH, TRUE);
 		}
 
@@ -1188,7 +1188,7 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
-		DrawNumber(1216, 656, int(cbpm * option->op.speed_val + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
+		DrawNumber(1216, 656, int(cbpm * option->op.speedVal + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
 
 
@@ -1204,14 +1204,14 @@ void GAME(int song_number, int difficulty,
 				
 				option->op.speed--;
 				option->op.speed = number_ring(option->op.speed, option->SPEED_NUM - 1);//0~11に収める
-				//Option->op.speed_val = Option->speed_val[Option->op.speed];//実際の倍率を入れる
+				//Option->op.speedVal = Option->speedVal[Option->op.speed];//実際の倍率を入れる
 				if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-					option->op.speed_val = option->speed_val[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+					option->op.speedVal = option->speedVal[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
 				}
 				else {
-					option->op.speed_val = 1;
+					option->op.speedVal = 1;
 				}
-				high_speed = option->op.speed_val;
+				high_speed = option->op.speedVal;
 
 			}
 			if (Key[Keylist[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {//→
@@ -1223,14 +1223,14 @@ void GAME(int song_number, int difficulty,
 				
 				option->op.speed++;
 				option->op.speed = number_ring(option->op.speed, option->SPEED_NUM - 1);//0~11に収める
-				//Option->op.speed_val = Option->speed_val[Option->op.speed];//実際の倍率を入れる
+				//Option->op.speedVal = Option->speedVal[Option->op.speed];//実際の倍率を入れる
 				if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-					option->op.speed_val = option->speed_val[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+					option->op.speedVal = option->speedVal[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
 				}
 				else {
-					option->op.speed_val = 1;
+					option->op.speedVal = 1;
 				}
-				high_speed = option->op.speed_val;
+				high_speed = option->op.speedVal;
 			}
 
 
@@ -2850,7 +2850,7 @@ void GAME(int song_number, int difficulty,
 							}
 
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);;//黒終端ロングノートのグラデーション表示
-							if (note[j][i + 1].LN_k == 1 && option->op.black_gradation == option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
+							if (note[j][i + 1].LN_k == 1 && option->op.blackGradation == option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
 
 						}
 						else {////始点が終点より上にある場合
@@ -2943,7 +2943,7 @@ void GAME(int song_number, int difficulty,
 							}
 
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);//黒終端ロングノートのグラデーション表示
-							if (note[j][i].LN_k == 1 && option->op.black_gradation == option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
+							if (note[j][i].LN_k == 1 && option->op.blackGradation == option->OP_BLACK_GRADATION_ON)DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[8], TRUE);
 
 						}
 					}
@@ -3099,7 +3099,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
+		if (option->op.scoreGraph != option->OP_SCORE_GRAPH_OFF) {
 			//グラフ名ボックス描画
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), 160, 255);//現在のスコア
 			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), 160, 255);//ハイスコア
@@ -3149,7 +3149,7 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
-		if (option->op.scoregraph != option->OP_SCORE_GRAPH_OFF) {
+		if (option->op.scoreGraph != option->OP_SCORE_GRAPH_OFF) {
 			DrawGraph(0, 0, H_GAME_STR_SCORE_GRAPH, TRUE);
 		}
 
@@ -3162,7 +3162,7 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
-		DrawNumber(1216, 656, int(cbpm* option->op.speed_val + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
+		DrawNumber(1216, 656, int(cbpm* option->op.speedVal + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
 
 

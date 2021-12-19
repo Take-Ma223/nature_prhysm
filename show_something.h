@@ -11,7 +11,7 @@ void ShowExtendedStrFitToHandle(int x, int y, wchar_t *str, int str_width, int a
 extern void show_cloud(int, XY *, double, double);
 void DrawBoxWithLine(int x1, int y1, int x2, int y2, int color, int alphaBox = 80, int alphaLine=255);
 void DrawNumber(int x, int y, int value, int interval, int showType, int zeroFilingDigit, int* NUMBER_IMAGE_HANDLE);
-void DrawFloatNumber(int x, int y, int value, int interval, int zeroFilingDigit, int decimalShift, int* NUMBER_IMAGE_HANDLE, int NUMBER_DECIMAL_HANDLE);
+void DrawFloatNumber(int x, int y, int value, int interval, int zeroFilingDigit, double decimalShift, int* NUMBER_IMAGE_HANDLE, int NUMBER_DECIMAL_HANDLE);
 extern int GetRainbowColor(double val, double range);
 
 #endif

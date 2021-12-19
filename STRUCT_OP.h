@@ -354,7 +354,7 @@ typedef struct OPTION {//オプション構造体(全体)
 
 	wchar_t* sort[SORT_NUM] = { L"NAME", L"SCORE", L"CLEAR STATE",L"MIN MISS", L"PLAY COUNT",L"RADAR",L"GLOBAL",L"LOCAL",L"CHAIN",L"UNSTABILITY",L"STREAK",L"COLOR",
 		L"RED",L"GREEN",L"BLUE",L"CYAN",L"MAGENTA",L"YELLOW",L"WHITE",L"BLACK",L"RAINBOW",
-		L"MAX BPM",L"MIN BPM", L"MAX_CHORDS", L"VERSION" };
+		L"MAX BPM",L"MIN BPM", L"MAX CHORDS", L"VERSION" };
 	wchar_t* blackGradation[BLACK_GRADATION_NUM] = { L"ON", L"OFF" };
 	wchar_t** theme = 0;//名前はフォルダ名から取る パスの役割も果たす
 

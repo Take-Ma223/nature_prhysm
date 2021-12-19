@@ -1174,10 +1174,10 @@ void GAME_LOAD(int song_number,
 	int ncChords[4] = { 0,0,0,0 };
 	int timingSameIndex = 0;
 
-	while (ncChords[0] < nc[0] &&
-		ncChords[1] < nc[1] &&
-		ncChords[2] < nc[2] &&
-		ncChords[3] < nc[3]) {
+	while (ncChords[0] < nc[0] - 1 &&
+		ncChords[1] < nc[1] - 1 &&
+		ncChords[2] < nc[2] - 1 &&
+		ncChords[3] < nc[3] - 1) {
 
 		for (i = 0; i < 4; i++) {
 			if (note[i][ncChords[i] + 1].timing == timing_same[timingSameIndex]) {

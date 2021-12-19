@@ -267,6 +267,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 								writeCacheToMusic(&Cache, Music, i, j);
 							}
 						}
+
 						GAME_LOAD(i, j, note, barline, lane_dummy, readHeaderOnly, &Cdiff_dummy, &opt_dummy, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScrollDummy, &playing_time_dummy, config);
 						if (readHeaderOnly == 0) {
 							Cache.writeTime = file_lp.ftLastWriteTime;

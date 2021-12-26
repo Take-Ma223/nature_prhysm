@@ -53,8 +53,12 @@ def write(data):
 
 
 def main():
-    data = recv_data()
-    write(data)
+    try:
+        data = recv_data()
+    except TimeoutError as e:
+        print("Time out")
+    else:
+        write(data)
 
 
 if __name__ == "__main__":

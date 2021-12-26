@@ -137,12 +137,19 @@ def main():
     hash_sha3_256 = get_hash()
     print('sha3_256 : ' + hash_sha3_256)
     player_name = get_player_name()
-    data = load(args.IRdata_path)
-    if data["hash"] == hash_sha3_256:
-        data["player_name"] = player_name
-        data["clear_type"] = number_to_clear_type(data["clear_type"])
-        data["rank"] = number_to_rank(data["rank"])
-        send_data(data)
+    try:
+        data = load(args.IRdata_path)
+    except FileNotFoundError as e:
+        print(args.IRdata_path+" not found")
+    else:
+        if data["hash"] == hash_sha3_256:
+            data["player_name"] = player_name
+            data["clear_type"] = number_to_clear_type(data["clear_type"])
+            data["rank"] = number_to_rank(data["rank"])
+            try:
+                send_data(data)
+            except TimeoutError as e:
+                print("Time out")
 
 
 if __name__ == "__main__":

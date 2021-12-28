@@ -3190,7 +3190,7 @@ void SONG_SELECT(int *l_n,
 		
 		//BPM, VERSION描画
 		//枠の表示
-		if ((SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) || (SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2)) {
+		if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
 			
 			//BPM用表示枠
 			DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255));
@@ -3239,7 +3239,7 @@ void SONG_SELECT(int *l_n,
 		else if(SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2){//段位
 			DrawNumber(1062, 196, STList->bpmmin[list_number], 25, 0, 0, H_BPM_NUMBER_MIN);
 			DrawNumber(1216, 196, STList->bpmmax[list_number], 25, 0, 0, H_BPM_NUMBER_MAX);
-			DrawFloatNumber(1228, 246, STList->version, 25, 3, 1, H_VERSION_NUMBER, H_VERSION_DECIMAL);
+			//DrawFloatNumber(1228, 246, STList->version, 25, 3, 1, H_VERSION_NUMBER, H_VERSION_DECIMAL);
 
 			/*
 			cash = int(log10(STList->bpmmax[list_number]));//桁を格納

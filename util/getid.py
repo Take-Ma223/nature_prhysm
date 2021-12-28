@@ -57,6 +57,8 @@ def main():
         data = recv_data()
     except TimeoutError as e:
         print("Time out")
+    except ConnectionRefusedError as e:
+        print(e)
     else:
         write(data)
 

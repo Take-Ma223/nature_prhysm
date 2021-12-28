@@ -901,10 +901,10 @@ void SONG_SELECT(int *l_n,
 	saveData.totalHighScore = 0;
 	saveData.totalHighScoreRainbow = 0;
 	for (int diff = 1; diff < 5; diff++) {//難易度
-		for (j = 0; j < folder->folder_c[FOLDERS_ALL_DIFFICULTY]; j++) {
-			if (folder->folder[i][j].kind == 0 && Music[folder->folder[FOLDERS_ALL_DIFFICULTY][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
-				saveData.totalHighScore += Highscore[folder->folder[FOLDERS_ALL_DIFFICULTY][j].song_number].score[diff];
-				saveData.totalHighScoreRainbow += Highscore[folder->folder[FOLDERS_ALL_DIFFICULTY][j].song_number].score[diff + 4];
+		for (j = 0; j < folder->folder_c[FOLDERS_ALL_SONGS]; j++) {
+			if (folder->folder[i][j].kind == 0 && Music[folder->folder[FOLDERS_ALL_SONGS][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
+				saveData.totalHighScore += Highscore[folder->folder[FOLDERS_ALL_SONGS][j].song_number].score[diff];
+				saveData.totalHighScoreRainbow += Highscore[folder->folder[FOLDERS_ALL_SONGS][j].song_number].score[diff + 4];
 			}
 		}
 	}

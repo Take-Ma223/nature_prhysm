@@ -817,7 +817,7 @@ void SHOW_RESULT(RESULT res,
 				PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 			}
 
-			if (Key[KEY_INPUT_F2] == 1) {//スコア再送信&ランキング表示
+			if (Key[KEY_INPUT_F2] == 1 && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {//スコア再送信&ランキング表示
 				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
 				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
 				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, config);
@@ -1359,12 +1359,12 @@ void SHOW_RESULT(RESULT res,
 
 		if (*debug == 1 && config.ShowDebug == 1) {
 			printfDx(L"DEBUG MODE\n");
-			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE) {
+			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 				printfDx(L"F2:スコアランキング表示\n");
 			}
 		}
 		else {
-			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE) {
+			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 				printfDx(L"F2:スコアランキング表示\n");
 			}
 			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE) {

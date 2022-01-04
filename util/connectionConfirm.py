@@ -59,7 +59,7 @@ def write(data):
 
 
 def main():
-    socket.setdefaulttimeout(0.1)
+    socket.setdefaulttimeout(1)
     authorization_password()
 
 

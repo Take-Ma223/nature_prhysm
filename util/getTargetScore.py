@@ -91,7 +91,7 @@ def write(data):
 
 
 def main():
-    socket.setdefaulttimeout(0.1)
+    socket.setdefaulttimeout(1)
     data = recv_data()
     print("data:", data)
     write(int(data))

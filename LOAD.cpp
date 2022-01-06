@@ -73,7 +73,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 		sprintfDx(connectionStateMessage, L"スコアランキングサーバーに接続できません　インターネット接続の問題か、サーバーメンテナンス中の可能性があります");
 		break;
 	case CONNECTION_VERSION_ERROR:
-		sprintfDx(connectionStateMessage, L"スコアランキングサーバーに接続できません　本体のバージョンが古いため、最新版をダウンロードしてください");
+		sprintfDx(connectionStateMessage, L"スコアランキングサーバーに接続できません　インターネット接続の問題か、ゲームのバージョンが古い可能性があります");
 		break;
 	}
 

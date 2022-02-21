@@ -30,6 +30,7 @@
 #include<string>
 #include "IR_process.h"
 #include "Image.h"
+#include "GetValueFromController.h"
 
 using namespace std;
 
@@ -55,6 +56,7 @@ void GAME(int song_number, int difficulty,
 	hEvent = CreateEvent(NULL, FALSE, FALSE, L"olp");
 	memset(&ovl, 0, sizeof(OVERLAPPED));
 	ovl.hEvent = hEvent;
+
 
 	SCORE_CELL score_cell_head;
 	score_cell_head.next = NULL;
@@ -887,6 +889,7 @@ void GAME(int song_number, int difficulty,
 
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {
+
 		if (ProcessMessage() != 0) {
 			DxLib_End();
 			exit(0);
@@ -1273,10 +1276,16 @@ void GAME(int song_number, int difficulty,
 		}
 	}
 
+	int controllerVolume = 0;
+
 	//演奏開始
 	time_cash = 0;//最初のLOOP_passed_timeが負の値に(-5000とか)にならないように初期化
 	GAME_start_time = GetNowCount_d(config);//譜面開始時のカウント
 	while (1) {
+
+		getValueFromController(&controllerVolume, hComm, &ovl);
+		printfDx(L"%u\n",controllerVolume);
+
 		//ProcessMessage();
 		//note_fall = -92 + 100 * sin(0.0087*GAME_passed_time);
 		//judge_area = 390 + 100 * sin(0.006*GAME_passed_time);

@@ -56,6 +56,9 @@ void GAME(int song_number, int difficulty,
 	hEvent = CreateEvent(NULL, FALSE, FALSE, L"olp");
 	memset(&ovl, 0, sizeof(OVERLAPPED));
 	ovl.hEvent = hEvent;
+	//コントローラのボリューム値取得
+	int controllerVolume = 0;
+	GetValueFromController ControllerVolume(hComm);
 
 
 	SCORE_CELL score_cell_head;
@@ -887,6 +890,7 @@ void GAME(int song_number, int difficulty,
 		targetScore2 = LoadTargetScore(Music[song_number].SaveFolder);
 	}
 
+
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {
 
@@ -906,6 +910,10 @@ void GAME(int song_number, int difficulty,
 		int CRTBuf = int(CounterRemainTime);
 
 		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
+
+		//コントローラから値を取得
+		ControllerVolume.start();
+		controllerVolume = ControllerVolume.getVal();
 
 		Get_Key_State(Buf, Key, AC);
 		if (Key[KEY_INPUT_ESCAPE] == 1 && *escape == 0 && AllowExit == 1) {
@@ -1276,15 +1284,13 @@ void GAME(int song_number, int difficulty,
 		}
 	}
 
-	int controllerVolume = 0;
+
+
 
 	//演奏開始
 	time_cash = 0;//最初のLOOP_passed_timeが負の値に(-5000とか)にならないように初期化
 	GAME_start_time = GetNowCount_d(config);//譜面開始時のカウント
 	while (1) {
-
-		getValueFromController(&controllerVolume, hComm, &ovl);
-		printfDx(L"%u\n",controllerVolume);
 
 		//ProcessMessage();
 		//note_fall = -92 + 100 * sin(0.0087*GAME_passed_time);
@@ -1298,6 +1304,10 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//----Button----
+
+		//コントローラから値を取得
+		ControllerVolume.start();
+		controllerVolume = ControllerVolume.getVal();
 
 		Get_Key_State(Buf, Key, AC);
 
@@ -3033,17 +3043,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		//int((log10())で桁数を算出													
-		//printfDx("%f\n", log10(combo));
-		int ComboBuf=combo;
-		if (SkillTestFlag != 0)ComboBuf = *CourseCombo;//コースモードの時はコース全体のコンボで表示
-
-		if (combo_draw_counter > 0 && ComboBuf > 0) {//コンボ描画
-			DrawExtendGraph(640, int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 640 + 256, int(320 + 128 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO, TRUE);
-			for (i = 0; i <= int(log10(ComboBuf)); i++) {
-				DrawExtendGraph(540 - i * 40, int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 540 + 64 - i * 40, int(320 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO_NUMBER[combo_digit[i]], TRUE);
-			}
-		}
+		
 
         //時間描画
 		if (PassedTime_Hours <= 9) {//6~9のとき
@@ -3175,7 +3175,58 @@ void GAME(int song_number, int difficulty,
 
 
 
+		if (start_c_draw_counter == 0 && ClearFlag == 0) {//スタート時の中心カバー上げ
+			DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);//中心カバー
+			if (gauge_draw_counter >= gauge - 0.001) {//曲名の透過度
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - sin((3.14 / 2) * c_m_draw_counter)) * 255));
+			}
+			SetFontSize(30);
+			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+			ShowExtendedStrFit(640, 350, Music[song_number].title[difficulty], title_width, 620, config,
+				Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
+			ShowExtendedStrFit(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config);//アーティスト
+			ShowExtendedStrFit(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config);//ジャンル
+			SetDrawMode(DX_DRAWMODE_NEAREST);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
+			for (i = 0; i < CRTBuf; i++) {
+				if ((c_m_draw_counter <= 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
+					c_m_draw_counter += 0.0012;
+				}
+				if ((c_m_draw_counter > 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
+					c_m_draw_counter = 1;
+					start_c_draw_counter = 1;
+				}
+			}
+		}
+		else if (ClearFlag != 0) {//演奏終了していたら中心カバーの表示
+			DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+			for (i = 0; i < CRTBuf; i++) {
+				if (c_m_draw_counter > 0) {
+					c_m_draw_counter -= 0.0012;
+				}
+			}
+			if (c_m_draw_counter < 0) {
+				//printfDx("flag\n");
+				PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
+				c_m_draw_counter = int(0);
+				if (str_draw_counter == -1)str_draw_counter = int(1);//CLEARED FAILEDカウンタを1に
+			}
+		}
+		else {//演奏中のカバー位置
+			DrawGraph(320, int(pow(((double)controllerVolume/255), 2) * 720 - 720), H_COVER_MIDDLE, TRUE);
+		}
+
+
+		int ComboBuf = combo;
+		if (SkillTestFlag != 0)ComboBuf = *CourseCombo;//コースモードの時はコース全体のコンボで表示
+
+		if (combo_draw_counter > 0 && ComboBuf > 0) {//コンボ描画
+			DrawExtendGraph(640, int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 640 + 256, int(320 + 128 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO, TRUE);
+			for (i = 0; i <= int(log10(ComboBuf)); i++) {
+				DrawExtendGraph(540 - i * 40, int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 540 + 64 - i * 40, int(320 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO_NUMBER[combo_digit[i]], TRUE);
+			}
+		}
 
 		for (i = 0; i <= 3; i++) {//ノートを叩いた時のフラッシュ、判定表示
 			for (j = 0; j <= NOTE_HIT_LARGE_FLASH_NUMBER - 1; j++) {//4個までなら同時に表示
@@ -3187,10 +3238,10 @@ void GAME(int song_number, int difficulty,
 
 
 			if (dnote_hit_flash[i] >= 0)DrawGraph(lane[i], judge_area, H_HIT_D[11 - (int)dnote_hit_flash[i]], TRUE);//黒ノートを叩いた時のフラッシュ
-			if (hit_sky_perfect[i] > 0)DrawGraph(lane[i], int(-10 * cos(3.14*hit_sky_perfect[i] / 2) + 10 + judge_area), H_SKY_PERFECT, TRUE);
-			if (hit_perfect[i] > 0)DrawGraph(lane[i], int(-10 * cos(3.14*hit_perfect[i] / 2) + 10 + judge_area), H_PERFECT, TRUE);
-			if (hit_good[i]    > 0)DrawGraph(lane[i], int(-10 * cos(3.14*hit_good[i] / 2) + 10 + judge_area), H_GOOD, TRUE);
-			if (hit_miss[i]    > 0)DrawGraph(lane[i], int(-10 * cos(3.14*hit_miss[i] / 2) + 10 + judge_area), H_MISS, TRUE);
+			if (hit_sky_perfect[i] > 0)DrawGraph(lane[i], int(-10 * cos(3.14 * hit_sky_perfect[i] / 2) + 10 + judge_area), H_SKY_PERFECT, TRUE);
+			if (hit_perfect[i] > 0)DrawGraph(lane[i], int(-10 * cos(3.14 * hit_perfect[i] / 2) + 10 + judge_area), H_PERFECT, TRUE);
+			if (hit_good[i] > 0)DrawGraph(lane[i], int(-10 * cos(3.14 * hit_good[i] / 2) + 10 + judge_area), H_GOOD, TRUE);
+			if (hit_miss[i] > 0)DrawGraph(lane[i], int(-10 * cos(3.14 * hit_miss[i] / 2) + 10 + judge_area), H_MISS, TRUE);
 
 			for (j = 0; j < CRTBuf; j++) {
 				for (k = 0; k <= NOTE_HIT_LARGE_FLASH_NUMBER - 1; k++) {
@@ -3208,23 +3259,6 @@ void GAME(int song_number, int difficulty,
 			I_Fast[i].draw(GetNowCount_d(config));
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		}
-
-		if (ClearFlag != 0) {//演奏終了していたら中心カバーの表示
-			DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
-			for (i = 0; i < CRTBuf; i++) {
-				if (c_m_draw_counter > 0) {
-					c_m_draw_counter -= 0.0012;
-				}
-			}
-			if (c_m_draw_counter < 0) {
-				//printfDx("flag\n");
-				PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
-				c_m_draw_counter = int(0);
-				if (str_draw_counter == -1)str_draw_counter = int(1);//CLEARED FAILEDカウンタを1に
-			}
-		}
-		//printfDx("str_draw_counter:%f\n", str_draw_counter);
-		//printfDx("c_m_draw_counter:%f\n", c_m_draw_counter);
 
 
 		if(note[0][j_n_n[0]].color == 0 &&
@@ -3282,30 +3316,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 
-		if (start_c_draw_counter == 0 && ClearFlag == 0) {//スタート時の中心カバー上げ
-			DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);//中心カバー
-			if (gauge_draw_counter >= gauge - 0.001) {//曲名の透過度
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - sin((3.14 / 2)*c_m_draw_counter)) * 255));
-			}
-			SetFontSize(30);
-			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-			ShowExtendedStrFit(640, 350, Music[song_number].title[difficulty], title_width, 620, config,
-				Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
-			ShowExtendedStrFit(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config);//アーティスト
-			ShowExtendedStrFit(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config);//ジャンル
-			SetDrawMode(DX_DRAWMODE_NEAREST);
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
-			for (i = 0; i < CRTBuf; i++) {
-				if ((c_m_draw_counter <= 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
-					c_m_draw_counter += 0.0012;
-				}
-				if ((c_m_draw_counter > 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
-					c_m_draw_counter = 1;
-					start_c_draw_counter = 1;
-				}
-			}
-		}
 
 
 		/*

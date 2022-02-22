@@ -49,7 +49,7 @@ void setupSerial(HANDLE *hComm) {//シリアル通信
 		0,/* 共有モード */
 		NULL,                         /* セキュリティ属性 */
 		OPEN_EXISTING,                /* 作成フラグ */
-		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,        /* 属性 */
+		FILE_ATTRIBUTE_NORMAL,        /* 属性 */
 		NULL                          /* テンプレートのハンドル */
 	);
 
@@ -88,14 +88,14 @@ void setupSerial(HANDLE *hComm) {//シリアル通信
 	//4.タイムアウト時間の設定
 	COMMTIMEOUTS timeout; // COMMTIMEOUTS構造体の変数を宣言
 
-	timeout.ReadIntervalTimeout = 500; // 文字読込時の２も時間の全体待ち時間（msec）
+	timeout.ReadIntervalTimeout = 0; // 文字読込時の２も時間の全体待ち時間（msec）
 
 	timeout.ReadTotalTimeoutMultiplier = 0; //読込の１文字あたりの時間
-	timeout.ReadTotalTimeoutConstant = 500; //読込エラー検出用のタイムアウト時間
+	timeout.ReadTotalTimeoutConstant = 1; //読込エラー検出用のタイムアウト時間
 		 //(受信トータルタイムアウト) = ReadTotalTimeoutMultiplier * (受信予定バイト数) + ReadTotalTimeoutConstant
 
 	timeout.WriteTotalTimeoutMultiplier = 0; //書き込み１文字あたりの待ち時間
-	timeout.WriteTotalTimeoutConstant = 500;//書き込みエラー検出用のタイムアウト時間
+	timeout.WriteTotalTimeoutConstant = 1;//書き込みエラー検出用のタイムアウト時間
 		 //(送信トータルタイムアウト) = WriteTotalTimeoutMultiplier * (送信予定バイト数) + WriteTotalTimeoutConstant
 
 	Ret = SetCommTimeouts(*hComm, &timeout);//SetCommTimeOut()関数にポートハンドルおよびCOMMTIMEOUTS構造体の

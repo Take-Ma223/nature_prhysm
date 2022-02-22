@@ -71,7 +71,7 @@ void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int i, DWORD *dwWritte
 	//(str, "\n");
 
 
-	WriteFile(hComm, str, (DWORD)strlen(str), dwWritten, ovl);
+	WriteFile(hComm, str, (DWORD)strlen(str), dwWritten, NULL);
 }
 
 void turn_off_LED(HANDLE hComm, STATE *LED_state, DWORD *dwWritten, OVERLAPPED *ovl) {//コントローラのLEDを消す
@@ -105,6 +105,6 @@ void turn_off_LED(HANDLE hComm, STATE *LED_state, DWORD *dwWritten, OVERLAPPED *
 
 
 
-		WriteFile(hComm, str, (DWORD)strlen(str), dwWritten, ovl);
+		WriteFile(hComm, str, (DWORD)strlen(str), dwWritten, NULL);
 	}
 }

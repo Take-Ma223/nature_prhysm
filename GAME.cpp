@@ -1308,6 +1308,7 @@ void GAME(int song_number, int difficulty,
 		//コントローラから値を取得
 		ControllerVolume.start();
 		controllerVolume = ControllerVolume.getVal();
+		//printfDx(L"%f", (double)controllerVolume / 255);
 
 		Get_Key_State(Buf, Key, AC);
 

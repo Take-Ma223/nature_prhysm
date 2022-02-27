@@ -1,4 +1,4 @@
-#include"STRUCT_RESULT.h"
+#include "STRUCT_SAVEDATA.h"
 
 #ifndef _SAVEDATASAVELOAD
 #define _SAVEDATASAVELOAD

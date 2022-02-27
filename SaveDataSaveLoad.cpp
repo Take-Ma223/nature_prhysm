@@ -1,7 +1,6 @@
 #include"SaveDataSaveLoad.h"
 #include"DxLib.h"
 #include<sys/stat.h>
-#include"STRUCT_RESULT.h"
 
 void writeSaveData(SAVEDATA saveData){
 	FILE* fp = 0;

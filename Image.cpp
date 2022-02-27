@@ -2,124 +2,27 @@
 #include "DxLib.h"
 #include <math.h>
 
-event::event(int startVal, int endVal, ConvertMode mode, double base, double timeStart, double  timeEnd) {
-	event::startVal = startVal;
-	event::endVal = endVal;
 
-	event::mode = mode;
-	event::base = base;
+Image::Image(int handle, double* time, int x, int y, BOOL visible, int alpha) {
+	Image::X = Animation(time);
+	Image::Y = Animation(time);
+	Image::visible = Animation(time);
+	Image::alpha = Animation(time);
 
-	event::timeStart = timeStart;
-	event::timeEnd = timeEnd;
-}
-
-double event::calculateTimeRatio(double now) {
-	double ratio = 0;
-	if (timeEnd == timeStart) {
-		ratio = 1;
-	}
-	else {
-		ratio = (now - timeStart) / (timeEnd - timeStart);
-	}
-	if (ratio < 0) {
-		ratio = 0;
-	}
-	else if (ratio > 1) {
-		ratio = 1;
-	}
-	return ratio;
-}
-
-double event::easing(double input) {
-	double output = 0;
-	switch (mode) {
-	case ConvertMode::Teleportation:
-		if (input < 1) {
-			output = 0;
-		}
-		else {
-			output = input;
-		}
-		break;
-	case ConvertMode::Linear:
-		output = input;
-		break;
-	case ConvertMode::HalfCosine:
-		output = (1.0 - cos(input * 3.14159265)) / 2;
-		break;
-	case ConvertMode::QuarterSine:
-		output = sin(input * (3.14159265 / 2));
-		break;
-	case ConvertMode::QuarterCosine:
-		output = 1.0 - cos(input * (3.14159265 / 2));
-		break;
-	case ConvertMode::Exponential:
-		output = 0;
-		double startExpY = 1;
-		double endExpY = 4;
-
-		if (base == 1 || base <= 0) {
-			output = input;
-		}
-		else if (base > 1) {
-			startExpY = 0;
-			endExpY = pow(base, 1) - 1;
-			output = (pow(base, input) - 1) / endExpY;
-		}
-		else if (base < 1) {
-			startExpY = 0;
-			endExpY = 1 - pow(base, 1);
-			output = (1 - pow(base, input)) / endExpY;
-		}
-		break;
-	}
-	return output;
-}
-
-//setter
-void event::setStartVal(int start) { startVal = start; }
-void event::setEndVal(int end) { endVal = end; }
-
-void event::setMode(ConvertMode mode, double base) {
-	event::mode = mode;
-	event::base = base;
-}
-void event::setTime(int start, int end) {
-	timeStart = start;
-	timeEnd = end;
-}
-
-//getter
-int event::getStartVal() { return startVal; }
-int event::getEndVal() { return endVal; }
-ConvertMode event::getMode() { return mode; }
-double event::getBase() { return base; }
-double event::getTimeStart() { return timeStart; }
-double event::getTimeEnd() { return timeEnd; }
-
-
-Image::Image(int handle, int x, int y, BOOL visible, int alpha) {
 	Image::handle = handle;
 
-	Image::visible.push(
-		event(visible, visible)
-	);
+	Image::visible.eSet(visible);
 
-	Image::moveXEvent.push(
-		event(x, x)
-	);
+	Image::X.eSet(x);
 
-	Image::moveYEvent.push(
-		event(y, y)
-	);
+	Image::Y.eSet(y);
 
-	Image::alpha.push(
-		event(alpha, alpha)
-	);
-	Image::x = x;
-	Image::y = y;
-	visibleVal = visible;
-	alphaVal = alpha;
+	Image::alpha.eSet(alpha);
+
+	Image::X.setValue(x);
+	Image::Y.setValue(y);
+	Image::visible.setValue(visible);
+	Image::alpha.setValue(alpha);
 
 }
 
@@ -127,102 +30,69 @@ Image::~Image() {
 	//DeleteGraph(handle);
 }
 
-void Image::reset() {
-	clearEvent(visible);
-	clearEvent(moveXEvent);
-	clearEvent(moveYEvent);
-	clearEvent(alpha);
+void Image::clearAllEvent() {
+	visible.clearEvent();
+	X.clearEvent();
+	Y.clearEvent();
+	alpha.clearEvent();
 }
 
-void Image::clearEvent(std::queue<event> &eventQueue) {
-	std::queue<event> empty;
-	std::swap(eventQueue, empty);
+void Image::playAll() {
+	visible.play();
+	X.play();
+	Y.play();
+	alpha.play();
+}
+void Image::stopAll() {
+	visible.stop();
+	X.stop();
+	Y.stop();
+	alpha.stop();
+}
+void Image::resumeAll() {
+	visible.resume();
+	X.resume();
+	Y.resume();
+	alpha.resume();
+}
+void Image::reverseAll() {
+	visible.reverse();
+	X.reverse();
+	Y.reverse();
+	alpha.reverse();
+}
+void Image::setReverseAll(BOOL isReverse) {
+	visible.setReverse(isReverse);
+	X.setReverse(isReverse);
+	Y.setReverse(isReverse);
+	alpha.setReverse(isReverse);
+}
+void Image::setLoopAll(BOOL isLoop) {
+	visible.setLoop(isLoop);
+	X.setLoop(isLoop);
+	Y.setLoop(isLoop);
+	alpha.setLoop(isLoop);
+}
+void Image::setPlaySpeedAll(double playSpeed) {
+	visible.setPlaySpeed(playSpeed);
+	X.setPlaySpeed(playSpeed);
+	Y.setPlaySpeed(playSpeed);
+	alpha.setPlaySpeed(playSpeed);
 }
 
-void Image::move(int xStart, int yStart, int xEnd, int yEnd, Specify specify, ConvertMode mode, double nowTime, double time, double base) {//éwíËÇµÇΩç¿ïWä‘Çà⁄ìÆ		
-	Image::moveXEvent.push(
-		event(absRel(specify, x, xStart), absRel(specify, x, xEnd), mode, base, nowTime, nowTime + time)
-	);
-
-	Image::moveYEvent.push(
-		event(absRel(specify, y, yStart), absRel(specify, y, yEnd), mode, base, nowTime, nowTime + time)
-	);
-
-}
-
-void Image::moveTo(int x, int y,	Specify specify, ConvertMode mode, double nowTime, double time, double base){//åªç›ÇÃç¿ïWÇ©ÇÁà⁄ìÆ
-	Image::moveXEvent.push(
-		event(Image::x, absRel(specify, Image::x, x), mode, base, nowTime, nowTime + time)
-	);
-
-	Image::moveYEvent.push(
-		event(Image::y, absRel(specify, Image::y, y), mode, base, nowTime, nowTime + time)
-	);
-}
+void Image::draw() {
+	visible.update();
+	X.update();
+	Y.update();
+	alpha.update();
 
 
-void Image::appear(double nowTime, double time) {
-	Image::visible.push(
-		event(0, 1, Teleportation, 1, nowTime, nowTime + time)
-	);
-}
-void Image::disappear(double nowTime, double time) {
-	Image::visible.push(
-		event(1, 0, Teleportation, 1, nowTime, nowTime + time)
-	);
-}
-
-void Image::changeAlpha(int startVal, int endVal, Specify specify, ConvertMode mode, double nowTime, double time, double base) {
-	Image::alpha.push(
-		event(absRel(specify, alphaVal, startVal), absRel(specify, alphaVal, endVal), mode, base, nowTime, nowTime + time)
-	);
-}
-void Image::changeAlphaTo(int val, Specify specify, ConvertMode mode, double nowTime, double time, double base) {
-	Image::alpha.push(
-		event(alphaVal, absRel(specify, alphaVal,  val), mode, base, nowTime, nowTime + time)
-	);
-}
-
-
-void Image::draw(double nowTime) {
-	if (!visible.empty()) {
-		visibleVal = calculateVal(nowTime, visible.front());
-		pop(&visible, nowTime);
-	}
-	if (!moveXEvent.empty()) { 
-		x = calculateVal(nowTime, moveXEvent.front());
-		pop(&moveXEvent, nowTime);
-	}
-	if (!moveYEvent.empty()) { 
-		y = calculateVal(nowTime, moveYEvent.front());
-		pop(&moveYEvent, nowTime);
-	}
-	if (!alpha.empty()) {
-		alphaVal = calculateVal(nowTime, alpha.front());
-		pop(&alpha, nowTime);
-	}
-
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alphaVal);
-	if (visibleVal && alphaVal != 0) {
-		DrawGraph(x, y, handle, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());
+	if (visible.getValue() && alpha.getValue() != 0) {
+		DrawGraph(X.getValue(), Y.getValue(), handle, TRUE);
 	}
 }
 
-int Image::calculateVal(double nowTime, event event) {
-	//à⁄ìÆéûä‘åoâﬂäÑçá
-	double timeRatio = event.calculateTimeRatio(nowTime);
-
-	//ãóó£Ç…Ç©ÇØÇÈíl(Ç±ÇÃílÇÃïœâªãÔçáÇ≈à⁄ìÆÇÃédï˚Ç™ïœÇÌÇÈ)
-	double multipleRatio = event.easing(timeRatio);
-
-	double distance = (double)event.getEndVal() - event.getStartVal();
-
-	return (int)((double)event.getStartVal() + distance * multipleRatio);
-}
-
-void Image::pop(std::queue<event>* eventQueue, double nowTime) {
-	if (eventQueue->front().getTimeEnd() <= nowTime)eventQueue->pop();
-}
 
 int Image::absRel(Specify specify, int now, int target) {//ílÇÃê‚ëŒéwíËÅAëäëŒéwíËîªï ä÷êî
 	if (specify == Specify::Abs) {
@@ -232,3 +102,4 @@ int Image::absRel(Specify specify, int now, int target) {//ílÇÃê‚ëŒéwíËÅAëäëŒéwí
 		return now + target;
 	}
 }
+

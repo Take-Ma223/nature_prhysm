@@ -676,13 +676,13 @@ void GAME(int song_number, int difficulty,
 				I_Fast[i].visible.eON();
 				I_Fast[i].alpha.eSet(255);
 
-				//I_Fast[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, 200);
 				I_Fast[i].alpha.eChange(255, 0, Linear, 100, 200);
 				I_Fast[i].visible.eOFF(300);
 
 				I_Slow[i].clearAllEvent();
 				I_Slow[i].visible.eOFF();
 
+				//I_Fast[i].setLoopAll(TRUE);
 				I_Fast[i].playAll();
 				I_Slow[i].playAll();
 			}
@@ -691,7 +691,6 @@ void GAME(int song_number, int difficulty,
 				I_Slow[i].visible.eON();
 				I_Slow[i].alpha.eSet(255);
 
-				//I_Slow[i].move(lane[i], judge_area + fastSlowY, lane[i], judge_area + fastSlowY - fastSlowYMove, Abs, ConvertMode::QuarterSine, 200);
 				I_Slow[i].alpha.eChange(255, 0, Linear, 100, 200);
 				I_Slow[i].visible.eOFF(300);
 

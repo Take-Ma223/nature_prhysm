@@ -676,7 +676,7 @@ void GAME(int song_number, int difficulty,
 				I_Fast[i].visible.eON();
 				I_Fast[i].alpha.eSet(255);
 
-				I_Fast[i].alpha.eChange(255, 0, Linear, 100, 200);
+				I_Fast[i].alpha.eChange(255, 0, Converter(Linear), 100, 200);
 				I_Fast[i].visible.eOFF(300);
 
 				I_Slow[i].clearAllEvent();
@@ -691,7 +691,7 @@ void GAME(int song_number, int difficulty,
 				I_Slow[i].visible.eON();
 				I_Slow[i].alpha.eSet(255);
 
-				I_Slow[i].alpha.eChange(255, 0, Linear, 100, 200);
+				I_Slow[i].alpha.eChange(255, 0, Converter(Linear), 100, 200);
 				I_Slow[i].visible.eOFF(300);
 
 				I_Fast[i].clearAllEvent();
@@ -699,6 +699,9 @@ void GAME(int song_number, int difficulty,
 
 				I_Fast[i].playAll();
 				I_Slow[i].playAll();
+
+
+
 			}
 		}
 	};

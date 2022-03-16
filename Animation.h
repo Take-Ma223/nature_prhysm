@@ -11,6 +11,19 @@ enum ConvertMode {
 	Exponential
 };
 
+class Converter {
+	ConvertMode mode = Linear;
+	double paramA = 0;//modeがExponentialのときの底
+
+public:
+	Converter(ConvertMode mode = Linear, double paramA = 0);
+	ConvertMode getMode();
+	double getParamA();
+
+};
+
+
+
 enum Specify {
 	Abs,//絶対
 	Rel//相対
@@ -30,22 +43,22 @@ public:
 };
 
 class event {//値の変化情報を保持するクラス
+
+
 	point start;//相対指定のときは、このイベント実行時にstartValの値にその時の自身の値が加算される
 	point end;  //相対指定のときは、このイベント実行時にendValの値にその時の自身の値が加算される
 
-	ConvertMode mode = Linear;
-	double base = 1;//modeがExponentialのときの底
+	Converter converter;
 
 	double timeStart = 0;
 	double timeEnd = 0;
 
 public:
-	event(point start = point(), point end = point(), ConvertMode mode = Linear, double base = 0, double timeStart = 0, double  timeEnd = 0);
+	event(point start = point(), point end = point(), Converter converter = Converter(Linear, 0), double timeStart = 0, double  timeEnd = 0);
 
 	double calculateTimeRatio(double now);
 	double easing(double input);
 
-	void setMode(ConvertMode mode, double base = 1);
 	void setTime(int start, int end);
 
 	void determinValueFrom(int nowVal, BOOL isReverse = FALSE);//現在の値に相対値を加える、イベント実行時に実行
@@ -54,14 +67,20 @@ public:
 	int getStartVal();
 	int getEndVal();
 
-	ConvertMode getMode();
-	double getBase();
-
-	double getTimeStart();
-	double getTimeEnd();
+	double getStartTime();
+	double getEndTime();
 
 
 };
+
+class eventAbsAbs :public event {
+
+
+
+
+
+};
+
 
 
 
@@ -76,7 +95,7 @@ class Animation
 
 	double playStartTime = 0;//アニメーション内のどの時刻から再生するか
 	double playingTime = 0;//アニメーション内のどこを再生しているか
-	double durationBuf = 0;//playStartTime + durationがアニメーションの長さを越えたときにあらかじめアニメーション長分引いて範囲内に収まるようにする
+	double durationOffset = 0;//playStartTime + durationがアニメーションの長さを越えたときにあらかじめアニメーション長分引いて範囲内に収まるようにする
 
 
 	double playedTimeOfCaller = 0;//アニメーションを再生(または途中再生)開始したときの呼び出し元の時間
@@ -88,9 +107,14 @@ class Animation
 	BOOL isLoop = FALSE;//ループ再生するかどうか
 	BOOL isReverse = FALSE;//逆再生するかどうか
 	
+	void calculateWhereToPlay();
+	void decideWhichEventToProcess();
+
 	int calculateVal(event event);
 	double getNowTime();
 	void push(event);
+
+	int getLastIndex();
 public:
 	Animation(double* time = NULL);
 	int getValue();
@@ -98,8 +122,8 @@ public:
 	void update();
 
 
-	void eChange(point start, point end, ConvertMode mode = Teleportation, double durationTime = 0, double startTime = 0, double base = 4);
-	void eChangeTo(point end, ConvertMode mode = Teleportation, double durationTime = 0, double startTime = 0, double base = 4);
+	void eChange(point start, point end, Converter converter = Converter(Teleportation, 4), double durationTime = 0, double startTime = 0);
+	void eChangeTo(point end, Converter converter = Converter(Teleportation, 4), double durationTime = 0, double startTime = 0);
 	void eSet(point Abs, double startTime = 0);
 	void eON(double startTime = 0);
 	void eOFF(double startTime = 0);

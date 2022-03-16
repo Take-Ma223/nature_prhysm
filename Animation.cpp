@@ -1,6 +1,23 @@
 #include "Animation.h"
 #include <math.h>
 
+Converter::Converter(ConvertMode mode, double paramA)
+{
+	Converter::mode = mode;
+	Converter::paramA = paramA;
+}
+
+ConvertMode Converter::getMode()
+{
+	return mode;
+}
+
+double Converter::getParamA()
+{
+	return paramA;
+}
+
+
 point::point(int val, Specify specify) {
 	point::val = val;
 	point::different = val;
@@ -26,12 +43,11 @@ int point::getVal()
 }
 
 
-event::event(point start, point end, ConvertMode mode, double base, double timeStart, double  timeEnd) {
+event::event(point start, point end, Converter converter, double timeStart, double  timeEnd) {
 	event::start = start;
 	event::end = end;
 
-	event::mode = mode;
-	event::base = base;
+	event::converter = converter;
 
 	event::timeStart = timeStart;
 	event::timeEnd = timeEnd;
@@ -56,7 +72,7 @@ double event::calculateTimeRatio(double now) {
 
 double event::easing(double input) {
 	double output = 0;
-	switch (mode) {
+	switch (converter.getMode()) {
 	case ConvertMode::Teleportation:
 		if (input < 1) {
 			output = 0;
@@ -81,6 +97,7 @@ double event::easing(double input) {
 		output = 0;
 		double startExpY = 1;
 		double endExpY = 4;
+		double base = converter.getParamA();
 
 		if (base == 1 || base <= 0) {
 			output = input;
@@ -101,10 +118,6 @@ double event::easing(double input) {
 }
 
 //setter
-void event::setMode(ConvertMode mode, double base) {
-	event::mode = mode;
-	event::base = base;
-}
 void event::setTime(int start, int end) {
 	timeStart = start;
 	timeEnd = end;
@@ -119,10 +132,8 @@ void event::determinValueFrom(int nowVal, BOOL isReverse)
 //getter
 int event::getStartVal() { return start.getVal(); }
 int event::getEndVal() { return end.getVal(); }
-ConvertMode event::getMode() { return mode; }
-double event::getBase() { return base; }
-double event::getTimeStart() { return timeStart; }
-double event::getTimeEnd() { return timeEnd; }
+double event::getStartTime() { return timeStart; }
+double event::getEndTime() { return timeEnd; }
 
 
 //Animationクラス
@@ -143,29 +154,29 @@ void Animation::setValue(int input)
 
 //イベント挿入
 
-void Animation::eChange(point start, point end, ConvertMode mode, double durationTime, double startTime, double base) {
+void Animation::eChange(point start, point end, Converter converter, double durationTime, double startTime) {
 	push(
-		event(start, end, mode, base, startTime, startTime + durationTime)
+		event(start, end, converter, startTime, startTime + durationTime)
 	);
 }
-void Animation::eChangeTo(point end, ConvertMode mode, double durationTime, double startTime, double base) {
+void Animation::eChangeTo(point end, Converter converter, double durationTime, double startTime) {
 	push(
-		event(point(0, Rel), end, mode, base, startTime, startTime + durationTime)
+		event(point(0, Rel), end, converter, startTime, startTime + durationTime)
 	);
 }
 void Animation::eSet(point val, double startTime) {
 	push(
-		event(val, val, Teleportation, 1, startTime, startTime)
+		event(val, val, Converter(Teleportation, 1), startTime, startTime)
 	);
 }
 void Animation::eON(double startTime) {
 	push(
-		event(0, 1, Teleportation, 1, startTime, startTime)
+		event(0, 1, Converter(Teleportation, 1), startTime, startTime)
 	);
 }
 void Animation::eOFF(double startTime) {
 	push(
-		event(1, 0, Teleportation, 1, startTime, startTime)
+		event(1, 0, Converter(Teleportation, 1), startTime, startTime)
 	);
 }
 
@@ -184,31 +195,48 @@ void Animation::push(event input)
 	return;
 }
 
+int Animation::getLastIndex(){
+	return transition.size() - 1;
+}
+
 
 //プレーヤー関係
-
-
 void Animation::play()
 {
 	if (!transition.empty()) {
-		playStartTime = 0;
-		playedTimeOfCaller = getNowTime();
-		Animation::isPlay = TRUE;
-		eventIndex = 0;
-		durationBuf = 0;
-		transition[eventIndex].determinValueFrom(value, isReverse);
+		if (!isReverse) {
+			playStartTime = 0;
+			playedTimeOfCaller = getNowTime();
+			Animation::isPlay = TRUE;
+			eventIndex = 0;
+			durationOffset = 0;
+			transition[eventIndex].determinValueFrom(value, isReverse);
+		}
+		else {
+			playStartTime = transition.back().getEndTime();
+			playedTimeOfCaller = getNowTime();
+			Animation::isPlay = TRUE;
+			eventIndex = getLastIndex();
+			durationOffset = 0;
+			transition[eventIndex].determinValueFrom(value, isReverse);
+		}
 	}
 }
 
 void Animation::stop()
 {
-	Animation::isPlay = FALSE;
+	if (Animation::isPlay) {
+		Animation::isPlay = FALSE;
+	}
 }
 
 void Animation::resume()
 {
-	playStartTime = playingTime;
-	Animation::isPlay = TRUE;
+	if (!Animation::isPlay) {
+		playStartTime = playingTime;
+		playedTimeOfCaller = getNowTime();
+		Animation::isPlay = TRUE;
+	}
 }
 
 void Animation::reverse()
@@ -233,7 +261,7 @@ void Animation::setReverse(BOOL isReverse)
 void Animation::setLoop(BOOL isLoop)
 {
 	if (!transition.empty()) {
-		if (transition.back().getTimeEnd() - transition.front().getTimeStart() > 0) {//アニメーションに長さがあるときだけ変更許可
+		if (transition.back().getEndTime() - 0 > 0) {//アニメーションに長さがあるときだけ変更許可
 			Animation::isLoop = isLoop;
 		}
 		else {
@@ -254,61 +282,114 @@ void Animation::setPlaySpeed(double playSpeed)
 void Animation::update()
 {
 	if (!transition.empty()) {
-
 		if (isPlay) {
-			//どこを再生するべきか計算
-			//playStartTimeからの相対時間
-			double duration = getNowTime() - playedTimeOfCaller - durationBuf;
-			playingTime = playStartTime + duration;//playingTimeは必ずアニメーションの時間内を指す
-
-			while (playStartTime + duration > transition.back().getTimeEnd()) {//アニメーションの最後まで到達
-				if (isLoop) {//ループ再生時
-					durationBuf += transition.back().getTimeEnd();
-					duration = getNowTime() - playedTimeOfCaller - durationBuf;
-
-					
-					eventIndex = 0;
-
-					transition[eventIndex].determinValueFrom(transition.back().getEndVal(), isReverse);
-
-					playingTime = playStartTime + duration;//playingTimeは必ずアニメーションの時間内を指す
-				}
-				else {//ワンショット時
-					stop();//停止
-
-					//アニメーションの最後を指すようにする
-					playingTime = transition.back().getTimeEnd();
-					break;
-				}
-			}
-			
-			
-
-			//処理するべきイベント番号を決める
-			//今のイベント番号が適切かどうか
-			while (1) {
-				if ((transition[eventIndex].getTimeStart() <= playingTime) && (playingTime <= transition[eventIndex].getTimeEnd())) {//イベントの開始終了時間の範囲内
-					break;
-				}
-
-				eventIndex++;//次のイベントを見る
-				if (eventIndex == transition.size()) {//次が無かった  最後まで探索 最後のイベントを指定
-					eventIndex--;
-					break;
-				}
-				transition[eventIndex].determinValueFrom(transition[eventIndex - 1].getEndVal(), isReverse);
-
-				if (playingTime < transition[eventIndex].getTimeStart()) {//次のイベントの開始時間に達していない　イベントの無い区間にいる場合は直前のイベントを参照
-					eventIndex--;
-					break;
-				}
-
-			}
-		
+			calculateWhereToPlay();
+			decideWhichEventToProcess();
 		}
 		value = calculateVal(transition[eventIndex]);
 	}
 	return;
+}
+
+void Animation::calculateWhereToPlay() {
+	//どこを再生するべきか計算
+	
+	double duration = 0;
+	auto calculateDuration = [&] {
+		duration = getNowTime() - (playedTimeOfCaller + durationOffset);
+		duration *= playSpeed;
+	};
+
+	if (!isReverse) {
+		//playStartTimeからの相対時間
+		calculateDuration();
+		playingTime = playStartTime + duration;//playingTimeは必ずアニメーションの時間内を指す
+
+		while (playingTime > transition.back().getEndTime()) {//アニメーションの最後まで到達
+			if (isLoop) {//ループ再生時
+				durationOffset += transition.back().getEndTime();
+				calculateDuration();
+				eventIndex = 0;
+				transition[eventIndex].determinValueFrom(transition.back().getEndVal(), isReverse);
+				playingTime = playStartTime + duration;//playingTimeは必ずアニメーションの時間内を指す
+			}
+			else {//ワンショット時
+				stop();//停止
+
+				//アニメーションの最後を指すようにする
+				playingTime = transition.back().getEndTime();
+				break;
+			}
+		}
+	}
+	else {
+		//playStartTimeからの相対時間
+		calculateDuration();
+		playingTime = playStartTime - duration;//playingTimeは必ずアニメーションの時間内を指す
+
+		while (playingTime < 0) {//アニメーションの最初まで到達
+			if (isLoop) {//ループ再生時
+				durationOffset -= transition.back().getEndTime();
+				calculateDuration();
+				eventIndex = getLastIndex();
+				transition[eventIndex].determinValueFrom(transition.front().getStartVal(), isReverse);
+				playingTime = playStartTime - duration;//playingTimeは必ずアニメーションの時間内を指す
+			}
+			else {//ワンショット時
+				stop();//停止
+
+				//アニメーションの最初を指すようにする
+				playingTime = transition.front().getStartTime();
+				break;
+			}
+		}
+	}
+}
+
+void Animation::decideWhichEventToProcess()
+{
+	//処理するべきイベント番号を決める
+
+	if (!isReverse) {
+		//今のイベント番号が適切かどうか
+		while (1) {
+			if ((transition[eventIndex].getStartTime() <= playingTime) && (playingTime <= transition[eventIndex].getEndTime())) {//イベントの開始終了時間の範囲内
+				break;
+			}
+
+			eventIndex++;//次のイベントを見る
+			if (eventIndex == transition.size()) {//次が無かった  最後まで探索 最後のイベントを指定
+				eventIndex--;
+				break;
+			}
+			transition[eventIndex].determinValueFrom(transition[eventIndex - 1].getEndVal(), isReverse);
+
+			if (playingTime < transition[eventIndex].getStartTime()) {//次のイベントの開始時間に達していない　イベントの無い区間にいる場合は直前のイベントを参照
+				eventIndex--;
+				break;
+			}
+		}
+	}
+	else {
+		//今のイベント番号が適切かどうか
+		while (1) {
+			if ((transition[eventIndex].getStartTime() <= playingTime) && (playingTime <= transition[eventIndex].getEndTime())) {//イベントの開始終了時間の範囲内
+				break;
+			}
+
+			eventIndex--;//次のイベントを見る
+			if (eventIndex == -1) {//次が無かった  最後まで探索 最後のイベントを指定
+				eventIndex++;
+				break;
+			}
+			transition[eventIndex].determinValueFrom(transition[eventIndex + 1].getStartVal(), isReverse);
+
+			if (playingTime > transition[eventIndex].getEndTime()) {//次のイベントの開始時間に達していない　イベントの無い区間にいる場合は直前のイベントを参照
+				eventIndex++;
+				break;
+			}
+		}
+	}
 }
 
 int Animation::calculateVal(event event) {
@@ -327,7 +408,4 @@ double Animation::getNowTime()
 {
 	return *nowTime;
 }
-
-
-
 

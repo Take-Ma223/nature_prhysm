@@ -24,33 +24,104 @@ point::point(int val, Specify specify) {
 	point::specify = specify;
 }
 
-void point::determinValueFrom(int nowVal, BOOL isReverse)
-{
-	if (specify == Rel) {
-		if (isReverse) {
-			val = nowVal - different;
-		}
-		else {
-			val = nowVal + different;
-		}
-
-	}
-}
-
 int point::getVal()
 {
 	return val;
 }
 
+Specify point::getSpecify()
+{
+	return specify;
+}
+
 
 event::event(point start, point end, Converter converter, double timeStart, double  timeEnd) {
-	event::start = start;
-	event::end = end;
+	event::eventType = determinEventType(start, end);
 
 	event::converter = converter;
 
 	event::timeStart = timeStart;
 	event::timeEnd = timeEnd;
+}
+
+EventType event::determinEventType(point p1, point p2)
+{
+	Specify s1 = p1.getSpecify();
+	Specify s2 = p2.getSpecify();
+
+	if (s1 == Abs && s2 == Abs) { 
+		event::startValue = p1.getVal();
+		event::endValue = p2.getVal();
+		return EventType(AbsAbs); 
+	}
+	if (s1 == Abs && s2 == Rel) { 
+		event::startValue = p1.getVal();
+		event::endRelativeValue = p2.getVal();
+		return EventType(AbsRel); 
+	}
+	if (s1 == Rel && s2 == Abs) { 
+		event::startRelativeValue = p1.getVal();
+		event::endValue = p2.getVal();
+		return EventType(RelAbs); 
+	}
+	if (s1 == Rel && s2 == Rel) { 
+		event::startRelativeValue = p1.getVal();
+		event::endRelativeValue = p2.getVal();
+		return EventType(RelRel); 
+	}
+
+}
+
+void event::determinValueFrom(int nowVal, BOOL isReverse)
+{
+	if (!isReverse) {
+		switch (eventType)
+		{
+		case AbsAbs:
+			startValue = startValue;
+			endValue = endValue;
+			break;
+		case AbsRel:
+			startValue = startValue;
+			endValue = nowVal + endRelativeValue;
+			break;
+		case RelAbs:
+			startValue = nowVal + startRelativeValue;
+			endValue = endValue;
+			break;
+		case RelRel:
+			startValue = nowVal + startRelativeValue;
+			endValue = nowVal + endRelativeValue;
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		switch (eventType)
+		{
+		case AbsAbs:
+			startValue = startValue;
+			endValue = endValue;
+			break;
+		case AbsRel:
+			startValue = startValue;
+			endValue = nowVal;
+			break;
+		case RelAbs:
+			startValue = endValue;//逆再生不可能なので終了値から動かないようにする
+			endValue = endValue;
+			break;
+		case RelRel:
+			startValue = nowVal - endRelativeValue;
+			endValue = nowVal - startRelativeValue;
+			break;
+		default:
+			break;
+		}
+	}
+
+
 }
 
 double event::calculateTimeRatio(double now) {
@@ -123,15 +194,11 @@ void event::setTime(int start, int end) {
 	timeEnd = end;
 }
 
-void event::determinValueFrom(int nowVal, BOOL isReverse)
-{
-	start.determinValueFrom(nowVal, isReverse);
-	end.determinValueFrom(nowVal, isReverse);
-}
-
 //getter
-int event::getStartVal() { return start.getVal(); }
-int event::getEndVal() { return end.getVal(); }
+int event::getStartVal() { return startValue; }
+int event::getEndVal() { return endValue; }
+int event::getStartRelVal() { return startRelativeValue; }
+int event::getEndRelVal() { return endRelativeValue; }
 double event::getStartTime() { return timeStart; }
 double event::getEndTime() { return timeEnd; }
 
@@ -171,12 +238,12 @@ void Animation::eSet(point val, double startTime) {
 }
 void Animation::eON(double startTime) {
 	push(
-		event(0, 1, Converter(Teleportation, 1), startTime, startTime)
+		event(1, 1, Converter(Teleportation, 1), startTime, startTime)
 	);
 }
 void Animation::eOFF(double startTime) {
 	push(
-		event(1, 0, Converter(Teleportation, 1), startTime, startTime)
+		event(0, 0, Converter(Teleportation, 1), startTime, startTime)
 	);
 }
 
@@ -235,6 +302,7 @@ void Animation::resume()
 	if (!Animation::isPlay) {
 		playStartTime = playingTime;
 		playedTimeOfCaller = getNowTime();
+		durationOffset = 0;
 		Animation::isPlay = TRUE;
 	}
 }
@@ -249,6 +317,7 @@ void Animation::reverse()
 	}
 	playStartTime = playingTime;
 	playedTimeOfCaller = getNowTime();
+	durationOffset = 0;
 }
 
 void Animation::setReverse(BOOL isReverse)
@@ -256,6 +325,7 @@ void Animation::setReverse(BOOL isReverse)
 	Animation::isReverse = isReverse;
 	playStartTime = playingTime;
 	playedTimeOfCaller = getNowTime();
+	durationOffset = 0;
 }
 
 void Animation::setLoop(BOOL isLoop)
@@ -275,6 +345,7 @@ void Animation::setPlaySpeed(double playSpeed)
 	Animation::playSpeed = playSpeed;
 	playStartTime = playingTime;
 	playedTimeOfCaller = getNowTime();
+	durationOffset = 0;
 }
 
 
@@ -307,7 +378,7 @@ void Animation::calculateWhereToPlay() {
 
 		while (playingTime > transition.back().getEndTime()) {//アニメーションの最後まで到達
 			if (isLoop) {//ループ再生時
-				durationOffset += transition.back().getEndTime();
+				durationOffset += transition.back().getEndTime() / playSpeed;
 				calculateDuration();
 				eventIndex = 0;
 				transition[eventIndex].determinValueFrom(transition.back().getEndVal(), isReverse);
@@ -329,7 +400,7 @@ void Animation::calculateWhereToPlay() {
 
 		while (playingTime < 0) {//アニメーションの最初まで到達
 			if (isLoop) {//ループ再生時
-				durationOffset -= transition.back().getEndTime();
+				durationOffset += transition.back().getEndTime() / playSpeed;
 				calculateDuration();
 				eventIndex = getLastIndex();
 				transition[eventIndex].determinValueFrom(transition.front().getStartVal(), isReverse);
@@ -353,7 +424,11 @@ void Animation::decideWhichEventToProcess()
 	if (!isReverse) {
 		//今のイベント番号が適切かどうか
 		while (1) {
-			if ((transition[eventIndex].getStartTime() <= playingTime) && (playingTime <= transition[eventIndex].getEndTime())) {//イベントの開始終了時間の範囲内
+			if ((transition[eventIndex].getStartTime() <= playingTime) && (playingTime < transition[eventIndex].getEndTime()) 
+				&& ((transition[eventIndex].getStartTime()- transition[eventIndex].getEndTime()) != 0)) {//長さが0ではないイベントの開始終了時間の範囲内
+
+
+
 				break;
 			}
 
@@ -362,7 +437,7 @@ void Animation::decideWhichEventToProcess()
 				eventIndex--;
 				break;
 			}
-			transition[eventIndex].determinValueFrom(transition[eventIndex - 1].getEndVal(), isReverse);
+			transition[eventIndex].determinValueFrom(transition[eventIndex - 1].getEndVal(), isReverse);//このイベントを通るので遷移値を決める
 
 			if (playingTime < transition[eventIndex].getStartTime()) {//次のイベントの開始時間に達していない　イベントの無い区間にいる場合は直前のイベントを参照
 				eventIndex--;
@@ -373,7 +448,8 @@ void Animation::decideWhichEventToProcess()
 	else {
 		//今のイベント番号が適切かどうか
 		while (1) {
-			if ((transition[eventIndex].getStartTime() <= playingTime) && (playingTime <= transition[eventIndex].getEndTime())) {//イベントの開始終了時間の範囲内
+			if ((transition[eventIndex].getStartTime() < playingTime) && (playingTime <= transition[eventIndex].getEndTime())
+				&& ((transition[eventIndex].getStartTime() - transition[eventIndex].getEndTime()) != 0)) {//長さが0ではないイベントの開始終了時間の範囲内
 				break;
 			}
 
@@ -382,7 +458,7 @@ void Animation::decideWhichEventToProcess()
 				eventIndex++;
 				break;
 			}
-			transition[eventIndex].determinValueFrom(transition[eventIndex + 1].getStartVal(), isReverse);
+			transition[eventIndex].determinValueFrom(transition[eventIndex + 1].getStartVal(), isReverse);//このイベントを通るので遷移値を決める
 
 			if (playingTime > transition[eventIndex].getEndTime()) {//次のイベントの開始時間に達していない　イベントの無い区間にいる場合は直前のイベントを参照
 				eventIndex++;

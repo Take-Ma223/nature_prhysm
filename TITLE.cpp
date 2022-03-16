@@ -13,6 +13,7 @@
 #include<string>
 #include"IR_process.h"
 #include"KeyConfig.h"
+#include "Image.h"
 
 using namespace std;
 
@@ -87,6 +88,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	int KeyConfigMenuStat = KEY_CONFIG_MENU_SETTING;
 
+	ImageSet imageSet;//使う画像セット
 
 	wstring themeStr1(L"img/themes/");
 	wstring themeStr2(option->theme[option->op.theme]);
@@ -94,6 +96,46 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	H_CLOUD = LoadGraph(L"img/cloud.png");
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
+
+	Image buttonBB = Image(imageSet.getHandle(L"img/button_BB.png"), &GAME_passed_time, 600, 300, 255);
+	auto buttonAnimation = [&] {
+		buttonBB.clearAllEvent();
+		buttonBB.visible.eON();
+		buttonBB.X.eSet(600);
+		buttonBB.X.eChange(point(800, Abs), point(500,Rel), Converter(Linear), 5000, 0);
+		buttonBB.X.eSet(1200, 5000);
+
+
+
+		buttonBB.playAll();
+	};
+
+	auto buttonStop = [&] {
+		buttonBB.stopAll();
+	};
+
+	auto buttonResume = [&] {
+		buttonBB.resumeAll();
+	};
+
+	auto buttonReverse = [&] {
+		buttonBB.reverseAll();
+	};
+
+	auto buttonSpeed2 = [&] {
+
+		buttonBB.setPlaySpeedAll(2);
+	};
+
+	auto buttonSpeed05 = [&] {
+
+		buttonBB.setPlaySpeedAll(0.5);
+	};
+
+	auto buttonLoop = [&] {
+
+		buttonBB.setLoopAll(TRUE);
+	};
 
 	SH_START = LoadSoundMem(L"sound/nature_prhysm_jingle.wav");
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
@@ -136,6 +178,43 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
 
 		Get_Key_State(Buf, Key, AC);
+
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_1]==1) {
+				buttonAnimation();
+			}
+		}
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_2]) {
+				buttonStop();
+			}
+		}
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_3]) {
+				buttonResume();
+			}
+		}
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_4]==1) {
+				buttonReverse();
+			}
+		}
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_5]==1) {
+				buttonSpeed05();
+			}
+		}
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_6] == 1) {
+				buttonSpeed2();
+			}
+		}
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_7] == 1) {
+				buttonLoop();
+			}
+		}
+
 
 		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[Button[0][0]] || Key[Button[0][1]] || Key[Button[0][2]] || Key[Button[0][3]] ||
@@ -543,7 +622,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			}
 		}
 
-
+		buttonBB.draw();
 
 		SetDrawBright(brightness, brightness, brightness);
 		if (config.Vsync == 0) {

@@ -38,21 +38,32 @@ class point {
 public:
 	point(int val = 0, Specify specify = Abs);
 
-	void determinValueFrom(int nowVal, BOOL isReverse = FALSE);//現在の値に相対値を加える、イベント実行時に実行
 	int getVal();
+	Specify getSpecify();
+};
+
+enum EventType {
+	AbsAbs,
+	AbsRel,
+	RelAbs,
+	RelRel
 };
 
 class event {//値の変化情報を保持するクラス
+	int startValue = 0;
+	int endValue = 0;
 
+	int startRelativeValue = 0;
+	int endRelativeValue = 0;
 
-	point start;//相対指定のときは、このイベント実行時にstartValの値にその時の自身の値が加算される
-	point end;  //相対指定のときは、このイベント実行時にendValの値にその時の自身の値が加算される
+	EventType eventType;
 
 	Converter converter;
 
 	double timeStart = 0;
 	double timeEnd = 0;
 
+	EventType determinEventType(point, point);
 public:
 	event(point start = point(), point end = point(), Converter converter = Converter(Linear, 0), double timeStart = 0, double  timeEnd = 0);
 
@@ -61,27 +72,20 @@ public:
 
 	void setTime(int start, int end);
 
-	void determinValueFrom(int nowVal, BOOL isReverse = FALSE);//現在の値に相対値を加える、イベント実行時に実行
+	void determinValueFrom(int nowVal, BOOL isReverse = FALSE);//現在の値から実際に遷移する値の初期値、終了値を決める、イベント実行時に実行
 
 	//getter
 	int getStartVal();
 	int getEndVal();
+
+	int getStartRelVal();
+	int getEndRelVal();
 
 	double getStartTime();
 	double getEndTime();
 
 
 };
-
-class eventAbsAbs :public event {
-
-
-
-
-
-};
-
-
 
 
 class Animation

@@ -92,14 +92,3 @@ void Image::draw() {
 		DrawGraph(X.getValue(), Y.getValue(), handle, TRUE);
 	}
 }
-
-
-int Image::absRel(Specify specify, int now, int target) {//値の絶対指定、相対指定判別関数
-	if (specify == Specify::Abs) {
-		return target;
-	}
-	else if (specify == Specify::Rel) {
-		return now + target;
-	}
-}
-

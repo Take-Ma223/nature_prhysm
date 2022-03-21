@@ -13,7 +13,7 @@ private:
 	HANDLE hComm;
 	std::future<int> f1;
 
-
+	int easing(int input);//3~253‚ð0~1000‚É•ÏŠ·()
 public:
 	GetValueFromController(HANDLE rcvHComm);
 	int getValFromController(int);
@@ -23,7 +23,7 @@ public:
 
 	void finish();
 
-	int getVal();
+	int getVal(int *reault);
 
 
 };

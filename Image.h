@@ -8,8 +8,6 @@
 
 class Image{
 	int handle = 0;//読み込んだ画像ハンドル
-	int absRel(Specify specify, int now, int target);//絶対相対判別して値を格納
-
 	double* nowTime;//現在のゲーム時間へのポインタ
 
 public:

@@ -102,12 +102,17 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		buttonBB.clearAllEvent();
 		buttonBB.visible.eON();
 		buttonBB.X.eSet(600);
-		buttonBB.X.eChange(point(800, Abs), point(500,Rel), Converter(Linear), 5000, 0);
+		buttonBB.X.eChange(point(600, Abs), point(1200,Abs), Converter(Linear), 0, 5000);
 		buttonBB.X.eSet(1200, 5000);
 
 
 
+		//buttonBB.playAll();
+	};
+
+	auto buttonPlay = [&] {
 		buttonBB.playAll();
+		buttonBB.X.setStartTimeFromRange(0.5);
 	};
 
 	auto buttonStop = [&] {
@@ -178,6 +183,12 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
 
 		Get_Key_State(Buf, Key, AC);
+
+		if (stat == STATE_PRESS_ANY_KEY) {
+			if (Key[KEY_INPUT_0] == 1) {
+				buttonPlay();
+			}
+		}
 
 		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[KEY_INPUT_1]==1) {

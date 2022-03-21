@@ -45,14 +45,35 @@ void GetValueFromController::finish() {
 	finishFlag = TRUE;
 }
 
-int GetValueFromController::getVal() {
-	int result = f1.get();
+//値の更新があったとき1を返す
+int GetValueFromController::getVal(int *result) {
+	int val = f1.get();
 
-	if (result != -1) {
-		val = result;
+	if (val != -1) {//受信成功
+		if (*result == easing(val)) {//値の更新無し
+			return 0;
+		}
+		else {
+			*result = easing(val);//値の更新
+			return 1;
+		}
 	}
 
-	return val;
+	return 0;//受信失敗(タイムアウト)
 }
 
 
+int GetValueFromController::easing(int input)
+{
+	if (input < 3) {
+		return 0;
+	}
+	else if (input >= 253) {
+		return 1000;
+	}
+	else {
+		int output = 4 * (input - 3);
+		return output;
+	}
+
+}

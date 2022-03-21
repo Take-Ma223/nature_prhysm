@@ -221,14 +221,26 @@ void Animation::setValue(int input)
 
 //イベント挿入
 
-void Animation::eChange(point start, point end, Converter converter, double durationTime, double startTime) {
+void Animation::eChange(point start, point end, Converter converter, double startTime, double endTimeInput) {
+	double endTime = endTimeInput;
+
+	if (endTime < startTime) {
+		endTime = startTime;
+	}
+	
 	push(
-		event(start, end, converter, startTime, startTime + durationTime)
+		event(start, end, converter, startTime, endTime)
 	);
 }
-void Animation::eChangeTo(point end, Converter converter, double durationTime, double startTime) {
+void Animation::eChangeTo(point end, Converter converter, double startTime, double endTimeInput) {
+	double endTime = endTimeInput;
+
+	if (endTime < startTime) {
+		endTime = startTime;
+	}
+
 	push(
-		event(point(0, Rel), end, converter, startTime, startTime + durationTime)
+		event(point(0, Rel), end, converter, startTime, endTime)
 	);
 }
 void Animation::eSet(point val, double startTime) {
@@ -252,8 +264,7 @@ void Animation::clearEvent() {
 	std::vector<event> empty;
 	std::swap(transition, empty);
 	//transition.clear();
-	playStartTime = 0;
-	isLoop = FALSE;
+	//playStartTime = 0;
 }
 
 void Animation::push(event input)
@@ -275,16 +286,16 @@ void Animation::play()
 			playStartTime = 0;
 			playedTimeOfCaller = getNowTime();
 			Animation::isPlay = TRUE;
-			eventIndex = 0;
 			durationOffset = 0;
+			eventIndex = 0;
 			transition[eventIndex].determinValueFrom(value, isReverse);
 		}
 		else {
 			playStartTime = transition.back().getEndTime();
 			playedTimeOfCaller = getNowTime();
 			Animation::isPlay = TRUE;
-			eventIndex = getLastIndex();
 			durationOffset = 0;
+			eventIndex = getLastIndex();
 			transition[eventIndex].determinValueFrom(value, isReverse);
 		}
 	}
@@ -311,9 +322,17 @@ void Animation::reverse()
 {
 	if (Animation::isReverse) {
 		Animation::isReverse = FALSE;
+		if (!transition.empty()) {
+			eventIndex = 0;
+			transition[eventIndex].determinValueFrom(value, isReverse);
+		}
 	}
 	else {
 		Animation::isReverse = TRUE;
+		if (!transition.empty()) {
+			eventIndex = getLastIndex();
+			transition[eventIndex].determinValueFrom(value, isReverse);
+		}
 	}
 	playStartTime = playingTime;
 	playedTimeOfCaller = getNowTime();
@@ -323,6 +342,20 @@ void Animation::reverse()
 void Animation::setReverse(BOOL isReverse)
 {
 	Animation::isReverse = isReverse;
+
+	if (!Animation::isReverse) {
+		if (!transition.empty()) {
+			eventIndex = 0;
+			transition[eventIndex].determinValueFrom(value, isReverse);
+		}
+	}
+	else {
+		if (!transition.empty()) {
+			eventIndex = getLastIndex();
+			transition[eventIndex].determinValueFrom(value, isReverse);
+		}
+	}
+
 	playStartTime = playingTime;
 	playedTimeOfCaller = getNowTime();
 	durationOffset = 0;
@@ -348,6 +381,22 @@ void Animation::setPlaySpeed(double playSpeed)
 	durationOffset = 0;
 }
 
+void Animation::setStartTimeFromTime(int startTime)
+{
+	Animation::playStartTime = startTime;
+	playingTime = playStartTime;
+	playedTimeOfCaller = getNowTime();
+	durationOffset = 0;
+}
+
+void Animation::setStartTimeFromRange(double startTimeRange)
+{
+	Animation::playStartTime = startTimeRange * transition.back().getEndTime();
+	playingTime = playStartTime;
+	playedTimeOfCaller = getNowTime();
+	durationOffset = 0;
+}
+
 
 //アニメーション処理
 void Animation::update()
@@ -356,8 +405,8 @@ void Animation::update()
 		if (isPlay) {
 			calculateWhereToPlay();
 			decideWhichEventToProcess();
+			value = calculateVal(transition[eventIndex]);
 		}
-		value = calculateVal(transition[eventIndex]);
 	}
 	return;
 }
@@ -385,7 +434,7 @@ void Animation::calculateWhereToPlay() {
 				playingTime = playStartTime + duration;//playingTimeは必ずアニメーションの時間内を指す
 			}
 			else {//ワンショット時
-				stop();//停止
+				//stop();//停止
 
 				//アニメーションの最後を指すようにする
 				playingTime = transition.back().getEndTime();
@@ -407,7 +456,7 @@ void Animation::calculateWhereToPlay() {
 				playingTime = playStartTime - duration;//playingTimeは必ずアニメーションの時間内を指す
 			}
 			else {//ワンショット時
-				stop();//停止
+				//stop();//停止
 
 				//アニメーションの最初を指すようにする
 				playingTime = transition.front().getStartTime();

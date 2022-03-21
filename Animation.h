@@ -122,12 +122,12 @@ class Animation
 public:
 	Animation(double* time = NULL);
 	int getValue();
-	void setValue(int);//初期化以外では使わない
+	void setValue(int);//初期化時と、他の変数によって値を決めるときに使う
 	void update();
 
 
-	void eChange(point start, point end, Converter converter = Converter(Teleportation, 4), double durationTime = 0, double startTime = 0);
-	void eChangeTo(point end, Converter converter = Converter(Teleportation, 4), double durationTime = 0, double startTime = 0);
+	void eChange(point start, point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
+	void eChangeTo(point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
 	void eSet(point Abs, double startTime = 0);
 	void eON(double startTime = 0);
 	void eOFF(double startTime = 0);
@@ -142,6 +142,9 @@ public:
 	void setReverse(BOOL);    //どちら向きで再生するか指定
 	void setLoop(BOOL);       //ループ再生するかどうか設定
 	void setPlaySpeed(double);//再生倍率を設定
+
+	void setStartTimeFromTime(int);//再生位置を設定(時間指定)
+	void setStartTimeFromRange(double);//再生位置を設定(割合指定)
 
 };
 

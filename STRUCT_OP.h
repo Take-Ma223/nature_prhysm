@@ -19,21 +19,22 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	int targetScore2 = 0;//TARGET SCORE2
 	int fastSlow = 1;//FAST/SLOW
 	int noteOffset = 6;//音符オフセット調整
+	int windbreak = 0;//レーンカバー初期位置
 }OP;
 
 typedef struct OPTION {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 16;//オプションの数
+	static const int OPTION_NUM = 17;//オプションの数
 
-	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"NOTE",L"HIT SOUND",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"SORT"};
+	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"WINDBREAK",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"NOTE",L"HIT SOUND",L"SORT"};
 
 	static const int SPEED_NUM = 78;//ハイスピの数
 	static const int GAUGE_NUM = 6;//ゲージ種類の数
 	static const int LANE_NUM = 4;//レーンオプションの数
 	static const int COLOR_NUM = 8;//色オプションの数
-	int NOTE_NUM = 0;//ノートスキンオプションの数
-	int HITSOUND_NUM = 0;//ヒット音オプションの数
+	static const int WINDBREAK_NUM = 11;//カバー位置オプションの数
+
 	static const int FAST_SLOW_NUM = 3;//FAST/SLOWオプションの数
 	static const int BARLINE_NUM = 2;//小節線オプションの数
 	static const int DARKNESS_NUM = 5;//黒背景オプションの数
@@ -43,6 +44,8 @@ typedef struct OPTION {//オプション構造体(全体)
 	static const int SCORE_GRAPH_NUM = 2;//スコアグラフオプションの数
 	static const int TARGET_SCORE1_NUM = 8;//スコアグラフターゲットオプションの数
 	static const int TARGET_SCORE2_NUM = 6;//スコアグラフターゲットオプションの数
+	int NOTE_NUM = 0;//ノートスキンオプションの数
+	int HITSOUND_NUM = 0;//ヒット音オプションの数
 	static const int SORT_NUM = 25;//曲ソート種類の数
 	int THEME_NUM = 0;//テーマオプションの数
 
@@ -50,18 +53,21 @@ typedef struct OPTION {//オプション構造体(全体)
 	const int OP_GAUGE = 1;
 	const int OP_LANE = 2;
 	const int OP_COLOR = 3;
-	const int OP_NOTE = 4;
-	const int OP_HITSOUND = 5;
-	const int OP_FAST_SLOW = 6;
-	const int OP_BARLINE = 7;
-	const int OP_DARKNESS = 8;
-	const int OP_GRADATION = 9;
-	const int OP_NOTE_OFFSET = 10;
-	const int OP_SCORETARGET = 11;
-	const int OP_TARGETSCORE1 = 12;
-	const int OP_TARGETSCORE2 = 13;
-	const int OP_THEME = 14;
-	const int OP_SORT = 15;
+	const int OP_WINDBREAK = 4;
+	const int OP_FAST_SLOW = 5;
+	const int OP_BARLINE = 6;
+	const int OP_DARKNESS = 7;
+	const int OP_GRADATION = 8;
+	const int OP_NOTE_OFFSET = 9;
+	const int OP_SCORETARGET = 10;
+	const int OP_TARGETSCORE1 = 11;
+	const int OP_TARGETSCORE2 = 12;
+	const int OP_THEME = 13;
+	const int OP_NOTE = 14;
+	const int OP_HITSOUND = 15;
+	const int OP_SORT = 16;
+
+
 
 	const int OP_GAUGE_NORMAL = 0;
 	const int OP_GAUGE_HARD = 1;
@@ -85,6 +91,19 @@ typedef struct OPTION {//オプション構造体(全体)
 	const int OP_COLOR_CMY_ONLY = 5;
 	const int OP_COLOR_W_ONLY = 6;
 	const int OP_COLOR_RAINBOW = 7;
+
+	const int OP_WINDBREAK_0 = 0;
+	const int OP_WINDBREAK_10 = 1;
+	const int OP_WINDBREAK_20 = 2;
+	const int OP_WINDBREAK_30 = 3;
+	const int OP_WINDBREAK_40 = 4;
+	const int OP_WINDBREAK_50 = 5;
+	const int OP_WINDBREAK_60 = 6;
+	const int OP_WINDBREAK_70 = 7;
+	const int OP_WINDBREAK_80 = 8;
+	const int OP_WINDBREAK_90 = 9;
+	const int OP_WINDBREAK_100 = 10;
+
 
 	const int OP_FAST_SLOW_OFF = 0;
 	const int OP_FAST_SLOW_ON_FAST_CYAN = 1;
@@ -310,6 +329,22 @@ typedef struct OPTION {//オプション構造体(全体)
 	wchar_t* gauge[GAUGE_NUM + 1] = { L"NORMAL",L"HARD",L"SUPER HARD",L"FC ATTACK",L"PFC ATTACK",L"NO FAIL", L"SKILL TEST"};
 	wchar_t* lane[LANE_NUM] = { L"NONE",L"MIRROR",L"RANDOM",L"SUPER RAND" };
 	wchar_t* color[COLOR_NUM] = { L"NONE",L"RGB CHANGE",L"RGB RAND",L"SUPER RAND",L"RGB ONLY",L"CMY ONLY",L"W ONLY",L"RAINBOW" };
+	wchar_t* windbreak[WINDBREAK_NUM] = { L"OFF",L"10%",L"20%",L"30%",L"40%",L"50%",L"60%",L"70%",L"80%",L"90%",L"100%" };
+
+	int windbreakVal[WINDBREAK_NUM] = {
+		0,
+		100,
+		200,
+		300,
+		400,
+		500,
+		600,
+		700,
+		800,
+		900,
+		1000
+	};
+
 	wchar_t** note = 0;//名前はフォルダ名から取る パスの役割も果たす
 	wchar_t** hitSound = 0;//名前はフォルダ名から取る パスの役割も果たす
 	wchar_t* fastSlow[FAST_SLOW_NUM] = { L"OFF",L"ON:C/R",L"ON:R/C" };
@@ -460,6 +495,19 @@ typedef struct OPTION {//オプション構造体(全体)
 		,L"音符の色が白のみになります(スコアは保存されません)"
 		,L"音符の色が虹色のみになります(スコアは別に保存されます)" };//説明文
 
+	wchar_t* sent_windbreak[WINDBREAK_NUM] = {
+		L"レーンカバーを下げずに演奏開始します"
+		,L"レーンカバーを10%下げて演奏開始します"
+		,L"レーンカバーを20%下げて演奏開始します"
+		,L"レーンカバーを30%下げて演奏開始します"
+		,L"レーンカバーを40%下げて演奏開始します"
+		,L"レーンカバーを50%下げて演奏開始します"
+		,L"レーンカバーを60%下げて演奏開始します"
+		,L"レーンカバーを70%下げて演奏開始します"
+		,L"レーンカバーを80%下げて演奏開始します"
+		,L"レーンカバーを90%下げて演奏開始します"
+		,L"レーンカバーを100%下げて演奏開始します"};//説明文
+
 	wchar_t *sent_note = L"音符を変更します";
 
 	wchar_t *sent_hitSound = L"音符を叩いた時の音を変更します";
@@ -564,8 +612,7 @@ typedef struct OPTION {//オプション構造体(全体)
 		&GAUGE_NUM,
 		&LANE_NUM,
 		&COLOR_NUM,
-		&NOTE_NUM,
-		&HITSOUND_NUM,
+		&WINDBREAK_NUM,
 		&FAST_SLOW_NUM,
 		&BARLINE_NUM,
 		&DARKNESS_NUM,
@@ -575,6 +622,8 @@ typedef struct OPTION {//オプション構造体(全体)
 		&TARGET_SCORE1_NUM,
 		&TARGET_SCORE2_NUM,
 		&THEME_NUM,
+		&NOTE_NUM,
+		&HITSOUND_NUM,
 		&SORT_NUM };//各オプションの数
 
 	wchar_t** ArrayOptionSent[OPTION_NUM] = {
@@ -582,8 +631,7 @@ typedef struct OPTION {//オプション構造体(全体)
 		sent_gauge,
 		sent_lane,
 		sent_color,
-		&sent_note,
-		&sent_hitSound,
+		sent_windbreak,
 		sent_fastSlow,
 		sent_barline,
 		sent_darkness,
@@ -593,6 +641,8 @@ typedef struct OPTION {//オプション構造体(全体)
 		sent_targetScore1,
 		sent_targetScore2,
 		&sent_theme,
+		&sent_note,
+		&sent_hitSound,
 		sent_sort };//説明文
 
 	wchar_t** ArrayOptionKindName[OPTION_NUM] = { 
@@ -600,8 +650,7 @@ typedef struct OPTION {//オプション構造体(全体)
 		gauge,
 		lane,
 		color,
-		note,
-		hitSound,
+		windbreak,
 		fastSlow,
 		barline,
 		darkness,
@@ -611,6 +660,8 @@ typedef struct OPTION {//オプション構造体(全体)
 		targetScore1,
 		targetScore2,
 		theme,
+		note,
+		hitSound,
 		sort };//オプション名称
 
 	int* ArrayValue[OPTION_NUM] = {
@@ -618,8 +669,7 @@ typedef struct OPTION {//オプション構造体(全体)
 		&(op.gauge),
 		&(op.lane),
 		&(op.color),
-		&(op.note),
-		&(op.hitSound),
+		&(op.windbreak),
 		&(op.fastSlow),
 		&(op.barline),
 		&(op.darkness),
@@ -629,6 +679,8 @@ typedef struct OPTION {//オプション構造体(全体)
 		&(op.targetScore1),
 		&(op.targetScore2),
 		&(op.theme),
+		&(op.note),
+		&(op.hitSound),
 		&(op.sort) };//選んでいるオプションの値
 
 

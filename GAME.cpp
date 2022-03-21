@@ -31,6 +31,7 @@
 #include "IR_process.h"
 #include "Image.h"
 #include "GetValueFromController.h"
+#include "CoverView.h"
 
 using namespace std;
 
@@ -69,6 +70,8 @@ void GAME(int song_number, int difficulty,
 	double GAME_start_time;
 	double GAME_passed_time;//単位はms 判定と音用の経過時間
 	double GAME_passed_time_for_draw;//譜面描画用の経過時間(ディスプレイ遅延補正用)
+	double GAME_passed_time_for_UI;//単位はms UI用の経過時間
+
 	double LOOP_passed_time = 1;//1ループにかかった時間(ms)
 	double CounterRemainTime = 0;////カウンターの値を1msずつ変動するための時間　1msずつ引かれて小数以下は蓄積する
 	double time_cash = 0;//LOOP_passed_timeを算出するための記憶変数
@@ -94,6 +97,7 @@ void GAME(int song_number, int difficulty,
 	int H_COVER = 0;//カバー画像
 	int H_COVER_FLASH;//カバーフラッシュ画像
 	int H_COVER_MIDDLE;//中心カバー
+
 	int H_GAUGE_BOX;//ゲージの下に表示
 	int H_GAUGE_BAR = 0;//ゲージ画像
 	int H_FAILED;//
@@ -273,7 +277,7 @@ void GAME(int song_number, int difficulty,
 	int jingleflag = 0;//ジングルを鳴らすフラグ
 	int openflag = 0;//中心カバーが開くときの音を鳴らすフラグ
 	int cleared_time = 0;//クリアした時間を記録
-	int start_c_draw_counter = 0;//スタート時の中心カバー描画フラグ
+	int isStartCoverMoveUpComplete = 0;//スタート時の中心カバー描画フラグ
 	double debug_time_passed = 0;//戻ったり進んだりする時間
 	int debug_stop = 0;//譜面再生停止
 	int debug_warp = 0;//再生位置移動したかどうか(0:していない 1:している)
@@ -588,6 +592,14 @@ void GAME(int song_number, int difficulty,
 
 
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+
+	CoverView coverView = CoverView(//中央カバー
+		0, 
+		imageSet.getHandle((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str()), 
+		0, &GAME_passed_time_for_UI);
+	
+	
+	
 	H_FAILED = LoadGraph(L"img/failed.png");
 	H_CLEARED = LoadGraph(L"img/cleared.png");
 
@@ -655,16 +667,16 @@ void GAME(int song_number, int difficulty,
 	}
 
 	Image I_Fast[4] = {
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time, lane[0],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time, lane[1],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time, lane[2],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time, lane[3],judge_area + fastSlowY, 0)
+	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area + fastSlowY, 0)
 	};
 	Image I_Slow[4] = {
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time, lane[0],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time, lane[1],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time, lane[2],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time, lane[3],judge_area+ fastSlowY, 0)
+	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
+	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area+ fastSlowY, 0)
 	};
 
 
@@ -676,7 +688,7 @@ void GAME(int song_number, int difficulty,
 				I_Fast[i].visible.eON();
 				I_Fast[i].alpha.eSet(255);
 
-				I_Fast[i].alpha.eChange(255, 0, Converter(Linear), 100, 200);
+				I_Fast[i].alpha.eChange(255, 0, Converter(Linear), 100, 300);
 				I_Fast[i].visible.eOFF(300);
 
 				I_Slow[i].clearAllEvent();
@@ -691,7 +703,7 @@ void GAME(int song_number, int difficulty,
 				I_Slow[i].visible.eON();
 				I_Slow[i].alpha.eSet(255);
 
-				I_Slow[i].alpha.eChange(255, 0, Converter(Linear), 100, 200);
+				I_Slow[i].alpha.eChange(255, 0, Converter(Linear), 100, 300);
 				I_Slow[i].visible.eOFF(300);
 
 				I_Fast[i].clearAllEvent();
@@ -913,6 +925,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//Calc
+		GAME_passed_time_for_UI = GetNowCount_d(config) - GAME_start_time;
 		GAME_passed_time = GetNowCount_d(config) - GAME_start_time;//中心カバーが上がった時からの経過時間計算
 		LOOP_passed_time = GAME_passed_time - time_cash;//1ループにかかった時間を算出
 		time_cash = GAME_passed_time;
@@ -922,10 +935,6 @@ void GAME(int song_number, int difficulty,
 		int CRTBuf = int(CounterRemainTime);
 
 		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
-
-		//コントローラから値を取得
-		ControllerVolume.start();
-		controllerVolume = ControllerVolume.getVal();
 
 		Get_Key_State(Buf, Key, AC);
 		if (Key[KEY_INPUT_ESCAPE] == 1 && *escape == 0 && AllowExit == 1) {
@@ -1302,6 +1311,17 @@ void GAME(int song_number, int difficulty,
 	//演奏開始
 	time_cash = 0;//最初のLOOP_passed_timeが負の値に(-5000とか)にならないように初期化
 	GAME_start_time = GetNowCount_d(config);//譜面開始時のカウント
+	GAME_passed_time_for_UI = GetNowCount_d(config) - GAME_start_time;
+
+	if (ClearFlag == 0) {
+		coverView.setFirstOpenRange(option->windbreakVal[option->op.windbreak]);
+		coverView.startMiddleCover();//カバーを事前設定した高さまで上げる
+	}
+	else if(ClearFlag==2){
+		coverView.setFirstOpenRange(1000);
+		coverView.finishMiddleCover();//カバーを下げる
+
+	}
 	while (1) {
 
 		//ProcessMessage();
@@ -1317,9 +1337,6 @@ void GAME(int song_number, int difficulty,
 
 		//----Button----
 
-		//コントローラから値を取得
-		ControllerVolume.start();
-		controllerVolume = ControllerVolume.getVal();
 		//printfDx(L"%f", (double)controllerVolume / 255);
 
 		Get_Key_State(Buf, Key, AC);
@@ -1330,6 +1347,12 @@ void GAME(int song_number, int difficulty,
 			//c_m_draw_counter = 0;
 			PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 			cleared_time = int(GAME_passed_time);
+			if (isStartCoverMoveUpComplete) {
+				coverView.finishMiddleCover();//開き切っている時は今の位置から閉じる
+			}
+			else {
+				coverView.middleCover.setReverseAll(TRUE);//今開いている動作を逆転して閉じる
+			}
 		}
 		if (Key[Button_Shutter] == 1) {//スクリーンショット
 			ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
@@ -1338,6 +1361,7 @@ void GAME(int song_number, int difficulty,
 		//printfDx("%d %d\n",Key[KEY_INPUT_F],Key[KEY_INPUT_G]);
 
 		//----CALC----
+		GAME_passed_time_for_UI = GetNowCount_d(config) - GAME_start_time;
 		GAME_passed_time = (((double)GetNowCount_d(config) - (double)GAME_start_time) + ((double)debug_time_passed - (double)debug_stop_time));//経過時間計算
 		GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
 		LOOP_passed_time = ((double)GetNowCount_d(config) - GAME_start_time) - time_cash;//1ループにかかった時間を算出
@@ -1355,6 +1379,26 @@ void GAME(int song_number, int difficulty,
 
 		int PressFrame = int(25.0*(17.0 / LOOP_passed_time));//ボタン押し続けてカーソルが動き続けるようになるまでのフレーム
 		if (PressFrame <= 0)PressFrame = 1;//0以下にはしない
+
+		//コントローラから値を取得
+		if (isStartCoverMoveUpComplete == 1 && ClearFlag == 0) {//スタート時の中心カバー上げが完了している
+			ControllerVolume.start();
+			if (ControllerVolume.getVal(&controllerVolume)) {
+				coverView.setOpenRange(controllerVolume);
+			}
+			else {//コントローラから入力が無い時キーボードでのカバー操作許可
+				if (Key[KEY_INPUT_LSHIFT] == 1 || Key[KEY_INPUT_RSHIFT] == 1) {
+					coverView.openMiddleCover();
+				}
+				if (Key[KEY_INPUT_LCONTROL] == 1 || Key[KEY_INPUT_RCONTROL] == 1) {
+					coverView.closeMiddleCover();
+				}
+				if (Key[KEY_INPUT_LSHIFT] == 0 && Key[KEY_INPUT_RSHIFT] == 0 && Key[KEY_INPUT_LCONTROL] == 0 && Key[KEY_INPUT_RCONTROL] == 0) {
+					coverView.stopMiddleCover();
+				}
+			}
+
+		}
 
 		if (*debug == 1) {//デバッグモードONなら
 			for (i = 0; i < CRTBuf; i++) {
@@ -2497,6 +2541,8 @@ void GAME(int song_number, int difficulty,
 			PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 			cleared_time = int(GAME_passed_time);
 			StopSoundMem(SH_SONG);//曲再生停止
+
+			coverView.finishMiddleCover();//カバーを下げる
 		}
 		if (GAME_passed_time >= Music[song_number].TimeToEnd[difficulty] && ClearFlag == 0
 			&& note[0][j_n_n[0]].color == 0
@@ -2507,6 +2553,8 @@ void GAME(int song_number, int difficulty,
 			c_m_draw_counter = 1;
 			PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 			cleared_time = int(GAME_passed_time);
+
+			coverView.finishMiddleCover();//カバーを下げる
 		}
 
 		
@@ -3175,7 +3223,7 @@ void GAME(int song_number, int difficulty,
 			DrawGraph(0, 0, H_GAME_STR_SCORE_GRAPH, TRUE);
 		}
 
-		//数値表意
+		//数値表示
 		DrawNumber(1094, 536, SKY_PERFECT, 25, 1, 0, H_SMALL_NUMBER_CYAN);
 		DrawNumber(1094, 576, PERFECT, 25, 1, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1094, 616, GOOD, 25, 1, 0, H_SMALL_NUMBER_RED);
@@ -3184,12 +3232,35 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
-		DrawNumber(1216, 656, int(cbpm* option->op.speedVal + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
+
+
+		//HSを考慮したSPEEDを算出
+		float bpmRealBuf = 0;
+		for (i = 0; i < 4; i++) {
+			if (j_n_n[i] == MusicSub.objOfLane[difficulty][i]) {
+				bpmRealBuf += note[i][j_n_n[i] - 1].bpm_real;
+				//bpmRealBuf += cbpm;
+			}
+			else {
+				bpmRealBuf += note[i][j_n_n[i]].bpm_real;
+			}
+
+		}
+		bpmRealBuf /= 4;
+		//cbpm
+
+		int bpmBuf = int(bpmRealBuf * option->op.speedVal * coverView.getSpeedRatio() + 0.5);
+		if (bpmBuf >= 10000) {
+			bpmBuf = 9999;
+		}
+
+		DrawNumber(1216, 656, bpmBuf, 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
 
 
-		if (start_c_draw_counter == 0 && ClearFlag == 0) {//スタート時の中心カバー上げ
-			DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);//中心カバー
+		if (isStartCoverMoveUpComplete == 0 && ClearFlag == 0) {//スタート時の中心カバー上げ
+			//DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);//中心カバー
+			coverView.drawMiddleCover();
 			if (gauge_draw_counter >= gauge - 0.001) {//曲名の透過度
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - sin((3.14 / 2) * c_m_draw_counter)) * 255));
 			}
@@ -3203,17 +3274,20 @@ void GAME(int song_number, int difficulty,
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 			for (i = 0; i < CRTBuf; i++) {
-				if ((c_m_draw_counter <= 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
+				if ((c_m_draw_counter < 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
 					c_m_draw_counter += 0.0012;
 				}
-				if ((c_m_draw_counter > 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
+				if ((c_m_draw_counter > 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {//カバーが上がり切った
 					c_m_draw_counter = 1;
-					start_c_draw_counter = 1;
+					isStartCoverMoveUpComplete = 1;
+
+					coverView.startWindbreak();
 				}
 			}
 		}
 		else if (ClearFlag != 0) {//演奏終了していたら中心カバーの表示
-			DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+			//DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+			coverView.drawMiddleCover();
 			for (i = 0; i < CRTBuf; i++) {
 				if (c_m_draw_counter > 0) {
 					c_m_draw_counter -= 0.0012;
@@ -3227,7 +3301,8 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 		else {//演奏中のカバー位置
-			DrawGraph(320, int(pow(((double)controllerVolume/255), 2) * 720 - 720), H_COVER_MIDDLE, TRUE);
+			//DrawGraph(320, int(pow(((double)controllerVolume/255), 2) * 720 - 720), H_COVER_MIDDLE, TRUE);
+			coverView.drawMiddleCover();
 		}
 
 

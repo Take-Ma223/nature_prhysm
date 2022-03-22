@@ -97,6 +97,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
 
+	/*
 	Image buttonBB = Image(imageSet.getHandle(L"img/button_BB.png"), &GAME_passed_time, 600, 300, 255);
 	auto buttonAnimation = [&] {
 		buttonBB.clearAllEvent();
@@ -141,6 +142,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		buttonBB.setLoopAll(TRUE);
 	};
+	*/
 
 	SH_START = LoadSoundMem(L"sound/nature_prhysm_jingle.wav");
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
@@ -184,6 +186,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		Get_Key_State(Buf, Key, AC);
 
+		/*
 		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[KEY_INPUT_0] == 1) {
 				buttonPlay();
@@ -225,7 +228,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 				buttonLoop();
 			}
 		}
-
+		*/
 
 		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[Button[0][0]] || Key[Button[0][1]] || Key[Button[0][2]] || Key[Button[0][3]] ||
@@ -633,7 +636,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			}
 		}
 
-		buttonBB.draw();
+		//buttonBB.draw();
 
 		SetDrawBright(brightness, brightness, brightness);
 		if (config.Vsync == 0) {

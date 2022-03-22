@@ -411,10 +411,14 @@ void GAME(int song_number, int difficulty,
 	}
 
 	SongSub MusicSub;
+	SpeedBuffer speedBuffer = SpeedBuffer(note, j_n_n);
 
 	GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
 	Music[song_number].hash[difficulty] = hash;
 	res->hash = hash;//ハッシュ値を格納
+
+	speedBuffer.updateAverage();
+
 
 	if (playing_time > GAUGE_INC_BASE_TIME) {//120秒以上の譜面なら
 		gauge_inc_times = (double)playing_time / (double)GAUGE_INC_BASE_TIME;
@@ -836,6 +840,8 @@ void GAME(int song_number, int difficulty,
 		StopSoundMem(SH_SONG);
 		GAME_passed_time = (GetNowCount_d(config) - GAME_start_time) + (debug_time_passed - debug_stop_time);
 		GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+
+		speedBuffer.updateAverage();
 	};
 
 	//ボタン音再生
@@ -1211,7 +1217,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 
-		//数値表意
+		//数値表示
 		DrawNumber(1094, 536, SKY_PERFECT, 25, 1, 0, H_SMALL_NUMBER_CYAN);
 		DrawNumber(1094, 576, PERFECT, 25, 1, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1094, 616, GOOD, 25, 1, 0, H_SMALL_NUMBER_RED);
@@ -1220,7 +1226,7 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
-		DrawNumber(1216, 656, int(cbpm * option->op.speedVal + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
+		DrawNumber(1216, 656, int(speedBuffer.getAverage() * option->op.speedVal + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
 
 
@@ -1861,6 +1867,8 @@ void GAME(int song_number, int difficulty,
 
 						if (note[i][j_n_n[i]].group == 1 && LN_flag[i] == 2) {
 							j_n_n[i]++;//LN始点を叩いた時ノートカウンタを1上げる
+							speedBuffer.updateAverage();//NOWSPEED算出
+
 							if (abs(timingDifference) <= judge_time_perfect) {//PERFECT以内
 								if (abs(timingDifference) <= judge_time_sky_perfect) {//SKY_PERFECT
 									LN_judge[i] = 3;
@@ -2370,6 +2378,7 @@ void GAME(int song_number, int difficulty,
 					}
 
 					j_n_n[i]++;
+					speedBuffer.updateAverage();//NOWSPEED算出
 					if (j_n_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 				}
 
@@ -2461,9 +2470,11 @@ void GAME(int song_number, int difficulty,
 
 
 								j_n_n[i]++;
+								speedBuffer.updateAverage();//NOWSPEED算出
 							}
 							while ((note[i][j_n_n[i]].hit == 1 || note[i][j_n_n[i]].color == 8) && (note[i][j_n_n[i]].color != 0)) {//叩かれているか黒ならそれ以外になるまでカウンタを進める()
 								j_n_n[i]++;
+								if (note[i][j_n_n[i]].color != 8)speedBuffer.updateAverage();//NOWSPEED算出
 								if (j_n_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 							}
 						}
@@ -2498,9 +2509,11 @@ void GAME(int song_number, int difficulty,
 								TimeMiss++;
 							}
 							j_n_n[i]++;
+							speedBuffer.updateAverage();//NOWSPEED算出
 						}
 						while ((note[i][j_n_n[i]].hit == 1 || note[i][j_n_n[i]].color == 8) && (note[i][j_n_n[i]].color != 0)) {//叩かれているか黒ならそれ以外になるまでカウンタを進める()
 							j_n_n[i]++;
+							if(note[i][j_n_n[i]].color != 8)speedBuffer.updateAverage();//NOWSPEED算出
 							if (j_n_n[i] >= MusicSub.objOfLane[difficulty][i])break;
 						}
 					}
@@ -3235,21 +3248,8 @@ void GAME(int song_number, int difficulty,
 
 
 		//HSを考慮したSPEEDを算出
-		float bpmRealBuf = 0;
-		for (i = 0; i < 4; i++) {
-			if (j_n_n[i] == MusicSub.objOfLane[difficulty][i]) {
-				bpmRealBuf += note[i][j_n_n[i] - 1].bpm_real;
-				//bpmRealBuf += cbpm;
-			}
-			else {
-				bpmRealBuf += note[i][j_n_n[i]].bpm_real;
-			}
-
-		}
-		bpmRealBuf /= 4;
 		//cbpm
-
-		int bpmBuf = int(bpmRealBuf * option->op.speedVal * coverView.getSpeedRatio() + 0.5);
+		int bpmBuf = int(speedBuffer.getAverage() * option->op.speedVal * coverView.getSpeedRatio() + 0.5);
 		if (bpmBuf >= 10000) {
 			bpmBuf = 9999;
 		}
@@ -3731,4 +3731,69 @@ void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effe
 
 }
 
+
+
+//HSを考慮したNOW SPD計算のためのクラス
+//これから叩く音符4つの速さの平均を取得する
+SpeedBuffer::SpeedBuffer(NOTE** note, int* j_n_n) {//初期値
+	SpeedBuffer::note = note;
+	SpeedBuffer::noteIndex = j_n_n;
+}
+
+void SpeedBuffer::updateAverage() {
+	int index[4] = { noteIndex[0],noteIndex[1], noteIndex[2], noteIndex[3] };//探索用インデックス
+
+
+	float averageBuf = 0;
+
+	int averageCount = 0;
+	for (averageCount = 0; averageCount < SIZE; averageCount++) {
+		//4列からタイミングが一番近いものを探す
+		int timingBuf = 0;
+		int isFoundFirst = TRUE;
+		for (int i = 0; i < 4; i++) {
+			if (note[i][index[i]].color != 0 && note[i][index[i]].color != 8) {
+				if (isFoundFirst) {
+					timingBuf = note[i][index[i]].timing_real;
+					isFoundFirst = FALSE;
+				}
+
+				if (timingBuf > note[i][index[i]].timing_real) {
+					timingBuf = note[i][index[i]].timing_real;
+				}
+
+			}
+		}
+
+		if (isFoundFirst) {//残り音符が3つ以下の時は無くなった時点で抜けだす
+			if (averageCount == 0)return;
+			break;
+		}
+
+		//タイミングが同じものがあれば速さを平均する
+		//そのレーンのnoteIndexをインクリメント
+		int count = 0;
+		float speedSum = 0;
+		for (int i = 0; i < 4; i++) {
+			if (note[i][index[i]].color != 0 && note[i][index[i]].color != 8) {
+				if (timingBuf == note[i][index[i]].timing_real) {
+					speedSum += note[i][index[i]].bpm_real;
+					index[i]++;
+					count++;
+				}
+			}
+		}
+		//速さ算出
+		speedSum /= count;
+
+		averageBuf += speedSum;
+	}
+
+	average = averageBuf / averageCount;
+	return;
+}
+
+float SpeedBuffer::getAverage() {
+	return average;
+}
 

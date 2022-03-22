@@ -39,5 +39,22 @@ extern void GAME_judge_dark_note(int, NOTE**, int, int, int, int, int*, int *);
 extern void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effectResourceHandle, int *playingEffectHandle, int PFC);//フルコンボエフェクト
 
 
+class SpeedBuffer {
+	NOTE** note;
+	int* noteIndex;//各レーン毎のインデックス
+
+	float average = 0;
+
+	static const int SIZE = 1;//先を見る個数
+
+public:
+	SpeedBuffer(NOTE** note, int* j_n_n);
+
+	void updateAverage();
+
+	float getAverage();
+};
+
+
 
 #endif

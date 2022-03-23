@@ -38,7 +38,7 @@ class point {
 public:
 	point(int val = 0, Specify specify = Abs);
 
-	int getVal();
+	int updateVal();
 	Specify getSpecify();
 };
 

@@ -942,6 +942,12 @@ void GAME(int song_number, int difficulty,
 
 		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
 
+		//コントローラから値を取得
+		ControllerVolume.start();
+		if (ControllerVolume.updateVal(&controllerVolume)) {
+			//曲開始前は何にも使わない
+		}
+
 		Get_Key_State(Buf, Key, AC);
 		if (Key[KEY_INPUT_ESCAPE] == 1 && *escape == 0 && AllowExit == 1) {
 			*escape = 1;
@@ -1320,7 +1326,11 @@ void GAME(int song_number, int difficulty,
 	GAME_passed_time_for_UI = GetNowCount_d(config) - GAME_start_time;
 
 	if (ClearFlag == 0) {
-		coverView.setFirstOpenRange(option->windbreakVal[option->op.windbreak]);
+		int volume = option->windbreakVal[option->op.windbreak];
+		ControllerVolume.getValIfExist(&volume);
+
+		coverView.setFirstOpenRange(volume);
+
 		coverView.startMiddleCover();//カバーを事前設定した高さまで上げる
 	}
 	else if(ClearFlag==2){
@@ -1389,7 +1399,7 @@ void GAME(int song_number, int difficulty,
 		//コントローラから値を取得
 		if (isStartCoverMoveUpComplete == 1 && ClearFlag == 0) {//スタート時の中心カバー上げが完了している
 			ControllerVolume.start();
-			if (ControllerVolume.getVal(&controllerVolume)) {
+			if (ControllerVolume.updateVal(&controllerVolume)) {
 				coverView.setOpenRange(controllerVolume);
 			}
 			else {//コントローラから入力が無い時キーボードでのカバー操作許可

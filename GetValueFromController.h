@@ -9,9 +9,13 @@
 class GetValueFromController {
 private:
 	int val = 0;//コントローラから受け取った値
+
+	int volume = 0;
+
 	BOOL finishFlag = 0;
 	HANDLE hComm;
 	std::future<int> f1;
+	BOOL hasValue = FALSE;//一度でも値を受信したかどうか
 
 	int easing(int input);//3~253を0~1000に変換()
 public:
@@ -23,8 +27,8 @@ public:
 
 	void finish();
 
-	int getVal(int *reault);
-
+	int updateVal(int *reault);
+	void getValIfExist(int *value);
 
 };
 

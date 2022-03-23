@@ -46,20 +46,31 @@ void GetValueFromController::finish() {
 }
 
 //値の更新があったとき1を返す
-int GetValueFromController::getVal(int *result) {
+int GetValueFromController::updateVal(int *result) {
 	int val = f1.get();
 
 	if (val != -1) {//受信成功
+		hasValue = TRUE;
+
 		if (*result == easing(val)) {//値の更新無し
 			return 0;
 		}
 		else {
-			*result = easing(val);//値の更新
+			volume = easing(val);//値の更新
+			*result = volume;
 			return 1;
 		}
 	}
 
 	return 0;//受信失敗(タイムアウト)
+}
+
+//一度でも値を受信している時のみ値を最新のものに書き換える
+void GetValueFromController::getValIfExist(int* value)
+{
+	if (hasValue)*value = volume;
+	
+	return;
 }
 
 

@@ -24,7 +24,7 @@ point::point(int val, Specify specify) {
 	point::specify = specify;
 }
 
-int point::getVal()
+int point::updateVal()
 {
 	return val;
 }
@@ -50,23 +50,23 @@ EventType event::determinEventType(point p1, point p2)
 	Specify s2 = p2.getSpecify();
 
 	if (s1 == Abs && s2 == Abs) { 
-		event::startValue = p1.getVal();
-		event::endValue = p2.getVal();
+		event::startValue = p1.updateVal();
+		event::endValue = p2.updateVal();
 		return EventType(AbsAbs); 
 	}
 	if (s1 == Abs && s2 == Rel) { 
-		event::startValue = p1.getVal();
-		event::endRelativeValue = p2.getVal();
+		event::startValue = p1.updateVal();
+		event::endRelativeValue = p2.updateVal();
 		return EventType(AbsRel); 
 	}
 	if (s1 == Rel && s2 == Abs) { 
-		event::startRelativeValue = p1.getVal();
-		event::endValue = p2.getVal();
+		event::startRelativeValue = p1.updateVal();
+		event::endValue = p2.updateVal();
 		return EventType(RelAbs); 
 	}
 	if (s1 == Rel && s2 == Rel) { 
-		event::startRelativeValue = p1.getVal();
-		event::endRelativeValue = p2.getVal();
+		event::startRelativeValue = p1.updateVal();
+		event::endRelativeValue = p2.updateVal();
 		return EventType(RelRel); 
 	}
 

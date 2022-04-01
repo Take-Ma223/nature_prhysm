@@ -35,6 +35,23 @@ int GetValueFromController::getValFromController(int value) {
 	return -1;
 }
 
+//コントローラにボリュームの値を送信するように要求(演奏画面開始時に一回だけ使う)
+void GetValueFromController::sendVolumeRequest()
+{
+	DWORD dwWritten = 0;
+	char str[5];
+	char num[2];
+	strcpy_s(str, "L");
+	
+
+
+
+	//(str, "\n");
+
+
+	WriteFile(hComm, str, (DWORD)strlen(str), &dwWritten, NULL);
+}
+
 void GetValueFromController::start() {
 	f1 =
 	std::async(std::launch::async, [this] {return this->getValFromController(val);});

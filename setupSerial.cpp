@@ -76,7 +76,7 @@ void setupSerial(HANDLE *hComm) {//シリアル通信
 	//3.基本通信条件の設定
 	DCB dcb;
 	GetCommState(*hComm, &dcb); /* DCB を取得 */
-	dcb.BaudRate = 300;
+	dcb.BaudRate = 9600;
 	dcb.ByteSize = 8;
 	dcb.Parity = NOPARITY;
 	dcb.fParity = FALSE;

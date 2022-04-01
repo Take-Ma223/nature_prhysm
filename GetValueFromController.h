@@ -22,6 +22,7 @@ public:
 	GetValueFromController(HANDLE rcvHComm);
 	int getValFromController(int);
 
+	void sendVolumeRequest();
 
 	void start();
 

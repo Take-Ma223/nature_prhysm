@@ -60,6 +60,7 @@ void GAME(int song_number, int difficulty,
 	//コントローラのボリューム値取得
 	int controllerVolume = 0;
 	GetValueFromController ControllerVolume(hComm);
+	ControllerVolume.sendVolumeRequest();
 
 
 	SCORE_CELL score_cell_head;

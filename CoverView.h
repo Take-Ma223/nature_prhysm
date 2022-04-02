@@ -44,9 +44,12 @@ class CoverView
 
 	CoverViewPhase phase = Start;
 
+	void setMoveSpeedAnimation();
+
 
 public:
 	Animation CloseRatio;//カバー閉じてる率(1000分率)
+	Animation MoveSpeed;//カバー開閉1000分率スピード(キーボード操作時)押した瞬間だけ遅く動くようにする
 
 
 	Image leftCover;

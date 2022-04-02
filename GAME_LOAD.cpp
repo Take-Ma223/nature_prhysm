@@ -1174,15 +1174,15 @@ void GAME_LOAD(int song_number,
 	int ncChords[4] = { 0,0,0,0 };
 	int timingSameIndex = 0;
 
-	while (ncChords[0] < nc[0] - 1 ||
-		ncChords[1] < nc[1] - 1 ||
-		ncChords[2] < nc[2] - 1 ||
-		ncChords[3] < nc[3] - 1) {
+	while (ncChords[0] < nc[0] ||
+		ncChords[1] < nc[1] ||
+		ncChords[2] < nc[2] ||
+		ncChords[3] < nc[3]) {
 
 		for (i = 0; i < 4; i++) {
-			if (note[i][ncChords[i] + 1].timing == timing_same[timingSameIndex]) {
-				ncChords[i]++;
+			if (note[i][ncChords[i]].timing == timing_same[timingSameIndex]) {
 				MaxChords.setChords(i, note[i][ncChords[i]].color, note[i][ncChords[i]].group == 1);
+				ncChords[i]++;
 			}
 		}
 		MaxChords.updateMaxChord();

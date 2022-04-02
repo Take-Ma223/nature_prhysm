@@ -9,8 +9,8 @@ CoverView::CoverView(int leftCoverHandle, int middleCoverHandle, int rightCoverH
 	rightCover = Image(rightCoverHandle, time, XRightCoverClose, YRightCoverClose);
 
 	CloseRatio = Animation(time);
-
-
+	MoveSpeed = Animation(time);
+	setMoveSpeedAnimation();
 }
 
 int CoverView::easing(int x)//éûä‘Ç©ÇÁà íu
@@ -37,6 +37,12 @@ int CoverView::easingInvert(int x)//à íuÇ©ÇÁéûä‘
 	return ((input - functionXStart) / functionXRange) * 1000;
 }
 
+void CoverView::setMoveSpeedAnimation()
+{
+	MoveSpeed.clearEvent();
+	MoveSpeed.eChange(0, 1000, Converter(Linear), 0, 150);
+}
+
 void CoverView::drawLeftCover()
 {
 	leftCover.draw();
@@ -45,7 +51,11 @@ void CoverView::drawLeftCover()
 void CoverView::drawMiddleCover()
 {
 	if (phase == Play) {
+		MoveSpeed.update();
+		double playSpeed = (double)MoveSpeed.getValue() / 1000;
+
 		CloseRatio.update();
+		CloseRatio.setPlaySpeed(playSpeed);
 		middleCover.Y.setValue(YMiddleCoverOpen + CloseRatio.getValue());//ê¸å`Ç…à⁄ìÆ
 	}
 
@@ -130,13 +140,15 @@ void CoverView::openMiddleCover()
 	CloseRatio.setReverse(TRUE);
 	CloseRatio.resume();
 
-
+	MoveSpeed.play();
 }
 
 void CoverView::closeMiddleCover()
 {
 	CloseRatio.setReverse(FALSE);
 	CloseRatio.resume();
+
+	MoveSpeed.play();
 }
 
 void CoverView::stopMiddleCover()

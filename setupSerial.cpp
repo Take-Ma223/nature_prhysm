@@ -76,7 +76,7 @@ void setupSerial(HANDLE *hComm) {//シリアル通信
 	//3.基本通信条件の設定
 	DCB dcb;
 	GetCommState(*hComm, &dcb); /* DCB を取得 */
-	dcb.BaudRate = 9600;
+	dcb.BaudRate = 300;
 	dcb.ByteSize = 8;
 	dcb.Parity = NOPARITY;
 	dcb.fParity = FALSE;
@@ -95,7 +95,7 @@ void setupSerial(HANDLE *hComm) {//シリアル通信
 		 //(受信トータルタイムアウト) = ReadTotalTimeoutMultiplier * (受信予定バイト数) + ReadTotalTimeoutConstant
 
 	timeout.WriteTotalTimeoutMultiplier = 0; //書き込み１文字あたりの待ち時間
-	timeout.WriteTotalTimeoutConstant = 1;//書き込みエラー検出用のタイムアウト時間
+	timeout.WriteTotalTimeoutConstant = 1000;//書き込みエラー検出用のタイムアウト時間
 		 //(送信トータルタイムアウト) = WriteTotalTimeoutMultiplier * (送信予定バイト数) + WriteTotalTimeoutConstant
 
 	Ret = SetCommTimeouts(*hComm, &timeout);//SetCommTimeOut()関数にポートハンドルおよびCOMMTIMEOUTS構造体の

@@ -24,7 +24,7 @@ const int CALC_MODE_RAINBOW = 1;
 
 class DifficultyRadar {
 public:
-	DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, int time, int StartTime, int EndTime, int* TimingSame, short *NotesAmount, double BPM_suggest);//イニシャライザ,各色の個数も算出
+	DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, SC* scrollchange, int time, int StartTime, int EndTime, int* TimingSame, short *NotesAmount, double BPM_suggest);//イニシャライザ,各色の個数も算出
 	int NumberTranslation(int color);//rgbycmwdfの番号をrgbcmywdfに変換
 	void GetLocalNotesGraph(short* LocalNotesGraph);//局所降水量の9分割グラフを求める
 
@@ -43,6 +43,7 @@ public:
 	int *nc;
 	BPMC* bpmchange;
 	STOP_SE *stopSequence;
+	SC* scrollchange;
 	int time;
 	int StartTime;
 	int EndTime;

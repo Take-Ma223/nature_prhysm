@@ -1197,7 +1197,7 @@ void GAME_LOAD(int song_number,
 
 
 	//DIFFICULTY_RADAR,NotesAmount算出
-	DifficultyRadar DR(note, nc, bpmchange, stopSequence, end_time - start_time, start_time, end_time, timing_same, Music[song_number].ColorNotesAmount[difficulty], BPM_suggest);
+	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, Music[song_number].ColorNotesAmount[difficulty], BPM_suggest);
 	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[difficulty]);//音符密度グラフを得る
 
 	Cdiff->global = DR.CalcGlobal(CALC_MODE_NORMAL);
@@ -1664,11 +1664,12 @@ static void bpm_change_add(double bpm,BPMC *bpmchange,int *bpm_seq_counter,doubl
 	(*bpm_seq_counter)++;
 }
 
-DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE *stopSequence,int time, int StartTime, int EndTime, int *TimingSame, short* NotesAmount, double BPM_suggest) {
+DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE *stopSequence, SC *scrollchange, int time, int StartTime, int EndTime, int *TimingSame, short* NotesAmount, double BPM_suggest) {
 	DifficultyRadar::note = note;
 	DifficultyRadar::nc = nc;
 	DifficultyRadar::bpmchange = bpmchange;
 	DifficultyRadar::stopSequence = stopSequence;
+	DifficultyRadar::scrollchange = scrollchange;
 	DifficultyRadar::time = time;
 	DifficultyRadar::StartTime = StartTime;
 	DifficultyRadar::EndTime = EndTime;
@@ -2467,6 +2468,10 @@ int DifficultyRadar::CalcUnstability() {
 	double BpmBuf = bpmchange[BpmCount].bpm;
 	double BPMChangeSum = 0;//BPM変化量
 
+	int scrollCount = 0;
+	double scrollBuf = scrollchange[scrollCount].scroll;
+	double scrollChangeSum = 0;//Scroll変化量
+
 	/*
 	while (bpmchange[BpmCount].use == 1) {
 		if (BpmBuf != bpmchange[BpmCount].bpm) {//BPM変化があった
@@ -2479,6 +2484,19 @@ int DifficultyRadar::CalcUnstability() {
 	BPMChangeSum = 0;//不使用
 	*/
 
+
+	//ScrollChangeについて算出
+	while (scrollchange[scrollCount].use == 1) {
+		if (scrollBuf != scrollchange[scrollCount].scroll) {//Scroll変化があった
+			scrollChangeSum += fabs((log(abs(scrollchange[scrollCount].scroll) + 0.1) / log(2)) - (log(abs(scrollBuf) + 0.1) / log(2))) * 2;//Scroll変化の重みは2倍
+			//2の対数をとりScrollを比較 倍の関係になっていたら1加算
+			scrollBuf = scrollchange[scrollCount].scroll;
+		}
+		scrollCount++;
+	}
+	Unstability += scrollChangeSum;
+
+
 	//Stopについて算出
 	int StopCount = 0;
 	double stopSum = 0;
@@ -2488,7 +2506,7 @@ int DifficultyRadar::CalcUnstability() {
 		StopCount++;
 	}
 
-	Unstability = BPMChangeSum + stopSum*0.5 + (double)StopCount*4;//BPM,HSとの重みバランス調節
+	Unstability += stopSum*0.5 + (double)StopCount*4;//BPM,HSとの重みバランス調節
 
 
 	//HS,瞬間風速から離れた速さの音符について算出

@@ -1397,148 +1397,100 @@ void SONG_SELECT(int *l_n,
 					if ((Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[KEY_INPUT_UP] >= 1)
 						&& (Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[KEY_INPUT_DOWN] >= 1)) {//上下同時押しでフォルダセレクトに戻る
 						SelectingTarget = SELECTING_FOLDER;
-
 						StopSoundMem(SH_SONG);
-
-						//PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
-						song_play_counter = 1;
-
-						jacket_show_counter = 1;//ジャケットの読み込み
-						jacket_alpha = 0;
-						widthCalcFlag = 1;
-					}
-					if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
-						if (difficulty != 1) {
-							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
-
-							if ((wcscmp(Music[song_number].wavpath[difficulty], Music[song_number].wavpath[difficulty - 1]) != 0//パスが違う
-								|| (Music[song_number].demostart[difficulty] != Music[song_number].demostart[difficulty - 1]))//それかデモスタートが違う
-								|| ((Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty - 1]))) {
-								StopSoundMem(SH_SONG);
-								//DeleteSoundMem(SH_SONG);
-								song_play_counter = 1;
-							}
-
-							if (
-								(wcscmp(Music[song_number].jacketpath[difficulty], Music[song_number].jacketpath[difficulty - 1]) != 0)
-								|| (Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty - 1])
-								) {
-								jacket_show_counter = 1;//ジャケットの読み込み
-								jacket_alpha = 0;
-							}
-							widthCalcFlag = 1;
-
-							//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
-							int now_list_number = list_number;
-							for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-								if (now_list_number == SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty - 1 - 1][SearchListNumberBase].index) {
-									list_number_base = SearchListNumberBase;
-								}
-							}
-						}
-						difficulty--;
-						if (difficulty > 4)difficulty = 4;
-						if (difficulty < 1)difficulty = 1;
-					}
-
-					if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
-						if (difficulty != 4) {
-							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
-
-							if ((wcscmp(Music[song_number].wavpath[difficulty], Music[song_number].wavpath[difficulty + 1]) != 0
-								|| (Music[song_number].demostart[difficulty] != Music[song_number].demostart[difficulty + 1]))
-								|| ((Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty + 1]))) {
-								StopSoundMem(SH_SONG);
-								//DeleteSoundMem(SH_SONG);
-								song_play_counter = 1;
-							}
-							if (
-								(wcscmp(Music[song_number].jacketpath[difficulty], Music[song_number].jacketpath[difficulty + 1]) != 0)
-								|| (Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty + 1])
-								) {
-								jacket_show_counter = 1;//ジャケットの読み込み
-								jacket_alpha = 0;
-							}
-							widthCalcFlag = 1;
-
-							//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
-							int now_list_number = list_number;
-							for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-								if (now_list_number == SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty + 1 - 1][SearchListNumberBase].index) {
-									list_number_base = SearchListNumberBase;
-								}
-							}
-
-
-						}
-						difficulty++;
-						if (difficulty > 4)difficulty = 4;
-						if (difficulty < 1)difficulty = 1;
-					}
-
-					if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
-						StopSoundMem(SH_SONG);
-						//DeleteSoundMem(SH_SONG);
-
-						list_number_base--;
-						list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
-
-						list_number = SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty - 1][list_number_base].index;
-
-						song_number = folder->folder[folder->selected_folder][list_number].song_number;
-
-
-						if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
-							difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
-						}
-
-						bn_draw_counter--;
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						song_play_counter = 1;
-
 						jacket_show_counter = 1;//ジャケットの読み込み
 						jacket_alpha = 0;
 						widthCalcFlag = 1;
 					}
-					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
-						StopSoundMem(SH_SONG);
-						//DeleteSoundMem(SH_SONG);
-						list_number_base++;
-						list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+					else {
+						if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
+							if (difficulty != 1) {
+								PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 
-						list_number = SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty - 1][list_number_base].index;
-						song_number = folder->folder[folder->selected_folder][list_number].song_number;
+								if ((wcscmp(Music[song_number].wavpath[difficulty], Music[song_number].wavpath[difficulty - 1]) != 0//パスが違う
+									|| (Music[song_number].demostart[difficulty] != Music[song_number].demostart[difficulty - 1]))//それかデモスタートが違う
+									|| ((Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty - 1]))) {
+									StopSoundMem(SH_SONG);
+									//DeleteSoundMem(SH_SONG);
+									song_play_counter = 1;
+								}
 
-						if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
-							difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+								if (
+									(wcscmp(Music[song_number].jacketpath[difficulty], Music[song_number].jacketpath[difficulty - 1]) != 0)
+									|| (Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty - 1])
+									) {
+									jacket_show_counter = 1;//ジャケットの読み込み
+									jacket_alpha = 0;
+								}
+								widthCalcFlag = 1;
+
+								//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
+								int now_list_number = list_number;
+								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
+									if (now_list_number == SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty - 1 - 1][SearchListNumberBase].index) {
+										list_number_base = SearchListNumberBase;
+									}
+								}
+							}
+							difficulty--;
+							if (difficulty > 4)difficulty = 4;
+							if (difficulty < 1)difficulty = 1;
 						}
 
-						bn_draw_counter++;
-						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
-						song_play_counter = 1;
+						if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
+							if (difficulty != 4) {
+								PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 
-						jacket_show_counter = 1;//ジャケットの読み込み
-						jacket_alpha = 0;
-						widthCalcFlag = 1;
-					}
+								if ((wcscmp(Music[song_number].wavpath[difficulty], Music[song_number].wavpath[difficulty + 1]) != 0
+									|| (Music[song_number].demostart[difficulty] != Music[song_number].demostart[difficulty + 1]))
+									|| ((Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty + 1]))) {
+									StopSoundMem(SH_SONG);
+									//DeleteSoundMem(SH_SONG);
+									song_play_counter = 1;
+								}
+								if (
+									(wcscmp(Music[song_number].jacketpath[difficulty], Music[song_number].jacketpath[difficulty + 1]) != 0)
+									|| (Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty + 1])
+									) {
+									jacket_show_counter = 1;//ジャケットの読み込み
+									jacket_alpha = 0;
+								}
+								widthCalcFlag = 1;
+
+								//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
+								int now_list_number = list_number;
+								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
+									if (now_list_number == SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty + 1 - 1][SearchListNumberBase].index) {
+										list_number_base = SearchListNumberBase;
+									}
+								}
 
 
-					if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] >= PressFrame) {
-						if (roll_counter == 0) {
+							}
+							difficulty++;
+							if (difficulty > 4)difficulty = 4;
+							if (difficulty < 1)difficulty = 1;
+						}
+
+						if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
 							StopSoundMem(SH_SONG);
 							//DeleteSoundMem(SH_SONG);
+
 							list_number_base--;
 							list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
 
 							list_number = SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty - 1][list_number_base].index;
+
 							song_number = folder->folder[folder->selected_folder][list_number].song_number;
+
 
 							if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
 								difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
 							}
 
 							bn_draw_counter--;
-							roll_counter = 1;
 							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							song_play_counter = 1;
 
@@ -1546,9 +1498,7 @@ void SONG_SELECT(int *l_n,
 							jacket_alpha = 0;
 							widthCalcFlag = 1;
 						}
-					}
-					if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
-						if (roll_counter == 0) {
+						if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
 							StopSoundMem(SH_SONG);
 							//DeleteSoundMem(SH_SONG);
 							list_number_base++;
@@ -1562,7 +1512,6 @@ void SONG_SELECT(int *l_n,
 							}
 
 							bn_draw_counter++;
-							roll_counter = 1;
 							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							song_play_counter = 1;
 
@@ -1570,33 +1519,83 @@ void SONG_SELECT(int *l_n,
 							jacket_alpha = 0;
 							widthCalcFlag = 1;
 						}
-					}
 
-					if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//曲決定
-						if (folder->folder[folder->selected_folder][list_number].kind == 0) {//内容が「フォルダ選択に戻る」じゃなくて「曲」のとき
-							if ((Music[song_number].exist[difficulty] == 1 && Music[song_number].secret != 1)//その難易度が存在して隠し曲ではない
-								|| (Music[song_number].exist[difficulty] == 1 && Music[song_number].secret == 1 && secret->song_appear_number == song_number)//それか隠し曲で出現対象になっているとき
-								) {
-								flag = FLAG_CLOSING_STATE;
-								PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
-							}
-							else {
-								PlaySoundMem(SH_NO, DX_PLAYTYPE_BACK, TRUE);//選曲不可
-							}
 
+						if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] >= PressFrame) {
+							if (roll_counter == 0) {
+								StopSoundMem(SH_SONG);
+								//DeleteSoundMem(SH_SONG);
+								list_number_base--;
+								list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+
+								list_number = SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty - 1][list_number_base].index;
+								song_number = folder->folder[folder->selected_folder][list_number].song_number;
+
+								if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
+									difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+								}
+
+								bn_draw_counter--;
+								roll_counter = 1;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								song_play_counter = 1;
+
+								jacket_show_counter = 1;//ジャケットの読み込み
+								jacket_alpha = 0;
+								widthCalcFlag = 1;
+							}
 						}
-						else {//「フォルダ選択に戻る」を決定したとき
-							SelectingTarget = SELECTING_FOLDER;
+						if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
+							if (roll_counter == 0) {
+								StopSoundMem(SH_SONG);
+								//DeleteSoundMem(SH_SONG);
+								list_number_base++;
+								list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
 
-							StopSoundMem(SH_SONG);
+								list_number = SortList[option->op.sort][folder->selected_folder][option->op.color == option->OP_COLOR_RAINBOW][difficulty - 1][list_number_base].index;
+								song_number = folder->folder[folder->selected_folder][list_number].song_number;
 
-							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
-							song_play_counter = 1;
+								if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
+									difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+								}
 
-							jacket_show_counter = 1;//ジャケットの読み込み
-							jacket_alpha = 0;
-							widthCalcFlag = 1;
-							Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
+								bn_draw_counter++;
+								roll_counter = 1;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								song_play_counter = 1;
+
+								jacket_show_counter = 1;//ジャケットの読み込み
+								jacket_alpha = 0;
+								widthCalcFlag = 1;
+							}
+						}
+
+						if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//曲決定
+							if (folder->folder[folder->selected_folder][list_number].kind == 0) {//内容が「フォルダ選択に戻る」じゃなくて「曲」のとき
+								if ((Music[song_number].exist[difficulty] == 1 && Music[song_number].secret != 1)//その難易度が存在して隠し曲ではない
+									|| (Music[song_number].exist[difficulty] == 1 && Music[song_number].secret == 1 && secret->song_appear_number == song_number)//それか隠し曲で出現対象になっているとき
+									) {
+									flag = FLAG_CLOSING_STATE;
+									PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+								}
+								else {
+									PlaySoundMem(SH_NO, DX_PLAYTYPE_BACK, TRUE);//選曲不可
+								}
+
+							}
+							else {//「フォルダ選択に戻る」を決定したとき
+								SelectingTarget = SELECTING_FOLDER;
+
+								StopSoundMem(SH_SONG);
+
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								song_play_counter = 1;
+
+								jacket_show_counter = 1;//ジャケットの読み込み
+								jacket_alpha = 0;
+								widthCalcFlag = 1;
+								Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
+							}
 						}
 					}
 				}
@@ -1605,68 +1604,62 @@ void SONG_SELECT(int *l_n,
 					if ((Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[KEY_INPUT_UP] >= 1)
 						&& (Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[KEY_INPUT_DOWN] >= 1)) {//上下同時押しでフォルダセレクトに戻る
 						SelectingTarget = SELECTING_FOLDER;
-
-						//StopSoundMem(SH_SONG);
-
-						//PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
-						//song_play_counter = 1;
-
-						//jacket_show_counter = 1;//ジャケットの読み込み
-						//jacket_alpha = 0;
-						widthCalcFlag = 1;
-					}
-
-					if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
-						list_number--;
-						list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
-						list_number_base = list_number;
-						bn_draw_counter--;
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						widthCalcFlag = 1;
 					}
-					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
-						list_number++;
-						list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
-						list_number_base = list_number;
-						bn_draw_counter++;
-						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
-						widthCalcFlag = 1;
-					}
-
-
-					if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] >= PressFrame) {
-						if (roll_counter == 0) {
+					else {
+						if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
 							list_number--;
 							list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
 							list_number_base = list_number;
 							bn_draw_counter--;
 							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							widthCalcFlag = 1;
-							roll_counter = 1;
 						}
-					}
-					if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
-						if (roll_counter == 0) {
+						if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
 							list_number++;
 							list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
 							list_number_base = list_number;
 							bn_draw_counter++;
 							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							widthCalcFlag = 1;
-							roll_counter = 1;
 						}
-					}
 
-					if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//コース決定
-						if (STList->Kind[list_number] != 2) {//内容が「フォルダ選択に戻る」じゃなくて「コース」のとき
-							flag = FLAG_CLOSING_STATE;
-							PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+
+						if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] >= PressFrame) {
+							if (roll_counter == 0) {
+								list_number--;
+								list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
+								list_number_base = list_number;
+								bn_draw_counter--;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								widthCalcFlag = 1;
+								roll_counter = 1;
+							}
 						}
-						else {//「フォルダ選択に戻る」を決定したとき
-							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
-							SelectingTarget = SELECTING_FOLDER;
-							widthCalcFlag = 1;
-							Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
+						if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
+							if (roll_counter == 0) {
+								list_number++;
+								list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
+								list_number_base = list_number;
+								bn_draw_counter++;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								widthCalcFlag = 1;
+								roll_counter = 1;
+							}
+						}
+
+						if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//コース決定
+							if (STList->Kind[list_number] != 2) {//内容が「フォルダ選択に戻る」じゃなくて「コース」のとき
+								flag = FLAG_CLOSING_STATE;
+								PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+							}
+							else {//「フォルダ選択に戻る」を決定したとき
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								SelectingTarget = SELECTING_FOLDER;
+								widthCalcFlag = 1;
+								Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
+							}
 						}
 					}
 				}

@@ -14,6 +14,7 @@
 #include"score_cell_operation.h"
 #include <algorithm>
 #include "EDIT_SCORE.h"
+#include "NPStringUtil.h"
 
 
 void GAME_LOAD(int song_number,
@@ -315,11 +316,11 @@ void GAME_LOAD(int song_number,
 		} while (wcscmp(str, L"") == 0);
 
 		sharp2[0] = L'\0';
-		swscanf_s(str, L"%[^:\n]:%[^:\n]", sharp1, _countof(sharp1), sharp2, _countof(sharp2));//:で前後に区切って読み込む
-																							 //printfDx(L"%s jjj %s\n", sharp1, sharp2);
-																							 //printfDx(L"%s", str);
 
-
+		wstring s1, s2;
+		NPStringUtil().devideByFirstColon(str, &s1, &s2);
+		sprintfDx(sharp1, L"%s", s1.c_str());
+		sprintfDx(sharp2, L"%s", s2.c_str());
 
 		if (wcscmp(L"#TITLE", sharp1) == 0) {
 			wchar_t DefaultTitle[] = L"\0";

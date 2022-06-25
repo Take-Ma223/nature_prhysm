@@ -59,8 +59,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #else
 
 	SetWindowStyleMode(7);//最大化ボタン追加
-
-	ChangeWindowMode(TRUE);//Windowモードで動作
+	
+	ChangeWindowMode(config.FullScreen == 0);//config.FullScreen が1ならフルスクリーン
+	
 	SetWindowSizeChangeEnableFlag(TRUE);//サイズ変更許可
 
 	wchar_t WindowTitle[30];

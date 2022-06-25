@@ -137,6 +137,13 @@ void ConfigLoad(CONFIG *config) {//Configファイルの読み込み
 			config->UsePy = _wtoi(Val);//数値格納
 		}
 
+		if (wcscmp(L"FULLSCREEN", sharp1) == 0) {
+			wchar_t Val[9];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->FullScreen = _wtoi(Val);//数値格納
+		}
+
 		if (wcscmp(L"#END", sharp1) == 0) {
 			break;
 		}

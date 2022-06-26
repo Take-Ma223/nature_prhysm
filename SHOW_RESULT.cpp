@@ -823,7 +823,7 @@ void SHOW_RESULT(RESULT res,
 				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, config);
 			}
 
-			if (Key[KEY_INPUT_F11] == 1 && *debug == 0 && config.FullScreen == FALSE) {//ツイート
+			if (Key[KEY_INPUT_F11] == 1 && *debug == 0) {//ツイート
 				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
 			
 				wchar_t tweet_sent[1024] = L"";
@@ -1359,15 +1359,15 @@ void SHOW_RESULT(RESULT res,
 
 		if (*debug == 1 && config.ShowDebug == 1) {
 			printfDx(L"DEBUG MODE\n");
-			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
+			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 				printfDx(L"F2:スコアランキング表示\n");
 			}
 		}
 		else {
-			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
+			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 				printfDx(L"F2:スコアランキング表示\n");
 			}
-			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && config.FullScreen == FALSE) {
+			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300) {
 				printfDx(L"F11:Twitterに投稿\n");
 			}
 		}

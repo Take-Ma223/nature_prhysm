@@ -1,25 +1,21 @@
 #include"DxLib.h"
-#include"ImageSet.h"
-#include "TransValue.h"
-#include "TransAction.h"
+#include"SoundSet.h"
+#include"TransValue.h"
 
 #pragma once
 
 
 
-class Image{
-	int handle = 0;//読み込んだ画像ハンドル
+class Sound {
+	int handle = 0;//読み込んだサウンドハンドル
 	double* nowTime;//現在のゲーム時間へのポインタ
 
 public:
-	Image(int handle = 0, double* time = NULL, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
-	~Image();
+	Sound(int handle = 0, double* time = NULL, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
+	~Sound();
 
 	TransValue visible;
-	TransValue X;
-	TransValue Y;
 	TransValue alpha;
-	TransAction action;
 
 	void clearAllEvent();
 	void playAll();//最初から再生(逆再生の時は最後から再生)

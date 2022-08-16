@@ -32,6 +32,7 @@
 #include "Image.h"
 #include "GetValueFromController.h"
 #include "CoverView.h"
+#include "Asset.h"
 
 using namespace std;
 
@@ -78,7 +79,7 @@ void GAME(int song_number, int difficulty,
 	double time_cash = 0;//LOOP_passed_timeを算出するための記憶変数
 	double TimePerFrame = 1000.0 / config.Fps;//1フレームの時間
 
-	ImageSet imageSet;//使う画像セット
+	Asset asset;//使う画像セット
 
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
 	//int H_NOTE_OR_FRAME;//ORノートの枠
@@ -600,7 +601,7 @@ void GAME(int song_number, int difficulty,
 
 	CoverView coverView = CoverView(//中央カバー
 		0, 
-		imageSet.getHandle((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str()), 
+		asset.img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str()), 
 		0, &GAME_passed_time_for_UI);
 	
 	
@@ -672,16 +673,16 @@ void GAME(int song_number, int difficulty,
 	}
 
 	Image I_Fast[4] = {
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(fast.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area + fastSlowY, 0)
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area + fastSlowY, 0)
 	};
 	Image I_Slow[4] = {
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
-	Image(imageSet.getHandle(slow.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area+ fastSlowY, 0)
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area+ fastSlowY, 0)
 	};
 
 

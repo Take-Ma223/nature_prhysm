@@ -1,6 +1,6 @@
-#include "Image.h"
-
 #pragma once
+#include "Image.h"
+#include "TransValue.h"
 
 enum CoverViewPhase {
 	Start,
@@ -48,8 +48,8 @@ class CoverView
 
 
 public:
-	Animation CloseRatio;//カバー閉じてる率(1000分率)
-	Animation MoveSpeed;//カバー開閉1000分率スピード(キーボード操作時)押した瞬間だけ遅く動くようにする
+	TransValue CloseRatio;//カバー閉じてる率(1000分率)
+	TransValue MoveSpeed;//カバー開閉1000分率スピード(キーボード操作時)押した瞬間だけ遅く動くようにする
 
 
 	Image leftCover;

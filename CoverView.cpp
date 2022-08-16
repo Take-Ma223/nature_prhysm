@@ -8,8 +8,8 @@ CoverView::CoverView(int leftCoverHandle, int middleCoverHandle, int rightCoverH
 	middleCover = Image(middleCoverHandle, time, XMiddleCoverClose, YMiddleCoverClose);
 	rightCover = Image(rightCoverHandle, time, XRightCoverClose, YRightCoverClose);
 
-	CloseRatio = Animation(time);
-	MoveSpeed = Animation(time);
+	CloseRatio = TransValue(time);
+	MoveSpeed = TransValue(time);
 	setMoveSpeedAnimation();
 }
 

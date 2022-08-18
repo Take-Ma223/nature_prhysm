@@ -14,6 +14,7 @@
 #include"IR_process.h"
 #include"KeyConfig.h"
 #include "Image.h"
+#include "Asset.h"
 
 using namespace std;
 
@@ -32,6 +33,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	int SH_BGM;
 	int SH_SHUTTER;
 	int SH_SHUTTER_SIGNAL;
+	int SH_ERROR;
 	//int SH_TEST[3];
 
 	int j = 0;
@@ -88,7 +90,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	int KeyConfigMenuStat = KEY_CONFIG_MENU_SETTING;
 
-	ImageSet imageSet;//使う画像セット
+	Asset asset;//使う画像セット
 
 	wstring themeStr1(L"img/themes/");
 	wstring themeStr2(option->theme[option->op.theme]);
@@ -97,8 +99,8 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
 
-	/*
-	Image buttonBB = Image(imageSet.getHandle(L"img/button_BB.png"), &GAME_passed_time, 600, 300, 255);
+	
+	Image buttonBB = Image(asset.img(L"img/button_BB.png"), &GAME_passed_time, 600, 300, 255);
 	auto buttonAnimation = [&] {
 		buttonBB.clearAllEvent();
 		buttonBB.visible.eON();
@@ -107,8 +109,14 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		buttonBB.X.eSet(1200, 5000);
 
 
+		buttonBB.action.eSet(0,[&]{
+			PlaySoundMem(SH_SHUTTER, DX_PLAYTYPE_BACK, TRUE);
+			});
+		buttonBB.action.eSet(1000,[&]{
+			PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+			});
 
-		//buttonBB.playAll();
+		buttonBB.playAll();
 	};
 
 	auto buttonPlay = [&] {
@@ -142,7 +150,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		buttonBB.setLoopAll(TRUE);
 	};
-	*/
+	
 
 	SH_START = LoadSoundMem(L"sound/nature_prhysm_jingle.wav");
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
@@ -151,6 +159,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	SH_BGM = LoadSoundMem(L"sound/nature_prhysm_theme.ogg");
 	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
 	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
+	SH_ERROR = LoadSoundMem(L"sound/no.wav");
 	/*
 	SH_TEST[0] = LoadSoundMem(L"sound/1.wav", 1);
 	SH_TEST[1] = LoadSoundMem(L"sound/2.wav", 1);
@@ -186,7 +195,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		Get_Key_State(Buf, Key, AC);
 
-		/*
+		
 		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[KEY_INPUT_0] == 1) {
 				buttonPlay();
@@ -228,7 +237,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 				buttonLoop();
 			}
 		}
-		*/
+		
 
 		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[Button[0][0]] || Key[Button[0][1]] || Key[Button[0][2]] || Key[Button[0][3]] ||
@@ -379,28 +388,35 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			else {
 				for (i = 0; i < 256; i++) {
 					if (Key[i] == 1) {
-						Button[settingKeyPosition.y][settingKeyPosition.x] = i;
-						settingKeyPosition.x++;
-						if (settingKeyPosition.x >= 4) {
-							settingKeyPosition.x = 0;
-							settingKeyPosition.y--;
-							if (settingKeyPosition.y <= -1) {
-								//キー配置保存
-								KeyConfigSave(Button, &Button_Shutter);
-								KeyConfigLoad(Button, &Button_Shutter);
+						if (isValidKey(i)) {
+							Button[settingKeyPosition.y][settingKeyPosition.x] = i;
+							settingKeyPosition.x++;
+							if (settingKeyPosition.x >= 4) {
+								settingKeyPosition.x = 0;
+								settingKeyPosition.y--;
+								if (settingKeyPosition.y <= -1) {
+									//キー配置保存
+									KeyConfigSave(Button, &Button_Shutter);
+									KeyConfigLoad(Button, &Button_Shutter);
 
-								SetDrawBright(255, 255, 255);
-								int width1;
-								wchar_t str2[64];
-								sprintfDx(str2, L"キー配置設定を保存しました");
-								width1 = GetDrawStringWidth(str2, wcslen(str2));
-								ShowExtendedStrFit(640, 500, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
-								ScreenFlip();
-								Sleep(2000);
-								keyConfigSettingFlag = 0;
+									SetDrawBright(255, 255, 255);
+									int width1;
+									wchar_t str2[64];
+									sprintfDx(str2, L"キー配置設定を保存しました");
+									width1 = GetDrawStringWidth(str2, wcslen(str2));
+									ShowExtendedStrFit(640, 500, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+									ScreenFlip();
+									Sleep(2000);
+									keyConfigSettingFlag = 0;
+								}
 							}
+							break;
 						}
-						break;
+						else {
+							PlaySoundMem(SH_ERROR, DX_PLAYTYPE_BACK, TRUE);
+						}
+
+
 					}
 				}
 					
@@ -636,7 +652,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			}
 		}
 
-		//buttonBB.draw();
+		buttonBB.draw();
 
 		SetDrawBright(brightness, brightness, brightness);
 		if (config.Vsync == 0) {
@@ -808,4 +824,34 @@ void CLOSE_COVER(int difficulty, CONFIG config, OPTION* option) {
 		ScreenFlip();
 		clsDx();
 	}
+}
+
+int isValidKey(int key) {
+
+
+	if (key == KEY_INPUT_ESCAPE)return FALSE;
+	if (key == KEY_INPUT_LSHIFT)return FALSE;
+	if (key == KEY_INPUT_LCONTROL)return FALSE;
+	if (key == KEY_INPUT_RSHIFT)return FALSE;
+	if (key == KEY_INPUT_RCONTROL)return FALSE;
+	if (key == KEY_INPUT_F1)return FALSE;
+	if (key == KEY_INPUT_F2)return FALSE;
+	if (key == KEY_INPUT_F3)return FALSE;
+	if (key == KEY_INPUT_F4)return FALSE;
+	if (key == KEY_INPUT_F5)return FALSE;
+	if (key == KEY_INPUT_F6)return FALSE;
+	if (key == KEY_INPUT_F7)return FALSE;
+	if (key == KEY_INPUT_F8)return FALSE;
+	if (key == KEY_INPUT_F9)return FALSE;
+	if (key == KEY_INPUT_F10)return FALSE;
+	if (key == KEY_INPUT_F11)return FALSE;
+	if (key == KEY_INPUT_F12)return FALSE;
+	if (key == KEY_INPUT_RETURN)return FALSE;
+	if (key == KEY_INPUT_NUMPADENTER)return FALSE;
+	if (key == KEY_INPUT_UP)return FALSE;
+	if (key == KEY_INPUT_DOWN)return FALSE;
+	if (key == KEY_INPUT_LEFT)return FALSE;
+	if (key == KEY_INPUT_RIGHT)return FALSE;
+
+	return TRUE;
 }

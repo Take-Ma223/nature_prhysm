@@ -1897,8 +1897,8 @@ int DifficultyRadar::CalcLocal(int Rainbow) {
 
 
 	//BoxTime秒の枠をずらしながら枠に入る音符の密度の最高値をLocal値とする
-	int BoxTime = 8000;//枠の時間(ms)
-	int SlideTime = 250;//枠をスライドする時間
+	int BoxTime = 6000;//枠の時間(ms)
+	int SlideTime = 100;//枠をスライドする時間
 	int Count[4] = { 0,0,0,0 };//枠の中に入っている音符の数
 	int SlideCount = 0;//スライド回数カウント
 

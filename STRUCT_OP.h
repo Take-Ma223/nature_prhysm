@@ -46,7 +46,7 @@ typedef struct OPTION {//オプション構造体(全体)
 	static const int TARGET_SCORE2_NUM = 6;//スコアグラフターゲットオプションの数
 	int NOTE_NUM = 0;//ノートスキンオプションの数
 	int HITSOUND_NUM = 0;//ヒット音オプションの数
-	static const int SORT_NUM = 25;//曲ソート種類の数
+	static const int SORT_NUM = 26;//曲ソート種類の数
 	int THEME_NUM = 0;//テーマオプションの数
 
 	const int OP_SPEED = 0;
@@ -139,30 +139,31 @@ typedef struct OPTION {//オプション構造体(全体)
 	const int OP_TARGET_SCORE2_LATEST = 5;
 
 	const int OP_SORT_NAME = 0;
-	const int OP_SORT_SCORE = 1;
-	const int OP_SORT_CLEAR_STATE = 2;
-	const int OP_SORT_MIN_MISS = 3;
-	const int OP_SORT_PLAY_COUNT = 4;
-	const int OP_SORT_RADAR = 5;
-	const int OP_SORT_GLOBAL = 6;
-	const int OP_SORT_LOCAL = 7;
-	const int OP_SORT_CHAIN = 8;
-	const int OP_SORT_UNSTABILITY = 9;
-	const int OP_SORT_STREAK = 10;
-	const int OP_SORT_COLOR = 11;
-	const int OP_SORT_RED_DENSITY = 12;
-	const int OP_SORT_GREEN_DENSITY = 13;
-	const int OP_SORT_BLUE_DENSITY = 14;
-	const int OP_SORT_CYAN_DENSITY = 15;
-	const int OP_SORT_MAGENTA_DENSITY = 16;
-	const int OP_SORT_YELLOW_DENSITY = 17;
-	const int OP_SORT_WHITE_DENSITY = 18;
-	const int OP_SORT_BLACK_DENSITY = 19;
-	const int OP_SORT_RAINBOW_DENSITY = 20;
-	const int OP_SORT_MAX_BPM = 21;
-	const int OP_SORT_MIN_BPM = 22;
-	const int OP_SORT_MAX_CHORDS = 23;
-	const int OP_SORT_VERSION = 24;
+	const int OP_SORT_LEVEL = 1;
+	const int OP_SORT_SCORE = 2;
+	const int OP_SORT_CLEAR_STATE = 3;
+	const int OP_SORT_MIN_MISS = 4;
+	const int OP_SORT_PLAY_COUNT = 5;
+	const int OP_SORT_RADAR = 6;
+	const int OP_SORT_GLOBAL = 7;
+	const int OP_SORT_LOCAL = 8;
+	const int OP_SORT_CHAIN = 9;
+	const int OP_SORT_UNSTABILITY = 10;
+	const int OP_SORT_STREAK = 11;
+	const int OP_SORT_COLOR = 12;
+	const int OP_SORT_RED_DENSITY = 13;
+	const int OP_SORT_GREEN_DENSITY = 14;
+	const int OP_SORT_BLUE_DENSITY = 15;
+	const int OP_SORT_CYAN_DENSITY = 16;
+	const int OP_SORT_MAGENTA_DENSITY = 17;
+	const int OP_SORT_YELLOW_DENSITY = 18;
+	const int OP_SORT_WHITE_DENSITY = 19;
+	const int OP_SORT_BLACK_DENSITY = 20;
+	const int OP_SORT_RAINBOW_DENSITY = 21;
+	const int OP_SORT_MAX_BPM = 22;
+	const int OP_SORT_MIN_BPM = 23;
+	const int OP_SORT_MAX_CHORDS = 24;
+	const int OP_SORT_VERSION = 25;
 
 	double speedVal[SPEED_NUM] = {
 		10,
@@ -387,7 +388,7 @@ typedef struct OPTION {//オプション構造体(全体)
 	wchar_t* targetScore2[TARGET_SCORE2_NUM] = { L"RIVAL", L"AVERAGE", L"MEDIAN", L"NEXT RANK", L"TOP", L"LATEST"
 };
 
-	wchar_t* sort[SORT_NUM] = { L"NAME", L"SCORE", L"CLEAR STATE",L"MIN MISS", L"PLAY COUNT",L"RADAR",L"GLOBAL",L"LOCAL",L"CHAIN",L"UNSTABILITY",L"STREAK",L"COLOR",
+	wchar_t* sort[SORT_NUM] = { L"NAME", L"LEVEL", L"SCORE", L"CLEAR STATE",L"MIN MISS", L"PLAY COUNT",L"RADAR",L"GLOBAL",L"LOCAL",L"CHAIN",L"UNSTABILITY",L"STREAK",L"COLOR",
 		L"RED",L"GREEN",L"BLUE",L"CYAN",L"MAGENTA",L"YELLOW",L"WHITE",L"BLACK",L"RAINBOW",
 		L"MAX BPM",L"MIN BPM", L"MAX CHORDS", L"VERSION" };
 	wchar_t* blackGradation[BLACK_GRADATION_NUM] = { L"ON", L"OFF" };
@@ -575,6 +576,7 @@ typedef struct OPTION {//オプション構造体(全体)
 
 	wchar_t* sent_sort[SORT_NUM] =
 	{ L"曲名で並び替えます"
+	 ,L"難易度(降水確率)で並び替えます"
 	 ,L"スコアで並び替えます"
 	 ,L"クリア状態で並び替えます"
 	 ,L"最小ミス数で並び替えます"

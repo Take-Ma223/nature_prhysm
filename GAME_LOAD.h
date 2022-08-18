@@ -53,7 +53,7 @@ public:
 	int* TimingSame;
 
 	int globalMax = 552;
-	int localMax = 850;
+	int localMax = 958;
 	int colorMax = 350;
 	int LNMax = 33;
 	int unstabilityMax = 259;

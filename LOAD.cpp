@@ -276,6 +276,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 						}
 
 						folder_insert(song_folder, i, j, Music);
+						folder_insert_radar(song_folder, i, j, Music);
 
 						Music[i].hash[j] = hash;
 					} while (FindNextFile(hFind_nps, &file_lp));

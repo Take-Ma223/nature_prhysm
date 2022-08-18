@@ -901,10 +901,10 @@ void SONG_SELECT(int *l_n,
 	saveData.totalHighScore = 0;
 	saveData.totalHighScoreRainbow = 0;
 	for (int diff = 1; diff < 5; diff++) {//難易度
-		for (j = 0; j < folder->folder_c[FOLDERS_ALL_SONGS]; j++) {
-			if (folder->folder[FOLDERS_ALL_SONGS][j].kind == 0 && Music[folder->folder[FOLDERS_ALL_SONGS][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
-				saveData.totalHighScore += Highscore[folder->folder[FOLDERS_ALL_SONGS][j].song_number].score[diff];
-				saveData.totalHighScoreRainbow += Highscore[folder->folder[FOLDERS_ALL_SONGS][j].song_number].score[diff + 4];
+		for (j = 0; j < folder->folder_c[FolderIndex::ALL_SONGS]; j++) {
+			if (folder->folder[FolderIndex::ALL_SONGS][j].kind == 0 && Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
+				saveData.totalHighScore += Highscore[folder->folder[FolderIndex::ALL_SONGS][j].song_number].score[diff];
+				saveData.totalHighScoreRainbow += Highscore[folder->folder[FolderIndex::ALL_SONGS][j].song_number].score[diff + 4];
 			}
 		}
 	}
@@ -915,7 +915,7 @@ void SONG_SELECT(int *l_n,
 
 	for (int rainbow = 0; rainbow < 2; rainbow++) {//自然管理技術者検定フォルダでランク、クリア状態を表示しないようプレイ状態扱いにする
 		for (int diff = 1; diff < 5; diff++) {
-			FolderScore[rainbow][FOLDER_SKILL_TEST_NUMBER][diff].ClearType = CLEARTYPE_PLAY;
+			FolderScore[rainbow][FolderIndex::SKILL_TEST_NUMBER][diff].ClearType = CLEARTYPE_PLAY;
 		}
 	}
 
@@ -938,6 +938,14 @@ void SONG_SELECT(int *l_n,
 						SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].index = ListInd;
 						if (SortKind == option->OP_SORT_NAME) {
 							SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = ListInd;
+						}
+						else if (SortKind == option->OP_SORT_LEVEL) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Music[folder->folder[FolderInd][ListInd].song_number].level[folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Music[folder->folder[FolderInd][ListInd].song_number].level[DifficultyInd + 1];
+							}
 						}
 						else if (SortKind == option->OP_SORT_SCORE) {
 							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
@@ -1106,7 +1114,7 @@ void SONG_SELECT(int *l_n,
 	}
 
 	//2回目以降の選曲画面に戻ってきたときのためのlist_number_baseとlist_number算出(段位認定から戻ってきたときは行わない)
-	if (folder->selected_folder != FOLDER_SKILL_TEST_NUMBER) {
+	if (folder->selected_folder != FolderIndex::SKILL_TEST_NUMBER) {
 		//ソート結果が前と変わってた時のために、元の曲番号と同じ番号、同じ難易度を指すlist_number_baseを探す
 		int now_song_number = song_number;
 		int now_difficulty = difficulty;

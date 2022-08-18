@@ -928,7 +928,9 @@ void SHOW_RESULT(RESULT res,
 
 				ReplaceTweetStr(tweet_sent);
 
-				sprintfDx(html_sent, L"https://twitter.com/intent/tweet?text=%s&source=webclient&hashtags=natureprhysm", tweet_sent);
+
+
+				sprintfDx(html_sent, L"https://twitter.com/intent/tweet?text=%s%%0A%%23natureprhysm%%0Ahttps://www.freem.ne.jp/win/game/16015&source=webclient", tweet_sent);
 
 
 

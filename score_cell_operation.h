@@ -18,7 +18,10 @@ SCORE_CELL* score_cell_find_next_note(SCORE_CELL *p, int column);//pポインタ
 
 SCORE_CELL* score_cell_find_before_command(SCORE_CELL *p, int column);//pポインタからbeforeをたどって最初にあるkind種類のコマンドのポインタを返す
 
-SCORE_CELL* score_cell_find_command(SCORE_CELL *p, int kind);//pポインタから同じstepの範囲でbeforeをたどって最初にあるcommand(種類はkind)のポインタを返す 見つからなければNULL
+SCORE_CELL* score_cell_find_command_before(SCORE_CELL *p, int kind);//pポインタから同じstepの範囲でbeforeをたどって最初にあるcommand(種類はkind)のポインタを返す 見つからなければNULL
+
+SCORE_CELL* score_cell_find_command_next(SCORE_CELL* p, int kind);//pポインタから同じstepの範囲でnextをたどって最初にあるcommand(種類はkind)のポインタを返す 見つからなければNULL
+
 
 void score_cell_delete_if_no_note(SCORE_CELL **p);//何もない行なら消す
 #endif

@@ -88,7 +88,7 @@ SCORE_CELL* score_cell_find_before_command(SCORE_CELL *p, int kind) {//pポイ�
 	return p;//見つからなければNULL
 }
 
-SCORE_CELL* score_cell_find_command(SCORE_CELL *p, int kind) {//pポインタから同じstepの範囲でbeforeをたどって最初にあるcommand(種類はkind)のポインタを返す 見つからなければNULL
+SCORE_CELL* score_cell_find_command_before(SCORE_CELL *p, int kind) {//pポインタから同じstepの範囲でbeforeをたどって最初にあるcommand(種類はkind)のポインタを返す 見つからなければNULL
 	int range_step = p->step;//探すステップ範囲
 	if (p->content == 2 && p->data.command.kind == kind)return p;//最初からなんかのkindの命令がある行が見つかった
 
@@ -98,6 +98,22 @@ SCORE_CELL* score_cell_find_command(SCORE_CELL *p, int kind) {//pポインタか
 			return NULL;//見つからなければNULL
 		}
 		if (p == NULL)break;
+		if (p->content == 2 && p->data.command.kind == kind)break;//なんかのkindの命令がある行が見つかった
+
+	};
+	return p;//見つからなければNULL
+}
+
+SCORE_CELL* score_cell_find_command_next(SCORE_CELL* p, int kind) {//pポインタから同じstepの範囲でbeforeをたどって最初にあるcommand(種類はkind)のポインタを返す 見つからなければNULL
+	int range_step = p->step;//探すステップ範囲
+	if (p->content == 2 && p->data.command.kind == kind)return p;//最初からなんかのkindの命令がある行が見つかった
+
+	while (1) {
+		p = p->next;
+		if (p->step != range_step) {//stepの範囲には無かった
+			return NULL;//見つからなければNULL
+		}
+		if (p->content == 3)break;
 		if (p->content == 2 && p->data.command.kind == kind)break;//なんかのkindの命令がある行が見つかった
 
 	};

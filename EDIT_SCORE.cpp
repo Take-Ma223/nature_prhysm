@@ -1152,7 +1152,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 									score_cell_write_command(insert_command, command_put, 1, 1, 1, 1);//1,1,1,1で初期化
 								}
 
-								insert_command = score_cell_find_command(insert_command, command_put);//↑でセル挿入してたらそのセルが返る(何も変わらない)
+								insert_command = score_cell_find_command_before(insert_command, command_put);//↑でセル挿入してたらそのセルが返る(何も変わらない)
 								if (insert_command == NULL) {//今のステップにこの命令が無いなら挿入
 
 									if (insert->content == CONTENTS_NOTE) {//insertが指しているのが音符
@@ -1162,35 +1162,36 @@ void EDIT_SCORE(SCORE_CELL* head,
 									if (insert->content == CONTENTS_COMMAND) {//insertが指しているのが命令
 										score_insert_cell(insert, step_count);//insertに新しいセル挿入
 										insert_command = insert->next;//現在操作している命令セルを格納
+										insert = insert_command;
 									}
-
-
-									if (command_put == COMMAND_KIND_STOPSTEP) {
-										score_cell_write_command(insert_command, command_put, cvb_STOPSTEP[0], cvb_STOPSTEP[1], 1, 1);//初期化
-									}
-									else if (command_put == COMMAND_KIND_STOP) {
-										score_cell_write_command(insert_command, command_put, cvb_STOP, 1, 1, 1);//初期化
-									}
-									else if (command_put == COMMAND_KIND_HS) {
-										score_cell_write_command(insert_command, command_put, cvb_HS[0], cvb_HS[1], cvb_HS[2], cvb_HS[3]);//初期化
-									}
-									else if (command_put == COMMAND_KIND_BPM) {
-										score_cell_write_command(insert_command, command_put, cvb_BPM, 1, 1, 1);//初期化
-									}
-									else if (command_put == COMMAND_KIND_LETBPM) {
-										score_cell_write_command(insert_command, command_put, cvb_LETBPM, 1, 1, 1);//初期化
-									}
-									else if (command_put == COMMAND_KIND_SCROLL) {
-										score_cell_write_command(insert_command, command_put, cvb_SCROLL, 1, 1, 1);//初期化
-									}
-									else if (command_put == COMMAND_KIND_SCROLL_BPM) {
-										score_cell_write_command(insert_command, command_put, cvb_SCROLL_BPM, 1, 1, 1);//初期化
-									}
-									else if (command_put == COMMAND_KIND_MEASURE) {
-										score_cell_write_command(insert_command, command_put, cvb_MEASURE[0], cvb_MEASURE[1], 1, 1);//初期化
-									}
-
 								}
+
+								if (command_put == COMMAND_KIND_STOPSTEP) {
+									score_cell_write_command(insert_command, command_put, cvb_STOPSTEP[0], cvb_STOPSTEP[1], 1, 1);//初期化
+								}
+								else if (command_put == COMMAND_KIND_STOP) {
+									score_cell_write_command(insert_command, command_put, cvb_STOP, 1, 1, 1);//初期化
+								}
+								else if (command_put == COMMAND_KIND_HS) {
+									score_cell_write_command(insert_command, command_put, cvb_HS[0], cvb_HS[1], cvb_HS[2], cvb_HS[3]);//初期化
+								}
+								else if (command_put == COMMAND_KIND_BPM) {
+									score_cell_write_command(insert_command, command_put, cvb_BPM, 1, 1, 1);//初期化
+								}
+								else if (command_put == COMMAND_KIND_LETBPM) {
+									score_cell_write_command(insert_command, command_put, cvb_LETBPM, 1, 1, 1);//初期化
+								}
+								else if (command_put == COMMAND_KIND_SCROLL) {
+									score_cell_write_command(insert_command, command_put, cvb_SCROLL, 1, 1, 1);//初期化
+								}
+								else if (command_put == COMMAND_KIND_SCROLL_BPM) {
+									score_cell_write_command(insert_command, command_put, cvb_SCROLL_BPM, 1, 1, 1);//初期化
+								}
+								else if (command_put == COMMAND_KIND_MEASURE) {
+									score_cell_write_command(insert_command, command_put, cvb_MEASURE[0], cvb_MEASURE[1], 1, 1);//初期化
+								}
+
+							
 
 								if (insert_command->next->content == CONTENTS_END) {//一番最後の音符、命令だったら
 									SCORE_CELL* p_m = score_cell_find_before_command(insert_command->next, COMMAND_KIND_MEASURE);
@@ -1212,7 +1213,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 								if (i == 0 || i == 2) {//赤、青が押された 値を増減する
 									push_command_val_counter = 0;
 									insert_command = insert;
-									insert_command = score_cell_find_command(insert_command, command_put);//目的の命令がstep_countにあるか
+									insert_command = score_cell_find_command_before(insert_command, command_put);//目的の命令がstep_countにあるか
 									if (insert_command != NULL) {//目的の命令が存在する
 										double inc = 1;
 										if (command_put == COMMAND_KIND_HS) {
@@ -1231,63 +1232,67 @@ void EDIT_SCORE(SCORE_CELL* head,
 											}
 										}
 
-										cvb_STOPSTEP[2];
-										cvb_STOP;
-										cvb_HS[4];
-										cvb_BPM;
-										cvb_SCROLL;
-										cvb_SCROLL_BPM;
-										cvb_MEASURE;
+										auto limitValue = [&] {
+											for (int k = 0; k < 4; k++) {//コマンドの値の下限処理
+												if (command_put == COMMAND_KIND_MEASURE) {
+													if (insert_command->data.command.value[k] < 1) {
+														insert_command->data.command.value[k] = 1;
+													}
+												}
+												else {
+													if (insert_command->data.command.value[k] < 0) {
+														insert_command->data.command.value[k] = 0;
+													}
+												}
+											}
+										};
 
 										if (command_put == COMMAND_KIND_STOPSTEP) {
 											if (j == 0 || j == 1)insert_command->data.command.value[0] += inc;
 											if (j == 2 || j == 3)insert_command->data.command.value[1] += inc;
+											limitValue();
 											cvb_STOPSTEP[0] = int(insert_command->data.command.value[0]);
 											cvb_STOPSTEP[1] = int(insert_command->data.command.value[1]);
 										}
 										else if (command_put == COMMAND_KIND_STOP) {
 											insert_command->data.command.value[0] += inc;
+											limitValue();
 											cvb_STOP = insert_command->data.command.value[0];
 										}
 										else if (command_put == COMMAND_KIND_HS) {
 											insert_command->data.command.value[j] += inc;
+											limitValue();
 											cvb_HS[j] = insert_command->data.command.value[j];
 										}
 										else if (command_put == COMMAND_KIND_BPM) {
 											insert_command->data.command.value[0] += inc;
+											limitValue();
 											cvb_BPM = insert_command->data.command.value[0];
 										}
 										else if (command_put == COMMAND_KIND_LETBPM) {
 											insert_command->data.command.value[0] += inc;
+											limitValue();
 											cvb_LETBPM = insert_command->data.command.value[0];
 										}
 										else if (command_put == COMMAND_KIND_SCROLL) {
 											insert_command->data.command.value[0] += inc;
+											limitValue();
 											cvb_SCROLL = insert_command->data.command.value[0];
 										}
 										else if (command_put == COMMAND_KIND_SCROLL_BPM) {
 											insert_command->data.command.value[0] += inc;
+											limitValue();
 											cvb_SCROLL_BPM = insert_command->data.command.value[0];
 										}
 										else if (command_put == COMMAND_KIND_MEASURE) {
 											if (j == 0 || j == 1)insert_command->data.command.value[0] += inc;
 											if (j == 2 || j == 3)insert_command->data.command.value[1] += inc;
-											cvb_STOPSTEP[0] = int(insert_command->data.command.value[0]);
-											cvb_STOPSTEP[1] = int(insert_command->data.command.value[1]);
+											limitValue();
+											cvb_MEASURE[0] = int(insert_command->data.command.value[0]);
+											cvb_MEASURE[1] = int(insert_command->data.command.value[1]);
 										}
 
-										for (int k = 0; k < 4; k++) {//コマンドの値の下限処理
-											if (command_put == COMMAND_KIND_MEASURE) {
-												if (insert_command->data.command.value[k] < 1) {
-														insert_command->data.command.value[k] = 1;
-												}
-											}
-											else {
-												if (insert_command->data.command.value[k] < 0) {
-													insert_command->data.command.value[k] = 0;
-												}
-											}
-										}
+										
 									}
 								}
 							}
@@ -1299,7 +1304,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 					if (insert->step == step_count) {//stepとinsert同じなら削除に移る
 						insert_command = insert;
-						insert_command = score_cell_find_command(insert_command, command_put);//目的の命令がstep_countにあるか
+						insert_command = score_cell_find_command_before(insert_command, command_put);//目的の命令がstep_countにあるか
 						if (insert_command != NULL) {//目的の命令が存在する
 							score_cell_write_note(insert_command, 0, 0, 0, 0);//音符セルということにして消す
 							score_cell_write_note(insert_command, 1, 0, 0, 0);//音符セルということにして消す
@@ -1731,10 +1736,12 @@ void EDIT_SCORE(SCORE_CELL* head,
 		}
 
 		if (MusicSub->editable[difficulty] != 1) {
+			setPrintColorDx(GetColor(255, 0, 0), GetColor(0, 0, 0)); 
 			printfDx(L"この譜面は編集できません\n");
 			printfDx(L"編集するには #EDITABLE:1 を\n");
 			printfDx(L"npsファイルに追加してください\n");
 			printfDx(L"\n");
+			setPrintColorDx(GetColor(255, 255, 255), GetColor(0, 0, 0));
 		}
 
 		if (isInstructionAppear) {
@@ -2063,7 +2070,7 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 						int numerator = measureLength / gcdVal;
 						int denominator = EDITSTEP / gcdVal;
 
-						SCORE_CELL* measure_command = score_cell_find_command(measure_p, COMMAND_KIND_MEASURE);
+						SCORE_CELL* measure_command = score_cell_find_command_next(measure_p, COMMAND_KIND_MEASURE);
 						if (measure_command == NULL) {//既に小節線変更コマンドが無ければ挿入
 							SCORE_CELL* insert = measure_p->before;
 							score_insert_cell(insert, measure_p->step);

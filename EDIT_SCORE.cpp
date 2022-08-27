@@ -12,6 +12,8 @@
 #include"ShowFps.h"
 #include"ScreenShot.h"
 #include<string>
+#include "Asset.h"
+#include "NotesMode.h"
 
 using namespace std;
 
@@ -44,6 +46,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	double CounterRemainTime = 0;
 	double time_cash = 0;//LOOP_passed_timeを算出するための記憶変数
 
+	Asset asset;//使う画像セット
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
 				   //int H_NOTE_OR_FRAME;//ORノートの枠
 
@@ -166,8 +169,12 @@ void EDIT_SCORE(SCORE_CELL* head,
 	H_LNOTE[8] = CreateGraphFromSoftImage(SOFTH_LNOTE_B);
 	DeleteSoftImage(SOFTH_LNOTE_B);
 
-
-
+	NotesMode notesMode = NotesMode(
+		asset.img(L"img/edit/notes_mode_rgb.png"), 
+		asset.img(L"img/edit/notes_mode_kfln.png"),
+		asset.img(L"img/edit/notes_mode_command.png"),
+		&GAME_passed_time);
+	notesMode.switchToRgb();
 														 //H_LNOTE_OR_FRAME = LoadGraph(L"img/note_or_frame_L.png");
 	/*
 	int H_BPM_NUMBER[10];
@@ -738,9 +745,11 @@ void EDIT_SCORE(SCORE_CELL* head,
 		if (Key[KEY_INPUT_SPACE] == 1) {
 			if (note_kind == 0) {
 				note_kind = 1;//配置音符種類変更
+				notesMode.switchToKfln();
 			}
 			else if (note_kind == 1) {
 				note_kind = 0;
+				notesMode.switchToRgb();
 			}
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
@@ -1334,39 +1343,48 @@ void EDIT_SCORE(SCORE_CELL* head,
 		//配置モードの変更
 		if (Key[KEY_INPUT_0] == 1) {//音符配置モードにする
 			command_put = 0;
+			notesMode.switchNoteMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 
 		if (Key[KEY_INPUT_1] == 1) {
 			command_put = COMMAND_KIND_MEASURE;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_2] == 1) {
 			command_put = COMMAND_KIND_STOPSTEP;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_3] == 1) {
 			command_put = COMMAND_KIND_STOP;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_4] == 1) {
 			command_put = COMMAND_KIND_HS;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_5] == 1) {
 			command_put = COMMAND_KIND_BPM;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_6] == 1) {
 			command_put = COMMAND_KIND_LETBPM;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_7] == 1) {
 			command_put = COMMAND_KIND_SCROLL;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 		if (Key[KEY_INPUT_8] == 1) {
 			command_put = COMMAND_KIND_SCROLL_BPM;
+			notesMode.switchCommandMode();
 			PlaySoundMem(SH_STEP_CHANGE, DX_PLAYTYPE_BACK, TRUE);
 		}
 
@@ -1662,11 +1680,11 @@ void EDIT_SCORE(SCORE_CELL* head,
 		while (show->step != -1) {//endからheadまで描画
 			if (show->content == CONTENTS_COMMAND) {//命令の時
 				if (show->data.command.kind == COMMAND_KIND_HS) {
-					sprintfDx(command_show_str, L"HS:");
-					DrawString(460, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
+					sprintfDx(command_show_str, L"HS");
+					DrawString(472, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
 
 					sprintfDx(command_show_str, L"%.2f", show->data.command.value[0]);
-					DrawString(lane[0] - 24, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
+					DrawString(lane[0] - 21, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
 					sprintfDx(command_show_str, L"%.2f", show->data.command.value[1]);
 					DrawString(lane[1] - 24, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
 					sprintfDx(command_show_str, L"%.2f", show->data.command.value[2]);
@@ -1678,7 +1696,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 				}
 				if (show->data.command.kind == COMMAND_KIND_STOP) {
 					sprintfDx(command_show_str, L"%.2f", show->data.command.value[0]);
-					DrawString(375, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
+					DrawString(365, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5 - 8), command_show_str, GetColor(255, 255, 255));
 				}
 				if (show->data.command.kind == COMMAND_KIND_STOPSTEP) {
 					sprintfDx(command_show_str, L"%d/%d", int(show->data.command.value[0]), int(show->data.command.value[1]));
@@ -1711,8 +1729,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 			show = show->before;
 		}
 
-
-
+		if(isInstructionAppear)notesMode.draw();
 
 
 		
@@ -1735,7 +1752,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 			printfDx(L"保存できません　別のプログラムでnpsファイルが開かれている可能性があります\n");
 		}
 
-		if (MusicSub->editable[difficulty] != 1) {
+		if (MusicSub->editable[difficulty] != 1 && isInstructionAppear) {
 			setPrintColorDx(GetColor(255, 0, 0), GetColor(0, 0, 0)); 
 			printfDx(L"この譜面は編集できません\n");
 			printfDx(L"編集するには #EDITABLE:1 を\n");

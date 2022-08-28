@@ -32,8 +32,14 @@ def authorization_password():
         else:  # グローバル
             s.connect(('nature-prhysm.f5.si', 50001))
     except socket.timeout:
+        print("socket.timeout")
         write(CONNECTION_SERVER_NOT_FOUND)
         return
+    except BaseException as baseException:
+        print(baseException)
+        write(CONNECTION_SERVER_NOT_FOUND)
+
+    print("socket connected")
 
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
@@ -43,12 +49,16 @@ def authorization_password():
         recv = s.recv(1024)
         print(recv.decode("utf-8"))
         if recv == b"ok":
+            print("connection success")
             write(CONNECTION_SUCCESS)
             return
     except socket.timeout:
+        print("socket.timeout")
         write(CONNECTION_VERSION_ERROR)
         return
-
+    except BaseException as baseException:
+        print(baseException)
+        write(CONNECTION_SERVER_NOT_FOUND)
 
 def write(data):
     # フォルダ作成

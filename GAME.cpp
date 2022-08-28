@@ -1405,10 +1405,18 @@ void GAME(int song_number, int difficulty,
 				coverView.setOpenRange(controllerVolume);
 			}
 			else {//コントローラから入力が無い時キーボードでのカバー操作許可
+
 				if (Key[KEY_INPUT_LSHIFT] == 1 || Key[KEY_INPUT_RSHIFT] == 1) {
 					coverView.openMiddleCover();
 				}
 				if (Key[KEY_INPUT_LCONTROL] == 1 || Key[KEY_INPUT_RCONTROL] == 1) {
+					coverView.closeMiddleCover();
+				}
+
+				if ((Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) && (Key[KEY_INPUT_LCONTROL] == -1 || Key[KEY_INPUT_RCONTROL] == -1)) {
+					coverView.openMiddleCover();
+				}
+				if ((Key[KEY_INPUT_LSHIFT] == -1 || Key[KEY_INPUT_RSHIFT] == -1) && (Key[KEY_INPUT_LCONTROL] >= 1 || Key[KEY_INPUT_RCONTROL] >= 1)) {
 					coverView.closeMiddleCover();
 				}
 				if (Key[KEY_INPUT_LSHIFT] == 0 && Key[KEY_INPUT_RSHIFT] == 0 && Key[KEY_INPUT_LCONTROL] == 0 && Key[KEY_INPUT_RCONTROL] == 0) {

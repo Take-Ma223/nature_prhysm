@@ -121,7 +121,7 @@ typedef struct LIST {//曲フォルダ
 
 		L"GLOBAL(全体密度)傾向",
 		L"LOCAL(局所密度)傾向",
-		L"CHAIN(同一レーン)傾向",
+		L"CHAIN(縦連打)傾向",
 		L"UNSTABILITY(速度変化)傾向",
 		L"STREAK(ロングノート)傾向",
 		L"COLOR(色)傾向",

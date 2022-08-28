@@ -652,13 +652,14 @@ void GAME(int song_number, int difficulty,
 	int H_SMALL_NUMBER_GREEN[10];
 	int H_SMALL_NUMBER_YELLOW[10];
 	int H_SMALL_NUMBER_CYAN[10];
+	int H_SMALL_NUMBER_MAGENTA[10];
 
 	LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_RED);
 	LoadDivGraph(L"img/SmallNumberGreen.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_GREEN);
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_BLUE);
 	LoadDivGraph(L"img/SmallNumberYellow.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_YELLOW);
 	LoadDivGraph(L"img/SmallNumberCyan.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_CYAN);
-
+	LoadDivGraph(L"img/SmallNumberMagenta.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_MAGENTA);
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_POP_NUMBER);
 
 	int fastSlowY = -130;
@@ -1212,7 +1213,7 @@ void GAME(int song_number, int difficulty,
 
 		//BPM描画欄
 		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MAXBPM
-		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 255, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//BPM
+		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//BPM
 		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MINBPM
 		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//SPEED
 
@@ -1232,7 +1233,7 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1094, 656, MISS, 25, 1, 0, H_SMALL_NUMBER_BLUE);
 
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
-		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
+		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_MAGENTA);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
 		DrawNumber(1216, 656, int(speedBuffer.getAverage() * option->op.speedVal + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
@@ -3244,7 +3245,7 @@ void GAME(int song_number, int difficulty,
 
 		//BPM描画欄
 		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), 80, 255);//MAXBPM
-		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 255, 50), 80, 255);//BPM
+		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), 80, 255);//BPM
 		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), 80, 255);//MINBPM
 		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), 80, 255);//SPEED
 
@@ -3263,7 +3264,7 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1094, 656, MISS, 25, 1, 0, H_SMALL_NUMBER_BLUE);
 
 		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
-		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_YELLOW);
+		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_MAGENTA);
 		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
 
 

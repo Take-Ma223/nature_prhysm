@@ -13,6 +13,7 @@ class Asset
 public:
 	~Asset();
 	int img(std::wstring path);
+	std::vector<int> imgs(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize);
 	int snd(std::wstring path);
 };
 

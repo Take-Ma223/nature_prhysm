@@ -17,23 +17,23 @@ double Converter::getParamA()
 }
 
 
-point::point(int val, Specify specify) {
-	point::val = val;
-	point::different = val;
-	point::specify = specify;
+Point::Point(int val, Specify specify) {
+	Point::val = val;
+	Point::different = val;
+	Point::specify = specify;
 }
 
-int point::updateVal()
+int Point::updateVal()
 {
 	return val;
 }
 
-Specify point::getSpecify()
+Specify Point::getSpecify()
 {
 	return specify;
 }
 
-ValueEvent::ValueEvent(point start, point end, Converter converter, double timeStart, double timeEnd) : Event(timeStart, timeEnd)
+ValueEvent::ValueEvent(Point start, Point end, Converter converter, double timeStart, double timeEnd) : Event(timeStart, timeEnd)
 {
 	ValueEvent::eventType = determinEventType(start, end);
 
@@ -41,7 +41,7 @@ ValueEvent::ValueEvent(point start, point end, Converter converter, double timeS
 
 }
 
-EventType ValueEvent::determinEventType(point p1, point p2)
+EventType ValueEvent::determinEventType(Point p1, Point p2)
 {
 	Specify s1 = p1.getSpecify();
 	Specify s2 = p2.getSpecify();

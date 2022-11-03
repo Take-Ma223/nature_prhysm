@@ -7,7 +7,7 @@ TransValue::TransValue(double* time):Transition(time)
 }
 
 //ƒCƒxƒ“ƒg‘}“ü
-void TransValue::eChange(point start, point end, Converter converter, double startTime, double endTimeInput) {
+void TransValue::eChange(Point start, Point end, Converter converter, double startTime, double endTimeInput) {
 	double endTime = endTimeInput;
 
 	if (endTime < startTime) {
@@ -18,7 +18,7 @@ void TransValue::eChange(point start, point end, Converter converter, double sta
 		new ValueEvent(start, end, converter, startTime, endTime)
 	);
 }
-void TransValue::eChangeTo(point end, Converter converter, double startTime, double endTimeInput) {
+void TransValue::eChangeTo(Point end, Converter converter, double startTime, double endTimeInput) {
 	double endTime = endTimeInput;
 
 	if (endTime < startTime) {
@@ -26,11 +26,11 @@ void TransValue::eChangeTo(point end, Converter converter, double startTime, dou
 	}
 
 	push(
-		new ValueEvent(point(0, Rel), end, converter, startTime, endTime)
+		new ValueEvent(Point(0, Rel), end, converter, startTime, endTime)
 	);
 	
 }
-void TransValue::eSet(point val, double startTime) {
+void TransValue::eSet(Point val, double startTime) {
 	push(
 		new ValueEvent(val, val, Converter(Teleportation, 1), startTime, startTime)
 	);

@@ -21,7 +21,7 @@
 using namespace std;
 
 void SHOW_RESULT(RESULT res,
-	OPTION *option, 
+	Option *option, 
 	int song_number,
 	int difficulty,
 	int *debug, 

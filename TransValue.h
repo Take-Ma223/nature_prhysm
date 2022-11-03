@@ -16,9 +16,9 @@ protected:
 
 public:
 	TransValue(double* time = NULL);
-	void eChange(point start, point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
-	void eChangeTo(point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
-	void eSet(point Abs, double startTime = 0);
+	void eChange(Point start, Point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
+	void eChangeTo(Point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
+	void eSet(Point Abs, double startTime = 0);
 	void eON(double startTime = 0);
 	void eOFF(double startTime = 0);
 

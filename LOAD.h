@@ -8,9 +8,9 @@
 #ifndef _LOAD
 #define _LOAD
 
-extern void LOAD(LIST *, Song *, int *, SECRET *, SkillTestList *, OPTION *op, CONFIG config, IR_SETTING* ir);
-extern void SearchThemeSkin(OPTION* op);
-extern void SearchNoteSkin(OPTION *op);
-extern void SearchHitSoundSkin(OPTION *op);
+extern void LOAD(LIST *, Song *, int *, SECRET *, SkillTestList *, Option *op, CONFIG config, IR_SETTING* ir);
+extern void SearchThemeSkin(Option* op);
+extern void SearchNoteSkin(Option *op);
+extern void SearchHitSoundSkin(Option *op);
 
 #endif

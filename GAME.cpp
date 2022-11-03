@@ -37,7 +37,7 @@
 using namespace std;
 
 void GAME(int song_number, int difficulty,
-	RESULT *res, int *escape, OPTION *option, int *retryAble,
+	RESULT *res, int *escape, Option *option, int *retryAble,
 	int *debug, Song *Music, int Button[3][4], int Button_Shutter, int *Key, char *Buf,
 	int secret,//隠し曲演出中か(0:通常 1:演出中)
 	ANDROID_CONTROLLER *AC,
@@ -80,6 +80,10 @@ void GAME(int song_number, int difficulty,
 	double TimePerFrame = 1000.0 / config.Fps;//1フレームの時間
 
 	Asset asset;//使う画像セット
+
+	//ビューコンテキスト
+	ViewContext vc = ViewContext(&asset, option, &GAME_passed_time_for_UI);
+
 
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
 	//int H_NOTE_OR_FRAME;//ORノートの枠
@@ -599,10 +603,8 @@ void GAME(int song_number, int difficulty,
 
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 
-	CoverView coverView = CoverView(//中央カバー
-		0, 
-		asset.img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str()), 
-		0, &GAME_passed_time_for_UI);
+	//中央カバー
+	CoverView coverView = CoverView(vc, Cordinate(0, 0));
 	
 	
 	
@@ -3281,7 +3283,7 @@ void GAME(int song_number, int difficulty,
 
 		if (isStartCoverMoveUpComplete == 0 && ClearFlag == 0) {//スタート時の中心カバー上げ
 			//DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);//中心カバー
-			coverView.drawMiddleCover();
+			coverView.draw();
 			if (gauge_draw_counter >= gauge - 0.001) {//曲名の透過度
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - sin((3.14 / 2) * c_m_draw_counter)) * 255));
 			}
@@ -3308,7 +3310,7 @@ void GAME(int song_number, int difficulty,
 		}
 		else if (ClearFlag != 0) {//演奏終了していたら中心カバーの表示
 			//DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
-			coverView.drawMiddleCover();
+			coverView.draw();
 			for (i = 0; i < CRTBuf; i++) {
 				if (c_m_draw_counter > 0) {
 					c_m_draw_counter -= 0.0012;
@@ -3323,7 +3325,7 @@ void GAME(int song_number, int difficulty,
 		}
 		else {//演奏中のカバー位置
 			//DrawGraph(320, int(pow(((double)controllerVolume/255), 2) * 720 - 720), H_COVER_MIDDLE, TRUE);
-			coverView.drawMiddleCover();
+			coverView.draw();
 		}
 
 

@@ -22,7 +22,7 @@
 #include"STRUCT_IR_SETTING.h"
 #include"IR_process.h"
 
-void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, OPTION *op, CONFIG config, IR_SETTING* ir) {
+void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, Option *op, CONFIG config, IR_SETTING* ir) {
 	int i = 0, j = 0;
 
 	HANDLE hFind_Folders = 0;//songsフォルダからフォルダを見つける用ハンドル
@@ -39,7 +39,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	//NOTE dummy[5][NOTE_MAX_NUMBER];
 	int lane_dummy[5];
 	CALCDIFF Cdiff_dummy;
-	OPTION opt_dummy;
+	Option opt_dummy;
 	BPMC bpmchange[NOTE_MAX_NUMBER];
 	SC scrollchange[NOTE_MAX_NUMBER];
 	STOP_SE stopSequence[NOTE_MAX_NUMBER];
@@ -498,7 +498,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	return;
 }
 
-void SearchThemeSkin(OPTION *op) {//テーマスキン読み込み
+void SearchThemeSkin(Option *op) {//テーマスキン読み込み
 	HANDLE hFind_Themes = 0;//見つける用ハンドル
 	WIN32_FIND_DATA lp;
 	
@@ -555,7 +555,7 @@ void SearchThemeSkin(OPTION *op) {//テーマスキン読み込み
 }
 
 
-void SearchNoteSkin(OPTION* op) {//ノートスキン読み込み
+void SearchNoteSkin(Option* op) {//ノートスキン読み込み
 	HANDLE hFind_Notes = 0;//見つける用ハンドル
 	WIN32_FIND_DATA lp;
 
@@ -613,7 +613,7 @@ void SearchNoteSkin(OPTION* op) {//ノートスキン読み込み
 
 
 
-void SearchHitSoundSkin(OPTION *op) {//ヒット音スキン読み込み
+void SearchHitSoundSkin(Option *op) {//ヒット音スキン読み込み
 	HANDLE hFind_HitSounds = 0;//見つける用ハンドル
 	WIN32_FIND_DATA lp;
 

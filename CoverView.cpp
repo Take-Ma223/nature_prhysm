@@ -1,15 +1,22 @@
 #include "CoverView.h"
+#include <string>
+using namespace std;
 
-
-
-CoverView::CoverView(int leftCoverHandle, int middleCoverHandle, int rightCoverHandle, double* time)
+CoverView::CoverView(ViewContext vc, Cordinate cordinate) :View(vc, cordinate)
 {
-	leftCover = Image(leftCoverHandle, time, XLeftCoverClose, YLeftCoverClose);
-	middleCover = Image(middleCoverHandle, time, XMiddleCoverClose, YMiddleCoverClose);
-	rightCover = Image(rightCoverHandle, time, XRightCoverClose, YRightCoverClose);
+	wstring themeStr1(L"img/themes/");
+	wstring themeStr2(vc.option->theme[vc.option->op.theme]);
 
-	CloseRatio = TransValue(time);
-	MoveSpeed = TransValue(time);
+	int leftCoverHandle = 0;
+	int middleCoverHandle = vc.asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+	int rightCoverHandle = 0;
+
+	leftCover = Image(leftCoverHandle, vc.time, XLeftCoverClose, YLeftCoverClose);
+	middleCover = Image(middleCoverHandle, vc.time, XMiddleCoverClose, YMiddleCoverClose);
+	rightCover = Image(rightCoverHandle, vc.time, XRightCoverClose, YRightCoverClose);
+
+	CloseRatio = TransValue(vc.time);
+	MoveSpeed = TransValue(vc.time);
 	setMoveSpeedAnimation();
 }
 
@@ -67,6 +74,13 @@ void CoverView::drawRightCover()
 	rightCover.draw();
 }
 
+void CoverView::draw()
+{
+	drawLeftCover();
+	drawMiddleCover();
+	drawRightCover();
+}
+
 void CoverView::closeAll()
 {
 
@@ -99,7 +113,7 @@ void CoverView::finishMiddleCover()
 	//カバーアニメーション設定
 	middleCover.clearAllEvent();
 	//middleCover.Y.eSet(YMiddleCoverOpen + easing(CloseRatio.getValue()));
-	middleCover.Y.eChange(point(0,Rel), YMiddleCoverClose, Converter(QuarterSine), 0, 833);
+	middleCover.Y.eChange(Point(0,Rel), YMiddleCoverClose, Converter(QuarterSine), 0, 833);
 	middleCover.Y.eSet(YMiddleCoverClose, 833);
 	middleCover.setReverseAll(FALSE);
 	middleCover.playAll();

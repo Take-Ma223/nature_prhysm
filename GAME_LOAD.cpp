@@ -24,7 +24,7 @@ void GAME_LOAD(int song_number,
 	int *lane,
 	int readflag,
 	CALCDIFF *Cdiff,
-	OPTION  *Option,
+	Option  *Option,
 	BPMC *bpmchange,
 	SC *scrollchange,
 	STOP_SE *stopSequence,
@@ -98,7 +98,7 @@ void GAME_LOAD(int song_number,
 
 	Cdiff->level_local = 0;//ローカル難易度ポイント初期化
 	typedef struct diff_buffer {
-		double point = 0;
+		double Point = 0;
 		int timing = 0;
 	}diff_buffer;
 	const int LOCAL_DIFF_AMOUNT = 300;
@@ -960,14 +960,14 @@ void GAME_LOAD(int song_number,
 																						   //1/3として加算
 
 																						   //難易度ポイントバッファに格納していく
-										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint * color_point[j] * cp_CAP;
+										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = BeforeSamePoint * color_point[j] * cp_CAP;
 										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
 									}
 									else {//違う色だった
 										diff_point += BeforeSamePoint * color_point[j] * cp_CAP;//難易度ポイント普通に加算
 
 																					 //難易度ポイントバッファに格納していく
-										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint * color_point[j] * cp_CAP;
+										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = BeforeSamePoint * color_point[j] * cp_CAP;
 										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
 									}
 								}
@@ -975,7 +975,7 @@ void GAME_LOAD(int song_number,
 									diff_point += BeforeSamePoint * color_point[j] * cp_CAP;//難易度ポイント加算
 
 																				 //難易度ポイントバッファに格納していく
-									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = BeforeSamePoint * color_point[j] * cp_CAP;
+									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = BeforeSamePoint * color_point[j] * cp_CAP;
 									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
 								}
 								NearColorBuf = j;//この音符の色を保存(後に左の音符扱い)
@@ -1021,7 +1021,7 @@ void GAME_LOAD(int song_number,
 									diff_point += (double)cp_CAP * ((double)note[k][nc[k]].timing_real - note[k][nc[k] - 1].timing_real) / (LN_point);
 
 									//難易度ポイントバッファに格納していく
-									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].point = (double)cp_CAP * ((double)note[k][nc[k]].timing_real - note[k][nc[k] - 1].timing_real) / (LN_point);
+									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = (double)cp_CAP * ((double)note[k][nc[k]].timing_real - note[k][nc[k] - 1].timing_real) / (LN_point);
 									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
 
 
@@ -1054,7 +1054,7 @@ void GAME_LOAD(int song_number,
 									for (int ii = total_diff_point_notes; ii <= total_diff_point_notes + LOCAL_DIFF_AMOUNT - 1; ii++) {
 
 
-										diff_point_local_sum += diff_buf[number_ring(ii, LOCAL_DIFF_AMOUNT - 1)].point;
+										diff_point_local_sum += diff_buf[number_ring(ii, LOCAL_DIFF_AMOUNT - 1)].Point;
 
 									}
 

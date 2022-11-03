@@ -28,13 +28,13 @@ enum Specify {
 };
 
 //値の絶対相対指定クラス
-class point {
+class Point {
 	int val = 0;
 	int different = 0;
 	Specify specify = Abs;//Relのときはdifferentを相対値として扱う
 
 public:
-	point(int val = 0, Specify specify = Abs);
+	Point(int val = 0, Specify specify = Abs);
 
 	int updateVal();
 	Specify getSpecify();
@@ -58,9 +58,9 @@ class ValueEvent : public Event {
 
 	Converter converter;
 
-	EventType determinEventType(point, point);
+	EventType determinEventType(Point, Point);
 public:
-	ValueEvent(point start = point(), point end = point(), Converter converter = Converter(Linear, 0), double timeStart = 0, double  timeEnd = 0);
+	ValueEvent(Point start = Point(), Point end = Point(), Converter converter = Converter(Linear, 0), double timeStart = 0, double  timeEnd = 0);
 
 
 	double easing(double input);

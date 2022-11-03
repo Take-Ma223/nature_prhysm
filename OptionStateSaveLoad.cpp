@@ -23,7 +23,7 @@ void SaveOptionState(OP option) {
 }
 
 
-void LoadOptionState(OPTION *option) {
+void LoadOptionState(Option *option) {
 	FILE *fp = 0;
 	errno_t error = 0;
 

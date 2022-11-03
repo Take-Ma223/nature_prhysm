@@ -12,7 +12,7 @@
 extern void SONG_SELECT(int *l_n,
 	int *s_n,
 	int *diff,
-	OPTION *option, LIST *folder, Song *Music,
+	Option *option, LIST *folder, Song *Music,
 	int Button[3][4], int Button_Shutter, int *Key, char *Buf,
 	int *debug, int *NumberOfSongs,
 	int *result_count, int *result_rank_buf, SECRET *secret,
@@ -26,8 +26,8 @@ extern int GetCylinderColor(double val, double range, unsigned int R, unsigned  
 extern int GetRainbowColorForRadar(int val, int th);
 extern void DrawHexagon(short, short, short, short, short, short);
 
-extern void OptionValueChange(OPTION* Option, int option_select, int add);
-extern void DrawOptionSentence(OPTION* Option, int option_select, CONFIG config, int FontHandle);
+extern void OptionValueChange(Option* Option, int option_select, int add);
+extern void DrawOptionSentence(Option* Option, int option_select, CONFIG config, int FontHandle);
 
 extern int clearStateConverter(int clearState);
 

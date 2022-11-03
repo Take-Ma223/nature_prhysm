@@ -1,6 +1,8 @@
 #pragma once
 #include "Image.h"
-class NotesMode
+#include "View.h"
+
+class NotesModeView : View
 {
 	int X = 439;
 	int Y = 532;
@@ -14,7 +16,7 @@ class NotesMode
 	BOOL isCommandMode = FALSE;
 
 public:
-	NotesMode(int rgbHandle, int kflnHandle, int commandHandle, double* time);
+	NotesModeView(ViewContext vc, Cordinate cordinate);
 	Image rgb;
 	Image kfln;
 	Image command;

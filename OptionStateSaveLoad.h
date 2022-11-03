@@ -5,7 +5,7 @@
 
 
 extern void SaveOptionState(OP option);
-extern void LoadOptionState(OPTION *option);
+extern void LoadOptionState(Option *option);
 
 
 #endif

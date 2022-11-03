@@ -20,7 +20,7 @@ using namespace std;
 void EDIT_SCORE(SCORE_CELL* head,
 	Song* Music,
 	SongSub* MusicSub,
-	OPTION *option,
+	Option *option,
 	int song_number,
 	int difficulty,
 	double init_scroll,
@@ -47,6 +47,10 @@ void EDIT_SCORE(SCORE_CELL* head,
 	double time_cash = 0;//LOOP_passed_timeを算出するための記憶変数
 
 	Asset asset;//使う画像セット
+
+	//ビューコンテキスト
+	ViewContext vc = ViewContext(&asset, option, &GAME_passed_time);
+
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
 				   //int H_NOTE_OR_FRAME;//ORノートの枠
 
@@ -169,11 +173,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	H_LNOTE[8] = CreateGraphFromSoftImage(SOFTH_LNOTE_B);
 	DeleteSoftImage(SOFTH_LNOTE_B);
 
-	NotesMode notesMode = NotesMode(
-		asset.img(L"img/edit/notes_mode_rgb.png"), 
-		asset.img(L"img/edit/notes_mode_kfln.png"),
-		asset.img(L"img/edit/notes_mode_command.png"),
-		&GAME_passed_time);
+	NotesModeView notesMode = NotesModeView(vc,Cordinate(0,0));
 	notesMode.switchToRgb();
 														 //H_LNOTE_OR_FRAME = LoadGraph(L"img/note_or_frame_L.png");
 	/*

@@ -99,7 +99,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int list_number = 0;
 	int song_number = 0;
 	int difficulty = 1;
-	OPTION option;//全体オプション構造体
+	Option option;//全体オプション構造体
 	LIST folder;
 
 	for (i = 0; i < NUMBER_OF_FOLDERS; i++) {

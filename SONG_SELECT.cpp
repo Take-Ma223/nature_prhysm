@@ -32,7 +32,7 @@ using namespace std;
 void SONG_SELECT(int *l_n, 
 	int *s_n, 
 	int *diff, 
-	OPTION *option,
+	Option *option,
 	LIST *folder, 
 	Song *Music, 
 	int Button[3][4], int Button_Shutter, int *Key, char *Buf, 
@@ -4007,14 +4007,14 @@ void DrawHexagon(short v1, short v2, short v3, short v4, short v5, short v6) {
 	return;
 }
 
-void OptionValueChange(OPTION *Option, int option_select, int add) {//オプションの値変更関数
+void OptionValueChange(Option *Option, int option_select, int add) {//オプションの値変更関数
 	*Option->ArrayValue[option_select] = *Option->ArrayValue[option_select] + add;
 	*Option->ArrayValue[option_select] = number_ring(*Option->ArrayValue[option_select], *Option->ArrayOptionNum[option_select] - 1);//数値を収める
 
 	return;
 }
 
-void DrawOptionSentence(OPTION* Option, int option_select, CONFIG config, int FontHandle) {//Option->H_SENTにオプションの説明を描画
+void DrawOptionSentence(Option* Option, int option_select, CONFIG config, int FontHandle) {//Option->H_SENTにオプションの説明を描画
 	int i = 0;
 	wchar_t* StrAddress;//選んでいるオプションの説明文の先頭アドレス
 

@@ -22,7 +22,7 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	int windbreak = 0;//レーンカバー初期位置
 }OP;
 
-typedef struct OPTION {//オプション構造体(全体)
+typedef struct Option {//オプション構造体(全体)
 	OP op;
 
 	static const int OPTION_NUM = 17;//オプションの数
@@ -686,6 +686,6 @@ typedef struct OPTION {//オプション構造体(全体)
 		&(op.sort) };//選んでいるオプションの値
 
 
-}OPTION;
+}Option;
 
 #endif

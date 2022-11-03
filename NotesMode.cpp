@@ -1,36 +1,40 @@
 #include "NotesMode.h"
 
-NotesMode::NotesMode(int rgbHandle, int kflnHandle, int commandHandle, double* time)
+NotesModeView::NotesModeView(ViewContext vc, Cordinate cordinate) : View(vc, cordinate)
 {
-	rgb = Image(rgbHandle, time, X, Y);
-	kfln = Image(kflnHandle, time, X, Y);
-	command = Image(commandHandle, time, X, Y);
+	int rgbHandle = vc.asset->img(L"img/edit/notes_mode_rgb.png");
+	int kflnHandle = vc.asset->img(L"img/edit/notes_mode_kfln.png");
+	int commandHandle = vc.asset->img(L"img/edit/notes_mode_command.png");
+
+	rgb = Image(rgbHandle, vc.time, X, Y);
+	kfln = Image(kflnHandle, vc.time, X, Y);
+	command = Image(commandHandle, vc.time, X, Y);
 }
 
-void NotesMode::switchToRgb()
+void NotesModeView::switchToRgb()
 {
 	selectingMode = RGB;
 	return;
 }
 
-void NotesMode::switchToKfln()
+void NotesModeView::switchToKfln()
 {
 	selectingMode = KFLN;
 	return;
 }
 
-void NotesMode::switchNoteMode()
+void NotesModeView::switchNoteMode()
 {
 	isCommandMode = FALSE;
 }
 
-void NotesMode::switchCommandMode()
+void NotesModeView::switchCommandMode()
 {
 	isCommandMode = TRUE;
 }
 
 
-void NotesMode::draw()
+void NotesModeView::draw()
 {
 	if (isCommandMode) {
 		command.draw();

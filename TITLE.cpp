@@ -18,7 +18,7 @@
 
 using namespace std;
 
-void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, CONFIG config, OPTION *option, IR_SETTING *ir) {
+void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, CONFIG config, Option *option, IR_SETTING *ir) {
 	int H_BG;//背景画像
 	int H_CLOUD;//雲画像
 	int H_TITLE_LOGO;//ロゴ画像
@@ -105,7 +105,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		buttonBB.clearAllEvent();
 		buttonBB.visible.eON();
 		buttonBB.X.eSet(600);
-		buttonBB.X.eChange(point(600, Abs), point(1200,Abs), Converter(Linear), 0, 5000);
+		buttonBB.X.eChange(Point(600, Abs), Point(1200,Abs), Converter(Linear), 0, 5000);
 		buttonBB.X.eSet(1200, 5000);
 
 
@@ -739,7 +739,7 @@ void OPEN_COVER(int difficulty,CONFIG config) {
 	}
 }
 
-void CLOSE_COVER(int difficulty, CONFIG config, OPTION* option) {
+void CLOSE_COVER(int difficulty, CONFIG config, Option* option) {
 	int H_COVER = 0;//カバー画像
 	int H_COVER_MIDDLE;//中心カバー
 	int H_BG;

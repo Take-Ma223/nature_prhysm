@@ -1,14 +1,15 @@
 #pragma once
 #include "Image.h"
 #include "TransValue.h"
+#include "View.h"
 
-enum CoverViewPhase {
+enum CoverViewPhase{
 	Start,
 	Play,
 	Finish
 };
 
-class CoverView
+class CoverView : public View
 {
 	int XLeftCoverOpen = -320;
 	int XLeftCoverClose = 0;
@@ -46,7 +47,9 @@ class CoverView
 
 	void setMoveSpeedAnimation();
 
-
+	void drawLeftCover();
+	void drawMiddleCover();
+	void drawRightCover();
 public:
 	TransValue CloseRatio;//カバー閉じてる率(1000分率)
 	TransValue MoveSpeed;//カバー開閉1000分率スピード(キーボード操作時)押した瞬間だけ遅く動くようにする
@@ -56,10 +59,9 @@ public:
 	Image middleCover;
 	Image rightCover;
 
-	CoverView(int leftCoverHandle, int middleCoverHandle, int rightCoverHandle, double* time);
-	void drawLeftCover();//毎フレーム呼ぶ
-	void drawMiddleCover();//毎フレーム呼ぶ
-	void drawRightCover();//毎フレーム呼ぶ
+	CoverView(ViewContext vc, Cordinate cordinate);
+
+	void draw();//毎フレーム呼ぶ
 
 	void closeAll();
 	void openAll();

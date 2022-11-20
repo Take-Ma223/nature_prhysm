@@ -41,7 +41,7 @@ void GAME(int song_number, int difficulty,
 	int *debug, Song *Music, int Button[3][4], int Button_Shutter, int *Key, char *Buf,
 	int secret,//隠し曲演出中か(0:通常 1:演出中)
 	ANDROID_CONTROLLER *AC,
-	CONFIG config,
+	Config config,
 	IR_SETTING* ir,
 	int SkillTestFlag,//段位認定モードか(0:通常 1~4:段位認定モード ステージ数を示す)
 	double *GaugeVal,
@@ -604,7 +604,7 @@ void GAME(int song_number, int difficulty,
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 
 	//中央カバー
-	CoverView coverView = CoverView(vc, Cordinate(0, 0));
+	CoverView coverView = CoverView(&vc, Cordinate(0, 0));
 	
 	
 	

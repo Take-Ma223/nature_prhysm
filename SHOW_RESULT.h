@@ -12,7 +12,7 @@
 extern void SHOW_RESULT(RESULT res, Option *option, int song_number, int difficulty, int *debug, Song *Music, int Button[3][4], int Button_Shutter, int *Key, char *Buf, ANDROID_CONTROLLER *AC, int TryCount,
 	SkillTestList *STList,
 	int list_number,
-	CONFIG config,
+	Config config,
 	IR_SETTING* ir,
 	int SkillTestFlag = 0
 );

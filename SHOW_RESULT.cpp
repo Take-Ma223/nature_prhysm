@@ -34,7 +34,7 @@ void SHOW_RESULT(RESULT res,
 	int TryCount,
 	SkillTestList *STList,
 	int list_number,
-	CONFIG config,
+	Config config,
 	IR_SETTING* ir,
 	int SkillTestFlag) {
 	RESULT high_score;//現在のハイスコア

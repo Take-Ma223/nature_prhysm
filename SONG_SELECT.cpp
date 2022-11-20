@@ -38,7 +38,7 @@ void SONG_SELECT(int *l_n,
 	int Button[3][4], int Button_Shutter, int *Key, char *Buf, 
 	int *debug, int *NumberOfSongs,
 	int *result_count,int *result_rank_buf,SECRET *secret, ANDROID_CONTROLLER *AC,int *StageCount, SkillTestList *STList,
-	CONFIG config, IR_SETTING* ir) {
+	Config config, IR_SETTING* ir) {
 
 
 
@@ -4014,7 +4014,7 @@ void OptionValueChange(Option *Option, int option_select, int add) {//オプシ�
 	return;
 }
 
-void DrawOptionSentence(Option* Option, int option_select, CONFIG config, int FontHandle) {//Option->H_SENTにオプションの説明を描画
+void DrawOptionSentence(Option* Option, int option_select, Config config, int FontHandle) {//Option->H_SENTにオプションの説明を描画
 	int i = 0;
 	wchar_t* StrAddress;//選んでいるオプションの説明文の先頭アドレス
 

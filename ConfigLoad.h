@@ -2,6 +2,6 @@
 #define _CONFIG_LOAD
 #ifndef _CONFIGLOAD
 
-void ConfigLoad(CONFIG *config);
+void ConfigLoad(Config *config);
 
 #endif

@@ -17,7 +17,7 @@ extern void SONG_SELECT(int *l_n,
 	int *debug, int *NumberOfSongs,
 	int *result_count, int *result_rank_buf, SECRET *secret,
 	ANDROID_CONTROLLER *AC, int *StageCount, SkillTestList *STList,
-	CONFIG config, IR_SETTING* ir);
+	Config config, IR_SETTING* ir);
 
 extern wchar_t *announce_str(int StageCount, int PlayCount);
 
@@ -27,7 +27,7 @@ extern int GetRainbowColorForRadar(int val, int th);
 extern void DrawHexagon(short, short, short, short, short, short);
 
 extern void OptionValueChange(Option* Option, int option_select, int add);
-extern void DrawOptionSentence(Option* Option, int option_select, CONFIG config, int FontHandle);
+extern void DrawOptionSentence(Option* Option, int option_select, Config config, int FontHandle);
 
 extern int clearStateConverter(int clearState);
 

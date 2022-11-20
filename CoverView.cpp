@@ -2,21 +2,21 @@
 #include <string>
 using namespace std;
 
-CoverView::CoverView(ViewContext vc, Cordinate cordinate) :View(vc, cordinate)
+CoverView::CoverView(ViewContext* vc, Cordinate cordinate) :View(vc, cordinate)
 {
 	wstring themeStr1(L"img/themes/");
-	wstring themeStr2(vc.option->theme[vc.option->op.theme]);
+	wstring themeStr2(vc->option->theme[vc->option->op.theme]);
 
 	int leftCoverHandle = 0;
-	int middleCoverHandle = vc.asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+	int middleCoverHandle = vc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 	int rightCoverHandle = 0;
 
-	leftCover = Image(leftCoverHandle, vc.time, XLeftCoverClose, YLeftCoverClose);
-	middleCover = Image(middleCoverHandle, vc.time, XMiddleCoverClose, YMiddleCoverClose);
-	rightCover = Image(rightCoverHandle, vc.time, XRightCoverClose, YRightCoverClose);
+	leftCover = Image(leftCoverHandle, vc->time, XLeftCoverClose, YLeftCoverClose);
+	middleCover = Image(middleCoverHandle, vc->time, XMiddleCoverClose, YMiddleCoverClose);
+	rightCover = Image(rightCoverHandle, vc->time, XRightCoverClose, YRightCoverClose);
 
-	CloseRatio = TransValue(vc.time);
-	MoveSpeed = TransValue(vc.time);
+	CloseRatio = TransValue(vc->time);
+	MoveSpeed = TransValue(vc->time);
 	setMoveSpeedAnimation();
 }
 

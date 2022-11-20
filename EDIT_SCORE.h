@@ -15,7 +15,7 @@
 void EDIT_SCORE(SCORE_CELL *head, Song *Music, SongSub* MusicSub, Option *Option,
 	int song_number, int difficulty, double init_scroll,
 	int Button[3][4], int Button_Shutter, int* Key, char* Buf, double, double*,
-	double* scale_score, int* step_array_number, int* measure_start_step, int* SwingBackBeatTime, ANDROID_CONTROLLER *AC, CONFIG config, int SH_SONG);
+	double* scale_score, int* step_array_number, int* measure_start_step, int* SwingBackBeatTime, ANDROID_CONTROLLER *AC, Config config, int SH_SONG);
 
 int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficulty, double scroll);
 wchar_t note_to_char(char color, char group, BOOL bright, BOOL LN_k);

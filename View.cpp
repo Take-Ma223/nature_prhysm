@@ -13,7 +13,7 @@ ViewContext::ViewContext(Asset* asset, Option* option, double* time)
 	ViewContext::time = time;
 }
 
-View::View(ViewContext vc, Cordinate cordinate){
+View::View(ViewContext* vc, Cordinate cordinate){
 	View::vc = vc;
 	View::cordinate = cordinate;
 }

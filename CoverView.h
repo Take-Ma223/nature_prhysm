@@ -59,7 +59,7 @@ public:
 	Image middleCover;
 	Image rightCover;
 
-	CoverView(ViewContext vc, Cordinate cordinate);
+	CoverView(ViewContext* vc, Cordinate cordinate);
 
 	void draw();//–ˆƒtƒŒ[ƒ€ŒÄ‚Ô
 

@@ -87,7 +87,7 @@ int LoadConnectionState() {
 }
 
 
-void IRgetID(CONFIG config) {
+void IRgetID(Config config) {
 	//初回起動時にIR idの取得
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
@@ -117,7 +117,7 @@ void IRgetID(CONFIG config) {
 	}
 }
 
-void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, BOOL onlyOption, CONFIG config) {
+void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, BOOL onlyOption, Config config) {
 	//送信用スコアの保存
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
@@ -147,7 +147,7 @@ void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, i
 
 }
 
-void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficulty, int rainbow, CONFIG config) {
+void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficulty, int rainbow, Config config) {
 	if (ir->IR_Enable == FALSE)return;//IRに参加しない場合は送信しない
 
 	//スコアの送信
@@ -175,7 +175,7 @@ void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficult
 	::CloseHandle(pi.hThread);
 }
 
-void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config) {
+void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, Config config) {
 	//スコアランキングの表示
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
@@ -202,7 +202,7 @@ void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, CONFIG config) 
 	::CloseHandle(pi.hThread);
 }
 
-void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mode, int score, int rivalID, CONFIG config) {
+void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mode, int score, int rivalID, Config config) {
 	//ターゲットスコアの取得
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";
@@ -229,7 +229,7 @@ void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mod
 	::CloseHandle(pi.hThread);
 }
 
-void connectionConfirm(CONFIG config) {
+void connectionConfirm(Config config) {
 	//サーバー接続状態の取得
 	struct stat statBuf;
 	wchar_t passbuf[512] = L"";

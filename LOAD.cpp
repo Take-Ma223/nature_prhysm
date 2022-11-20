@@ -22,7 +22,7 @@
 #include"STRUCT_IR_SETTING.h"
 #include"IR_process.h"
 
-void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, Option *op, CONFIG config, IR_SETTING* ir) {
+void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, Option *op, Config config, IR_SETTING* ir) {
 	int i = 0, j = 0;
 
 	HANDLE hFind_Folders = 0;//songsフォルダからフォルダを見つける用ハンドル

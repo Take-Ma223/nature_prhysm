@@ -34,11 +34,11 @@ public:
 class View
 {
 protected:
-	ViewContext vc;
+	ViewContext* vc;
 	Cordinate cordinate;
 
 public:
-	View(ViewContext vc, Cordinate cordinate);
+	View(ViewContext* vc, Cordinate cordinate);
 	
 	virtual void draw() = 0;//View‚Ì•`‰æˆ— –ˆƒtƒŒ[ƒ€ŒÄ‚Ñ‚Ü‚· Œp³æ‚Å•K‚¸À‘•‚µ‚Ä‚­‚¾‚³‚¢
 

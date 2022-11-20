@@ -13,7 +13,7 @@
 #include"ScreenShot.h"
 #include<string>
 #include "Asset.h"
-#include "NotesMode.h"
+#include "NotesModeView.h"
 
 using namespace std;
 
@@ -35,7 +35,7 @@ void EDIT_SCORE(SCORE_CELL* head,
     int *measure_start_step,//小節線を表示する起点
 	int *SwingBackBeatTime,//裏拍のSwingDivisionに対する位置
 	ANDROID_CONTROLLER *AC,
-	CONFIG config,
+	Config config,
 	int SH_SONG
 ) {
 	//headのstepは-1
@@ -173,7 +173,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	H_LNOTE[8] = CreateGraphFromSoftImage(SOFTH_LNOTE_B);
 	DeleteSoftImage(SOFTH_LNOTE_B);
 
-	NotesModeView notesMode = NotesModeView(vc,Cordinate(0,0));
+	NotesModeView notesMode = NotesModeView(&vc,Cordinate(0,0));
 	notesMode.switchToRgb();
 														 //H_LNOTE_OR_FRAME = LoadGraph(L"img/note_or_frame_L.png");
 	/*

@@ -33,7 +33,7 @@ void GAME_LOAD(int song_number,
 	SongSub *MusicSub,
 	int *TimeToEndScroll,
 	int *playing_time,
-	CONFIG config,
+	Config config,
 	double pitch,
 	SCORE_CELL *score_cell_head,//EDIT_SCORE関数用の譜面情報格納リスト
 	int SkillTestFlag

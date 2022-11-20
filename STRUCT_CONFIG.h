@@ -1,7 +1,7 @@
 #ifndef _STRUCT_CONFIG
 #define _STRUCT_CONFIG
 
-typedef struct CONFIG {//コンフィグデータ
+typedef struct Config {//コンフィグデータ
 	int FullScreen = 0;
 	int Vsync = 1;
 	int VsyncOffsetCompensation = 1;
@@ -14,6 +14,6 @@ typedef struct CONFIG {//コンフィグデータ
 	int ShowDebug = 1;//デモモード (1の時にプレイ画面でDEBUG MODEが表示されないようになる)
 	int Local = 0;//ソケット通信の接続先IPアドレスをローカルにする
 	int UsePy = 0;//utilフォルダのプログラムにpyファイルを使用する
-} CONFIG;
+} Config;
 
 #endif

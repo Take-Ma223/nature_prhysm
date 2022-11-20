@@ -46,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	SetGraphMode(1280, 720, 32);//画面サイズは1280*720
 
-	CONFIG config;
+	Config config;
 	ConfigLoad(&config);//Config.dat読み込み
 
 	SetWaitVSyncFlag(config.Vsync);//垂直同期

@@ -3,7 +3,7 @@
 #include"CONSTANT_VALUE.h"
 #include"DxLib.h"
 
-void ConfigLoad(CONFIG *config) {//Configファイルの読み込み
+void ConfigLoad(Config *config) {//Configファイルの読み込み
 	wchar_t path[255];
 	int fp;
 

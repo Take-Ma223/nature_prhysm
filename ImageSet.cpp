@@ -1,5 +1,6 @@
 #include "ImageSet.h"
 #include "DxLib.h"
+#include <string>
 
 ImageSet::~ImageSet(){//グラフィックを解放
 	deleteImage();

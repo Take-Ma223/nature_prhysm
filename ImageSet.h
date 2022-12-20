@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <string>
 
 class ImageSet{
 	std::unordered_map<std::wstring, int> img;//(画像パス,ハンドル)　の辞書

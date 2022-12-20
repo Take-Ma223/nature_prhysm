@@ -11,9 +11,9 @@ CoverView::CoverView(ViewContext* vc, Cordinate cordinate) :View(vc, cordinate)
 	int middleCoverHandle = vc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 	int rightCoverHandle = 0;
 
-	leftCover = Image(leftCoverHandle, vc->time, XLeftCoverClose, YLeftCoverClose);
-	middleCover = Image(middleCoverHandle, vc->time, XMiddleCoverClose, YMiddleCoverClose);
-	rightCover = Image(rightCoverHandle, vc->time, XRightCoverClose, YRightCoverClose);
+	leftCover = Image(leftCoverHandle, vc->time, Cordinate(XLeftCoverClose, YLeftCoverClose));
+	middleCover = Image(middleCoverHandle, vc->time, Cordinate(XMiddleCoverClose, YMiddleCoverClose));
+	rightCover = Image(rightCoverHandle, vc->time, Cordinate(XRightCoverClose, YRightCoverClose));
 
 	CloseRatio = TransValue(vc->time);
 	MoveSpeed = TransValue(vc->time);

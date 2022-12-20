@@ -1,5 +1,6 @@
 #include "SoundSet.h"
 #include "DxLib.h"
+#include <string>
 
 SoundSet::~SoundSet() {//ƒTƒEƒ“ƒh‚ğ‰ğ•ú
 	deleteSound();

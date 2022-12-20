@@ -2,6 +2,7 @@
 #include"ImageSet.h"
 #include "TransValue.h"
 #include "TransAction.h"
+#include "View.h"
 
 #pragma once
 
@@ -12,12 +13,12 @@ class Image{
 	double* nowTime;//現在のゲーム時間へのポインタ
 
 public:
-	Image(int handle = 0, double* time = NULL, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
+	Image(int handle = 0, double* time = NULL, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
 	~Image();
 
 	TransValue visible;
-	TransValue X;
-	TransValue Y;
+	TransValue X;//画面上の絶対座標を示す
+	TransValue Y;//画面上の絶対座標を示す
 	TransValue alpha;
 	TransAction action;
 

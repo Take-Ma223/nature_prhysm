@@ -675,17 +675,18 @@ void GAME(int song_number, int difficulty,
 		slow = L"img/judge/slow_c.png";
 	}
 
+	const auto fastSlowCordinate = Cordinate(lane[0], judge_area + fastSlowY);
 	Image I_Fast[4] = {
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area + fastSlowY, 0)
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0)
 	};
 	Image I_Slow[4] = {
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[0],judge_area + fastSlowY, 0),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[1],judge_area + fastSlowY, 0),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[2],judge_area + fastSlowY, 0),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, lane[3],judge_area+ fastSlowY, 0)
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate, 0)
 	};
 
 

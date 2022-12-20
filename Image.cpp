@@ -3,7 +3,7 @@
 #include <math.h>
 
 
-Image::Image(int handle, double* time, int x, int y, BOOL visible, int alpha) {
+Image::Image(int handle, double* time, Cordinate cordinate, BOOL visible, int alpha) {
 	Image::X = TransValue(time);
 	Image::Y = TransValue(time);
 	Image::visible = TransValue(time);
@@ -14,14 +14,14 @@ Image::Image(int handle, double* time, int x, int y, BOOL visible, int alpha) {
 
 	Image::visible.eSet(visible);
 
-	Image::X.eSet(x);
+	Image::X.eSet(cordinate.x);
 
-	Image::Y.eSet(y);
+	Image::Y.eSet(cordinate.y);
 
 	Image::alpha.eSet(alpha);
 
-	Image::X.setValue(x);
-	Image::Y.setValue(y);
+	Image::X.setValue(cordinate.x);
+	Image::Y.setValue(cordinate.y);
 	Image::visible.setValue(visible);
 	Image::alpha.setValue(alpha);
 

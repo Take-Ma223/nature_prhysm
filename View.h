@@ -10,7 +10,7 @@ public:
 	int x = 0;
 	int y = 0;
 
-	Cordinate(int x = 0, int y = 0);
+	Cordinate(int x, int y);
 };
 
 /**
@@ -35,9 +35,12 @@ class View
 {
 protected:
 	ViewContext* vc;
-	Cordinate cordinate;
+	Cordinate cordinate = Cordinate(0,0);
 
 public:
+	/**
+	* 継承先でコンストラクタをオーバーライドする際に、使用するImage,Viewのインスタンスを用意する処理を記述してください
+	*/
 	View(ViewContext* vc, Cordinate cordinate);
 	
 	virtual void draw() = 0;//Viewの描画処理 毎フレーム呼びます 継承先で必ず実装してください

@@ -6,9 +6,10 @@ NotesModeView::NotesModeView(ViewContext* vc, Cordinate cordinate) : View(vc, co
 	int kflnHandle = vc->asset->img(L"img/edit/notes_mode_kfln.png");
 	int commandHandle = vc->asset->img(L"img/edit/notes_mode_command.png");
 
-	rgb = Image(rgbHandle, vc->time, X, Y);
-	kfln = Image(kflnHandle, vc->time, X, Y);
-	command = Image(commandHandle, vc->time, X, Y);
+	auto c = Cordinate(X, Y);
+	rgb = Image(rgbHandle, vc->time, c);
+	kfln = Image(kflnHandle, vc->time, c);
+	command = Image(commandHandle, vc->time, c);
 }
 
 void NotesModeView::switchToRgb()

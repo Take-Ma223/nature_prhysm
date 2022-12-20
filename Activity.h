@@ -26,8 +26,8 @@ class Activity
 
 protected:
 	ActivityContext* ac;
-	double GAME_start_time;
-	double GAME_passed_time;//単位はms 経過時間
+	double GAME_start_time = 0;
+	double GAME_passed_time = 0;//単位はms 経過時間
 
 	double LOOP_passed_time = 1;//1ループにかかった時間(ms)
 	double time_cash = 0;//LOOP_passed_timeを算出するための記憶変数

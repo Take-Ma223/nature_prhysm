@@ -1,6 +1,7 @@
 #pragma once
 #include "Asset.h"
 #include "STRUCT_OP.h"
+#include "Drawable.h"
 
 /** 
 * 座標クラス
@@ -31,7 +32,7 @@ public:
 /**
 * ビュークラス 全てのビューの基底クラス
 */
-class View
+class View : Drawable
 {
 protected:
 	ViewContext* vc;
@@ -43,7 +44,7 @@ public:
 	*/
 	View(ViewContext* vc, Cordinate cordinate);
 	
-	virtual void draw() = 0;//Viewの描画処理 毎フレーム呼びます 継承先で必ず実装してください
+	virtual void draw() override = 0;//Viewの描画処理 毎フレーム呼びます 継承先で必ず実装してください
 
 };
 

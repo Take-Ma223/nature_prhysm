@@ -3,12 +3,13 @@
 #include "TransValue.h"
 #include "TransAction.h"
 #include "View.h"
+#include "Drawable.h"
 
 #pragma once
 
 
 
-class Image{
+class Image: Drawable {
 	int handle = 0;//読み込んだ画像ハンドル
 	double* nowTime;//現在のゲーム時間へのポインタ
 
@@ -32,7 +33,7 @@ public:
 	void setPlaySpeedAll(double);//再生倍率を設定
 
 
-	void draw();//毎フレーム呼ぶ
+	void draw() override;//毎フレーム呼ぶ
 
 };
 

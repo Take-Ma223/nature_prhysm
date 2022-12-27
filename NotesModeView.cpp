@@ -2,9 +2,9 @@
 
 NotesModeView::NotesModeView(ViewContext* vc, Cordinate cordinate) : View(vc, cordinate)
 {
-	int rgbHandle = vc->asset->img(L"img/edit/notes_mode_rgb.png");
-	int kflnHandle = vc->asset->img(L"img/edit/notes_mode_kfln.png");
-	int commandHandle = vc->asset->img(L"img/edit/notes_mode_command.png");
+	ImageHandle rgbHandle = vc->asset->img(L"img/edit/notes_mode_rgb.png");
+	ImageHandle kflnHandle = vc->asset->img(L"img/edit/notes_mode_kfln.png");
+	ImageHandle commandHandle = vc->asset->img(L"img/edit/notes_mode_command.png");
 
 	auto c = Cordinate(X, Y);
 	rgb = Image(rgbHandle, vc->time, c);

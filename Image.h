@@ -4,17 +4,18 @@
 #include "TransAction.h"
 #include "View.h"
 #include "Drawable.h"
+#include "ImageHandle.h"
 
 #pragma once
 
 
 
 class Image: Drawable {
-	int handle = 0;//読み込んだ画像ハンドル
+	ImageHandle handle;//表示する画像ハンドル情報
 	double* nowTime;//現在のゲーム時間へのポインタ
 
 public:
-	Image(int handle = 0, double* time = NULL, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
+	Image(ImageHandle handle = ImageHandle(), double* time = NULL, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
 	~Image();
 
 	TransValue visible;
@@ -22,6 +23,11 @@ public:
 	TransValue Y;//画面上の絶対座標を示す
 	TransValue alpha;
 	TransAction action;
+
+	int sizeX;
+	int sizeY;
+	double centerRatioX = 0;
+	double centerRatioY = 0;
 
 	void clearAllEvent();
 	void playAll();//最初から再生(逆再生の時は最後から再生)

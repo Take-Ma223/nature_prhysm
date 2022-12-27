@@ -3,7 +3,7 @@
 #include <math.h>
 
 
-Image::Image(int handle, double* time, Cordinate cordinate, BOOL visible, int alpha) {
+Image::Image(ImageHandle handle, double* time, Cordinate cordinate, BOOL visible, int alpha) {
 	Image::X = TransValue(time);
 	Image::Y = TransValue(time);
 	Image::visible = TransValue(time);
@@ -98,6 +98,6 @@ void Image::draw() {
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());
 	if (visible.getValue() && alpha.getValue() != 0) {
-		DrawGraph(X.getValue(), Y.getValue(), handle, TRUE);
+		DrawGraph(X.getValue(), Y.getValue(), handle.getHandle(), TRUE);
 	}
 }

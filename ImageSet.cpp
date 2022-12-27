@@ -6,7 +6,7 @@ ImageSet::~ImageSet(){//グラフィックを解放
 	deleteImage();
 }
 
-ImageHandle ImageSet::getSingleScreen(std::wstring path) {
+ImageHandle ImageSet::getImageHandle(std::wstring path) {
 	if (img.find(path.c_str()) != img.end()) {
 		//既に読みこんだ画像
 	}
@@ -17,7 +17,7 @@ ImageHandle ImageSet::getSingleScreen(std::wstring path) {
 	return img[path];
 }
 
-std::vector<ImageHandle> ImageSet::getSingleScreens(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize)
+std::vector<ImageHandle> ImageSet::getImageHandles(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize)
 {
 	if (imgs.find(path.c_str()) != imgs.end()) {
 		//既に読みこんだ画像
@@ -51,6 +51,11 @@ void ImageSet::registImages(std::wstring path, int allNum, int XNum, int YNum, i
 	imgs[path] = singleScreens; //画像パスとハンドルの登録
 }
 
+void ImageSet::registImageHandler(ImageHandle imageHandle)
+{
+	tmpImageHandles.push_back(imageHandle);
+}
+
 void ImageSet::deleteImage() {
 	for (auto itr = img.begin(); itr != img.end(); ++itr) {
 		DeleteGraph(itr->second.getHandle());
@@ -60,5 +65,9 @@ void ImageSet::deleteImage() {
 		for (auto itr2 = itr->second.begin(); itr2 != itr->second.end(); ++itr2) {
 			DeleteGraph(itr2->getHandle());
 		}
+	}
+
+	for (auto itr = tmpImageHandles.begin(); itr != tmpImageHandles.end(); ++itr) {
+		DeleteGraph(itr->getHandle());
 	}
 }

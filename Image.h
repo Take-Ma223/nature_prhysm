@@ -24,10 +24,10 @@ public:
 	TransValue alpha;
 	TransAction action;
 
-	int sizeX;
-	int sizeY;
-	double centerRatioX = 0;
-	double centerRatioY = 0;
+	double centerRatioX = 0.5;//中心座標(Image内の割合)
+	double centerRatioY = 0.5;//中心座標(Image内の割合)
+
+	void setCenterRatio(double x, double y);
 
 	void clearAllEvent();
 	void playAll();//最初から再生(逆再生の時は最後から再生)

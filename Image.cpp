@@ -28,7 +28,13 @@ Image::Image(ImageHandle handle, double* time, Cordinate cordinate, BOOL visible
 }
 
 Image::~Image() {
-	//DeleteGraph(handle);
+	//DeleteGraph(handle.getHandle());
+}
+
+void Image::setCenterRatio(double x, double y)
+{
+	centerRatioX = x;
+	centerRatioY = y;
 }
 
 void Image::clearAllEvent() {

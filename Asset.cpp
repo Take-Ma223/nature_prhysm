@@ -7,12 +7,17 @@ Asset::~Asset()
 
 ImageHandle Asset::img(std::wstring path)
 {
-	return asset.getSingleScreen(path);
+	return asset.getImageHandle(path);
 }
 
 std::vector<ImageHandle> Asset::imgs(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize)
 {
-	return asset.getSingleScreens(path, allNum, XNum, YNum, XSize, YSize);
+	return asset.getImageHandles(path, allNum, XNum, YNum, XSize, YSize);
+}
+
+void Asset::registImageHandler(ImageHandle imageHandle)
+{
+	asset.registImageHandler(imageHandle);
 }
 
 int Asset::snd(std::wstring path)

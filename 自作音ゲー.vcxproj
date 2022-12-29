@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1207439A-2927-40C7-BA8E-7F4E66883FF0}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>自作音ゲー</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>Default</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用</AdditionalLibraryDirectories>
+      <ProgramDatabaseFile />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ProgramDatabaseFile />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="ActionEvent.cpp" />
+    <ClCompile Include="Activity.cpp" />
+    <ClCompile Include="Asset.cpp" />
+    <ClCompile Include="cell_operation.cpp" />
+    <ClCompile Include="ConfigLoad.cpp" />
+    <ClCompile Include="CoverView.cpp" />
+    <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="EDIT_SCORE.cpp" />
+    <ClCompile Include="Event.cpp" />
+    <ClCompile Include="folder_insert.cpp" />
+    <ClCompile Include="GAME.cpp" />
+    <ClCompile Include="GAME_LOAD.cpp" />
+    <ClCompile Include="GetNowCount_d.cpp" />
+    <ClCompile Include="Get_Key_State.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="ImageSet.cpp" />
+    <ClCompile Include="IR_process.cpp" />
+    <ClCompile Include="KeyConfig.cpp" />
+    <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="LED_operation.cpp" />
+    <ClCompile Include="LOAD.cpp" />
+    <ClCompile Include="LoadSkillTestNpsPathList.cpp" />
+    <ClCompile Include="make_result_hash.cpp" />
+    <ClCompile Include="nature prhysm.cpp" />
+    <ClCompile Include="NotesModeView.cpp" />
+    <ClCompile Include="NPStringUtil.cpp" />
+    <ClCompile Include="NPTimer.cpp" />
+    <ClCompile Include="number_digit.cpp" />
+    <ClCompile Include="number_ring.cpp" />
+    <ClCompile Include="OptionStateSaveLoad.cpp" />
+    <ClCompile Include="PlayHitSound.cpp" />
+    <ClCompile Include="GetValueFromController.cpp" />
+    <ClCompile Include="SaveDataSaveLoad.cpp" />
+    <ClCompile Include="ScoreData_Authentication.cpp" />
+    <ClCompile Include="score_cell_operation.cpp" />
+    <ClCompile Include="ScreenShot.cpp" />
+    <ClCompile Include="secret_LOAD.cpp" />
+    <ClCompile Include="setupSerial.cpp" />
+    <ClCompile Include="ShowErrorName.cpp" />
+    <ClCompile Include="ShowFps.cpp" />
+    <ClCompile Include="SHOW_RESULT.cpp" />
+    <ClCompile Include="show_something.cpp" />
+    <ClCompile Include="ImageHandle.cpp" />
+    <ClCompile Include="SongCacheSaveLoad.cpp" />
+    <ClCompile Include="SONG_SELECT.cpp" />
+    <ClCompile Include="Sound.cpp" />
+    <ClCompile Include="SoundSet.cpp" />
+    <ClCompile Include="TITLE.cpp" />
+    <ClCompile Include="TitleController.cpp" />
+    <ClCompile Include="TransAction.cpp" />
+    <ClCompile Include="Transition.cpp" />
+    <ClCompile Include="TransValue.cpp" />
+    <ClCompile Include="ValueEvent.cpp" />
+    <ClCompile Include="View.cpp" />
+    <ClCompile Include="xtosinx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ActionEvent.h" />
+    <ClInclude Include="Activity.h" />
+    <ClInclude Include="Asset.h" />
+    <ClInclude Include="ConfigLoad.h" />
+    <ClInclude Include="CoverView.h" />
+    <ClInclude Include="Drawable.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="GetNowCount_d.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="ImageSet.h" />
+    <ClInclude Include="IR_process.h" />
+    <ClInclude Include="Controller.h" />
+    <ClInclude Include="LoadSkillTestNpsPathList.h" />
+    <ClInclude Include="NotesModeView.h" />
+    <ClInclude Include="NPStringUtil.h" />
+    <ClInclude Include="NPTimer.h" />
+    <ClInclude Include="OptionStateSaveLoad.h" />
+    <ClInclude Include="GetValueFromController.h" />
+    <ClInclude Include="SaveDataSaveLoad.h" />
+    <ClInclude Include="ScreenShot.h" />
+    <ClInclude Include="ShowErrorName.h" />
+    <ClInclude Include="ShowFps.h" />
+    <ClInclude Include="ImageHandle.h" />
+    <ClInclude Include="SongCacheSaveLoad.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="SoundSet.h" />
+    <ClInclude Include="STRUCT_ANDROID_CONTROLLER.h" />
+    <ClInclude Include="cell_operation.h" />
+    <ClInclude Include="CONSTANT_VALUE.h" />
+    <ClInclude Include="CONST_NOTE.h" />
+    <ClInclude Include="EDIT_SCORE.h" />
+    <ClInclude Include="folder_insert.h" />
+    <ClInclude Include="GAME.h" />
+    <ClInclude Include="GAME_LOAD.h" />
+    <ClInclude Include="Get_Key_State.h" />
+    <ClInclude Include="Header.h" />
+    <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="LED_operation.h" />
+    <ClInclude Include="LOAD.h" />
+    <ClInclude Include="make_result_hash.h" />
+    <ClInclude Include="number_digit.h" />
+    <ClInclude Include="number_ring.h" />
+    <ClInclude Include="PlayHitSound.h" />
+    <ClInclude Include="ScoreData_Authentication.h" />
+    <ClInclude Include="score_cell_operation.h" />
+    <ClInclude Include="secret_LOAD.h" />
+    <ClInclude Include="setupSerial.h" />
+    <ClInclude Include="show_something.h" />
+    <ClInclude Include="STRUCT_CALCDIFF.h" />
+    <ClInclude Include="STRUCT_CELL.h" />
+    <ClInclude Include="STRUCT_CONFIG.h" />
+    <ClInclude Include="STRUCT_EDIT_SCORE.h" />
+    <ClInclude Include="STRUCT_GAME_SH.h" />
+    <ClInclude Include="STRUCT_IR_SETTING.h" />
+    <ClInclude Include="STRUCT_LIST.h" />
+    <ClInclude Include="STRUCT_NOTE.h" />
+    <ClInclude Include="SHOW_RESULT.h" />
+    <ClInclude Include="SONG_SELECT.h" />
+    <ClInclude Include="STRUCT_OP.h" />
+    <ClInclude Include="STRUCT_RESULT.h" />
+    <ClInclude Include="STRUCT_SAVEDATA.h" />
+    <ClInclude Include="STRUCT_SECRET.h" />
+    <ClInclude Include="STRUCT_SEQ.h" />
+    <ClInclude Include="STRUCT_Song.h" />
+    <ClInclude Include="STRUCT_XY.h" />
+    <ClInclude Include="TITLE.h" />
+    <ClInclude Include="TitleController.h" />
+    <ClInclude Include="TransAction.h" />
+    <ClInclude Include="Transition.h" />
+    <ClInclude Include="TransValue.h" />
+    <ClInclude Include="ValueEvent.h" />
+    <ClInclude Include="View.h" />
+    <ClInclude Include="xtosinx.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

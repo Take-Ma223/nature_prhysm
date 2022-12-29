@@ -1,0 +1,497 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\GAME">
+      <UniqueIdentifier>{308b5225-c2c9-450c-a635-08adfc2a2ccc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util">
+      <UniqueIdentifier>{77d82ddb-0e1c-4261-9000-f549d83329df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\ControllerCommunication">
+      <UniqueIdentifier>{97d4f4b0-da2d-42d5-ac4d-806bbf7e1baa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\TITLE">
+      <UniqueIdentifier>{6e197381-5766-4446-adca-c3e41093d929}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\LOAD">
+      <UniqueIdentifier>{09796ed4-f5e4-42a6-86f3-efce9c832d1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\EDIT">
+      <UniqueIdentifier>{d4f94522-97f1-4246-a0aa-267e68a0cad8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\SONG_SELECT">
+      <UniqueIdentifier>{77a867ba-b14e-4af7-81ce-0b16af776d0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\IR">
+      <UniqueIdentifier>{095f68d2-70ca-4263-8663-45e25d2da46d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\SHOW_RESULT">
+      <UniqueIdentifier>{51ef2f83-ad9b-4243-9815-1f0f93d8373f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Sound">
+      <UniqueIdentifier>{6c832380-c8c6-494a-bbd9-67d294da1c6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Key">
+      <UniqueIdentifier>{aaa54c1c-6fac-472e-8a4a-05c15960c3d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Song">
+      <UniqueIdentifier>{8da46954-e499-4bb3-be91-08d9abb89e9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Song\folder">
+      <UniqueIdentifier>{9a642585-2c96-44a3-b9e8-4c32cf9e6a52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\SaveData">
+      <UniqueIdentifier>{fa8be104-28a4-456d-9680-4137c8b754ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Option">
+      <UniqueIdentifier>{7ab6b01a-fa5e-40f7-9766-e696bfea23d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\View">
+      <UniqueIdentifier>{d54ca417-c296-4ae2-a86c-39f1530149de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\View\CoverView">
+      <UniqueIdentifier>{5e29e8fe-5f3d-49f8-9aca-46c2f3ac2cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil">
+      <UniqueIdentifier>{7d58bd0f-162a-47f0-bf63-b2322ba4fbd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil\ImageUtil">
+      <UniqueIdentifier>{f25d4b30-aff6-4635-8adb-6331582efa7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil\SoundUtil">
+      <UniqueIdentifier>{c10b4528-55ea-446e-86df-bdd04462a664}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil\Asset">
+      <UniqueIdentifier>{cb0d23ed-9a12-4b15-b2fc-6daa223e4656}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Transition">
+      <UniqueIdentifier>{15b8953d-04b0-4b57-8e36-e1277b356e0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Transition\Event">
+      <UniqueIdentifier>{1cf1e86c-5b35-4ff3-90d1-f31ef4cac61d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\EDIT\View">
+      <UniqueIdentifier>{b9084b9f-7e99-480b-9ba1-467c2565d7bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\EDIT\View\NotesMode">
+      <UniqueIdentifier>{cb1089ad-26f9-4ef7-82e6-2b652d690597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Activity">
+      <UniqueIdentifier>{12a4832a-c8cc-4c1c-86a1-12299defa310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\TITLE\Controller">
+      <UniqueIdentifier>{7955783a-1c2e-47cc-b78e-5baef746c480}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil\Interface">
+      <UniqueIdentifier>{1966a889-10a2-433c-aa6b-d6f07ee68f17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil\ImageHandle">
+      <UniqueIdentifier>{32549b24-78c2-45e7-a522-1b22cf09fbc4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="nature prhysm.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreData_Authentication.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="LED_operation.cpp">
+      <Filter>ソース ファイル\Util\ControllerCommunication</Filter>
+    </ClCompile>
+    <ClCompile Include="setupSerial.cpp">
+      <Filter>ソース ファイル\Util\ControllerCommunication</Filter>
+    </ClCompile>
+    <ClCompile Include="GetValueFromController.cpp">
+      <Filter>ソース ファイル\Util\ControllerCommunication</Filter>
+    </ClCompile>
+    <ClCompile Include="GAME.cpp">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
+    <ClCompile Include="GAME_LOAD.cpp">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
+    <ClCompile Include="cell_operation.cpp">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
+    <ClCompile Include="TITLE.cpp">
+      <Filter>ソース ファイル\TITLE</Filter>
+    </ClCompile>
+    <ClCompile Include="LOAD.cpp">
+      <Filter>ソース ファイル\LOAD</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigLoad.cpp">
+      <Filter>ソース ファイル\LOAD</Filter>
+    </ClCompile>
+    <ClCompile Include="xtosinx.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="number_digit.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="number_ring.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="GetNowCount_d.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Get_Key_State.cpp">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyConfig.cpp">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenShot.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowFps.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowErrorName.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="show_something.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="EDIT_SCORE.cpp">
+      <Filter>ソース ファイル\EDIT</Filter>
+    </ClCompile>
+    <ClCompile Include="score_cell_operation.cpp">
+      <Filter>ソース ファイル\EDIT</Filter>
+    </ClCompile>
+    <ClCompile Include="SONG_SELECT.cpp">
+      <Filter>ソース ファイル\SONG_SELECT</Filter>
+    </ClCompile>
+    <ClCompile Include="IR_process.cpp">
+      <Filter>ソース ファイル\Util\IR</Filter>
+    </ClCompile>
+    <ClCompile Include="SHOW_RESULT.cpp">
+      <Filter>ソース ファイル\SHOW_RESULT</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayHitSound.cpp">
+      <Filter>ソース ファイル\Util\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionStateSaveLoad.cpp">
+      <Filter>ソース ファイル\Util\Option</Filter>
+    </ClCompile>
+    <ClCompile Include="make_result_hash.cpp">
+      <Filter>ソース ファイル\SHOW_RESULT</Filter>
+    </ClCompile>
+    <ClCompile Include="secret_LOAD.cpp">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClCompile>
+    <ClCompile Include="SongCacheSaveLoad.cpp">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClCompile>
+    <ClCompile Include="folder_insert.cpp">
+      <Filter>ソース ファイル\Util\Song\folder</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadSkillTestNpsPathList.cpp">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClCompile>
+    <ClCompile Include="SaveDataSaveLoad.cpp">
+      <Filter>ソース ファイル\Util\SaveData</Filter>
+    </ClCompile>
+    <ClCompile Include="NPStringUtil.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="CoverView.cpp">
+      <Filter>ソース ファイル\Util\View\CoverView</Filter>
+    </ClCompile>
+    <ClCompile Include="Transition.cpp">
+      <Filter>ソース ファイル\Util\Transition</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\ImageUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageSet.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundSet.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\SoundUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>ソース ファイル\Util\Transition\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionEvent.cpp">
+      <Filter>ソース ファイル\Util\Transition\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="ValueEvent.cpp">
+      <Filter>ソース ファイル\Util\Transition\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="TransValue.cpp">
+      <Filter>ソース ファイル\Util\Transition</Filter>
+    </ClCompile>
+    <ClCompile Include="TransAction.cpp">
+      <Filter>ソース ファイル\Util\Transition</Filter>
+    </ClCompile>
+    <ClCompile Include="NotesModeView.cpp">
+      <Filter>ソース ファイル\EDIT\View\NotesMode</Filter>
+    </ClCompile>
+    <ClCompile Include="View.cpp">
+      <Filter>ソース ファイル\Util\View</Filter>
+    </ClCompile>
+    <ClCompile Include="NPTimer.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Activity.cpp">
+      <Filter>ソース ファイル\Util\Activity</Filter>
+    </ClCompile>
+    <ClCompile Include="Controller.cpp">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleController.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawable.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageHandle.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\ImageHandle</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Header.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="CONSTANT_VALUE.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreData_Authentication.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="CONST_NOTE.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="setupSerial.h">
+      <Filter>ソース ファイル\Util\ControllerCommunication</Filter>
+    </ClInclude>
+    <ClInclude Include="LED_operation.h">
+      <Filter>ソース ファイル\Util\ControllerCommunication</Filter>
+    </ClInclude>
+    <ClInclude Include="GetValueFromController.h">
+      <Filter>ソース ファイル\Util\ControllerCommunication</Filter>
+    </ClInclude>
+    <ClInclude Include="cell_operation.h">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="GAME.h">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="GAME_LOAD.h">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_SEQ.h">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_NOTE.h">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_CELL.h">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="TITLE.h">
+      <Filter>ソース ファイル\TITLE</Filter>
+    </ClInclude>
+    <ClInclude Include="LOAD.h">
+      <Filter>ソース ファイル\LOAD</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigLoad.h">
+      <Filter>ソース ファイル\LOAD</Filter>
+    </ClInclude>
+    <ClInclude Include="xtosinx.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="number_digit.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="number_ring.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="GetNowCount_d.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Get_Key_State.h">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyConfig.h">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenShot.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="ShowFps.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="ShowErrorName.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="show_something.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="EDIT_SCORE.h">
+      <Filter>ソース ファイル\EDIT</Filter>
+    </ClInclude>
+    <ClInclude Include="score_cell_operation.h">
+      <Filter>ソース ファイル\EDIT</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_CONFIG.h">
+      <Filter>ソース ファイル\LOAD</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_XY.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_ANDROID_CONTROLLER.h">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="SONG_SELECT.h">
+      <Filter>ソース ファイル\SONG_SELECT</Filter>
+    </ClInclude>
+    <ClInclude Include="IR_process.h">
+      <Filter>ソース ファイル\Util\IR</Filter>
+    </ClInclude>
+    <ClInclude Include="SHOW_RESULT.h">
+      <Filter>ソース ファイル\SHOW_RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_IR_SETTING.h">
+      <Filter>ソース ファイル\Util\IR</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayHitSound.h">
+      <Filter>ソース ファイル\Util\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_GAME_SH.h">
+      <Filter>ソース ファイル\Util\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionStateSaveLoad.h">
+      <Filter>ソース ファイル\Util\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_OP.h">
+      <Filter>ソース ファイル\Util\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="make_result_hash.h">
+      <Filter>ソース ファイル\SHOW_RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_RESULT.h">
+      <Filter>ソース ファイル\SHOW_RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_Song.h">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClInclude>
+    <ClInclude Include="SongCacheSaveLoad.h">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClInclude>
+    <ClInclude Include="secret_LOAD.h">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_EDIT_SCORE.h">
+      <Filter>ソース ファイル\EDIT</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_SECRET.h">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClInclude>
+    <ClInclude Include="folder_insert.h">
+      <Filter>ソース ファイル\Util\Song\folder</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_LIST.h">
+      <Filter>ソース ファイル\Util\Song\folder</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadSkillTestNpsPathList.h">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveDataSaveLoad.h">
+      <Filter>ソース ファイル\Util\SaveData</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_SAVEDATA.h">
+      <Filter>ソース ファイル\Util\SaveData</Filter>
+    </ClInclude>
+    <ClInclude Include="STRUCT_CALCDIFF.h">
+      <Filter>ソース ファイル\Util\Song</Filter>
+    </ClInclude>
+    <ClInclude Include="NPStringUtil.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="CoverView.h">
+      <Filter>ソース ファイル\Util\View\CoverView</Filter>
+    </ClInclude>
+    <ClInclude Include="Transition.h">
+      <Filter>ソース ファイル\Util\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>ソース ファイル\Util\UiUtil\ImageUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageSet.h">
+      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundSet.h">
+      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset.h">
+      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>ソース ファイル\Util\UiUtil\SoundUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>ソース ファイル\Util\Transition\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionEvent.h">
+      <Filter>ソース ファイル\Util\Transition\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="ValueEvent.h">
+      <Filter>ソース ファイル\Util\Transition\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="TransValue.h">
+      <Filter>ソース ファイル\Util\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="TransAction.h">
+      <Filter>ソース ファイル\Util\Transition</Filter>
+    </ClInclude>
+    <ClInclude Include="NotesModeView.h">
+      <Filter>ソース ファイル\EDIT\View\NotesMode</Filter>
+    </ClInclude>
+    <ClInclude Include="View.h">
+      <Filter>ソース ファイル\Util\View</Filter>
+    </ClInclude>
+    <ClInclude Include="NPTimer.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Activity.h">
+      <Filter>ソース ファイル\Util\Activity</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleController.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawable.h">
+      <Filter>ソース ファイル\Util\UiUtil\Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageHandle.h">
+      <Filter>ソース ファイル\Util\UiUtil\ImageHandle</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

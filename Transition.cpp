@@ -6,19 +6,6 @@ Transition::Transition(double* time) {
 	nowTime = time;
 }
 
-int Transition::getValue() {
-	return value;
-}
-
-void Transition::setValue(int input)
-{
-	value = input;
-	return;
-}
-
-
-
-
 void Transition::clearEvent() {
 	std::vector<Event*> empty;
 	

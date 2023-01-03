@@ -45,10 +45,7 @@ protected:
 public:
 	
 	Transition(double* time = NULL);
-	int getValue();
-	void setValue(int);//‰Šú‰»‚ÆA‘¼‚Ì•Ï”‚É‚æ‚Á‚Ä’l‚ğŒˆ‚ß‚é‚Æ‚«‚Ég‚¤
 	void update();
-
 
 	void clearEvent();//transition‚ğ‹ó‚É‚µ‚Äíœ
 

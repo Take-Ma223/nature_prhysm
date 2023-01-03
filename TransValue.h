@@ -16,6 +16,9 @@ protected:
 
 public:
 	TransValue(double* time = NULL);
+	int getValue();
+	void setValue(int);//‰Šú‰»‚ÆA‘¼‚Ì•Ï”‚É‚æ‚Á‚Ä’l‚ğŒˆ‚ß‚é‚Æ‚«‚Ég‚¤
+
 	void eChange(Point start, Point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
 	void eChangeTo(Point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
 	void eSet(Point Abs, double startTime = 0);

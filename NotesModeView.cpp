@@ -2,14 +2,15 @@
 
 NotesModeView::NotesModeView(ViewContext* vc, Cordinate cordinate) : View(vc, cordinate)
 {
+	makeScreen(viewSize());
+
 	ImageHandle rgbHandle = vc->asset->img(L"img/edit/notes_mode_rgb.png");
 	ImageHandle kflnHandle = vc->asset->img(L"img/edit/notes_mode_kfln.png");
 	ImageHandle commandHandle = vc->asset->img(L"img/edit/notes_mode_command.png");
 
-	auto c = Cordinate(X, Y);
-	rgb = Image(rgbHandle, vc->time, c);
-	kfln = Image(kflnHandle, vc->time, c);
-	command = Image(commandHandle, vc->time, c);
+	rgb = Image(rgbHandle, vc->time, Cordinate(0, 0));
+	kfln = Image(kflnHandle, vc->time, Cordinate(0, 0));
+	command = Image(commandHandle, vc->time, Cordinate(0, 0));
 }
 
 void NotesModeView::switchToRgb()
@@ -35,17 +36,17 @@ void NotesModeView::switchCommandMode()
 }
 
 
-void NotesModeView::draw()
+void NotesModeView::putContents(int drawScreen)
 {
 	if (isCommandMode) {
-		command.draw();
+		command.draw(drawScreen);
 		return;
 	}
 
 	if (selectingMode == RGB) {
-		rgb.draw();
+		rgb.draw(drawScreen);
 	}
 	else if (selectingMode == KFLN) {
-		kfln.draw();
+		kfln.draw(drawScreen);
 	}
 }

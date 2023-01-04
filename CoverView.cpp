@@ -4,6 +4,8 @@ using namespace std;
 
 CoverView::CoverView(ViewContext* vc, Cordinate cordinate) :View(vc, cordinate)
 {
+	makeScreen(viewSize());
+
 	wstring themeStr1(L"img/themes/");
 	wstring themeStr2(vc->option->theme[vc->option->op.theme]);
 
@@ -50,12 +52,12 @@ void CoverView::setMoveSpeedAnimation()
 	MoveSpeed.eChange(0, 1000, Converter(Linear), 0, 150);
 }
 
-void CoverView::drawLeftCover()
+void CoverView::drawLeftCover(int drawScreen)
 {
-	leftCover.draw();
+	leftCover.draw(drawScreen);
 }
 
-void CoverView::drawMiddleCover()
+void CoverView::drawMiddleCover(int drawScreen)
 {
 	if (phase == Play) {
 		MoveSpeed.update();
@@ -66,19 +68,19 @@ void CoverView::drawMiddleCover()
 		middleCover.Y.setValue(YMiddleCoverOpen + CloseRatio.getValue());//ê¸å`Ç…à⁄ìÆ
 	}
 
-	middleCover.draw();
+	middleCover.draw(drawScreen);
 }
 
-void CoverView::drawRightCover()
+void CoverView::drawRightCover(int drawScreen)
 {
-	rightCover.draw();
+	rightCover.draw(drawScreen);
 }
 
-void CoverView::draw()
+void CoverView::putContents(int drawScreen)
 {
-	drawLeftCover();
-	drawMiddleCover();
-	drawRightCover();
+	drawLeftCover(drawScreen);
+	drawMiddleCover(drawScreen);
+	drawRightCover(drawScreen);
 }
 
 void CoverView::closeAll()

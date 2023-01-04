@@ -3,14 +3,13 @@
 
 ImageHandle::ImageHandle()
 {
-	ImageHandle(0, 0, 0);
+	ImageHandle(0);
 }
 
-ImageHandle::ImageHandle(int h, int x, int y)
+ImageHandle::ImageHandle(int h, Size s)
 {
 	handle = h;
-	sizeX = x;
-	sizeY = y;
+	size = s;
 }
 
 int ImageHandle::getHandle()
@@ -18,12 +17,7 @@ int ImageHandle::getHandle()
 	return handle;
 }
 
-int ImageHandle::getSizeX()
+Size ImageHandle::getSize()
 {
-	return sizeX;
-}
-
-int ImageHandle::getSizeY()
-{
-	return sizeY;
+	return size;
 }

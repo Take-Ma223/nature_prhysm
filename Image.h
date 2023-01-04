@@ -5,6 +5,7 @@
 #include "View.h"
 #include "Drawable.h"
 #include "ImageHandle.h"
+#include "Geometry.h"
 
 #pragma once
 
@@ -39,7 +40,8 @@ public:
 	void setPlaySpeedAll(double);//再生倍率を設定
 
 
-	void draw() override;//毎フレーム呼ぶ
-
+	void draw(int drawScreen) override;//毎フレーム呼ぶ
+	void setScreen(int drawScreen) override;
+	void putContents(int drawScreen) override;
 };
 

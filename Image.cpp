@@ -95,7 +95,18 @@ void Image::setPlaySpeedAll(double playSpeed) {
 	action.setPlaySpeed(playSpeed);
 }
 
-void Image::draw() {
+void Image::draw(int drawScreen) {
+	setScreen(drawScreen);
+	putContents(drawScreen);
+}
+
+void Image::setScreen(int drawScreen)
+{
+	SetDrawScreen(drawScreen);
+}
+
+void Image::putContents(int drawScreen)
+{
 	visible.update();
 	X.update();
 	Y.update();

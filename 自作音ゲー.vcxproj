@@ -167,6 +167,7 @@
     <ClCompile Include="folder_insert.cpp" />
     <ClCompile Include="GAME.cpp" />
     <ClCompile Include="GAME_LOAD.cpp" />
+    <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="GetNowCount_d.cpp" />
     <ClCompile Include="Get_Key_State.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="CoverView.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="GetNowCount_d.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ImageSet.h" />

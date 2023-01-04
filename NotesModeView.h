@@ -2,11 +2,8 @@
 #include "Image.h"
 #include "View.h"
 
-class NotesModeView : View
+class NotesModeView : public View
 {
-	int X = 439;
-	int Y = 532;
-	
 	enum Selecting
 	{
 		RGB,KFLN
@@ -15,6 +12,9 @@ class NotesModeView : View
 	Selecting selectingMode = Selecting::RGB;
 	BOOL isCommandMode = FALSE;
 
+	int sizeX = 32;
+	int sizeY = 96;
+	Size virtual viewSize() override { return Size(sizeX, sizeY); };
 public:
 	NotesModeView(ViewContext* vc, Cordinate cordinate);
 	Image rgb;
@@ -28,7 +28,8 @@ public:
 	void switchNoteMode();
 	void switchCommandMode();
 
-	void draw();
+	virtual void putContents(int drawScreen) override;
+
 
 
 };

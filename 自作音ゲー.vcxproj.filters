@@ -100,6 +100,9 @@
     <Filter Include="ソース ファイル\Util\UiUtil\ImageHandle">
       <UniqueIdentifier>{32549b24-78c2-45e7-a522-1b22cf09fbc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil\Geometry">
+      <UniqueIdentifier>{75b16014-e79d-4402-b770-f4ca4847778c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -266,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="ImageHandle.cpp">
       <Filter>ソース ファイル\Util\UiUtil\ImageHandle</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>ソース ファイル\Util\UiUtil\Geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -492,6 +498,9 @@
     </ClInclude>
     <ClInclude Include="ImageHandle.h">
       <Filter>ソース ファイル\Util\UiUtil\ImageHandle</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>ソース ファイル\Util\UiUtil\Geometry</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

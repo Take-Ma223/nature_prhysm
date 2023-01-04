@@ -47,9 +47,13 @@ class CoverView : public View
 
 	void setMoveSpeedAnimation();
 
-	void drawLeftCover();
-	void drawMiddleCover();
-	void drawRightCover();
+	void drawLeftCover(int drawScreen);
+	void drawMiddleCover(int drawScreen);
+	void drawRightCover(int drawScreen);
+
+	int sizeX = 1280;
+	int sizeY = 720;
+	Size virtual viewSize() override { return Size(sizeX, sizeY); };
 public:
 	TransValue CloseRatio;//カバー閉じてる率(1000分率)
 	TransValue MoveSpeed;//カバー開閉1000分率スピード(キーボード操作時)押した瞬間だけ遅く動くようにする
@@ -61,7 +65,8 @@ public:
 
 	CoverView(ViewContext* vc, Cordinate cordinate);
 
-	void draw();//毎フレーム呼ぶ
+	void putContents(int drawScreen) override;
+
 
 	void closeAll();
 	void openAll();

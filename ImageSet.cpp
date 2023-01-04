@@ -34,7 +34,7 @@ void ImageSet::registImage(std::wstring path) {
 
 	int x, y;
 	GetGraphSize(handle, &x, &y);
-	img[path] = ImageHandle(handle, x, y); //‰æ‘œƒpƒX‚Æƒnƒ“ƒhƒ‹‚Ì“o˜^
+	img[path] = ImageHandle(handle, Size(x, y)); //‰æ‘œƒpƒX‚Æƒnƒ“ƒhƒ‹‚Ì“o˜^
 }
 
 void ImageSet::registImages(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize) {
@@ -45,7 +45,7 @@ void ImageSet::registImages(std::wstring path, int allNum, int XNum, int YNum, i
 	int x, y;
 	for (auto itr = handles.begin(); itr != handles.end(); ++itr) {
 		GetGraphSize(*itr, &x, &y);
-		singleScreens.push_back(ImageHandle(*itr, x, y));
+		singleScreens.push_back(ImageHandle(*itr, Size(x, y)));
 	}
 
 	imgs[path] = singleScreens; //‰æ‘œƒpƒX‚Æƒnƒ“ƒhƒ‹‚Ì“o˜^

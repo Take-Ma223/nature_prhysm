@@ -3289,7 +3289,7 @@ void GAME(int song_number, int difficulty,
 
 		if (isStartCoverMoveUpComplete == 0 && ClearFlag == 0) {//スタート時の中心カバー上げ
 			//DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);//中心カバー
-			coverView.draw();
+			coverView.draw(DX_SCREEN_BACK);
 			if (gauge_draw_counter >= gauge - 0.001) {//曲名の透過度
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - sin((3.14 / 2) * c_m_draw_counter)) * 255));
 			}
@@ -3316,7 +3316,7 @@ void GAME(int song_number, int difficulty,
 		}
 		else if (ClearFlag != 0) {//演奏終了していたら中心カバーの表示
 			//DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
-			coverView.draw();
+			coverView.draw(DX_SCREEN_BACK);
 			for (i = 0; i < CRTBuf; i++) {
 				if (c_m_draw_counter > 0) {
 					c_m_draw_counter -= 0.0012;
@@ -3331,7 +3331,7 @@ void GAME(int song_number, int difficulty,
 		}
 		else {//演奏中のカバー位置
 			//DrawGraph(320, int(pow(((double)controllerVolume/255), 2) * 720 - 720), H_COVER_MIDDLE, TRUE);
-			coverView.draw();
+			coverView.draw(DX_SCREEN_BACK);
 		}
 
 
@@ -3372,8 +3372,8 @@ void GAME(int song_number, int difficulty,
 				if (hit_miss[i] >= 0)hit_miss[i] -= 0.006;
 			}
 
-			I_Slow[i].draw();
-			I_Fast[i].draw();
+			I_Slow[i].draw(DX_SCREEN_BACK);
+			I_Fast[i].draw(DX_SCREEN_BACK);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		}
 

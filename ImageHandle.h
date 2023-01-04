@@ -1,4 +1,5 @@
 #pragma once
+#include "Geometry.h"
 
 /**
 * メモリに存在する一枚の画像のハンドル情報を表すクラス 
@@ -6,14 +7,12 @@
 */
 class ImageHandle {
 	int handle;//画像ハンドル
-	int sizeX;
-	int sizeY;
+	Size size;
 
 public:
 	ImageHandle();
-	ImageHandle(int handle, int sizeX, int sizeY);
+	ImageHandle(int handle, Size size = Size(1, 1));
 
 	int getHandle();
-	int getSizeX();
-	int getSizeY();
+	Size getSize();;
 };

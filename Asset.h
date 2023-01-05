@@ -1,6 +1,7 @@
 #pragma once
 #include "ImageSet.h"
 #include "SoundSet.h"
+#include "FontSet.h"
 
 /**
 * アセット管理クラス
@@ -12,6 +13,7 @@ class Asset
 {
 	ImageSet asset;
 	SoundSet soundSet;
+	FontSet fontSet;
 	void deleteAsset();
 
 public:
@@ -21,4 +23,6 @@ public:
 	void registImageHandler(ImageHandle imageHandle);
 
 	int snd(std::wstring path);
+
+	FontHandle font(FontInfo fontInfo);
 };

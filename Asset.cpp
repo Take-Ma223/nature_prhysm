@@ -25,6 +25,11 @@ int Asset::snd(std::wstring path)
 	return soundSet.getHandle(path);
 }
 
+FontHandle Asset::font(FontInfo fontInfo)
+{
+	return fontSet.getFontHandle(fontInfo);
+}
+
 void Asset::deleteAsset()
 {
 	asset.deleteImage();

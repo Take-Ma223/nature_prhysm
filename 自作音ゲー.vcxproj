@@ -165,6 +165,9 @@
     <ClCompile Include="EDIT_SCORE.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="folder_insert.cpp" />
+    <ClCompile Include="FontHandle.cpp" />
+    <ClCompile Include="FontInfo.cpp" />
+    <ClCompile Include="FontSet.cpp" />
     <ClCompile Include="GAME.cpp" />
     <ClCompile Include="GAME_LOAD.cpp" />
     <ClCompile Include="Geometry.cpp" />
@@ -223,6 +226,9 @@
     <ClInclude Include="CoverView.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="FontHandle.h" />
+    <ClInclude Include="FontInfo.h" />
+    <ClInclude Include="FontSet.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="GetNowCount_d.h" />
     <ClInclude Include="Image.h" />

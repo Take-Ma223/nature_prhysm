@@ -2,7 +2,7 @@
 #include <string>
 using namespace std;
 
-CoverView::CoverView(ViewContext* vc, Cordinate cordinate) :View(vc, cordinate)
+CoverView::CoverView(ViewContext* vc, Cordinate cordinate, BOOL visible, int alpha) : View(vc, cordinate, visible, alpha)
 {
 	makeScreen(Size(sizeX, sizeY));
 
@@ -76,7 +76,7 @@ void CoverView::drawRightCover(int drawScreen)
 	rightCover.draw(drawScreen);
 }
 
-void CoverView::putContents(int drawScreen)
+void CoverView::prepareScreen(int drawScreen)
 {
 	drawLeftCover(drawScreen);
 	drawMiddleCover(drawScreen);

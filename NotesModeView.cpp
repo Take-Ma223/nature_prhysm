@@ -1,6 +1,6 @@
 #include "NotesModeView.h"
 
-NotesModeView::NotesModeView(ViewContext* vc, Cordinate cordinate) : View(vc, cordinate)
+NotesModeView::NotesModeView(ViewContext* vc, Cordinate cordinate, BOOL visible, int alpha) : View(vc, cordinate, visible, alpha)
 {
 	makeScreen(Size(sizeX, sizeY));
 
@@ -36,7 +36,7 @@ void NotesModeView::switchCommandMode()
 }
 
 
-void NotesModeView::putContents(int drawScreen)
+void NotesModeView::prepareScreen(int drawScreen)
 {
 	if (isCommandMode) {
 		command.draw(drawScreen);

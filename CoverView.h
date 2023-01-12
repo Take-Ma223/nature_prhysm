@@ -62,9 +62,9 @@ public:
 	Image middleCover;
 	Image rightCover;
 
-	CoverView(ViewContext* vc, Cordinate cordinate);
+	CoverView(ViewContext* vc, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
 
-	void putContents(int drawScreen) override;
+	void prepareScreen(int drawScreen) override;
 
 
 	void closeAll();

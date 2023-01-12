@@ -16,7 +16,7 @@ class NotesModeView : public View
 	int sizeY = 96;
 
 public:
-	NotesModeView(ViewContext* vc, Cordinate cordinate);
+	NotesModeView(ViewContext* vc, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
 	Image rgb;
 	Image kfln;
 	Image command;
@@ -28,7 +28,7 @@ public:
 	void switchNoteMode();
 	void switchCommandMode();
 
-	virtual void putContents(int drawScreen) override;
+	virtual void prepareScreen(int drawScreen) override;
 
 
 

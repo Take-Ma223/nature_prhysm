@@ -22,11 +22,9 @@ public:
 /**
 * ビュークラス 全てのビューの基底クラス
 */
-class View : Drawable
+class View : public Drawable
 {
 private:
-	int screenHandle = 0;//このViewの画像ハンドル
-	Size size = Size(1, 1);//このViewのサイズ makeScreen実行時に変更されます
 	void deleteGraph();
 
 protected:
@@ -39,11 +37,15 @@ public:
 	/**
 	* 継承先でコンストラクタをオーバーライドする際に、使用するImage,Viewのインスタンスを用意する処理を記述してください
 	*/
-	View(ViewContext* vc, Cordinate cordinate);
+	View(ViewContext* vc, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
 	~View();
 
 	void draw(int drawScreen) override;//Viewの描画処理の開始 毎フレーム呼びます 
-	void setScreen(int drawScreen) override;//描画先スクリーンの指定
-	virtual void putContents(int drawScreen) override = 0;//描画処理 継承先で必ず実装してください
+	virtual void prepareScreen(int drawScreen) = 0;//drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください
+
+	int drawHandle() override {
+		return handle.getHandle();
+	};
+
 };
 

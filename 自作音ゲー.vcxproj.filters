@@ -94,9 +94,6 @@
     <Filter Include="ソース ファイル\TITLE\Controller">
       <UniqueIdentifier>{7955783a-1c2e-47cc-b78e-5baef746c480}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\Interface">
-      <UniqueIdentifier>{1966a889-10a2-433c-aa6b-d6f07ee68f17}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Util\UiUtil\Geometry">
       <UniqueIdentifier>{75b16014-e79d-4402-b770-f4ca4847778c}</UniqueIdentifier>
     </Filter>
@@ -105,6 +102,9 @@
     </Filter>
     <Filter Include="ソース ファイル\Util\UiUtil\Asset\FontHandle">
       <UniqueIdentifier>{aa98f354-43c2-4739-bce1-ab1d05514a51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\UiUtil\Drawable">
+      <UniqueIdentifier>{1966a889-10a2-433c-aa6b-d6f07ee68f17}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -268,7 +268,7 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Drawable.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Interface</Filter>
+      <Filter>ソース ファイル\Util\UiUtil\Drawable</Filter>
     </ClCompile>
     <ClCompile Include="ImageHandle.cpp">
       <Filter>ソース ファイル\Util\UiUtil\Asset\ImageHandle</Filter>
@@ -506,7 +506,7 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Drawable.h">
-      <Filter>ソース ファイル\Util\UiUtil\Interface</Filter>
+      <Filter>ソース ファイル\Util\UiUtil\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="ImageHandle.h">
       <Filter>ソース ファイル\Util\UiUtil\Asset\ImageHandle</Filter>

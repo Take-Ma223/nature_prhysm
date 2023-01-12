@@ -2,7 +2,7 @@
 
 NotesModeView::NotesModeView(ViewContext* vc, Cordinate cordinate) : View(vc, cordinate)
 {
-	makeScreen(viewSize());
+	makeScreen(Size(sizeX, sizeY));
 
 	ImageHandle rgbHandle = vc->asset->img(L"img/edit/notes_mode_rgb.png");
 	ImageHandle kflnHandle = vc->asset->img(L"img/edit/notes_mode_kfln.png");

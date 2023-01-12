@@ -14,7 +14,7 @@ class NotesModeView : public View
 
 	int sizeX = 32;
 	int sizeY = 96;
-	Size virtual viewSize() override { return Size(sizeX, sizeY); };
+
 public:
 	NotesModeView(ViewContext* vc, Cordinate cordinate);
 	Image rgb;

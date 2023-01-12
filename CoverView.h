@@ -53,7 +53,6 @@ class CoverView : public View
 
 	int sizeX = 1280;
 	int sizeY = 720;
-	Size virtual viewSize() override { return Size(sizeX, sizeY); };
 public:
 	TransValue CloseRatio;//カバー閉じてる率(1000分率)
 	TransValue MoveSpeed;//カバー開閉1000分率スピード(キーボード操作時)押した瞬間だけ遅く動くようにする

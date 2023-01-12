@@ -24,24 +24,26 @@ public:
 */
 class View : Drawable
 {
-	
+private:
+	int screenHandle = 0;//このViewの画像ハンドル
+	Size size = Size(1, 1);//このViewのサイズ makeScreen実行時に変更されます
+	void deleteGraph();
+
 protected:
 	ViewContext* vc;
 	Cordinate cordinate = Cordinate(0,0);
-
-	ImageHandle handle;//表示する画像ハンドル情報
-
-	virtual Size viewSize() = 0;//継承先でこのViewのサイズを指定してください
-	void makeScreen(Size s);//このViewを描画するスクリーンの用意 継承先のコンストラクタで呼び出してください
+	
+	void makeScreen(Size s);//このViewを描画するスクリーンの用意 継承先のコンストラクタで呼び出してください s:用意するサイズ 
 
 public:
 	/**
 	* 継承先でコンストラクタをオーバーライドする際に、使用するImage,Viewのインスタンスを用意する処理を記述してください
 	*/
 	View(ViewContext* vc, Cordinate cordinate);
+	~View();
 
-	void draw(int drawScreen) override;//Viewの描画処理 毎フレーム呼びます 継承先で必ず実装してください
-	void setScreen(int drawScreen) override;
-	virtual void putContents(int drawScreen) override = 0;
+	void draw(int drawScreen) override;//Viewの描画処理の開始 毎フレーム呼びます 
+	void setScreen(int drawScreen) override;//描画先スクリーンの指定
+	virtual void putContents(int drawScreen) override = 0;//描画処理 継承先で必ず実装してください
 };
 

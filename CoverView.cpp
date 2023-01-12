@@ -4,7 +4,7 @@ using namespace std;
 
 CoverView::CoverView(ViewContext* vc, Cordinate cordinate) :View(vc, cordinate)
 {
-	makeScreen(viewSize());
+	makeScreen(Size(sizeX, sizeY));
 
 	wstring themeStr1(L"img/themes/");
 	wstring themeStr2(vc->option->theme[vc->option->op.theme]);

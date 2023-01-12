@@ -8,11 +8,17 @@ ViewContext::ViewContext(Asset* asset, Option* option, double* time)
 	ViewContext::time = time;
 }
 
+void View::deleteGraph()
+{
+	DeleteGraph(screenHandle);
+}
+
 void View::makeScreen(Size s)
 {
-	int h = MakeScreen(s.x, s.y, TRUE);
-	handle = ImageHandle(h, s);
-	vc->asset->registImageHandler(handle);
+	deleteGraph();
+	screenHandle = MakeScreen(s.x, s.y, TRUE);
+	size = s;
+	vc->asset->registImageHandler(screenHandle);
 }
 
 View::View(ViewContext* vc, Cordinate cordinate){
@@ -20,16 +26,21 @@ View::View(ViewContext* vc, Cordinate cordinate){
 	View::cordinate = cordinate;
 }
 
+View::~View()
+{
+	deleteGraph();
+}
+
 void View::draw(int drawScreen)
 {
 	//Viewの描画
-	setScreen(handle.getHandle());
+	setScreen(screenHandle);
 	ClearDrawScreen();
-	putContents(handle.getHandle());
+	putContents(screenHandle);
 
 	//View全体を指定されたスクリーンへ描画
 	setScreen(drawScreen);
-	DrawGraph(cordinate.x, cordinate.y, handle.getHandle(), TRUE);
+	DrawGraph(cordinate.x, cordinate.y, screenHandle, TRUE);
 }
 
 void View::setScreen(int drawScreen)

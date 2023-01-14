@@ -15,6 +15,7 @@
 #include"KeyConfig.h"
 #include "Image.h"
 #include "Asset.h"
+#include "TextView.h"
 
 using namespace std;
 
@@ -90,8 +91,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	int KeyConfigMenuStat = KEY_CONFIG_MENU_SETTING;
 
-	Asset asset;//使う画像セット
-
 	wstring themeStr1(L"img/themes/");
 	wstring themeStr2(option->theme[option->op.theme]);
 	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
@@ -166,10 +165,23 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	SH_TEST[1] = LoadSoundMem(L"sound/2.wav", 1);
 	SH_TEST[2] = LoadSoundMem(L"sound/3.wav", 1);
 	*/
-
+	
+	Asset asset;//使う画像セット
+	
+	//ViewContext vc = ViewContext(&asset, option, &GAME_passed_time);
+	//DrawableInitParam tvp1; tvp1.cordinate = Cordinate(0, 0);
+	//DrawableInitParam tvp2; tvp2.cordinate = Cordinate(0, 100);
+	//DrawableInitParam tvp3; tvp3.cordinate = Cordinate(0, 200);
+	//DrawableInitParam tvp4; tvp4.cordinate = Cordinate(0, 300);
+	//TextView testText1 = TextView(
+	//	&vc,
+	//	TextViewParam(wstring(L"TEST"), FontInfo(wstring(L"メイリオ"), 32, 0, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
+	//	tvp1
+	//);
+	
 
 	ChangeFont(L"メイリオ");
-	SetFontThickness(9);
+	SetFontThickness(2);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(26);
 
@@ -501,7 +513,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		ClearDrawScreen();
 		SetDrawBright(255, 255, 255);
 
-
 		for (i = 0; i < CRTBuf; i++) {
 			if (BackDrawCounter < 255) {
 				BackDrawCounter += 0.05;
@@ -524,7 +535,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 			}
 		}
-
 		
 		//printfDx(L"BackDrawCounter:%f\n", BackDrawCounter);
 		//printfDx(L"OtherDrawCounter:%f\n", OtherDrawCounter);
@@ -652,6 +662,8 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 				DrawBoxWithLine(640 + 40, 520, 640 + 80, 560,	settingKeyPosition.y == 2 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
 			}
 		}
+
+		//testText1.draw(DX_SCREEN_BACK);
 
 		//buttonBB.draw();
 

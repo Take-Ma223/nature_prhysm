@@ -78,6 +78,7 @@ void Drawable::drawWithProcessing()
 	action.update();
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());
+	SetDrawBright(brightnessR.getValue(), brightnessG.getValue(), brightnessB.getValue());
 	if (visible.getValue() && alpha.getValue() != 0) {
 		DrawGraph(
 			X.getValue() - handle.getSize().x * centerRatioX, 

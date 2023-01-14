@@ -73,9 +73,17 @@ public:
 		ImageHandle  middleCoverHandle = vc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 		ImageHandle  rightCoverHandle = ImageHandle();
 
-		leftCover = Image(leftCoverHandle, vc->time, DrawableInitParam(Cordinate(XLeftCoverClose, YLeftCoverClose)));
-		middleCover = Image(middleCoverHandle, vc->time, DrawableInitParam(Cordinate(XMiddleCoverClose, YMiddleCoverClose)));
-		rightCover = Image(rightCoverHandle, vc->time, DrawableInitParam(Cordinate(XRightCoverClose, YRightCoverClose)));
+		DrawableInitParam p1;
+		p1.cordinate = Cordinate(XLeftCoverClose, YLeftCoverClose);
+		DrawableInitParam p2;
+		p2.cordinate = Cordinate(XMiddleCoverClose, YMiddleCoverClose);
+		DrawableInitParam p3;
+		p3.cordinate = Cordinate(XRightCoverClose, YRightCoverClose);
+
+
+		leftCover = Image(leftCoverHandle, vc->time, p1);
+		middleCover = Image(middleCoverHandle, vc->time, p2);
+		rightCover = Image(rightCoverHandle, vc->time, p3);
 
 		CloseRatio = TransValue(vc->time);
 		MoveSpeed = TransValue(vc->time);

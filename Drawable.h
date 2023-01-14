@@ -6,23 +6,14 @@
 #include "ImageHandle.h"
 
 
-class DrawableInitParam {
-private:
-	Cordinate cordinate;
-	BOOL visible;
-	int alpha;
+struct DrawableInitParam {
+	Cordinate cordinate = Cordinate(0, 0);
+	BOOL visible = 1;
+	int alpha = 255;
 
-public:
-	DrawableInitParam(Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255) {
-		DrawableInitParam::cordinate = cordinate;
-		DrawableInitParam::visible = visible;
-		DrawableInitParam::alpha = alpha;
-	}
-
-	Cordinate getCordinate() {return cordinate;}
-	BOOL getVisible() { return visible; }
-	int getAlpha() { return alpha; }
-
+	int brightnessR = 255;
+	int brightnessG = 255;
+	int brightnessB = 255;
 };
 
 
@@ -37,6 +28,12 @@ public:
 	TransValue X;//画面上の絶対座標を示す
 	TransValue Y;//画面上の絶対座標を示す
 	TransValue alpha;
+
+	TransValue brightnessR;
+	TransValue brightnessG;
+	TransValue brightnessB;
+
+
 	TransAction action;
 
 	Drawable(double* time = NULL, DrawableInitParam param = DrawableInitParam()) {
@@ -47,15 +44,24 @@ public:
 		Drawable::alpha = TransValue(time);
 		Drawable::action = TransAction(time);
 	
-		Drawable::visible.eSet(param.getVisible());
-		Drawable::X.eSet(param.getCordinate().x);
-		Drawable::Y.eSet(param.getCordinate().y);
-		Drawable::alpha.eSet(param.getAlpha());
+		Drawable::visible.eSet(param.visible);
+		Drawable::X.eSet(param.cordinate.x);
+		Drawable::Y.eSet(param.cordinate.y);
+		Drawable::alpha.eSet(param.alpha);
+
+		Drawable::brightnessR.eSet(param.brightnessR);
+		Drawable::brightnessG.eSet(param.brightnessG);
+		Drawable::brightnessB.eSet(param.brightnessB);
 	
-		Drawable::visible.setValue(param.getVisible());
-		Drawable::X.setValue(param.getCordinate().x);
-		Drawable::Y.setValue(param.getCordinate().y);
-		Drawable::alpha.setValue(param.getAlpha());
+		Drawable::visible.setValue(param.visible);
+		Drawable::X.setValue(param.cordinate.x);
+		Drawable::Y.setValue(param.cordinate.y);
+		Drawable::alpha.setValue(param.alpha);
+
+		Drawable::brightnessR.setValue(param.brightnessR);
+		Drawable::brightnessG.setValue(param.brightnessG);
+		Drawable::brightnessB.setValue(param.brightnessB);
+
 	};
 	virtual ~Drawable() {};
 	virtual void draw(int drawScreen) = 0;//毎フレーム呼ぶ

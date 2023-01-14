@@ -604,7 +604,9 @@ void GAME(int song_number, int difficulty,
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 
 	//中央カバー
-	CoverView coverView = CoverView(&vc, Cordinate(0, 0));
+	DrawableInitParam coverViewParam;
+	coverViewParam.cordinate = Cordinate(0, 0);
+	CoverView coverView = CoverView(&vc, coverViewParam);
 	
 	
 	
@@ -675,25 +677,18 @@ void GAME(int song_number, int difficulty,
 		slow = L"img/judge/slow_c.png";
 	}
 
-	const Cordinate fastSlowCordinate[4] = {
-	 Cordinate(lane[0], judge_area + fastSlowY)
-	,Cordinate(lane[1], judge_area + fastSlowY) 
-	,Cordinate(lane[2], judge_area + fastSlowY) 
-	,Cordinate(lane[3], judge_area + fastSlowY) };
+	Cordinate fastSlowCordinate[4];
+	DrawableInitParam fastSlowParams[4];
+	Image I_Fast[4];
+	Image I_Slow[4];
 
-	Image I_Fast[4] = {
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[0], 0)),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[1], 0)),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[2], 0)),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[3], 0))
-	};
-	Image I_Slow[4] = {
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[0], 0)),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[1], 0)),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[2], 0)),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[3], 0))
-	};
-
+	for (i = 0; i < 4; i++) {
+		fastSlowCordinate[i] = Cordinate(lane[0], judge_area + fastSlowY);
+		fastSlowParams[i].visible = 0;
+		fastSlowParams[i].cordinate = fastSlowCordinate[i];
+		I_Fast[i] = Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowParams[0]);
+		I_Slow[i] = Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowParams[0]);
+	}
 
 	//出現アニメーション
 	auto fastSlowAppear = [&] {

@@ -173,7 +173,9 @@ void EDIT_SCORE(SCORE_CELL* head,
 	H_LNOTE[8] = CreateGraphFromSoftImage(SOFTH_LNOTE_B);
 	DeleteSoftImage(SOFTH_LNOTE_B);
 
-	NotesModeView notesMode = NotesModeView(&vc,Cordinate(439, 532));
+	DrawableInitParam notesModeViewParam;
+	notesModeViewParam.cordinate = Cordinate(439, 532);
+	NotesModeView notesMode = NotesModeView(&vc,notesModeViewParam);
 	notesMode.switchToRgb();
 														 //H_LNOTE_OR_FRAME = LoadGraph(L"img/note_or_frame_L.png");
 	/*

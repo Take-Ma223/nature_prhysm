@@ -79,7 +79,11 @@ void Drawable::drawWithProcessing()
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());
 	if (visible.getValue() && alpha.getValue() != 0) {
-		DrawGraph(X.getValue(), Y.getValue(), drawHandle(), TRUE);
+		DrawGraph(
+			X.getValue() - handle.getSize().x * centerRatioX, 
+			Y.getValue() - handle.getSize().y * centerRatioY,
+			drawHandle(),
+			TRUE);
 	}
 }
 

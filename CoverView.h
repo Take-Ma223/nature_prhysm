@@ -62,7 +62,25 @@ public:
 	Image middleCover;
 	Image rightCover;
 
-	CoverView(ViewContext* vc, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
+	CoverView::CoverView(ViewContext* vc, DrawableInitParam param = DrawableInitParam()) : View(vc, param)
+	{
+		makeScreen(Size(sizeX, sizeY));
+
+		wstring themeStr1(L"img/themes/");
+		wstring themeStr2(vc->option->theme[vc->option->op.theme]);
+
+		ImageHandle leftCoverHandle = ImageHandle();
+		ImageHandle  middleCoverHandle = vc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+		ImageHandle  rightCoverHandle = ImageHandle();
+
+		leftCover = Image(leftCoverHandle, vc->time, DrawableInitParam(Cordinate(XLeftCoverClose, YLeftCoverClose)));
+		middleCover = Image(middleCoverHandle, vc->time, DrawableInitParam(Cordinate(XMiddleCoverClose, YMiddleCoverClose)));
+		rightCover = Image(rightCoverHandle, vc->time, DrawableInitParam(Cordinate(XRightCoverClose, YRightCoverClose)));
+
+		CloseRatio = TransValue(vc->time);
+		MoveSpeed = TransValue(vc->time);
+		setMoveSpeedAnimation();
+	}
 
 	void prepareScreen(int drawScreen) override;
 

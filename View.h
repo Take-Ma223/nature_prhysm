@@ -37,8 +37,13 @@ public:
 	/**
 	* 継承先でコンストラクタをオーバーライドする際に、使用するImage,Viewのインスタンスを用意する処理を記述してください
 	*/
-	View(ViewContext* vc, Cordinate cordinate = Cordinate(0, 0), BOOL visible = 1, int alpha = 255);
-	~View();
+	View(ViewContext* vc, DrawableInitParam param = DrawableInitParam()) : Drawable(vc->time, param) {
+		View::vc = vc;
+		View::cordinate = cordinate;
+	}
+	~View() {
+		deleteGraph();
+	}
 
 	void draw(int drawScreen) override;//Viewの描画処理の開始 毎フレーム呼びます 
 	virtual void prepareScreen(int drawScreen) = 0;//drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください

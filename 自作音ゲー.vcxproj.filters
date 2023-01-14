@@ -61,9 +61,6 @@
     <Filter Include="ソース ファイル\Util\View">
       <UniqueIdentifier>{d54ca417-c296-4ae2-a86c-39f1530149de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Util\View\CoverView">
-      <UniqueIdentifier>{5e29e8fe-5f3d-49f8-9aca-46c2f3ac2cb0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Util\UiUtil">
       <UniqueIdentifier>{7d58bd0f-162a-47f0-bf63-b2322ba4fbd0}</UniqueIdentifier>
     </Filter>
@@ -105,6 +102,15 @@
     </Filter>
     <Filter Include="ソース ファイル\Util\UiUtil\Drawable">
       <UniqueIdentifier>{1966a889-10a2-433c-aa6b-d6f07ee68f17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\GAME\CoverView">
+      <UniqueIdentifier>{5e29e8fe-5f3d-49f8-9aca-46c2f3ac2cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\View\NumberView">
+      <UniqueIdentifier>{aa3d5ec1-b7a9-4716-8bcd-d903bc75885b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\View\TextView">
+      <UniqueIdentifier>{bd4855bb-adf0-4a7d-9a22-f3e017388822}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -214,7 +220,7 @@
       <Filter>ソース ファイル\Util</Filter>
     </ClCompile>
     <ClCompile Include="CoverView.cpp">
-      <Filter>ソース ファイル\Util\View\CoverView</Filter>
+      <Filter>ソース ファイル\GAME\CoverView</Filter>
     </ClCompile>
     <ClCompile Include="Transition.cpp">
       <Filter>ソース ファイル\Util\Transition</Filter>
@@ -284,6 +290,9 @@
     </ClCompile>
     <ClCompile Include="FontInfo.cpp">
       <Filter>ソース ファイル\Util\UiUtil\Asset\FontHandle</Filter>
+    </ClCompile>
+    <ClCompile Include="TextView.cpp">
+      <Filter>ソース ファイル\Util\View\TextView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -452,7 +461,7 @@
       <Filter>ソース ファイル\Util</Filter>
     </ClInclude>
     <ClInclude Include="CoverView.h">
-      <Filter>ソース ファイル\Util\View\CoverView</Filter>
+      <Filter>ソース ファイル\GAME\CoverView</Filter>
     </ClInclude>
     <ClInclude Include="Transition.h">
       <Filter>ソース ファイル\Util\Transition</Filter>
@@ -522,6 +531,9 @@
     </ClInclude>
     <ClInclude Include="FontInfo.h">
       <Filter>ソース ファイル\Util\UiUtil\Asset\FontHandle</Filter>
+    </ClInclude>
+    <ClInclude Include="TextView.h">
+      <Filter>ソース ファイル\Util\View\TextView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

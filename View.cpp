@@ -21,16 +21,6 @@ void View::makeScreen(Size s)
 	handle = ImageHandle(screenHandle, size);
 }
 
-View::View(ViewContext* vc, Cordinate cordinate, BOOL visible, int alpha) : Drawable(vc->time, cordinate, visible, alpha){
-	View::vc = vc;
-	View::cordinate = cordinate;
-}
-
-View::~View()
-{
-	deleteGraph();
-}
-
 void View::draw(int drawScreen)
 {
 	//View‚Ì•`‰æ

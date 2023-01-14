@@ -682,16 +682,16 @@ void GAME(int song_number, int difficulty,
 	,Cordinate(lane[3], judge_area + fastSlowY) };
 
 	Image I_Fast[4] = {
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[0], 0),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[1], 0),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[2], 0),
-	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[3], 0)
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[0], 0)),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[1], 0)),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[2], 0)),
+	Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[3], 0))
 	};
 	Image I_Slow[4] = {
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[0], 0),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[1], 0),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[2], 0),
-	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowCordinate[3], 0)
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[0], 0)),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[1], 0)),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[2], 0)),
+	Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, DrawableInitParam(fastSlowCordinate[3], 0))
 	};
 
 

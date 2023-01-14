@@ -2,26 +2,6 @@
 #include <string>
 using namespace std;
 
-CoverView::CoverView(ViewContext* vc, Cordinate cordinate, BOOL visible, int alpha) : View(vc, cordinate, visible, alpha)
-{
-	makeScreen(Size(sizeX, sizeY));
-
-	wstring themeStr1(L"img/themes/");
-	wstring themeStr2(vc->option->theme[vc->option->op.theme]);
-
-	ImageHandle leftCoverHandle = ImageHandle();
-	ImageHandle  middleCoverHandle = vc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
-	ImageHandle  rightCoverHandle = ImageHandle();
-
-	leftCover = Image(leftCoverHandle, vc->time, Cordinate(XLeftCoverClose, YLeftCoverClose));
-	middleCover = Image(middleCoverHandle, vc->time, Cordinate(XMiddleCoverClose, YMiddleCoverClose));
-	rightCover = Image(rightCoverHandle, vc->time, Cordinate(XRightCoverClose, YRightCoverClose));
-
-	CloseRatio = TransValue(vc->time);
-	MoveSpeed = TransValue(vc->time);
-	setMoveSpeedAnimation();
-}
-
 int CoverView::easing(int x)//ŠÔ‚©‚çˆÊ’u
 {
 	//0~1000‚ğ0~618‚É“ñŸŠÖ”‚Å•ÏŠ·

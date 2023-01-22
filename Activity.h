@@ -38,12 +38,13 @@ protected:
 	virtual void onStart() = 0;//画面開始する瞬間の処理(あまり重い処理は書かない)
 
 	virtual void initTimer();//タイマーの初期化
-	virtual void timerProccess();//タイマーの計算処理
+
 
 	virtual void initButton();//ボタン処理の初期化
-	virtual void buttonProccess();//ボタンの処理
 
 	void loop();//メインループ
+	virtual void timerProccess();//タイマーの計算処理
+	virtual void buttonProccess();//ボタンの処理
 	virtual void logic() = 0;//毎フレームのロジック処理
 	virtual void draw() = 0;//描画順番を指定
 public:

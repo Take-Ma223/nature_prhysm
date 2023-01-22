@@ -1,4 +1,5 @@
 #include "FontSet.h"
+#include <stdexcept>
 
 void FontSet::registFont(FontInfo fontInfo)
 {
@@ -8,6 +9,9 @@ void FontSet::registFont(FontInfo fontInfo)
 		fontInfo.thick,
 		(int)(fontInfo.fontType)
 	);
+	if (handle == -1) {
+		throw std::runtime_error("フォントの読み込みに失敗しました");
+	}
 	font[fontInfo] = FontHandle(handle, fontInfo); //フォント情報とハンドルの登録
 }
 

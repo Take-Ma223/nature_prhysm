@@ -31,9 +31,15 @@ private:
     TextViewParam param;
     virtual void prepareScreen(int drawScreen) override;
 
+protected:
+    ImageHandle textImageHandle;//•\¦‚·‚é‰æ‘œƒnƒ“ƒhƒ‹î•ñ
+
 public:
     TextView(ViewContext* vc, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(vc, drawableInitParam) {
         setText(textViewInitParam);
+    }
+    ~TextView() {
+        DeleteGraph(textImageHandle.getHandle());
     }
 
     void setText(TextViewParam p);

@@ -11,11 +11,10 @@
 
 
 class Image: public Drawable {
-	ImageHandle handle;//表示する画像ハンドル情報
 
 public:
 	Image::Image(ImageHandle handle = ImageHandle(), double* time = NULL, DrawableInitParam param = DrawableInitParam()) : Drawable(time, param) {
-		Image::handle = handle;
+		Drawable::handle = handle;
 	}
 
 	Image::~Image() {
@@ -23,9 +22,5 @@ public:
 	}
 
 	void draw(int drawScreen) override;//毎フレーム呼ぶ
-	int drawHandle() override {
-		return handle.getHandle();
-	};
-
 };
 

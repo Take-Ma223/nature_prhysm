@@ -13,6 +13,8 @@ void TextView::prepareScreen(int drawScreen)
 		);
 }
 
+
+
 void TextView::setText(TextViewParam p) {
 	TextView::param = p;
 	FontHandle fh = vc->asset->font(param.getFontInfo());
@@ -22,5 +24,20 @@ void TextView::setText(TextViewParam p) {
 		param.getString().length(),
 		fh.getHandle());
 
-	makeScreen(Size(width, fh.getSize()));
+	//テキスト画像の用意
+	int screenHandle = MakeScreen(width, fh.getSize(), TRUE);
+	Size size = Size(width, fh.getSize());
+	textImageHandle = ImageHandle(screenHandle, size);
+	setScreen(textImageHandle.getHandle());
+	DrawStringToHandle(
+		0, 0,
+		param.getString().c_str(),
+		param.getColor(),
+		fh.getHandle()
+	);
+
+
+	makeScreen(size);
+
+	
 }

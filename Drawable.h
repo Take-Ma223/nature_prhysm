@@ -89,7 +89,5 @@ protected:
 	void setScreen(int drawScreen);
 	
 	void drawWithProcessing();
-	virtual int drawHandle() = 0;
-
 };
 

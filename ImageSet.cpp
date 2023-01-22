@@ -1,6 +1,7 @@
 #include "ImageSet.h"
 #include "DxLib.h"
 #include <string>
+#include <stdexcept>
 
 ImageSet::~ImageSet(){//グラフィックを解放
 	deleteImage();
@@ -31,6 +32,9 @@ std::vector<ImageHandle> ImageSet::getImageHandles(std::wstring path, int allNum
 
 void ImageSet::registImage(std::wstring path) {
 	int handle = LoadGraph(path.c_str());
+	if (handle == -1) {
+		throw std::runtime_error("ファイルの読み込みに失敗しました");
+	}
 
 	int x, y;
 	GetGraphSize(handle, &x, &y);
@@ -39,7 +43,9 @@ void ImageSet::registImage(std::wstring path) {
 
 void ImageSet::registImages(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize) {
 	std::vector<int> handles(allNum);
-	LoadDivGraph(path.c_str(),allNum,XNum,YNum,XSize,YSize,&handles[0]);
+	if (LoadDivGraph(path.c_str(), allNum, XNum, YNum, XSize, YSize, &handles[0]) == -1) {
+		throw std::runtime_error("ファイルの読み込みに失敗しました");
+	}
 
 	std::vector<ImageHandle> singleScreens;
 	int x, y;

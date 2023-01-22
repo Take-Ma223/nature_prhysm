@@ -83,7 +83,7 @@ void Drawable::drawWithProcessing()
 		DrawGraph(
 			X.getValue() - handle.getSize().x * centerRatioX, 
 			Y.getValue() - handle.getSize().y * centerRatioY,
-			drawHandle(),
+			handle.getHandle(),
 			TRUE);
 	}
 }

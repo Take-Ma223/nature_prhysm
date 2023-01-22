@@ -1,6 +1,7 @@
 #include "SoundSet.h"
 #include "DxLib.h"
 #include <string>
+#include <stdexcept>
 
 SoundSet::~SoundSet() {//サウンドを解放
 	deleteSound();
@@ -19,6 +20,9 @@ int SoundSet::getHandle(std::wstring path) {
 
 void SoundSet::registSound(std::wstring path) {
 	int handle = LoadSoundMem(path.c_str());
+	if (handle == -1) {
+		throw std::runtime_error("ファイルの読み込みに失敗しました");
+	}
 	snd[path] = handle; //サウンドパスとハンドルの登録
 }
 

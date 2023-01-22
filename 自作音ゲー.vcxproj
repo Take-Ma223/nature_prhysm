@@ -186,6 +186,7 @@
     <ClCompile Include="NotesModeView.cpp" />
     <ClCompile Include="NPStringUtil.cpp" />
     <ClCompile Include="NPTimer.cpp" />
+    <ClCompile Include="NumberView.cpp" />
     <ClCompile Include="number_digit.cpp" />
     <ClCompile Include="number_ring.cpp" />
     <ClCompile Include="OptionStateSaveLoad.cpp" />
@@ -240,6 +241,7 @@
     <ClInclude Include="NotesModeView.h" />
     <ClInclude Include="NPStringUtil.h" />
     <ClInclude Include="NPTimer.h" />
+    <ClInclude Include="NumberView.h" />
     <ClInclude Include="OptionStateSaveLoad.h" />
     <ClInclude Include="GetValueFromController.h" />
     <ClInclude Include="SaveDataSaveLoad.h" />

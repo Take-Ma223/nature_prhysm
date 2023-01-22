@@ -32,6 +32,7 @@ protected:
 	Cordinate cordinate = Cordinate(0,0);
 	
 	void makeScreen(Size s);//このViewを描画するスクリーンの用意 継承先のコンストラクタで呼び出してください s:用意するサイズ 
+	virtual void prepareScreen(int drawScreen) = 0;//drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください
 
 public:
 	/**
@@ -46,11 +47,5 @@ public:
 	}
 
 	void draw(int drawScreen) override;//Viewの描画処理の開始 毎フレーム呼びます 
-	virtual void prepareScreen(int drawScreen) = 0;//drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください
-
-	int drawHandle() override {
-		return handle.getHandle();
-	};
-
 };
 

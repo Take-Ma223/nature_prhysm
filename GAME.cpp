@@ -683,11 +683,11 @@ void GAME(int song_number, int difficulty,
 	Image I_Slow[4];
 
 	for (i = 0; i < 4; i++) {
-		fastSlowCordinate[i] = Cordinate(lane[0], judge_area + fastSlowY);
+		fastSlowCordinate[i] = Cordinate(lane[i], judge_area + fastSlowY);
 		fastSlowParams[i].visible = 0;
 		fastSlowParams[i].cordinate = fastSlowCordinate[i];
-		I_Fast[i] = Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowParams[0]);
-		I_Slow[i] = Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowParams[0]);
+		I_Fast[i] = Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowParams[i]);
+		I_Slow[i] = Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowParams[i]);
 	}
 
 	//出現アニメーション

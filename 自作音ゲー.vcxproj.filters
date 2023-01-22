@@ -294,6 +294,9 @@
     <ClCompile Include="TextView.cpp">
       <Filter>ソース ファイル\Util\View\TextView</Filter>
     </ClCompile>
+    <ClCompile Include="NumberView.cpp">
+      <Filter>ソース ファイル\Util\View\NumberView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -534,6 +537,9 @@
     </ClInclude>
     <ClInclude Include="TextView.h">
       <Filter>ソース ファイル\Util\View\TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberView.h">
+      <Filter>ソース ファイル\Util\View\NumberView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

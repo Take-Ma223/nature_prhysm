@@ -16,6 +16,7 @@
 #include "Image.h"
 #include "Asset.h"
 #include "TextView.h"
+#include "NumberView.h"
 
 using namespace std;
 
@@ -168,26 +169,50 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	
 	Asset asset;//使う画像セット
 	
-	//ViewContext vc = ViewContext(&asset, option, &GAME_passed_time);
-	//DrawableInitParam tvp1; tvp1.cordinate = Cordinate(0, 0);
-	//DrawableInitParam tvp2; tvp2.cordinate = Cordinate(0, 100);
-	//DrawableInitParam tvp3; tvp3.cordinate = Cordinate(0, 200);
-	//DrawableInitParam tvp4; tvp4.cordinate = Cordinate(0, 300);
-	//TextView testText1 = TextView(
-	//	&vc,
-	//	TextViewParam(wstring(L"TEST"), FontInfo(wstring(L"メイリオ"), 32, 0, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
-	//	tvp1
-	//);
+	ViewContext vc = ViewContext(&asset, option, &GAME_passed_time);
+	DrawableInitParam tvp1; tvp1.cordinate = Cordinate(0, 0);
+	DrawableInitParam tvp2; tvp2.cordinate = Cordinate(0, 100);
+	DrawableInitParam tvp3; tvp3.cordinate = Cordinate(0, 200);
+	DrawableInitParam tvp4; tvp4.cordinate = Cordinate(0, 300);
+	TextView testText1 = TextView(
+		&vc,
+		TextViewParam(wstring(L"TEST"), FontInfo(wstring(L"メイリオ"), 32, 0, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
+		tvp1
+	);
+
+	NumberImageHandles numberHandles = NumberImageHandles(
+		asset.imgs(L"img/SmallNumberGreen.png",10,10,1,25,50),
+		asset.img(L"img/decimal.png")
+	);
+	NumberViewFormat nvp1 = NumberViewFormat(
+		numberHandles,
+		6,
+		2,
+		-3,
+		NumberViewShowType::Left,
+		4
+	);
+	NumberView testNumber1 = NumberView(
+		&vc,
+		nvp1,
+		tvp2
+	);
+	testNumber1.setCenterRatio(0, 0);
 	
 
 	ChangeFont(L"メイリオ");
-	SetFontThickness(2);
+	SetFontThickness(9);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(26);
 
 	GAME_start_time = GetNowCount_d(config);
 	Get_Key_State(Buf, Key, AC);
+
+	int testNumberValue = 0;
 	while (1) {
+		testNumberValue++;
+		testNumber1.setValue(testNumberValue);
+
 		if (ProcessMessage() != 0) {
 			DxLib_End();
 			exit(0);
@@ -663,8 +688,8 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			}
 		}
 
-		//testText1.draw(DX_SCREEN_BACK);
-
+		testText1.draw(DX_SCREEN_BACK);
+		testNumber1.draw(DX_SCREEN_BACK);
 		//buttonBB.draw();
 
 		SetDrawBright(brightness, brightness, brightness);

@@ -13,7 +13,9 @@
 class Image: public Drawable {
 
 public:
-	Image::Image(ImageHandle handle = ImageHandle(), double* time = NULL, DrawableInitParam param = DrawableInitParam()) : Drawable(time, param) {
+	Image::Image() : Drawable() {}
+
+	Image::Image(DrawableContext* dc, ImageHandle handle = ImageHandle(), DrawableInitParam param = DrawableInitParam()) : Drawable(dc, param) {
 		Drawable::handle = handle;
 	}
 

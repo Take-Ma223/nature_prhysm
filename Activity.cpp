@@ -11,7 +11,7 @@ ActivityContext::ActivityContext(Option* option, Config* config)
 Activity::Activity(ActivityContext* ac)
 {
 	Activity::ac = ac;
-	Activity::vc = ViewContext(&Asset(), ac->option, &GAME_passed_time);
+	Activity::dContext = DrawableContext(&Asset(), ac->option, &GAME_passed_time);
 	Activity::timer = NPTimer(ac->config);
 
 }

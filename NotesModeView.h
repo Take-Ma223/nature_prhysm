@@ -16,17 +16,17 @@ class NotesModeView : public View
 	int sizeY = 96;
 
 public:
-	NotesModeView::NotesModeView(ViewContext* vc, DrawableInitParam param = DrawableInitParam()) : View(vc, param)
+	NotesModeView::NotesModeView(DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) : View(dc, param)
 	{
 		makeScreen(Size(sizeX, sizeY));
 
-		ImageHandle rgbHandle = vc->asset->img(L"img/edit/notes_mode_rgb.png");
-		ImageHandle kflnHandle = vc->asset->img(L"img/edit/notes_mode_kfln.png");
-		ImageHandle commandHandle = vc->asset->img(L"img/edit/notes_mode_command.png");
+		ImageHandle rgbHandle = dc->asset->img(L"img/edit/notes_mode_rgb.png");
+		ImageHandle kflnHandle = dc->asset->img(L"img/edit/notes_mode_kfln.png");
+		ImageHandle commandHandle = dc->asset->img(L"img/edit/notes_mode_command.png");
 
-		rgb = Image(rgbHandle, vc->time);
-		kfln = Image(kflnHandle, vc->time);
-		command = Image(commandHandle, vc->time);
+		rgb = Image(dc, rgbHandle);
+		kfln = Image(dc, kflnHandle);
+		command = Image(dc, commandHandle);
 	}
 	Image rgb;
 	Image kfln;

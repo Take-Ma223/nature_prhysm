@@ -124,7 +124,7 @@ protected:
     virtual void prepareScreen(int drawScreen) override;
 
 public:
-    NumberView(ViewContext* vc, NumberViewFormat numberViewInitFormat, DrawableInitParam drawableInitParam = DrawableInitParam()) : View(vc, drawableInitParam) {
+    NumberView(DrawableContext* dc, NumberViewFormat numberViewInitFormat, DrawableInitParam drawableInitParam = DrawableInitParam()) : View(dc, drawableInitParam) {
         setFormat(numberViewInitFormat);
     }
 

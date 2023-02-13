@@ -21,7 +21,7 @@ public:
 */
 class Activity
 {
-	ViewContext vc;
+	DrawableContext dContext;
 	NPTimer timer;
 
 protected:

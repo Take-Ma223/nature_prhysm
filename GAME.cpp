@@ -82,7 +82,7 @@ void GAME(int song_number, int difficulty,
 	Asset asset;//使う画像セット
 
 	//ビューコンテキスト
-	ViewContext vc = ViewContext(&asset, option, &GAME_passed_time_for_UI);
+	DrawableContext dContext = DrawableContext(&asset, option, &GAME_passed_time_for_UI);
 
 
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
@@ -606,7 +606,7 @@ void GAME(int song_number, int difficulty,
 	//中央カバー
 	DrawableInitParam coverViewParam;
 	coverViewParam.cordinate = Cordinate(0, 0);
-	CoverView coverView = CoverView(&vc, coverViewParam);
+	CoverView coverView = CoverView(&dContext, coverViewParam);
 	
 	
 	
@@ -686,8 +686,8 @@ void GAME(int song_number, int difficulty,
 		fastSlowCordinate[i] = Cordinate(lane[i], judge_area + fastSlowY);
 		fastSlowParams[i].visible = 0;
 		fastSlowParams[i].cordinate = fastSlowCordinate[i];
-		I_Fast[i] = Image(asset.img(fast.c_str()), &GAME_passed_time_for_UI, fastSlowParams[i]);
-		I_Slow[i] = Image(asset.img(slow.c_str()), &GAME_passed_time_for_UI, fastSlowParams[i]);
+		I_Fast[i] = Image(&dContext, asset.img(fast.c_str()), fastSlowParams[i]);
+		I_Slow[i] = Image(&dContext, asset.img(slow.c_str()),  fastSlowParams[i]);
 	}
 
 	//出現アニメーション

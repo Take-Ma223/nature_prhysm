@@ -35,7 +35,7 @@ protected:
     ImageHandle textImageHandle;//•\¦‚·‚é‰æ‘œƒnƒ“ƒhƒ‹î•ñ
 
 public:
-    TextView(ViewContext* vc, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(vc, drawableInitParam) {
+    TextView(DrawableContext* dc, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(dc, drawableInitParam) {
         setText(textViewInitParam);
     }
     ~TextView() {

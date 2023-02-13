@@ -1,13 +1,6 @@
 #include "View.h"
 #include <DxLib.h>
 
-ViewContext::ViewContext(Asset* asset, Option* option, double* time)
-{
-	ViewContext::asset = asset;
-	ViewContext::option = option;
-	ViewContext::time = time;
-}
-
 void View::deleteGraph()
 {
 	DeleteGraph(handle.getHandle());

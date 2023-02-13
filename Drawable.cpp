@@ -1,5 +1,10 @@
 #include "Drawable.h"
 
+void Drawable::draw()
+{
+	draw(parentHandle.getHandle());
+}
+
 void Drawable::setCenterRatio(double x, double y)
 {
 	centerRatioX = x;

@@ -62,15 +62,15 @@ public:
 	Image middleCover;
 	Image rightCover;
 
-	CoverView::CoverView(ViewContext* vc, DrawableInitParam param = DrawableInitParam()) : View(vc, param)
+	CoverView::CoverView(DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) : View(dc, param)
 	{
 		makeScreen(Size(sizeX, sizeY));
 
 		wstring themeStr1(L"img/themes/");
-		wstring themeStr2(vc->option->theme[vc->option->op.theme]);
+		wstring themeStr2(dc->option->theme[dc->option->op.theme]);
 
 		ImageHandle leftCoverHandle = ImageHandle();
-		ImageHandle  middleCoverHandle = vc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+		ImageHandle  middleCoverHandle = dc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 		ImageHandle  rightCoverHandle = ImageHandle();
 
 		DrawableInitParam p1;
@@ -81,12 +81,12 @@ public:
 		p3.cordinate = Cordinate(XRightCoverClose, YRightCoverClose);
 
 
-		leftCover = Image(leftCoverHandle, vc->time, p1);
-		middleCover = Image(middleCoverHandle, vc->time, p2);
-		rightCover = Image(rightCoverHandle, vc->time, p3);
+		leftCover = Image(dc, leftCoverHandle, p1);
+		middleCover = Image(dc, middleCoverHandle, p2);
+		rightCover = Image(dc, rightCoverHandle, p3);
 
-		CloseRatio = TransValue(vc->time);
-		MoveSpeed = TransValue(vc->time);
+		CloseRatio = TransValue(dc->time);
+		MoveSpeed = TransValue(dc->time);
 		setMoveSpeedAnimation();
 	}
 

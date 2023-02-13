@@ -4,7 +4,26 @@
 #include "TransAction.h"
 #include "Geometry.h"
 #include "ImageHandle.h"
+#include "Asset.h"
+#include "STRUCT_OP.h"
 
+/**
+* Drawableクラスの前提となるコンテキストクラス
+* 画面内で共有されているもの
+*/
+class DrawableContext {
+public:
+	Asset* asset;
+	Option* option;
+	double* time;
+	ImageHandle baseHandle = ImageHandle(DX_SCREEN_BACK, Size(1280, 720));
+
+	DrawableContext(Asset* asset = NULL, Option* option = NULL, double* time = NULL) {
+		DrawableContext::asset = asset;
+		DrawableContext::option = option;
+		DrawableContext::time = time;
+	};
+};
 
 struct DrawableInitParam {
 	Cordinate cordinate = Cordinate(0, 0);
@@ -36,35 +55,21 @@ public:
 
 	TransAction action;
 
-	Drawable(double* time = NULL, DrawableInitParam param = DrawableInitParam()) {
-		nowTime = time;
-		Drawable::visible = TransValue(time);
-		Drawable::X = TransValue(time);
-		Drawable::Y = TransValue(time);
-		Drawable::alpha = TransValue(time);
-		Drawable::action = TransAction(time);
-	
-		Drawable::visible.eSet(param.visible);
-		Drawable::X.eSet(param.cordinate.x);
-		Drawable::Y.eSet(param.cordinate.y);
-		Drawable::alpha.eSet(param.alpha);
+	Drawable() {};
 
-		Drawable::brightnessR.eSet(param.brightnessR);
-		Drawable::brightnessG.eSet(param.brightnessG);
-		Drawable::brightnessB.eSet(param.brightnessB);
-	
-		Drawable::visible.setValue(param.visible);
-		Drawable::X.setValue(param.cordinate.x);
-		Drawable::Y.setValue(param.cordinate.y);
-		Drawable::alpha.setValue(param.alpha);
-
-		Drawable::brightnessR.setValue(param.brightnessR);
-		Drawable::brightnessG.setValue(param.brightnessG);
-		Drawable::brightnessB.setValue(param.brightnessB);
-
+	Drawable(DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) {
+		initParam(dc, param);
+		setParentHandle(dContext->baseHandle);
 	};
+
+	Drawable(Drawable* parent, DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) {
+		initParam(dc, param);
+		setParentHandle(parent->handle);
+	};
+
 	virtual ~Drawable() {};
-	virtual void draw(int drawScreen) = 0;//毎フレーム呼ぶ
+	void draw();//毎フレーム呼ぶ
+	virtual void draw(int drawScreen) = 0;
 
 
 	double centerRatioX = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
@@ -83,11 +88,47 @@ public:
 
 
 protected:
+	DrawableContext* dContext;
+
 	ImageHandle handle;//表示する画像ハンドル情報
-	double* nowTime;//現在のゲーム時間へのポインタ
 
 	void setScreen(int drawScreen);
 	
 	void drawWithProcessing();
+
+	ImageHandle parentHandle;//このDrawableを描画する対象のハンドル(親がいない場合はDX_SCREEN_BACK)
+
+private:
+	void initParam(DrawableContext* dc, DrawableInitParam param) {
+		dContext = dc;
+		Drawable::visible = TransValue(dContext->time);
+		Drawable::X = TransValue(dContext->time);
+		Drawable::Y = TransValue(dContext->time);
+		Drawable::alpha = TransValue(dContext->time);
+		Drawable::action = TransAction(dContext->time);
+
+		Drawable::visible.eSet(param.visible);
+		Drawable::X.eSet(param.cordinate.x);
+		Drawable::Y.eSet(param.cordinate.y);
+		Drawable::alpha.eSet(param.alpha);
+
+		Drawable::brightnessR.eSet(param.brightnessR);
+		Drawable::brightnessG.eSet(param.brightnessG);
+		Drawable::brightnessB.eSet(param.brightnessB);
+
+		Drawable::visible.setValue(param.visible);
+		Drawable::X.setValue(param.cordinate.x);
+		Drawable::Y.setValue(param.cordinate.y);
+		Drawable::alpha.setValue(param.alpha);
+
+		Drawable::brightnessR.setValue(param.brightnessR);
+		Drawable::brightnessG.setValue(param.brightnessG);
+		Drawable::brightnessB.setValue(param.brightnessB);
+	}
+
+	void setParentHandle(ImageHandle h) {
+		parentHandle = h;
+	}
+
 };
 

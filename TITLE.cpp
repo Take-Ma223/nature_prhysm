@@ -169,13 +169,13 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	
 	Asset asset;//使う画像セット
 	
-	ViewContext vc = ViewContext(&asset, option, &GAME_passed_time);
+	DrawableContext dContext = DrawableContext(&asset, option, &GAME_passed_time);
 	DrawableInitParam tvp1; tvp1.cordinate = Cordinate(0, 0);
 	DrawableInitParam tvp2; tvp2.cordinate = Cordinate(0, 100);
 	DrawableInitParam tvp3; tvp3.cordinate = Cordinate(0, 200);
 	DrawableInitParam tvp4; tvp4.cordinate = Cordinate(0, 300);
 	TextView testText1 = TextView(
-		&vc,
+		&dContext,
 		TextViewParam(wstring(L"TEST"), FontInfo(wstring(L"メイリオ"), 32, 0, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
 		tvp1
 	);
@@ -193,7 +193,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		4
 	);
 	NumberView testNumber1 = NumberView(
-		&vc,
+		&dContext,
 		nvp1,
 		tvp2
 	);

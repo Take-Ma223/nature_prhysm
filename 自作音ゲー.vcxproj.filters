@@ -58,21 +58,6 @@
     <Filter Include="ソース ファイル\Util\Option">
       <UniqueIdentifier>{7ab6b01a-fa5e-40f7-9766-e696bfea23d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Util\View">
-      <UniqueIdentifier>{d54ca417-c296-4ae2-a86c-39f1530149de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil">
-      <UniqueIdentifier>{7d58bd0f-162a-47f0-bf63-b2322ba4fbd0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\ImageUtil">
-      <UniqueIdentifier>{f25d4b30-aff6-4635-8adb-6331582efa7c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\SoundUtil">
-      <UniqueIdentifier>{c10b4528-55ea-446e-86df-bdd04462a664}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\Asset">
-      <UniqueIdentifier>{cb0d23ed-9a12-4b15-b2fc-6daa223e4656}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Util\Transition">
       <UniqueIdentifier>{15b8953d-04b0-4b57-8e36-e1277b356e0f}</UniqueIdentifier>
     </Filter>
@@ -91,26 +76,44 @@
     <Filter Include="ソース ファイル\TITLE\Controller">
       <UniqueIdentifier>{7955783a-1c2e-47cc-b78e-5baef746c480}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\Geometry">
-      <UniqueIdentifier>{75b16014-e79d-4402-b770-f4ca4847778c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\Asset\ImageHandle">
-      <UniqueIdentifier>{32549b24-78c2-45e7-a522-1b22cf09fbc4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\Asset\FontHandle">
-      <UniqueIdentifier>{aa98f354-43c2-4739-bce1-ab1d05514a51}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ソース ファイル\Util\UiUtil\Drawable">
-      <UniqueIdentifier>{1966a889-10a2-433c-aa6b-d6f07ee68f17}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\GAME\CoverView">
       <UniqueIdentifier>{5e29e8fe-5f3d-49f8-9aca-46c2f3ac2cb0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Util\View\NumberView">
+    <Filter Include="ソース ファイル\Util\Ui">
+      <UniqueIdentifier>{7d58bd0f-162a-47f0-bf63-b2322ba4fbd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\ImageUtil">
+      <UniqueIdentifier>{f25d4b30-aff6-4635-8adb-6331582efa7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\SoundUtil">
+      <UniqueIdentifier>{c10b4528-55ea-446e-86df-bdd04462a664}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\Asset">
+      <UniqueIdentifier>{cb0d23ed-9a12-4b15-b2fc-6daa223e4656}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\Asset\ImageHandle">
+      <UniqueIdentifier>{32549b24-78c2-45e7-a522-1b22cf09fbc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\Asset\FontHandle">
+      <UniqueIdentifier>{aa98f354-43c2-4739-bce1-ab1d05514a51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\Geometry">
+      <UniqueIdentifier>{75b16014-e79d-4402-b770-f4ca4847778c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\Drawable">
+      <UniqueIdentifier>{1966a889-10a2-433c-aa6b-d6f07ee68f17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\View">
+      <UniqueIdentifier>{d54ca417-c296-4ae2-a86c-39f1530149de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Ui\View\NumberView">
       <UniqueIdentifier>{aa3d5ec1-b7a9-4716-8bcd-d903bc75885b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Util\View\TextView">
+    <Filter Include="ソース ファイル\Util\Ui\View\TextView">
       <UniqueIdentifier>{bd4855bb-adf0-4a7d-9a22-f3e017388822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Processable">
+      <UniqueIdentifier>{e64bc892-4cfc-4f8c-a768-723d7d0d1f26}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -226,19 +229,19 @@
       <Filter>ソース ファイル\Util\Transition</Filter>
     </ClCompile>
     <ClCompile Include="Image.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\ImageUtil</Filter>
+      <Filter>ソース ファイル\Util\Ui\ImageUtil</Filter>
     </ClCompile>
     <ClCompile Include="ImageSet.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClCompile>
     <ClCompile Include="SoundSet.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClCompile>
     <ClCompile Include="Asset.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClCompile>
     <ClCompile Include="Sound.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\SoundUtil</Filter>
+      <Filter>ソース ファイル\Util\Ui\SoundUtil</Filter>
     </ClCompile>
     <ClCompile Include="Event.cpp">
       <Filter>ソース ファイル\Util\Transition\Event</Filter>
@@ -259,7 +262,7 @@
       <Filter>ソース ファイル\EDIT\View\NotesMode</Filter>
     </ClCompile>
     <ClCompile Include="View.cpp">
-      <Filter>ソース ファイル\Util\View</Filter>
+      <Filter>ソース ファイル\Util\Ui\View</Filter>
     </ClCompile>
     <ClCompile Include="NPTimer.cpp">
       <Filter>ソース ファイル\Util</Filter>
@@ -274,28 +277,28 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="Drawable.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Drawable</Filter>
+      <Filter>ソース ファイル\Util\Ui\Drawable</Filter>
     </ClCompile>
     <ClCompile Include="ImageHandle.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Asset\ImageHandle</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset\ImageHandle</Filter>
     </ClCompile>
     <ClCompile Include="Geometry.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Geometry</Filter>
+      <Filter>ソース ファイル\Util\Ui\Geometry</Filter>
     </ClCompile>
     <ClCompile Include="FontSet.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClCompile>
     <ClCompile Include="FontHandle.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Asset\FontHandle</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset\FontHandle</Filter>
     </ClCompile>
     <ClCompile Include="FontInfo.cpp">
-      <Filter>ソース ファイル\Util\UiUtil\Asset\FontHandle</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset\FontHandle</Filter>
     </ClCompile>
     <ClCompile Include="TextView.cpp">
-      <Filter>ソース ファイル\Util\View\TextView</Filter>
+      <Filter>ソース ファイル\Util\Ui\View\TextView</Filter>
     </ClCompile>
     <ClCompile Include="NumberView.cpp">
-      <Filter>ソース ファイル\Util\View\NumberView</Filter>
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -470,19 +473,19 @@
       <Filter>ソース ファイル\Util\Transition</Filter>
     </ClInclude>
     <ClInclude Include="Image.h">
-      <Filter>ソース ファイル\Util\UiUtil\ImageUtil</Filter>
+      <Filter>ソース ファイル\Util\Ui\ImageUtil</Filter>
     </ClInclude>
     <ClInclude Include="ImageSet.h">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClInclude>
     <ClInclude Include="SoundSet.h">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClInclude>
     <ClInclude Include="Asset.h">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClInclude>
     <ClInclude Include="Sound.h">
-      <Filter>ソース ファイル\Util\UiUtil\SoundUtil</Filter>
+      <Filter>ソース ファイル\Util\Ui\SoundUtil</Filter>
     </ClInclude>
     <ClInclude Include="Event.h">
       <Filter>ソース ファイル\Util\Transition\Event</Filter>
@@ -503,7 +506,7 @@
       <Filter>ソース ファイル\EDIT\View\NotesMode</Filter>
     </ClInclude>
     <ClInclude Include="View.h">
-      <Filter>ソース ファイル\Util\View</Filter>
+      <Filter>ソース ファイル\Util\Ui\View</Filter>
     </ClInclude>
     <ClInclude Include="NPTimer.h">
       <Filter>ソース ファイル\Util</Filter>
@@ -518,28 +521,28 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Drawable.h">
-      <Filter>ソース ファイル\Util\UiUtil\Drawable</Filter>
+      <Filter>ソース ファイル\Util\Ui\Drawable</Filter>
     </ClInclude>
     <ClInclude Include="ImageHandle.h">
-      <Filter>ソース ファイル\Util\UiUtil\Asset\ImageHandle</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset\ImageHandle</Filter>
     </ClInclude>
     <ClInclude Include="Geometry.h">
-      <Filter>ソース ファイル\Util\UiUtil\Geometry</Filter>
+      <Filter>ソース ファイル\Util\Ui\Geometry</Filter>
     </ClInclude>
     <ClInclude Include="FontSet.h">
-      <Filter>ソース ファイル\Util\UiUtil\Asset</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset</Filter>
     </ClInclude>
     <ClInclude Include="FontHandle.h">
-      <Filter>ソース ファイル\Util\UiUtil\Asset\FontHandle</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset\FontHandle</Filter>
     </ClInclude>
     <ClInclude Include="FontInfo.h">
-      <Filter>ソース ファイル\Util\UiUtil\Asset\FontHandle</Filter>
+      <Filter>ソース ファイル\Util\Ui\Asset\FontHandle</Filter>
     </ClInclude>
     <ClInclude Include="TextView.h">
-      <Filter>ソース ファイル\Util\View\TextView</Filter>
+      <Filter>ソース ファイル\Util\Ui\View\TextView</Filter>
     </ClInclude>
     <ClInclude Include="NumberView.h">
-      <Filter>ソース ファイル\Util\View\NumberView</Filter>
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

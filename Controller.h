@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <vector>
+#include "Processable.h"
 
 using namespace std;
 
@@ -28,10 +29,11 @@ struct KeyBehavior
 /**
 * キーコンフィグや複数のキーを一つのキーとして扱うための仮想キー入力クラス
 */
-class VirtualKeyInput {
+class VirtualKeyInput : public Processable {
 	function<void(void)> onTapHandler = [] {};
 	function<void(void)> onReleaseHandler = [] {};
 
+	void update();
 public:
 	KeyState keyState = Release;
 	bool isJustPressed = false;//押した瞬間かどうか
@@ -43,23 +45,25 @@ public:
 	void onTap();
 	void onRelease();
 
-	void update();
-
 	function<bool(void)> isPress;//この仮想キーを押しているとみなす条件
+
+	virtual void process() override;
+
 };
 
 
-class Controller
+class Controller : public Processable
 {
 	char keyInputBuffer[256];
 	KeyInput keyInput[256];
+	void updateInput();//毎フレーム呼ぶ
 
 	//継承先でVirtualKeyInputを必要なだけ宣言する
 public:
 	//継承先でVirtualKeyInputのisPressを設定する
 	Controller();
 
-	void updateInput();//毎フレーム呼ぶ
+
 
 	/**
 	* 仮想キー入力を制御する処理を継承先でオーバーライドする
@@ -67,6 +71,8 @@ public:
 	virtual void updateVirtualInput() = 0;
 
 	//継承先で仮想キーのハンドラセットメソッドを必要なだけ用意する
+
+	virtual void process() override;
 
 };
 

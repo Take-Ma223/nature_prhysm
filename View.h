@@ -13,8 +13,6 @@ private:
 	void deleteGraph();
 
 protected:
-	Cordinate cordinate = Cordinate(0,0);
-	
 	void makeScreen(Size s);//このViewを描画するスクリーンの用意 継承先のコンストラクタで呼び出してください s:用意するサイズ 
 	virtual void prepareScreen(int drawScreen) = 0;//drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください
 
@@ -24,7 +22,8 @@ public:
 	* 継承先でコンストラクタをオーバーライドする際に、使用するImage,Viewのインスタンスを用意する処理を記述してください
 	*/
 	View(DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) : Drawable(dc, param) {
-		View::cordinate = cordinate;
+	}
+	View(Drawable* parent, DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) : Drawable(parent, dc, param) {
 	}
 	~View() {
 		deleteGraph();

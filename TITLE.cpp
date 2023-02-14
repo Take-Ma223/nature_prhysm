@@ -17,6 +17,7 @@
 #include "Asset.h"
 #include "TextView.h"
 #include "NumberView.h"
+#include "CoverView.h"
 
 using namespace std;
 
@@ -199,6 +200,13 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	);
 	testNumber1.setCenterRatio(0, 0);
 	
+	std::vector<CoverView> a;
+
+	for (size_t i = 0; i < 100000; i++)
+	{
+		a.push_back(CoverView(&dContext,tvp1));
+	}
+
 
 	ChangeFont(L"メイリオ");
 	SetFontThickness(9);

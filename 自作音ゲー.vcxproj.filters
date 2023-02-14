@@ -300,6 +300,9 @@
     <ClCompile Include="NumberView.cpp">
       <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
     </ClCompile>
+    <ClCompile Include="Processable.cpp">
+      <Filter>ソース ファイル\Util\Processable</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -543,6 +546,9 @@
     </ClInclude>
     <ClInclude Include="NumberView.h">
       <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
+    </ClInclude>
+    <ClInclude Include="Processable.h">
+      <Filter>ソース ファイル\Util\Processable</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

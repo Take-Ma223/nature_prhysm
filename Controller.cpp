@@ -21,6 +21,11 @@ Controller::Controller()
 {
 }
 
+void Controller::process()
+{
+	updateInput();
+}
+
 KeyInput::KeyInput()
 {
 }
@@ -71,4 +76,9 @@ void VirtualKeyInput::update()
 		keyState = Release;
 
 	}
+}
+
+void VirtualKeyInput::process()
+{
+	update();
 }

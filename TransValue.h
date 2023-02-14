@@ -25,7 +25,5 @@ public:
 	void eON(double startTime = 0);
 	void eOFF(double startTime = 0);
 
-
-
 };
 

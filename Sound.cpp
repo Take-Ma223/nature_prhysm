@@ -57,8 +57,8 @@ void Sound::setPlaySpeedAll(double playSpeed) {
 }
 
 void Sound::draw() {
-	visible.update();
-	alpha.update();
+	visible.process();
+	alpha.process();
 
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());

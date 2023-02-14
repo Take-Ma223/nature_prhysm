@@ -6,6 +6,7 @@
 #include "ImageHandle.h"
 #include "Asset.h"
 #include "STRUCT_OP.h"
+#include "Processable.h"
 
 /**
 * Drawableクラスの前提となるコンテキストクラス
@@ -39,7 +40,7 @@ struct DrawableInitParam {
 /**
 * 描画可能なクラスを表す抽象クラス
 **/
-class Drawable
+class Drawable : public Processable
 {
 public:
 
@@ -71,7 +72,6 @@ public:
 	void draw();//毎フレーム呼ぶ
 	virtual void draw(int drawScreen) = 0;
 
-
 	double centerRatioX = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
 	double centerRatioY = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
 
@@ -87,8 +87,11 @@ public:
 	void setPlaySpeedAll(double);//再生倍率を設定
 
 
+	// Processable を介して継承されました
+	virtual void process() override;
+
 protected:
-	DrawableContext* dContext;
+	DrawableContext* dContext = NULL;
 
 	ImageHandle handle;//表示する画像ハンドル情報
 

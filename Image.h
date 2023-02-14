@@ -19,6 +19,10 @@ public:
 		Drawable::handle = handle;
 	}
 
+	Image::Image(Drawable* parent, DrawableContext* dc, ImageHandle handle = ImageHandle(), DrawableInitParam param = DrawableInitParam()) : Drawable(parent, dc, param) {
+		Drawable::handle = handle;
+	}
+
 	Image::~Image() {
 		//DeleteGraph(handle.getHandle());
 	}

@@ -3,8 +3,9 @@
 #include <queue>
 #include <functional>
 #include "Event.h"
+#include "Processable.h"
 
-class Transition
+class Transition: public Processable
 {
 	double* nowTime;//現在のゲーム時間へのポインタ
 	
@@ -15,6 +16,7 @@ class Transition
 	double getNowTime();
 	int getLastIndex();
 
+	void update();
 protected:
 	std::vector<Event*> transition;//イベントの配列
 
@@ -45,7 +47,7 @@ protected:
 public:
 	
 	Transition(double* time = NULL);
-	void update();
+	
 
 	void clearEvent();//transitionを空にして削除
 
@@ -59,6 +61,10 @@ public:
 
 	void setStartTimeFromTime(int);//再生位置を設定(時間指定)
 	void setStartTimeFromRange(double);//再生位置を設定(割合指定)
+
+
+	// Processable を介して継承されました
+	virtual void process() override;
 
 };
 

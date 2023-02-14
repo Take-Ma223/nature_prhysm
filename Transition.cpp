@@ -166,6 +166,11 @@ void Transition::setStartTimeFromRange(double startTimeRange)
 	durationOffset = 0;
 }
 
+void Transition::process()
+{
+	update();
+}
+
 
 //ƒgƒ‰ƒ“ƒWƒVƒ‡ƒ“ˆ—
 void Transition::update()

@@ -7,15 +7,6 @@ ActivityContext::ActivityContext(Option* option, Config* config)
 	ActivityContext::config = config;
 }
 
-
-Activity::Activity(ActivityContext* ac)
-{
-	Activity::ac = ac;
-	Activity::dContext = DrawableContext(&Asset(), ac->option, &GAME_passed_time);
-	Activity::timer = NPTimer(ac->config);
-
-}
-
 void Activity::start()
 {
 	initLogic();
@@ -24,7 +15,10 @@ void Activity::start()
 
 	initTimer();
 	onStart();
+}
 
+void Activity::process()
+{
 	loop();
 }
 

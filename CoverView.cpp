@@ -40,10 +40,10 @@ void CoverView::drawLeftCover(int drawScreen)
 void CoverView::drawMiddleCover(int drawScreen)
 {
 	if (phase == Play) {
-		MoveSpeed.update();
+		MoveSpeed.process();
 		double playSpeed = (double)MoveSpeed.getValue() / 1000;
 
-		CloseRatio.update();
+		CloseRatio.process();
 		CloseRatio.setPlaySpeed(playSpeed);
 		middleCover.Y.setValue(YMiddleCoverOpen + CloseRatio.getValue());//ê¸å`Ç…à⁄ìÆ
 	}

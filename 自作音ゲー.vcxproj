@@ -192,6 +192,7 @@
     <ClCompile Include="OptionStateSaveLoad.cpp" />
     <ClCompile Include="PlayHitSound.cpp" />
     <ClCompile Include="GetValueFromController.cpp" />
+    <ClCompile Include="Processable.cpp" />
     <ClCompile Include="SaveDataSaveLoad.cpp" />
     <ClCompile Include="ScoreData_Authentication.cpp" />
     <ClCompile Include="score_cell_operation.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="NumberView.h" />
     <ClInclude Include="OptionStateSaveLoad.h" />
     <ClInclude Include="GetValueFromController.h" />
+    <ClInclude Include="Processable.h" />
     <ClInclude Include="SaveDataSaveLoad.h" />
     <ClInclude Include="ScreenShot.h" />
     <ClInclude Include="ShowErrorName.h" />

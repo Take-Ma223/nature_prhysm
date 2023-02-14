@@ -2,6 +2,7 @@
 #include "STRUCT_OP.h"
 #include "View.h"
 #include "NPTimer.h"
+#include "Processable.h"
 
 /**
 * アクティビティクラスの前提となるコンテキストクラス
@@ -19,7 +20,7 @@ public:
 * 画面クラス
 * 継承して使います
 */
-class Activity
+class Activity : public Processable
 {
 	DrawableContext dContext;
 	NPTimer timer;
@@ -48,12 +49,16 @@ protected:
 	virtual void logic() = 0;//毎フレームのロジック処理
 	virtual void draw() = 0;//描画順番を指定
 public:
-	Activity(ActivityContext* ac);
+	Activity(ActivityContext* ac){
+		Activity::ac = ac;
+		Activity::dContext = DrawableContext(&Asset(), ac->option, &GAME_passed_time);
+		Activity::timer = NPTimer(ac->config);
+	}
+
 	void start();//画面を開始するときに親画面から呼ぶ
 
-
-
-
+	// Processable を介して継承されました
+	virtual void process() override;
 
 };
 

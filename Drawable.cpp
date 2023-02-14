@@ -76,11 +76,11 @@ void Drawable::setScreen(int drawScreen)
 
 void Drawable::drawWithProcessing()
 {
-	visible.update();
-	X.update();
-	Y.update();
-	alpha.update();
-	action.update();
+	visible.process();
+	X.process();
+	Y.process();
+	alpha.process();
+	action.process();
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());
 	SetDrawBright(brightnessR.getValue(), brightnessG.getValue(), brightnessB.getValue());
@@ -91,5 +91,10 @@ void Drawable::drawWithProcessing()
 			handle.getHandle(),
 			TRUE);
 	}
+}
+
+void Drawable::process()
+{
+	draw();
 }
 

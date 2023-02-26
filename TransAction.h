@@ -16,7 +16,7 @@ protected:
 
 
 public:
-	TransAction(double* time = NULL);
+	TransAction(ActivityContext* context = NULL);
 	void eSet(double startTime = 0, std::function<void(void)> handler = [] {});
 
 };

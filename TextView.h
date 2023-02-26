@@ -29,13 +29,13 @@ class TextView : public View
 {
 private:
     TextViewParam param;
-    virtual void prepareScreen(int drawScreen) override;
+    virtual void beforeDrawProcess(int drawScreen) override;
 
 protected:
     ImageHandle textImageHandle;//•\¦‚·‚é‰æ‘œƒnƒ“ƒhƒ‹î•ñ
 
 public:
-    TextView(DrawableContext* dc, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(dc, drawableInitParam) {
+    TextView(ActivityContext* c, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(c, drawableInitParam) {
         setText(textViewInitParam);
     }
     ~TextView() {

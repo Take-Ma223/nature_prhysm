@@ -7,24 +7,9 @@
 #include "Asset.h"
 #include "STRUCT_OP.h"
 #include "Processable.h"
+#include "ActivityContext.h"
 
-/**
-* Drawableクラスの前提となるコンテキストクラス
-* 画面内で共有されているもの
-*/
-class DrawableContext {
-public:
-	Asset* asset;
-	Option* option;
-	double* time;
-	ImageHandle baseHandle = ImageHandle(DX_SCREEN_BACK, Size(1280, 720));
-
-	DrawableContext(Asset* asset = NULL, Option* option = NULL, double* time = NULL) {
-		DrawableContext::asset = asset;
-		DrawableContext::option = option;
-		DrawableContext::time = time;
-	};
-};
+class ActivityContext;
 
 struct DrawableInitParam {
 	Cordinate cordinate = Cordinate(0, 0);
@@ -58,13 +43,13 @@ public:
 
 	Drawable() {};
 
-	Drawable(DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) {
-		initParam(dc, param);
-		setParentHandle(dContext->baseHandle);
+	Drawable(ActivityContext* context, DrawableInitParam param = DrawableInitParam()) {
+		initParam(context, param);
+		setParentHandle(context->getBaseHandle());
 	};
 
-	Drawable(Drawable* parent, DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) {
-		initParam(dc, param);
+	Drawable(Drawable* parent, ActivityContext* context, DrawableInitParam param = DrawableInitParam()) {
+		initParam(context, param);
 		setParentHandle(parent->handle);
 	};
 
@@ -91,7 +76,7 @@ public:
 	virtual void process() override;
 
 protected:
-	DrawableContext* dContext = NULL;
+	ActivityContext* context = NULL;
 
 	ImageHandle handle;//表示する画像ハンドル情報
 
@@ -102,13 +87,13 @@ protected:
 	ImageHandle parentHandle;//このDrawableを描画する対象のハンドル(親がいない場合はDX_SCREEN_BACK)
 
 private:
-	void initParam(DrawableContext* dc, DrawableInitParam param) {
-		dContext = dc;
-		Drawable::visible = TransValue(dContext->time);
-		Drawable::X = TransValue(dContext->time);
-		Drawable::Y = TransValue(dContext->time);
-		Drawable::alpha = TransValue(dContext->time);
-		Drawable::action = TransAction(dContext->time);
+	void initParam(ActivityContext* context, DrawableInitParam param) {
+		Drawable::context = context;
+		Drawable::visible = TransValue(context);
+		Drawable::X = TransValue(context);
+		Drawable::Y = TransValue(context);
+		Drawable::alpha = TransValue(context);
+		Drawable::action = TransAction(context);
 
 		Drawable::visible.eSet(param.visible);
 		Drawable::X.eSet(param.cordinate.x);

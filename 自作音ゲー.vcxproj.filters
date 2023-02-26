@@ -115,6 +115,18 @@
     <Filter Include="ソース ファイル\Util\Processable">
       <UniqueIdentifier>{e64bc892-4cfc-4f8c-a768-723d7d0d1f26}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\ActivityController">
+      <UniqueIdentifier>{3276c52d-de2c-498f-a8c6-4527e87af4e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\TEST">
+      <UniqueIdentifier>{cdaa4b1c-3ab9-4247-97af-5fa8e8c80faf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\ActivityController\AppContext">
+      <UniqueIdentifier>{724d3a64-bf59-481f-b295-69ef47d598bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\Activity\ActivityContext">
+      <UniqueIdentifier>{8b7e49e0-ec6e-4eb1-b62e-bd58bf61e9a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -302,6 +314,15 @@
     </ClCompile>
     <ClCompile Include="Processable.cpp">
       <Filter>ソース ファイル\Util\Processable</Filter>
+    </ClCompile>
+    <ClCompile Include="ActivityController.cpp">
+      <Filter>ソース ファイル\Util\ActivityController</Filter>
+    </ClCompile>
+    <ClCompile Include="AppContext.cpp">
+      <Filter>ソース ファイル\Util\ActivityController\AppContext</Filter>
+    </ClCompile>
+    <ClCompile Include="ActivityContext.cpp">
+      <Filter>ソース ファイル\Util\Activity\ActivityContext</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -549,6 +570,15 @@
     </ClInclude>
     <ClInclude Include="Processable.h">
       <Filter>ソース ファイル\Util\Processable</Filter>
+    </ClInclude>
+    <ClInclude Include="ActivityController.h">
+      <Filter>ソース ファイル\Util\ActivityController</Filter>
+    </ClInclude>
+    <ClInclude Include="AppContext.h">
+      <Filter>ソース ファイル\Util\ActivityController\AppContext</Filter>
+    </ClInclude>
+    <ClInclude Include="ActivityContext.h">
+      <Filter>ソース ファイル\Util\Activity\ActivityContext</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

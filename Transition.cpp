@@ -2,8 +2,8 @@
 #include <math.h>
 
 
-Transition::Transition(double* time) {
-	nowTime = time;
+Transition::Transition(ActivityContext* context) {
+	Transition::context = context;
 }
 
 void Transition::clearEvent() {
@@ -310,6 +310,6 @@ void Transition::decideWhichEventToProcess()
 
 double Transition::getNowTime()
 {
-	return *nowTime;
+	return context->getTime();
 }
 

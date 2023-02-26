@@ -15,7 +15,7 @@ protected:
 	void onNext(BOOL isReverse) override;
 
 public:
-	TransValue(double* time = NULL);
+	TransValue(ActivityContext* context = NULL);
 	int getValue();
 	void setValue(int);//‰Šú‰»‚ÆA‘¼‚Ì•Ï”‚É‚æ‚Á‚Ä’l‚ğŒˆ‚ß‚é‚Æ‚«‚Ég‚¤
 

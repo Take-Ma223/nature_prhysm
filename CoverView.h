@@ -47,9 +47,9 @@ class CoverView : public View
 
 	void setMoveSpeedAnimation();
 
-	void drawLeftCover(int drawScreen);
-	void drawMiddleCover(int drawScreen);
-	void drawRightCover(int drawScreen);
+	void beforeDrawLeftCoverProcess(int drawScreen);
+	void befpreDrawMiddleCoverProcess(int drawScreen);
+	void beforeDrawRightCoverProcess(int drawScreen);
 
 	int sizeX = 1280;
 	int sizeY = 720;
@@ -62,15 +62,15 @@ public:
 	Image middleCover;
 	Image rightCover;
 
-	CoverView::CoverView(DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) : View(dc, param)
+	CoverView::CoverView(ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : View(c, param)
 	{
 		makeScreen(Size(sizeX, sizeY));
 
 		wstring themeStr1(L"img/themes/");
-		wstring themeStr2(dc->option->theme[dc->option->op.theme]);
+		wstring themeStr2(c->getOption()->theme[c->getOption()->op.theme]);
 
 		ImageHandle leftCoverHandle = ImageHandle();
-		ImageHandle  middleCoverHandle = dc->asset->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+		ImageHandle  middleCoverHandle = c->getAsset()->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 		ImageHandle  rightCoverHandle = ImageHandle();
 
 		DrawableInitParam p1;
@@ -81,16 +81,20 @@ public:
 		p3.cordinate = Cordinate(XRightCoverClose, YRightCoverClose);
 
 
-		leftCover = Image(dc, leftCoverHandle, p1);
-		middleCover = Image(dc, middleCoverHandle, p2);
-		rightCover = Image(dc, rightCoverHandle, p3);
+		leftCover = Image(c, leftCoverHandle, p1);
+		middleCover = Image(c, middleCoverHandle, p2);
+		rightCover = Image(c, rightCoverHandle, p3);
 
-		CloseRatio = TransValue(dc->time);
-		MoveSpeed = TransValue(dc->time);
+		addDrawable(&leftCover);
+		addDrawable(&middleCover);
+		addDrawable(&rightCover);
+
+		CloseRatio = TransValue(c);
+		MoveSpeed = TransValue(c);
 		setMoveSpeedAnimation();
 	}
 
-	void prepareScreen(int drawScreen) override;
+	void beforeDrawProcess(int drawScreen) override;
 
 
 	void closeAll();

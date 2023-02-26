@@ -23,17 +23,23 @@ void NotesModeView::switchCommandMode()
 }
 
 
-void NotesModeView::prepareScreen(int drawScreen)
+void NotesModeView::beforeDrawProcess(int drawScreen)
 {
 	if (isCommandMode) {
-		command.draw(drawScreen);
+		command.visible.setValue(1);
+		rgb.visible.setValue(0);
+		kfln.visible.setValue(0);
 		return;
 	}
 
 	if (selectingMode == RGB) {
-		rgb.draw(drawScreen);
+		command.visible.setValue(0);
+		rgb.visible.setValue(1);
+		kfln.visible.setValue(0);
 	}
 	else if (selectingMode == KFLN) {
-		kfln.draw(drawScreen);
+		command.visible.setValue(0);
+		rgb.visible.setValue(0);
+		kfln.visible.setValue(1);
 	}
 }

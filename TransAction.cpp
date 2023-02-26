@@ -2,7 +2,7 @@
 
 //ƒCƒxƒ“ƒg‘}“ü
 
-TransAction::TransAction(double* time) :Transition(time)
+TransAction::TransAction(ActivityContext* context) :Transition(context)
 {
 }
 

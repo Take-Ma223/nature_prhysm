@@ -14,6 +14,7 @@
 #include<string>
 #include "Asset.h"
 #include "NotesModeView.h"
+#include "AppContext.h"
 
 using namespace std;
 
@@ -49,7 +50,8 @@ void EDIT_SCORE(SCORE_CELL* head,
 	Asset asset;//使う画像セット
 
 	//ビューコンテキスト
-	DrawableContext dContext = DrawableContext(&asset, option, &GAME_passed_time);
+	AppContext appContext = AppContext(NULL, option, &config, &GAME_passed_time);
+	ActivityContext context = ActivityContext(&appContext, &asset);
 
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
 				   //int H_NOTE_OR_FRAME;//ORノートの枠
@@ -175,7 +177,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 	DrawableInitParam notesModeViewParam;
 	notesModeViewParam.cordinate = Cordinate(439, 532);
-	NotesModeView notesMode = NotesModeView(&dContext,notesModeViewParam);
+	NotesModeView notesMode = NotesModeView(&context,notesModeViewParam);
 	notesMode.switchToRgb();
 														 //H_LNOTE_OR_FRAME = LoadGraph(L"img/note_or_frame_L.png");
 	/*

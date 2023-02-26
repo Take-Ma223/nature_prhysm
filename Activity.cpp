@@ -1,11 +1,6 @@
 #include "Activity.h"
 #include "GetNowCount_d.h"
-
-ActivityContext::ActivityContext(Option* option, Config* config)
-{
-	ActivityContext::option = option;
-	ActivityContext::config = config;
-}
+#include "AppContext.h"
 
 void Activity::start()
 {
@@ -19,17 +14,20 @@ void Activity::start()
 
 void Activity::process()
 {
-	loop();
+	timerProccess();
+	buttonProccess();
+	logic();
+	draw();
 }
 
 void Activity::initTimer()
 {
-	GAME_start_time = timer.getNowCount();
+	GAME_start_time = activityContext.getTime();
 }
 
 void Activity::timerProccess()
 {
-	GAME_passed_time = timer.getNowCount() - GAME_start_time;//経過時間計算
+	GAME_passed_time = activityContext.getTime() - GAME_start_time;//経過時間計算
 	LOOP_passed_time = GAME_passed_time - time_cash;//1ループにかかった時間を算出
 	time_cash = GAME_passed_time;
 }
@@ -44,15 +42,5 @@ void Activity::buttonProccess()
 
 }
 
-
-
-
-void Activity::loop()
-{
-	timerProccess();
-	buttonProccess();
-	logic();
-	draw();
-}
 
 

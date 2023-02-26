@@ -157,9 +157,12 @@
   <ItemGroup>
     <ClCompile Include="ActionEvent.cpp" />
     <ClCompile Include="Activity.cpp" />
+    <ClCompile Include="ActivityContext.cpp" />
+    <ClCompile Include="ActivityController.cpp" />
     <ClCompile Include="Asset.cpp" />
     <ClCompile Include="cell_operation.cpp" />
     <ClCompile Include="ConfigLoad.cpp" />
+    <ClCompile Include="AppContext.cpp" />
     <ClCompile Include="CoverView.cpp" />
     <ClCompile Include="Drawable.cpp" />
     <ClCompile Include="EDIT_SCORE.cpp" />
@@ -224,8 +227,11 @@
   <ItemGroup>
     <ClInclude Include="ActionEvent.h" />
     <ClInclude Include="Activity.h" />
+    <ClInclude Include="ActivityContext.h" />
+    <ClInclude Include="ActivityController.h" />
     <ClInclude Include="Asset.h" />
     <ClInclude Include="ConfigLoad.h" />
+    <ClInclude Include="AppContext.h" />
     <ClInclude Include="CoverView.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="Event.h" />

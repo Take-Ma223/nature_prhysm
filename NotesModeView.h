@@ -16,17 +16,21 @@ class NotesModeView : public View
 	int sizeY = 96;
 
 public:
-	NotesModeView::NotesModeView(DrawableContext* dc, DrawableInitParam param = DrawableInitParam()) : View(dc, param)
+	NotesModeView::NotesModeView(ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : View(c, param)
 	{
 		makeScreen(Size(sizeX, sizeY));
 
-		ImageHandle rgbHandle = dc->asset->img(L"img/edit/notes_mode_rgb.png");
-		ImageHandle kflnHandle = dc->asset->img(L"img/edit/notes_mode_kfln.png");
-		ImageHandle commandHandle = dc->asset->img(L"img/edit/notes_mode_command.png");
+		ImageHandle rgbHandle = c->getAsset()->img(L"img/edit/notes_mode_rgb.png");
+		ImageHandle kflnHandle = c->getAsset()->img(L"img/edit/notes_mode_kfln.png");
+		ImageHandle commandHandle = c->getAsset()->img(L"img/edit/notes_mode_command.png");
 
-		rgb = Image(dc, rgbHandle);
-		kfln = Image(dc, kflnHandle);
-		command = Image(dc, commandHandle);
+		rgb = Image(c, rgbHandle);
+		kfln = Image(c, kflnHandle);
+		command = Image(c, commandHandle);
+
+		addDrawable(&rgb);
+		addDrawable(&kfln);
+		addDrawable(&command);
 	}
 	Image rgb;
 	Image kfln;
@@ -39,7 +43,7 @@ public:
 	void switchNoteMode();
 	void switchCommandMode();
 
-	virtual void prepareScreen(int drawScreen) override;
+	virtual void beforeDrawProcess(int drawScreen) override;
 
 
 

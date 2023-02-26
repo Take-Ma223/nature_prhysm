@@ -4,10 +4,13 @@
 #include <functional>
 #include "Event.h"
 #include "Processable.h"
+#include "ActivityContext.h"
+
+class ActivityContext;//プロトタイプ宣言
 
 class Transition: public Processable
 {
-	double* nowTime;//現在のゲーム時間へのポインタ
+	ActivityContext* context;
 	
 	void calculateWhereToPlay();
 	void decideWhichEventToProcess();
@@ -46,7 +49,7 @@ protected:
 
 public:
 	
-	Transition(double* time = NULL);
+	Transition(ActivityContext* context = NULL);
 	
 
 	void clearEvent();//transitionを空にして削除

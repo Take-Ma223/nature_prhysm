@@ -19,7 +19,12 @@ void View::draw(int drawScreen)
 	//Viewの描画
 	setScreen(handle.getHandle());
 	ClearDrawScreen();
-	prepareScreen(handle.getHandle());
+	beforeDrawProcess(handle.getHandle());
+
+	//このViewの抱えるDrawableを全て描画(stackに積まれた順に描画する)
+	for (auto content : drawables) {
+		content->draw(handle.getHandle());
+	}
 
 	//View全体を指定されたスクリーンへ描画
 	setScreen(drawScreen);

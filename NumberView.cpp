@@ -1,6 +1,6 @@
 #include "NumberView.h"
 
-void NumberView::prepareScreen(int drawScreen)
+void NumberView::beforeDrawProcess(int drawScreen)
 {
 	int xOffset = 0;
 	if (format.getShowType() == NumberViewShowType::Left) {

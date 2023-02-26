@@ -2,7 +2,7 @@
 
 
 
-TransValue::TransValue(double* time):Transition(time)
+TransValue::TransValue(ActivityContext* context):Transition(context)
 {
 }
 

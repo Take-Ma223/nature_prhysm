@@ -11,7 +11,7 @@ class Sound {
 	double* nowTime;//現在のゲーム時間へのポインタ
 
 public:
-	Sound(int handle = 0, double* time = NULL, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
+	Sound(int handle = 0, ActivityContext* c = NULL, int x = 0, int y = 0, BOOL visible = 1, int alpha = 255);
 	~Sound();
 
 	TransValue visible;

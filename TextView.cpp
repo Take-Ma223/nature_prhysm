@@ -1,10 +1,10 @@
 #include "TextView.h"
 
-void TextView::prepareScreen(int drawScreen)
+void TextView::beforeDrawProcess(int drawScreen)
 {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 	SetDrawBright(255,255,255);
-	FontHandle fh = dContext->asset->font(param.getFontInfo());
+	FontHandle fh = context->getAsset()->font(param.getFontInfo());
 	DrawStringToHandle(
 		0,0, 
 		param.getString().c_str(), 
@@ -17,7 +17,7 @@ void TextView::prepareScreen(int drawScreen)
 
 void TextView::setText(TextViewParam p) {
 	TextView::param = p;
-	FontHandle fh = dContext->asset->font(param.getFontInfo());
+	FontHandle fh = context->getAsset()->font(param.getFontInfo());
 
 	int width = GetDrawStringWidthToHandle(
 		param.getString().c_str(),

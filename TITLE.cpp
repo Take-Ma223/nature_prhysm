@@ -18,6 +18,7 @@
 #include "TextView.h"
 #include "NumberView.h"
 #include "CoverView.h"
+#include "AppContext.h"
 
 using namespace std;
 
@@ -169,14 +170,15 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	*/
 	
 	Asset asset;//使う画像セット
-	
-	DrawableContext dContext = DrawableContext(&asset, option, &GAME_passed_time);
+
+	AppContext appContext = AppContext(NULL, option, &config, &GAME_passed_time);
+	ActivityContext context = ActivityContext(&appContext ,&asset);
 	DrawableInitParam tvp1; tvp1.cordinate = Cordinate(0, 0);
 	DrawableInitParam tvp2; tvp2.cordinate = Cordinate(0, 100);
 	DrawableInitParam tvp3; tvp3.cordinate = Cordinate(0, 200);
 	DrawableInitParam tvp4; tvp4.cordinate = Cordinate(0, 300);
 	TextView testText1 = TextView(
-		&dContext,
+		&context,
 		TextViewParam(wstring(L"TEST"), FontInfo(wstring(L"メイリオ"), 32, 0, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
 		tvp1
 	);
@@ -194,19 +196,12 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		4
 	);
 	NumberView testNumber1 = NumberView(
-		&dContext,
+		&context,
 		nvp1,
 		tvp2
 	);
 	testNumber1.setCenterRatio(0, 0);
 	
-	std::vector<CoverView> a;
-
-	for (size_t i = 0; i < 100000; i++)
-	{
-		a.push_back(CoverView(&dContext,tvp1));
-	}
-
 
 	ChangeFont(L"メイリオ");
 	SetFontThickness(9);

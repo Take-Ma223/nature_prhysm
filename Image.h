@@ -15,11 +15,11 @@ class Image: public Drawable {
 public:
 	Image::Image() : Drawable() {}
 
-	Image::Image(DrawableContext* dc, ImageHandle handle = ImageHandle(), DrawableInitParam param = DrawableInitParam()) : Drawable(dc, param) {
+	Image::Image(ActivityContext* c, ImageHandle handle = ImageHandle(), DrawableInitParam param = DrawableInitParam()) : Drawable(c, param) {
 		Drawable::handle = handle;
 	}
 
-	Image::Image(Drawable* parent, DrawableContext* dc, ImageHandle handle = ImageHandle(), DrawableInitParam param = DrawableInitParam()) : Drawable(parent, dc, param) {
+	Image::Image(Drawable* parent, ActivityContext* c, ImageHandle handle = ImageHandle(), DrawableInitParam param = DrawableInitParam()) : Drawable(parent, c, param) {
 		Drawable::handle = handle;
 	}
 

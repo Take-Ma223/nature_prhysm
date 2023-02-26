@@ -32,12 +32,12 @@ void CoverView::setMoveSpeedAnimation()
 	MoveSpeed.eChange(0, 1000, Converter(Linear), 0, 150);
 }
 
-void CoverView::drawLeftCover(int drawScreen)
+void CoverView::beforeDrawLeftCoverProcess(int drawScreen)
 {
-	leftCover.draw(drawScreen);
+
 }
 
-void CoverView::drawMiddleCover(int drawScreen)
+void CoverView::befpreDrawMiddleCoverProcess(int drawScreen)
 {
 	if (phase == Play) {
 		MoveSpeed.process();
@@ -48,19 +48,18 @@ void CoverView::drawMiddleCover(int drawScreen)
 		middleCover.Y.setValue(YMiddleCoverOpen + CloseRatio.getValue());//ê¸å`Ç…à⁄ìÆ
 	}
 
-	middleCover.draw(drawScreen);
 }
 
-void CoverView::drawRightCover(int drawScreen)
+void CoverView::beforeDrawRightCoverProcess(int drawScreen)
 {
-	rightCover.draw(drawScreen);
+
 }
 
-void CoverView::prepareScreen(int drawScreen)
+void CoverView::beforeDrawProcess(int drawScreen)
 {
-	drawLeftCover(drawScreen);
-	drawMiddleCover(drawScreen);
-	drawRightCover(drawScreen);
+	beforeDrawLeftCoverProcess(drawScreen);
+	befpreDrawMiddleCoverProcess(drawScreen);
+	beforeDrawRightCoverProcess(drawScreen);
 }
 
 void CoverView::closeAll()

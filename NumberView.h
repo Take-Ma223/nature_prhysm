@@ -121,10 +121,10 @@ private:
         }
     }
 protected:
-    virtual void prepareScreen(int drawScreen) override;
+    virtual void beforeDrawProcess(int drawScreen) override;
 
 public:
-    NumberView(DrawableContext* dc, NumberViewFormat numberViewInitFormat, DrawableInitParam drawableInitParam = DrawableInitParam()) : View(dc, drawableInitParam) {
+    NumberView(ActivityContext* c, NumberViewFormat numberViewInitFormat, DrawableInitParam drawableInitParam = DrawableInitParam()) : View(c, drawableInitParam) {
         setFormat(numberViewInitFormat);
     }
 

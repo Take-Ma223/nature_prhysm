@@ -3,9 +3,9 @@
 #include <math.h>
 
 
-Sound::Sound(int handle, double* time, int x, int y, BOOL visible, int alpha) {
-	Sound::visible = TransValue(time);
-	Sound::alpha = TransValue(time);
+Sound::Sound(int handle, ActivityContext* c, int x, int y, BOOL visible, int alpha) {
+	Sound::visible = TransValue(c);
+	Sound::alpha = TransValue(c);
 
 	Sound::handle = handle;
 

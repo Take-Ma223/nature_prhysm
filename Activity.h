@@ -50,22 +50,31 @@ public:
 	};
 
 	virtual void onCreate() {
+		OutputDebugString(L"onCreate\n");
 		ActivityState activityState = ActivityState::Waiting;
 	};
 	virtual void onStart() {
+		OutputDebugString(L"onStart\n");
 		ActivityState activityState = ActivityState::Running;
 	};
 	virtual void onPause() {
+		OutputDebugString(L"onPause\n");
 		ActivityState activityState = ActivityState::Pausing;
 	};
 	virtual void onDestroy() {
+		OutputDebugString(L"onDestroy\n");
 		//asset‰ğ•úˆ—
 	};
 
 	void start();//‰æ–Ê‚ğŠJn‚·‚é‚Æ‚«‚Ée‰æ–Ê‚©‚çŒÄ‚Ô
 
 	// Processable ‚ğ‰î‚µ‚ÄŒp³‚³‚ê‚Ü‚µ‚½
-	virtual void process() override;
+	virtual void process() override {
+		timerProccess();
+		buttonProccess();
+		logic();
+		draw();
+	}
 
 	ActivityState activityState = ActivityState::Waiting;
 

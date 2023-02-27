@@ -4,15 +4,13 @@
 #include "Activity.h"
 #include <functional>
 #include "AppContext.h"
+#include "TestActivity.h"
 
 class ActivityController
 {
 	AppContext context;
 
 	std::stack<Activity*> activities;
-
-	double time = 0;//ゲーム内時間
-	NPTimer timer;
 
 	void mainLoop() {
 		while (true) {
@@ -22,7 +20,7 @@ class ActivityController
 				return;
 			}
 
-			activities.top()->process();
+			if (!activities.empty())activities.top()->process();
 			updateTime();
 
 			if (activities.top()->activityState == ActivityState::Finished) {
@@ -33,7 +31,7 @@ class ActivityController
 	}
 
 	void updateTime() {
-		time = timer.getNowCount();
+		context.updateTime();
 	}
 
 
@@ -42,19 +40,20 @@ public:
 		context = AppContext(
 			[&](Activity* a) {startActivity(a);},
 			option,
-			config,
-			&time
+			config
 		);
-		timer = NPTimer(config);
 	};
 
-	void start(Activity* activity) {
-		startActivity(activity);
+	/*
+	* 最初のアクティビティの開始
+	*/
+	void start() {
+		startActivity(firstActivity());
 		mainLoop();
 	};
 
 	void startActivity(Activity* activity) {
-		activities.top()->onPause();
+		if(!activities.empty())activities.top()->onPause();
 		activities.push(activity);
 		activities.top()->onCreate();
 		activities.top()->onStart();
@@ -66,7 +65,11 @@ public:
 		delete (activities.top());
 
 		activities.pop();
-		activities.top()->onStart();
+		if (!activities.empty())activities.top()->onStart();
 	};
+
+	Activity* firstActivity() {
+		return new TestActivity(&context);
+	}
 
 };

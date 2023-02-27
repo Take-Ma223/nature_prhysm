@@ -4,6 +4,7 @@
 #include "STRUCT_CONFIG.h"
 #include <functional>
 #include "ImageHandle.h"
+#include "NPTimer.h"
 
 class Activity;//プロトタイプ宣言
 
@@ -22,24 +23,28 @@ public:
 		startActivityHandler(activity);
 	}
 
-
 	Option* option;//ゲーム内の設定
 	Config* config;//ゲーム全体の設定
-	double* time;
+	double time = 0;//ゲーム時間
+	NPTimer timer;
 	ImageHandle baseHandle = ImageHandle(DX_SCREEN_BACK, Size(1280, 720));
 
 	AppContext(
 		std::function<void(Activity*)> handler = NULL,
 		Option* option = NULL,
-		Config* config = NULL,
-		double* time = NULL) {
+		Config* config = NULL) {
 
 		startActivityHandler = handler;
 
 		AppContext::option = option;
 		AppContext::config = config;
 		AppContext::time = time;
+		AppContext::timer = NPTimer(config);
 
 	};
+
+	void updateTime() {
+		time = timer.getNowCount();
+	}
 };
 

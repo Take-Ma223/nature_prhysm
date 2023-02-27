@@ -24,7 +24,7 @@ public:
 	Config* getConfig() { return appContext->config; };
 
 	Asset* getAsset() { return asset; };
-	double getTime() { return *(appContext->time); };
+	double getTime() { return appContext->time; };
 	ImageHandle getBaseHandle() { return baseHandle; };
 };
 

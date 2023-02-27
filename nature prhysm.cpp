@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include "STRUCT_IR_SETTING.h"
 #include "IR_process.h"
+#include "ActivityController.h"
 
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
@@ -238,6 +239,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	*/ 
 
 	IR_SETTING ir;
+
+	auto ac = ActivityController(&option, &config);
+	ac.start();
 
 
 	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config, &ir);

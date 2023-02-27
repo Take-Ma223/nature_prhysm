@@ -12,14 +12,6 @@ void Activity::start()
 	onStart();
 }
 
-void Activity::process()
-{
-	timerProccess();
-	buttonProccess();
-	logic();
-	draw();
-}
-
 void Activity::initTimer()
 {
 	GAME_start_time = activityContext.getTime();

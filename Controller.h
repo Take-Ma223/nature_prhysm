@@ -1,4 +1,5 @@
 #pragma once
+#include "DxLib.h"
 #include <functional>
 #include <vector>
 #include "Processable.h"
@@ -15,21 +16,14 @@ class KeyInput
 {
 public:
 	KeyState keyState = Release;
-	KeyInput();
 };
-
-
-struct KeyBehavior
-{
-
-};
-
 
 
 /**
 * キーコンフィグや複数のキーを一つのキーとして扱うための仮想キー入力クラス
 */
 class VirtualKeyInput : public Processable {
+	function<bool(void)> isPress;//この仮想キーを押しているとみなす条件
 	function<void(void)> onTapHandler = [] {};
 	function<void(void)> onReleaseHandler = [] {};
 
@@ -39,13 +33,9 @@ public:
 	bool isJustPressed = false;//押した瞬間かどうか
 	bool isJustReleased = false;//離した瞬間かどうか
 
+	void setIsPressCondition(function<bool(void)> condition);
 	void setOnTapHandler(function<void(void)> handler);
 	void setOnReleaseHandler(function<void(void)> handler);
-
-	void onTap();
-	void onRelease();
-
-	function<bool(void)> isPress;//この仮想キーを押しているとみなす条件
 
 	virtual void process() override;
 
@@ -55,24 +45,26 @@ public:
 class Controller : public Processable
 {
 	char keyInputBuffer[256];
+	
+	void updateInput();//全キーの更新
+	void updateVirtualInput();//仮想キーの更新
+	std::vector<VirtualKeyInput*> virtualKeyInputs;
+protected:
 	KeyInput keyInput[256];
-	void updateInput();//毎フレーム呼ぶ
 
-	//継承先でVirtualKeyInputを必要なだけ宣言する
+	/*
+	* 仮想キーの追加
+	*/
+	void addVirtualKeyInput(VirtualKeyInput* k) {
+		virtualKeyInputs.push_back(k);
+	}
+
 public:
-	//継承先でVirtualKeyInputのisPressを設定する
 	Controller();
 
-
-
-	/**
-	* 仮想キー入力を制御する処理を継承先でオーバーライドする
-	*/
-	virtual void updateVirtualInput() = 0;
-
-	//継承先で仮想キーのハンドラセットメソッドを必要なだけ用意する
+	//継承先で仮想キーを用意し、追加してください
+	virtual void addKey() = 0;
 
 	virtual void process() override;
-
 };
 

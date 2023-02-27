@@ -73,7 +73,6 @@ void GAME(int song_number, int difficulty,
 	double GAME_start_time;
 	double GAME_passed_time;//単位はms 判定と音用の経過時間
 	double GAME_passed_time_for_draw;//譜面描画用の経過時間(ディスプレイ遅延補正用)
-	double GAME_passed_time_for_UI;//単位はms UI用の経過時間
 
 	double LOOP_passed_time = 1;//1ループにかかった時間(ms)
 	double CounterRemainTime = 0;////カウンターの値を1msずつ変動するための時間　1msずつ引かれて小数以下は蓄積する
@@ -83,7 +82,7 @@ void GAME(int song_number, int difficulty,
 	Asset asset;//使う画像セット
 
 	//コンテキスト
-	AppContext appContext = AppContext(NULL, option, &config, &GAME_passed_time_for_UI);
+	AppContext appContext = AppContext(NULL, option, &config);
 	ActivityContext context = ActivityContext(&appContext, &asset);
 
 
@@ -939,7 +938,6 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//Calc
-		GAME_passed_time_for_UI = GetNowCount_d(config) - GAME_start_time;
 		GAME_passed_time = GetNowCount_d(config) - GAME_start_time;//中心カバーが上がった時からの経過時間計算
 		LOOP_passed_time = GAME_passed_time - time_cash;//1ループにかかった時間を算出
 		time_cash = GAME_passed_time;
@@ -1331,7 +1329,6 @@ void GAME(int song_number, int difficulty,
 	//演奏開始
 	time_cash = 0;//最初のLOOP_passed_timeが負の値に(-5000とか)にならないように初期化
 	GAME_start_time = GetNowCount_d(config);//譜面開始時のカウント
-	GAME_passed_time_for_UI = GetNowCount_d(config) - GAME_start_time;
 
 	if (ClearFlag == 0) {
 		int volume = option->windbreakVal[option->op.windbreak];
@@ -1385,7 +1382,6 @@ void GAME(int song_number, int difficulty,
 		//printfDx("%d %d\n",Key[KEY_INPUT_F],Key[KEY_INPUT_G]);
 
 		//----CALC----
-		GAME_passed_time_for_UI = GetNowCount_d(config) - GAME_start_time;
 		GAME_passed_time = (((double)GetNowCount_d(config) - (double)GAME_start_time) + ((double)debug_time_passed - (double)debug_stop_time));//経過時間計算
 		GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
 		LOOP_passed_time = ((double)GetNowCount_d(config) - GAME_start_time) - time_cash;//1ループにかかった時間を算出

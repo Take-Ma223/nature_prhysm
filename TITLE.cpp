@@ -171,7 +171,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	
 	Asset asset;//使う画像セット
 
-	AppContext appContext = AppContext(NULL, option, &config, &GAME_passed_time);
+	AppContext appContext = AppContext(NULL, option, &config);
 	ActivityContext context = ActivityContext(&appContext ,&asset);
 	DrawableInitParam tvp1; tvp1.cordinate = Cordinate(0, 0);
 	DrawableInitParam tvp2; tvp2.cordinate = Cordinate(0, 100);

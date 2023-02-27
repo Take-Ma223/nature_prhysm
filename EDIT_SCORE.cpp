@@ -50,7 +50,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	Asset asset;//使う画像セット
 
 	//ビューコンテキスト
-	AppContext appContext = AppContext(NULL, option, &config, &GAME_passed_time);
+	AppContext appContext = AppContext(NULL, option, &config);
 	ActivityContext context = ActivityContext(&appContext, &asset);
 
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)

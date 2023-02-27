@@ -211,9 +211,10 @@
     <ClCompile Include="SONG_SELECT.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundSet.cpp" />
+    <ClCompile Include="TestActivity.cpp" />
     <ClCompile Include="TextView.cpp" />
     <ClCompile Include="TITLE.cpp" />
-    <ClCompile Include="TitleController.cpp" />
+    <ClCompile Include="TestController.cpp" />
     <ClCompile Include="TransAction.cpp" />
     <ClCompile Include="Transition.cpp" />
     <ClCompile Include="TransValue.cpp" />
@@ -260,6 +261,7 @@
     <ClInclude Include="SongCacheSaveLoad.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundSet.h" />
+    <ClInclude Include="TestActivity.h" />
     <ClInclude Include="TextView.h" />
     <ClInclude Include="STRUCT_ANDROID_CONTROLLER.h" />
     <ClInclude Include="cell_operation.h" />
@@ -301,7 +303,7 @@
     <ClInclude Include="STRUCT_Song.h" />
     <ClInclude Include="STRUCT_XY.h" />
     <ClInclude Include="TITLE.h" />
-    <ClInclude Include="TitleController.h" />
+    <ClInclude Include="TestController.h" />
     <ClInclude Include="TransAction.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="TransValue.h" />

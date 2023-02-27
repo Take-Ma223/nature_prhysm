@@ -285,9 +285,6 @@
     <ClCompile Include="Controller.cpp">
       <Filter>ソース ファイル\Util\Key</Filter>
     </ClCompile>
-    <ClCompile Include="TitleController.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Drawable.cpp">
       <Filter>ソース ファイル\Util\Ui\Drawable</Filter>
     </ClCompile>
@@ -323,6 +320,12 @@
     </ClCompile>
     <ClCompile Include="ActivityContext.cpp">
       <Filter>ソース ファイル\Util\Activity\ActivityContext</Filter>
+    </ClCompile>
+    <ClCompile Include="TestController.cpp">
+      <Filter>ソース ファイル\TEST</Filter>
+    </ClCompile>
+    <ClCompile Include="TestActivity.cpp">
+      <Filter>ソース ファイル\TEST</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -541,9 +544,6 @@
     <ClInclude Include="Controller.h">
       <Filter>ソース ファイル\Util\Key</Filter>
     </ClInclude>
-    <ClInclude Include="TitleController.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Drawable.h">
       <Filter>ソース ファイル\Util\Ui\Drawable</Filter>
     </ClInclude>
@@ -579,6 +579,12 @@
     </ClInclude>
     <ClInclude Include="ActivityContext.h">
       <Filter>ソース ファイル\Util\Activity\ActivityContext</Filter>
+    </ClInclude>
+    <ClInclude Include="TestController.h">
+      <Filter>ソース ファイル\TEST</Filter>
+    </ClInclude>
+    <ClInclude Include="TestActivity.h">
+      <Filter>ソース ファイル\TEST</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

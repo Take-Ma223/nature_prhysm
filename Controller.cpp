@@ -1,6 +1,54 @@
 #include "Controller.h"
 #include <DxLib.h>
 
+void VirtualKeyInput::setIsPressCondition(function<bool(void)> condition)
+{
+	isPress = condition;
+}
+
+void VirtualKeyInput::setOnTapHandler(function<void(void)> handler)
+{
+	onTapHandler = handler;
+}
+
+void VirtualKeyInput::setOnReleaseHandler(function<void(void)> handler)
+{
+	onReleaseHandler = handler;
+}
+
+void VirtualKeyInput::update()
+{
+	isJustReleased = false;
+	isJustPressed = false;
+
+	if (isPress()) {
+		if (keyState == Release) {//âüÇµÇΩèuä‘
+			isJustPressed = true;
+			onTapHandler();
+		}
+		else if (keyState == Press) {//ó£Ç≥ÇÍÇΩèuä‘
+		}
+		keyState = Press;
+
+	}
+	else {
+
+		if (keyState == Release) {//ó£Çµë±ÇØÇƒÇÈ
+		}
+		else if (keyState == Press) {//ó£Ç≥ÇÍÇΩèuä‘
+			isJustReleased = true;
+			onReleaseHandler();
+		}
+		keyState = Release;
+
+	}
+}
+
+void VirtualKeyInput::process()
+{
+	update();
+}
+
 void Controller::updateInput()
 {
 	GetHitKeyStateAll(keyInputBuffer);//keyInputBufferÇ…ÉLÅ[ÇÃâüâ∫èÛë‘Ç™ì¸ÇÈ(ó£ÇµÇƒÇ¢ÇΩÇÁëSÇƒ0)
@@ -21,64 +69,14 @@ Controller::Controller()
 {
 }
 
+void Controller::updateVirtualInput()
+{
+	for (auto virtualKey : virtualKeyInputs) {
+		virtualKey->process();
+	}
+}
+
 void Controller::process()
 {
 	updateInput();
-}
-
-KeyInput::KeyInput()
-{
-}
-
-void VirtualKeyInput::setOnTapHandler(function<void(void)> handler)
-{
-	onTapHandler = handler;
-}
-
-void VirtualKeyInput::setOnReleaseHandler(function<void(void)> handler)
-{
-	onReleaseHandler = handler;
-}
-
-void VirtualKeyInput::onTap()
-{
-	onTapHandler();
-}
-
-void VirtualKeyInput::onRelease()
-{
-	onReleaseHandler();
-}
-
-void VirtualKeyInput::update()
-{
-	isJustReleased = false;
-	isJustPressed = false;
-
-	if (isPress()) {
-		if (keyState == Release) {//âüÇµÇΩèuä‘
-			isJustPressed = true;
-			onTap();
-		}
-		else if (keyState == Press) {//ó£Ç≥ÇÍÇΩèuä‘
-		}
-		keyState = Press;
-
-	}
-	else {
-
-		if (keyState == Release) {//ó£Çµë±ÇØÇƒÇÈ
-		}
-		else if (keyState == Press) {//ó£Ç≥ÇÍÇΩèuä‘
-			isJustReleased = true;
-			onRelease();
-		}
-		keyState = Release;
-
-	}
-}
-
-void VirtualKeyInput::process()
-{
-	update();
 }

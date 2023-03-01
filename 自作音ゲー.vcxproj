@@ -184,6 +184,7 @@
     <ClCompile Include="LED_operation.cpp" />
     <ClCompile Include="LOAD.cpp" />
     <ClCompile Include="LoadSkillTestNpsPathList.cpp" />
+    <ClCompile Include="Log.cpp" />
     <ClCompile Include="make_result_hash.cpp" />
     <ClCompile Include="nature prhysm.cpp" />
     <ClCompile Include="NotesModeView.cpp" />
@@ -246,6 +247,7 @@
     <ClInclude Include="IR_process.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="LoadSkillTestNpsPathList.h" />
+    <ClInclude Include="Log.h" />
     <ClInclude Include="NotesModeView.h" />
     <ClInclude Include="NPStringUtil.h" />
     <ClInclude Include="NPTimer.h" />

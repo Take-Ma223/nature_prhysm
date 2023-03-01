@@ -5,6 +5,7 @@
 #include <functional>
 #include "AppContext.h"
 #include "TestActivity.h"
+#include"Log.h"
 
 class ActivityController
 {
@@ -14,6 +15,7 @@ class ActivityController
 
 	void mainLoop() {
 		while (true) {
+			Log(L"ActivityControllerLoop");
 			if (ProcessMessage() != 0) {
 				DxLib_End();
 				exit(0);

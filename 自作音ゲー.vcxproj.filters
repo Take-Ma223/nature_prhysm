@@ -127,6 +127,9 @@
     <Filter Include="ソース ファイル\Util\Activity\ActivityContext">
       <UniqueIdentifier>{8b7e49e0-ec6e-4eb1-b62e-bd58bf61e9a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\Log">
+      <UniqueIdentifier>{2dad55a2-65aa-4ba6-98b2-7e6cfbb2e362}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -326,6 +329,9 @@
     </ClCompile>
     <ClCompile Include="TestActivity.cpp">
       <Filter>ソース ファイル\TEST</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>ソース ファイル\Util\Log</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -585,6 +591,9 @@
     </ClInclude>
     <ClInclude Include="TestActivity.h">
       <Filter>ソース ファイル\TEST</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>ソース ファイル\Util\Log</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -4,6 +4,7 @@
 #include "NPTimer.h"
 #include "Processable.h"
 #include "ActivityContext.h"
+#include "Log.h"
 
 class AppContext;//プロトタイプ宣言
 
@@ -50,19 +51,19 @@ public:
 	};
 
 	virtual void onCreate() {
-		OutputDebugString(L"onCreate\n");
+		Log(L"onCreate\n");
 		ActivityState activityState = ActivityState::Waiting;
 	};
 	virtual void onStart() {
-		OutputDebugString(L"onStart\n");
+		Log(L"onStart\n");
 		ActivityState activityState = ActivityState::Running;
 	};
 	virtual void onPause() {
-		OutputDebugString(L"onPause\n");
+		Log(L"onPause\n");
 		ActivityState activityState = ActivityState::Pausing;
 	};
 	virtual void onDestroy() {
-		OutputDebugString(L"onDestroy\n");
+		Log(L"onDestroy\n");
 		//asset解放処理
 	};
 

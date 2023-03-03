@@ -5,6 +5,7 @@
 #include <functional>
 #include "ImageHandle.h"
 #include "NPTimer.h"
+#include "Intent.h"
 
 class Activity;//プロトタイプ宣言
 
@@ -14,13 +15,13 @@ class Activity;//プロトタイプ宣言
 */
 class AppContext {
 private:
-	std::function<void(Activity*)> startActivityHandler;
+	Intent* intent;
 
 public:
 	//ActivityController* activityController;
 
 	void startActivity(Activity* activity) {
-		startActivityHandler(activity);
+		intent->setActivity(activity);
 	}
 
 	Option* option;//ゲーム内の設定
@@ -29,18 +30,13 @@ public:
 	NPTimer timer;
 	ImageHandle baseHandle = ImageHandle(DX_SCREEN_BACK, Size(1280, 720));
 
-	AppContext(
-		std::function<void(Activity*)> handler = NULL,
-		Option* option = NULL,
-		Config* config = NULL) {
-
-		startActivityHandler = handler;
+	AppContext(Intent* intent = NULL, Option* option = NULL,	Config* config = NULL) {
 
 		AppContext::option = option;
 		AppContext::config = config;
 		AppContext::time = time;
 		AppContext::timer = NPTimer(config);
-
+		AppContext::intent = intent;
 	};
 
 	void updateTime() {

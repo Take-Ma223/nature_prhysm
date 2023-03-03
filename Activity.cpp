@@ -17,6 +17,11 @@ void Activity::initTimer()
 	GAME_start_time = activityContext.getTime();
 }
 
+void Activity::initButton()
+{
+
+}
+
 void Activity::timerProccess()
 {
 	GAME_passed_time = activityContext.getTime() - GAME_start_time;//Œo‰ßŽžŠÔŒvŽZ
@@ -24,15 +29,19 @@ void Activity::timerProccess()
 	time_cash = GAME_passed_time;
 }
 
-void Activity::initButton()
-{
-
-}
-
 void Activity::buttonProccess()
 {
 
 }
 
+void Activity::logic()
+{
+
+}
+
+void Activity::draw()
+{
+
+}
 
 

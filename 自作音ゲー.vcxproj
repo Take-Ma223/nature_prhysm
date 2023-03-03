@@ -178,6 +178,7 @@
     <ClCompile Include="Get_Key_State.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="ImageSet.cpp" />
+    <ClCompile Include="Intent.cpp" />
     <ClCompile Include="IR_process.cpp" />
     <ClCompile Include="KeyConfig.cpp" />
     <ClCompile Include="Controller.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="GetNowCount_d.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ImageSet.h" />
+    <ClInclude Include="Intent.h" />
     <ClInclude Include="IR_process.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="LoadSkillTestNpsPathList.h" />

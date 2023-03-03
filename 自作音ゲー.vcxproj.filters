@@ -130,6 +130,9 @@
     <Filter Include="ソース ファイル\Util\Log">
       <UniqueIdentifier>{2dad55a2-65aa-4ba6-98b2-7e6cfbb2e362}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\Intent">
+      <UniqueIdentifier>{ec0775e6-394c-4302-a733-8c93f0ae7e3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -332,6 +335,9 @@
     </ClCompile>
     <ClCompile Include="Log.cpp">
       <Filter>ソース ファイル\Util\Log</Filter>
+    </ClCompile>
+    <ClCompile Include="Intent.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -594,6 +600,9 @@
     </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>ソース ファイル\Util\Log</Filter>
+    </ClInclude>
+    <ClInclude Include="Intent.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

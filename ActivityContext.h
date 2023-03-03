@@ -26,5 +26,10 @@ public:
 	Asset* getAsset() { return asset; };
 	double getTime() { return appContext->time; };
 	ImageHandle getBaseHandle() { return baseHandle; };
+
+	void startActivity(Activity* activity) {
+		appContext->startActivity(activity);
+	}
+
 };
 

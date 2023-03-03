@@ -23,10 +23,9 @@ enum class ActivityState
 */
 class Activity : public Processable
 {
-	AppContext* appContext;
-
 	Asset asset = Asset();
 protected:
+	AppContext* appContext;
 	ActivityContext activityContext;
 	double GAME_start_time = 0;
 	double GAME_passed_time = 0;//単位はms 経過時間
@@ -42,9 +41,10 @@ protected:
 
 	virtual void timerProccess();//タイマーの計算処理
 	virtual void buttonProccess();//ボタンの処理
-	virtual void logic() {};//毎フレームのロジック処理
-	virtual void draw() {};//描画順番を指定
+	virtual void logic();//毎フレームのロジック処理
+	virtual void draw();//描画順番を指定
 public:
+	virtual ~Activity() {};
 	Activity(AppContext* appContext) {
 		Activity::appContext = appContext;
 		Activity::activityContext = ActivityContext(appContext, &asset);

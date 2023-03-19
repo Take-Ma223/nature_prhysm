@@ -3,6 +3,9 @@
 #include <DxLib.h>
 using namespace std;
 
+/// <summary>
+/// フォントタイプ
+/// </summary>
 enum class FontType
 {
 	NORMAL = DX_FONTTYPE_NORMAL,
@@ -17,9 +20,9 @@ enum class FontType
 	ANTIALIASING_EDGE_16X16 = DX_FONTTYPE_ANTIALIASING_EDGE_16X16,
 };
 
-/**
-* フォント情報クラス
-*/
+/// <summary>
+/// フォント情報クラス
+/// </summary>
 class FontInfo
 {
 public:
@@ -28,9 +31,22 @@ public:
 	int thick;
 	FontType fontType;
 
+	/// <summary>
+	/// フォント情報クラスコンストラクタ
+	/// </summary>
+	/// <param name="fontName">フォント名</param>
+	/// <param name="size">サイズ</param>
+	/// <param name="thick">厚さ</param>
+	/// <param name="fontType">フォントタイプ</param>
 	FontInfo(wstring fontName = wstring(L"メイリオ"), int size = 16, int thick = 2, FontType fontType = FontType::NORMAL);
 };
 
+/// <summary>
+/// フォント情報の同値判定
+/// </summary>
+/// <param name="a">フォント情報</param>
+/// <param name="b">フォント情報</param>
+/// <returns>同値かどうか</returns>
 inline bool operator==(const FontInfo& a, const FontInfo& b)
 {
 	return a.fontName == b.fontName
@@ -39,6 +55,9 @@ inline bool operator==(const FontInfo& a, const FontInfo& b)
 		&& a.fontType == b.fontType;
 }
 
+/// <summary>
+/// フォント情報クラスのハッシュ算出構造体
+/// </summary>
 struct FontInfoHash {
 	inline std::size_t operator()(FontInfo fontInfo) const {
 		std::size_t h1 = hash<wstring>()(fontInfo.fontName);

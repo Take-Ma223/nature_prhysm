@@ -1,10 +1,9 @@
 #pragma once
 #include "Geometry.h"
 
-/**
-* メモリに存在する一枚の画像のハンドル情報を表すクラス 
-* 
-*/
+/// <summary>
+/// メモリに存在する一枚の画像のハンドル情報を表すクラス 
+/// </summary>
 class ImageHandle {
 	int handle;//画像ハンドル
 	Size size;

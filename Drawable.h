@@ -22,24 +22,26 @@ struct DrawableInitParam {
 };
 
 
-/**
-* 描画可能なクラスを表す抽象クラス
-**/
+/// <summary>
+/// 描画可能なクラスを表す抽象クラス
+/// </summary>
 class Drawable : public Processable
 {
 public:
 
 	TransValue visible;
-	TransValue X;//画面上の絶対座標を示す
-	TransValue Y;//画面上の絶対座標を示す
+	TransValue X;//描画先の絶対座標を示す
+	TransValue Y;//描画先の絶対座標を示す
 	TransValue alpha;
 
 	TransValue brightnessR;
 	TransValue brightnessG;
 	TransValue brightnessB;
 
-
 	TransAction action;
+
+	double centerRatioX = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
+	double centerRatioY = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
 
 	Drawable() {};
 
@@ -57,9 +59,6 @@ public:
 	void draw();//毎フレーム呼ぶ
 	virtual void draw(int drawScreen) = 0;
 
-	double centerRatioX = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
-	double centerRatioY = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
-
 	void setCenterRatio(double x, double y);
 
 	void clearAllEvent();
@@ -70,7 +69,6 @@ public:
 	void setReverseAll(BOOL);    //どちら向きで再生するか指定
 	void setLoopAll(BOOL);       //ループ再生するかどうか設定
 	void setPlaySpeedAll(double);//再生倍率を設定
-
 
 	// Processable を介して継承されました
 	virtual void process() override;

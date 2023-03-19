@@ -6,9 +6,9 @@
 #include <stack>
 #include "ActivityContext.h"
 
-/**
-* ビュークラス 全てのビューの基底クラス
-*/
+/// <summary>
+/// ビュークラス 全てのビューの基底クラス
+/// </summary>
 class View : public Drawable
 {
 private:
@@ -20,14 +20,26 @@ protected:
 		drawables.push_back(d);
 	}
 
-	void makeScreen(Size s);//このViewを描画するスクリーンの用意 継承先のコンストラクタで呼び出してください s:用意するサイズ 
-	virtual void beforeDrawProcess(int drawScreen) = 0;//drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください
+	/// <summary>
+	/// このViewを描画するスクリーンの用意 継承先のコンストラクタで呼び出してください
+	/// </summary>
+	/// <param name="s">用意するサイズ </param>
+	void makeScreen(Size s);
+
+	/// <summary>
+	/// drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください
+	/// </summary>
+	/// <param name="drawScreen">描画先</param>
+	virtual void beforeDrawProcess(int drawScreen) = 0;
 
 public:
 	View() : Drawable() {}
-	/**
-	* 継承先でコンストラクタをオーバーライドする際に、使用するImage,Viewのインスタンスを用意する処理を記述してください
-	*/
+
+	/// <summary>
+	/// 継承先でコンストラクタをオーバーライドする際に、使用するImage,Viewのインスタンスを用意する処理を記述してください
+	/// </summary>
+	/// <param name="c"></param>
+	/// <param name="param"></param>
 	View(ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : Drawable(c, param) {
 	}
 	View(Drawable* parent, ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : Drawable(parent, c, param) {
@@ -37,6 +49,10 @@ public:
 		drawables.clear();
 	}
 
-	void draw(int drawScreen) override;//Viewの描画処理の開始 毎フレーム呼びます 
+	/// <summary>
+	/// Viewの描画処理の開始 毎フレーム呼びます 
+	/// </summary>
+	/// <param name="drawScreen">描画先</param>
+	void draw(int drawScreen) override;
 };
 

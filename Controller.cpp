@@ -44,11 +44,6 @@ void VirtualKeyInput::update()
 	}
 }
 
-void VirtualKeyInput::process()
-{
-	update();
-}
-
 void Controller::updateInput()
 {
 	GetHitKeyStateAll(keyInputBuffer);//keyInputBuffer‚ÉƒL[‚Ì‰Ÿ‰ºó‘Ô‚ª“ü‚é(—£‚µ‚Ä‚¢‚½‚ç‘S‚Ä0)
@@ -65,18 +60,9 @@ void Controller::updateInput()
 	updateVirtualInput();
 }
 
-Controller::Controller()
-{
-}
-
 void Controller::updateVirtualInput()
 {
 	for (auto virtualKey : virtualKeyInputs) {
 		virtualKey->process();
 	}
-}
-
-void Controller::process()
-{
-	updateInput();
 }

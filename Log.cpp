@@ -1,6 +1,10 @@
 #include "Log.h"
 #include "DxLib.h"
 
+/// <summary>
+/// ログ出力 Debugでのみ出力します
+/// </summary>
+/// <param name="msg">ログ</param>
 void Log(wstring msg)
 {
 #ifdef _DEBUG

@@ -7,17 +7,17 @@ Asset::~Asset()
 
 ImageHandle Asset::img(std::wstring path)
 {
-	return asset.getImageHandle(path);
+	return imageSet.getImageHandle(path);
 }
 
 std::vector<ImageHandle> Asset::imgs(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize)
 {
-	return asset.getImageHandles(path, allNum, XNum, YNum, XSize, YSize);
+	return imageSet.getImageHandles(path, allNum, XNum, YNum, XSize, YSize);
 }
 
 void Asset::registImageHandler(ImageHandle imageHandle)
 {
-	asset.registImageHandler(imageHandle);
+	imageSet.registImageHandler(imageHandle);
 }
 
 int Asset::snd(std::wstring path)
@@ -32,6 +32,7 @@ FontHandle Asset::font(FontInfo fontInfo)
 
 void Asset::deleteAsset()
 {
-	asset.deleteImage();
+	imageSet.deleteImage();
 	soundSet.deleteSound();
+	fontSet.deleteFont();
 }

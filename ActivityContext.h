@@ -13,7 +13,6 @@ class ActivityContext
 {
 	AppContext* appContext;
 	Asset* asset;
-	ImageHandle baseHandle = ImageHandle(DX_SCREEN_BACK, Size(1280, 720));
 public:
 	ActivityContext(AppContext* appContext = NULL, Asset* asset = NULL) {
 		ActivityContext::appContext = appContext;
@@ -25,7 +24,7 @@ public:
 
 	Asset* getAsset() { return asset; };
 	double getTime() { return appContext->time; };
-	ImageHandle getBaseHandle() { return baseHandle; };
+	ImageHandle getBaseHandle() { return appContext->baseHandle; };
 
 	void startActivity(Activity* activity) {
 		appContext->startActivity(activity);

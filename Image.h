@@ -9,7 +9,9 @@
 #include "ImageHandle.h"
 #include "Geometry.h"
 
-
+/// <summary>
+/// ‰æ‘œƒNƒ‰ƒX
+/// </summary>
 class Image: public Drawable {
 
 public:

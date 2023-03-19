@@ -2,6 +2,7 @@
 #include "Activity.h"
 #include "Log.h"
 #include "TestController.h"
+#include "CoverView.h"
 
 /// <summary>
 /// フレームワークのテスト用アクティビティ
@@ -10,6 +11,9 @@ class TestActivity : public Activity
 {
 public:
 	TestController controller;
+
+	DrawableInitParam param = DrawableInitParam();
+	Image img = Image(&activityContext, activityContext.getAsset()->img(L"img/A.png"), param);
 
 	int a = 0;
 	TestActivity(AppContext* ac) : Activity(ac) {
@@ -53,7 +57,7 @@ public:
 	}
 
 	virtual void draw() override {
-
+		img.Drawable::draw();
 	}
 };
 

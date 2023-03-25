@@ -241,7 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	IR_SETTING ir;
 
 	auto ac = ActivityController(&option, &config);
-	ac.start();
+	//ac.start();
 
 
 	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config, &ir);

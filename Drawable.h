@@ -11,14 +11,42 @@
 
 class ActivityContext;
 
+/// <summary>
+/// Drawableクラスの初期化パラメータ
+/// </summary>
 struct DrawableInitParam {
 	Cordinate cordinate = Cordinate(0, 0);
-	BOOL visible = 1;
+	bool visible = 1;
 	int alpha = 255;
 
 	int brightnessR = 255;
 	int brightnessG = 255;
 	int brightnessB = 255;
+
+	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	/// <param name="c">座標</param>
+	/// <param name="v">可視性</param>
+	/// <param name="a">アルファ値</param>
+	/// <param name="bR">輝度R</param>
+	/// <param name="bG">輝度G</param>
+	/// <param name="bB">輝度B</param>
+	DrawableInitParam(
+		Cordinate c = Cordinate(0, 0),
+		bool v = TRUE,
+		int a = 255,
+		int bR = 255,
+		int bG = 255,
+		int bB = 255
+	) {
+		cordinate = c;
+		visible = v;
+		alpha = a;
+		brightnessR = bR;
+		brightnessG = bG;
+		brightnessB = bB;
+	}
 };
 
 
@@ -102,14 +130,14 @@ private:
 		Drawable::brightnessG.eSet(param.brightnessG);
 		Drawable::brightnessB.eSet(param.brightnessB);
 
-		Drawable::visible.setValue(param.visible);
-		Drawable::X.setValue(param.cordinate.x);
-		Drawable::Y.setValue(param.cordinate.y);
-		Drawable::alpha.setValue(param.alpha);
+		Drawable::visible.value = param.visible;
+		Drawable::X.value = param.cordinate.x;
+		Drawable::Y.value = param.cordinate.y;
+		Drawable::alpha.value = param.alpha;
 
-		Drawable::brightnessR.setValue(param.brightnessR);
-		Drawable::brightnessG.setValue(param.brightnessG);
-		Drawable::brightnessB.setValue(param.brightnessB);
+		Drawable::brightnessR.value = param.brightnessR;
+		Drawable::brightnessG.value = param.brightnessG;
+		Drawable::brightnessB.value = param.brightnessB;
 	}
 
 	void setParentHandle(ImageHandle h) {

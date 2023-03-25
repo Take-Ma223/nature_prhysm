@@ -6,16 +6,6 @@ TransValue::TransValue(ActivityContext* context):Transition(context)
 {
 }
 
-int TransValue::getValue() {
-	return value;
-}
-
-void TransValue::setValue(int input)
-{
-	value = input;
-	return;
-}
-
 //ƒCƒxƒ“ƒg‘}“ü
 void TransValue::eChange(Point start, Point end, Converter converter, double startTime, double endTimeInput) {
 	double endTime = endTimeInput;

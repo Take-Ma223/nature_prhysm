@@ -23,8 +23,6 @@ class Transition: public Processable
 protected:
 	std::vector<Event*> transition;//イベントの配列
 
-	int value = 0;
-
 	double playSpeed = 1;//再生速度
 	double playStartTime = 0;//トランジション内のどの時刻から再生するか
 	double playingTime = 0;//トランジション内のどこを再生しているか

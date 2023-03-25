@@ -15,15 +15,13 @@ protected:
 	void onNext(BOOL isReverse) override;
 
 public:
+	int value = 0;
 	TransValue(ActivityContext* context = NULL);
-	int getValue();
-	void setValue(int);//‰Šú‰»‚ÆA‘¼‚Ì•Ï”‚É‚æ‚Á‚Ä’l‚ğŒˆ‚ß‚é‚Æ‚«‚Ég‚¤
 
 	void eChange(Point start, Point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
 	void eChangeTo(Point end, Converter converter = Converter(Teleportation, 4), double startTime = 0, double endTimeInput = 0);
 	void eSet(Point Abs, double startTime = 0);
 	void eON(double startTime = 0);
 	void eOFF(double startTime = 0);
-
 };
 

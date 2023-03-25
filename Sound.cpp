@@ -13,8 +13,8 @@ Sound::Sound(int handle, ActivityContext* c, int x, int y, BOOL visible, int alp
 
 	Sound::alpha.eSet(alpha);
 
-	Sound::visible.setValue(visible);
-	Sound::alpha.setValue(alpha);
+	Sound::visible.value = visible;
+	Sound::alpha.value = alpha;
 
 }
 
@@ -61,8 +61,8 @@ void Sound::draw() {
 	alpha.process();
 
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());
-	if (visible.getValue() && alpha.getValue() != 0) {
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.value);
+	if (visible.value && alpha.value != 0) {
 		DrawGraph(0, 0, handle, TRUE);
 	}
 }

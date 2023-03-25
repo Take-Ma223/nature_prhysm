@@ -930,7 +930,7 @@ void GAME(int song_number, int difficulty,
 
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {
-
+		appContext.updateTime();
 		if (ProcessMessage() != 0) {
 			DxLib_End();
 			exit(0);
@@ -1344,11 +1344,7 @@ void GAME(int song_number, int difficulty,
 
 	}
 	while (1) {
-
-		//ProcessMessage();
-		//note_fall = -92 + 100 * sin(0.0087*GAME_passed_time);
-		//judge_area = 390 + 100 * sin(0.006*GAME_passed_time);
-
+		appContext.updateTime();
 		if (ProcessMessage() != 0) {
 			turn_off_LED(hComm, &LED_state, &dwWritten, &ovl);//LEDを消す
 			DxLib_End();

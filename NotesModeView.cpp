@@ -26,20 +26,20 @@ void NotesModeView::switchCommandMode()
 void NotesModeView::beforeDrawProcess(int drawScreen)
 {
 	if (isCommandMode) {
-		command.visible.setValue(1);
-		rgb.visible.setValue(0);
-		kfln.visible.setValue(0);
+		command.visible.value = 1;
+		rgb.visible.value = 0;
+		kfln.visible.value = 0;
 		return;
 	}
 
 	if (selectingMode == RGB) {
-		command.visible.setValue(0);
-		rgb.visible.setValue(1);
-		kfln.visible.setValue(0);
+		command.visible.value = 0;
+		rgb.visible.value = 1;
+		kfln.visible.value = 0;
 	}
 	else if (selectingMode == KFLN) {
-		command.visible.setValue(0);
-		rgb.visible.setValue(0);
-		kfln.visible.setValue(1);
+		command.visible.value = 0;
+		rgb.visible.value = 0;
+		kfln.visible.value = 1;
 	}
 }

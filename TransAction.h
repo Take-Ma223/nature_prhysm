@@ -20,4 +20,3 @@ public:
 	void eSet(double startTime = 0, std::function<void(void)> handler = [] {});
 
 };
-

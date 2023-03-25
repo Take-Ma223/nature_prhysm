@@ -82,12 +82,12 @@ void Drawable::drawWithProcessing()
 	alpha.process();
 	action.process();
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.getValue());
-	SetDrawBright(brightnessR.getValue(), brightnessG.getValue(), brightnessB.getValue());
-	if (visible.getValue() && alpha.getValue() != 0) {
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.value);
+	SetDrawBright(brightnessR.value, brightnessG.value, brightnessB.value);
+	if (visible.value && alpha.value != 0) {
 		DrawGraph(
-			X.getValue() - handle.getSize().x * centerRatioX, 
-			Y.getValue() - handle.getSize().y * centerRatioY,
+			X.value - handle.getSize().x * centerRatioX, 
+			Y.value - handle.getSize().y * centerRatioY,
 			handle.getHandle(),
 			TRUE);
 	}

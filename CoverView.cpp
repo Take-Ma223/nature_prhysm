@@ -41,11 +41,11 @@ void CoverView::befpreDrawMiddleCoverProcess(int drawScreen)
 {
 	if (phase == Play) {
 		MoveSpeed.process();
-		double playSpeed = (double)MoveSpeed.getValue() / 1000;
+		double playSpeed = (double)MoveSpeed.value / 1000;
 
 		CloseRatio.process();
 		CloseRatio.setPlaySpeed(playSpeed);
-		middleCover.Y.setValue(YMiddleCoverOpen + CloseRatio.getValue());//ê¸å`Ç…à⁄ìÆ
+		middleCover.Y.value = (YMiddleCoverOpen + CloseRatio.value);//ê¸å`Ç…à⁄ìÆ
 	}
 
 }
@@ -120,7 +120,7 @@ void CoverView::startWindbreak()
 
 void CoverView::setOpenRange(int openRatio)
 {
-	CloseRatio.setValue(easing(openRatio));
+	CloseRatio.value = (easing(openRatio));
 	CloseRatio.setStartTimeFromRange((double)easing(openRatio) / CoverMoveRange);
 }
 
@@ -154,12 +154,12 @@ void CoverView::stopMiddleCover()
 void CoverView::setMiddleCover()
 {
 	setOpenRange(easing(CoverFirstRatio));
-	CloseRatio.setValue(easing(CoverFirstRatio));
+	CloseRatio.value = (easing(CoverFirstRatio));
 }
 
 int CoverView::getMiddleCoverBottomY()
 {
-	return CloseRatio.getValue();
+	return CloseRatio.value;
 }
 
 double CoverView::getSpeedRatio()

@@ -346,6 +346,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 	GAME_start_time = GetNowCount_d(config);//開始時のカウント
 	while (1) {
+		appContext.updateTime();
 		if (ProcessMessage() != 0) {
 			DxLib_End();
 			exit(0);

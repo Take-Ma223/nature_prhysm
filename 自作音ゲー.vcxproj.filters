@@ -339,6 +339,18 @@
     <ClCompile Include="Intent.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="NumberViewFormat.cpp">
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
+    </ClCompile>
+    <ClCompile Include="NumberViewShowType.cpp">
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
+    </ClCompile>
+    <ClCompile Include="NumberImageHandles.cpp">
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
+    </ClCompile>
+    <ClCompile Include="TextViewParam.cpp">
+      <Filter>ソース ファイル\Util\Ui\View\TextView</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -603,6 +615,18 @@
     </ClInclude>
     <ClInclude Include="Intent.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberViewFormat.h">
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberViewShowType.h">
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
+    </ClInclude>
+    <ClInclude Include="NumberImageHandles.h">
+      <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
+    </ClInclude>
+    <ClInclude Include="TextViewParam.h">
+      <Filter>ソース ファイル\Util\Ui\View\TextView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

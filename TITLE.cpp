@@ -101,60 +101,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
 
-	/*
-	Image buttonBB = Image(asset.img(L"img/button_BB.png"), &GAME_passed_time, 600, 300, 255);
-	auto buttonAnimation = [&] {
-		buttonBB.clearAllEvent();
-		buttonBB.visible.eON();
-		buttonBB.X.eSet(600);
-		buttonBB.X.eChange(Point(600, Abs), Point(1200,Abs), Converter(Linear), 0, 5000);
-		buttonBB.X.eSet(1200, 5000);
-
-
-		buttonBB.action.eSet(0,[&]{
-			PlaySoundMem(SH_SHUTTER, DX_PLAYTYPE_BACK, TRUE);
-			});
-		buttonBB.action.eSet(1000,[&]{
-			PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
-			});
-
-		buttonBB.playAll();
-	};
-
-	auto buttonPlay = [&] {
-		buttonBB.playAll();
-		buttonBB.X.setStartTimeFromRange(0.5);
-	};
-
-	auto buttonStop = [&] {
-		buttonBB.stopAll();
-	};
-
-	auto buttonResume = [&] {
-		buttonBB.resumeAll();
-	};
-
-	auto buttonReverse = [&] {
-		buttonBB.reverseAll();
-	};
-
-	auto buttonSpeed2 = [&] {
-
-		buttonBB.setPlaySpeedAll(2);
-	};
-
-	auto buttonSpeed05 = [&] {
-
-		buttonBB.setPlaySpeedAll(0.5);
-	};
-
-	auto buttonLoop = [&] {
-
-		buttonBB.setLoopAll(TRUE);
-	};
-	*/
-
-
 	SH_START = LoadSoundMem(L"sound/nature_prhysm_jingle.wav");
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
 	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");

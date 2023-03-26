@@ -1,71 +1,14 @@
 #pragma once
 #include "View.h"
-#include <cassert>
+#include "NumberViewFormat.h"
 
-using namespace std;
-
-class NumberImageHandles {
-    vector<ImageHandle> numbers;
-    ImageHandle point;
-public:
-    NumberImageHandles(vector<ImageHandle> numbers = vector<ImageHandle>(), ImageHandle point = ImageHandle()) {
-        NumberImageHandles::numbers = numbers;
-        NumberImageHandles::point = point;
-    }
-
-    vector<ImageHandle> getNumbers() { return numbers; }
-    ImageHandle getPoint() { return point; }
-};
-
-enum class NumberViewShowType {
-    Left,//左揃え
-    Center,//中心揃え
-    Right//右揃え
-};
-
-class NumberViewFormat {
-private:
-    NumberImageHandles handles;
-    int digits;//最大桁数
-    int floatingPoint;//digitに対して小数点を打つ位置
-    int interval;//interval:数値の間隔
-    NumberViewShowType showType;//揃え方
-    int zeroFilingDigit;//zeroFilingDigit:0で埋める桁数 0を指定すると0で埋めない
-
-public:
-    NumberViewFormat(NumberImageHandles handles = NumberImageHandles(), int digits = 1, int floatingPoint = 0, int interval = 16, NumberViewShowType showType = NumberViewShowType::Left, int zeroFilingDigit = 0) {
-        NumberViewFormat::handles = handles;
-
-        assert(1 <= digits && digits <= 10);
-        NumberViewFormat::digits = digits;
-
-        assert(0 <= floatingPoint && floatingPoint <= 9);
-        assert(floatingPoint < digits);
-        NumberViewFormat::floatingPoint = floatingPoint;
-
-        NumberViewFormat::interval = interval;
-        NumberViewFormat::showType = showType;
-
-        assert(0 <= zeroFilingDigit && zeroFilingDigit <= 10);
-        NumberViewFormat::zeroFilingDigit = zeroFilingDigit;
-
-        assert(zeroFilingDigit <= digits);
-    }
-
-    NumberImageHandles getHandles() { return handles; }
-    int getDigits() { return digits; }
-    int getFloatingPoint() { return floatingPoint; }
-    int getInterval() { return interval; }
-    NumberViewShowType getShowType() { return showType; }
-    int getZeroFilingDigit() { return zeroFilingDigit; }
-
-};
-
-/**
-* 数値画像を用いた正の数値の描画View
-* formatでfloatingPointを指定することで実数として表示が可能
-* 
-*/
+/// <summary>
+/// 数値画像を用いた正の数値の描画View 
+/// formatでfloatingPointを指定することで実数として表示が可能
+/// </summary>
+/// <param name="vc">ActivityContext</param>
+/// <param name="numberViewInitFormat">フォーマット</param>
+/// <param name="drawableInitParam">drawableパラメータ</param>
 class NumberView : public View
 {
 private:
@@ -124,6 +67,12 @@ protected:
     virtual void beforeDrawProcess(int drawScreen) override;
 
 public:
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="c">ActivityContext</param>
+    /// <param name="numberViewInitFormat">フォーマット</param>
+    /// <param name="drawableInitParam">Drawableパラメータ</param>
     NumberView(ActivityContext* c, NumberViewFormat numberViewInitFormat, DrawableInitParam drawableInitParam = DrawableInitParam()) : View(c, drawableInitParam) {
         setFormat(numberViewInitFormat);
     }

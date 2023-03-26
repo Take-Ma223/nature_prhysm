@@ -14,6 +14,11 @@ void View::makeScreen(Size s)
 	handle = ImageHandle(screenHandle, size);
 }
 
+void View::draw()
+{
+	Drawable::draw();
+}
+
 void View::draw(int drawScreen)
 {
 	//View‚Ì•`‰æ

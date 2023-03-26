@@ -155,6 +155,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="NumberImageHandles.cpp" />
+    <ClCompile Include="NumberViewFormat.cpp" />
     <ClCompile Include="ActionEvent.cpp" />
     <ClCompile Include="Activity.cpp" />
     <ClCompile Include="ActivityContext.cpp" />
@@ -192,6 +194,7 @@
     <ClCompile Include="NPStringUtil.cpp" />
     <ClCompile Include="NPTimer.cpp" />
     <ClCompile Include="NumberView.cpp" />
+    <ClCompile Include="NumberViewShowType.cpp" />
     <ClCompile Include="number_digit.cpp" />
     <ClCompile Include="number_ring.cpp" />
     <ClCompile Include="OptionStateSaveLoad.cpp" />
@@ -215,6 +218,7 @@
     <ClCompile Include="SoundSet.cpp" />
     <ClCompile Include="TestActivity.cpp" />
     <ClCompile Include="TextView.cpp" />
+    <ClCompile Include="TextViewParam.cpp" />
     <ClCompile Include="TITLE.cpp" />
     <ClCompile Include="TestController.cpp" />
     <ClCompile Include="TransAction.cpp" />
@@ -228,6 +232,8 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="NumberImageHandles.h" />
+    <ClInclude Include="NumberViewFormat.h" />
     <ClInclude Include="ActionEvent.h" />
     <ClInclude Include="Activity.h" />
     <ClInclude Include="ActivityContext.h" />
@@ -254,6 +260,7 @@
     <ClInclude Include="NPStringUtil.h" />
     <ClInclude Include="NPTimer.h" />
     <ClInclude Include="NumberView.h" />
+    <ClInclude Include="NumberViewShowType.h" />
     <ClInclude Include="OptionStateSaveLoad.h" />
     <ClInclude Include="GetValueFromController.h" />
     <ClInclude Include="Processable.h" />
@@ -306,6 +313,7 @@
     <ClInclude Include="STRUCT_SEQ.h" />
     <ClInclude Include="STRUCT_Song.h" />
     <ClInclude Include="STRUCT_XY.h" />
+    <ClInclude Include="TextViewParam.h" />
     <ClInclude Include="TITLE.h" />
     <ClInclude Include="TestController.h" />
     <ClInclude Include="TransAction.h" />

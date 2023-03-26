@@ -29,6 +29,7 @@ public:
 		//DeleteGraph(handle.getHandle());
 	}
 
-	void draw(int drawScreen) override;//–ˆƒtƒŒ[ƒ€ŒÄ‚Ô
+	void draw() override;
+	void draw(int drawScreen) override;
 };
 

@@ -1,30 +1,11 @@
 #pragma once
 #include "View.h"
 #include "FontSet.h"
-#include <string>
+#include "TextViewParam.h"
 
-using namespace std;
-
-
-class TextViewParam {
-private:
-    wstring string;
-    int color;
-    FontInfo fontInfo;
-
-public:
-    TextViewParam(wstring string = wstring(L""), FontInfo fontInfo = FontInfo(), int color = GetColor(128,128,128)) {
-        TextViewParam::string = string;
-        TextViewParam::color = color;
-        TextViewParam::fontInfo = fontInfo;
-    }
-
-    wstring getString() { return string; };
-    int getColor() { return color; };
-    FontInfo getFontInfo() { return fontInfo; };
-
-};
-
+/// <summary>
+/// テキスト表示ビュー
+/// </summary>
 class TextView : public View
 {
 private:
@@ -35,6 +16,12 @@ protected:
     ImageHandle textImageHandle;//表示する画像ハンドル情報
 
 public:
+    /// <summary>
+    /// コンストラクタ
+    /// </summary>
+    /// <param name="c">ActivityContext</param>
+    /// <param name="textViewInitParam">TextViewパラメータ</param>
+    /// <param name="drawableInitParam">Drawableパラメータ</param>
     TextView(ActivityContext* c, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(c, drawableInitParam) {
         setText(textViewInitParam);
     }

@@ -36,7 +36,7 @@ public:
 		update();
 	};
 private:
-	function<bool(void)> isPress;//この仮想キーを押しているとみなす条件
+	function<bool(void)> isPress = [] {return FALSE; };//この仮想キーを押しているとみなす条件
 	function<void(void)> onTapHandler = [] {return; };
 	function<void(void)> onReleaseHandler = [] {return; };
 
@@ -63,8 +63,8 @@ protected:
 	/// 仮想キーの追加
 	/// </summary>
 	/// <param name="k">仮想キー</param>
-	void addVirtualKeyInput(VirtualKeyInput* k) {
-		virtualKeyInputs.push_back(k);
+	void addVirtualKeyInput(VirtualKeyInput& k) {
+		virtualKeyInputs.push_back(&k);
 	}
 
 private:

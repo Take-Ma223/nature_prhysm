@@ -84,7 +84,7 @@ public:
 	};
 
 	virtual ~Drawable() {};
-	void draw();//毎フレーム呼ぶ
+	virtual void draw();//毎フレーム呼ぶ
 	virtual void draw(int drawScreen) = 0;
 
 	void setCenterRatio(double x, double y);

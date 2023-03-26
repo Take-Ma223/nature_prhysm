@@ -50,6 +50,11 @@ public:
 	}
 
 	/// <summary>
+	/// Viewの描画処理の開始 毎フレーム呼びます
+	/// </summary>
+	void draw() override;
+
+	/// <summary>
 	/// Viewの描画処理の開始 毎フレーム呼びます 
 	/// </summary>
 	/// <param name="drawScreen">描画先</param>

@@ -57,9 +57,20 @@ void ImageSet::registImages(std::wstring path, int allNum, int XNum, int YNum, i
 	imgs[path] = singleScreens; //‰æ‘œƒpƒX‚Æƒnƒ“ƒhƒ‹‚Ì“o˜^
 }
 
-void ImageSet::registImageHandler(ImageHandle imageHandle)
+void ImageSet::registImageHandleFromMem(std::wstring tag, ImageHandle imageHandle)
 {
-	tmpImageHandles.push_back(imageHandle);
+	imgFromMem[tag] = imageHandle; //‰æ‘œƒpƒX‚Æƒnƒ“ƒhƒ‹‚Ì“o˜^
+}
+
+ImageHandle ImageSet::getImageHandleFromMem(std::wstring tag)
+{
+	return imgFromMem[tag];
+}
+
+void ImageSet::deleteImageHandleFromMem(std::wstring tag)
+{
+	DeleteGraph(imgFromMem[tag].getHandle());
+	imgFromMem.erase(tag);
 }
 
 void ImageSet::deleteImage() {
@@ -73,7 +84,7 @@ void ImageSet::deleteImage() {
 		}
 	}
 
-	for (auto itr = tmpImageHandles.begin(); itr != tmpImageHandles.end(); ++itr) {
-		DeleteGraph(itr->getHandle());
+	for (auto itr = imgFromMem.begin(); itr != imgFromMem.end(); ++itr) {
+		DeleteGraph(itr->second.getHandle());
 	}
 }

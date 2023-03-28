@@ -15,9 +15,20 @@ std::vector<ImageHandle> Asset::imgs(std::wstring path, int allNum, int XNum, in
 	return imageSet.getImageHandles(path, allNum, XNum, YNum, XSize, YSize);
 }
 
-void Asset::registImageHandler(ImageHandle imageHandle)
+ImageHandle Asset::imgFromMem(std::wstring tag, ImageHandle imageHandle)
 {
-	imageSet.registImageHandler(imageHandle);
+	imageSet.registImageHandleFromMem(tag, imageHandle);
+	return imgFromMem(tag);
+}
+
+ImageHandle Asset::imgFromMem(std::wstring tag)
+{
+	return imageSet.getImageHandleFromMem(tag);
+}
+
+void Asset::deleteImgFromMem(std::wstring tag)
+{
+	imageSet.deleteImageHandleFromMem(tag);
 }
 
 int Asset::snd(std::wstring path)

@@ -20,15 +20,15 @@ public:
 	~Asset();
 
 	/// <summary>
-	/// 画像1つのハンドラを得る
+	/// 補助記憶装置に存在する画像ハンドルの取得
 	/// </summary>
 	/// <param name="path">画像パス</param>
-	/// <returns>画像ハンドラ</returns>
+	/// <returns>画像ハンドル</returns>
 	ImageHandle img(std::wstring path);
 
 
 	/// <summary>
-	/// 分割画像のハンドラを得る
+	/// 補助記憶装置に存在する分割画像の画像ハンドル配列を得る
 	/// </summary>
 	/// <param name="path">画像パス</param>
 	/// <param name="allNum">分割画像の個数</param>
@@ -36,15 +36,30 @@ public:
 	/// <param name="YNum">縦の個数</param>
 	/// <param name="XSize">Xサイズ</param>
 	/// <param name="YSize">Yサイズ</param>
-	/// <returns>画像ハンドラ配列</returns>
+	/// <returns>画像ハンドル配列</returns>
 	std::vector<ImageHandle> imgs(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize);
 
 	/// <summary>
-	/// 画像ハンドラを登録する
+	/// メモリに存在する画像ハンドルの取得
+	/// 最初の取得は必ずこのメソッドを使って画像ハンドルを登録してください
 	/// </summary>
-	/// <param name="imageHandle">画像ハンドラ</param>
-	void registImageHandler(ImageHandle imageHandle);
+	/// <param name="tag">メモリに存在する画像ハンドルのタグ</param>
+	/// <param name="imageHandle">メモリに存在する画像ハンドル</param>
+	/// <returns><画像ハンドル/returns>
+	ImageHandle imgFromMem(std::wstring tag, ImageHandle imageHandle);
+	
+	/// <summary>
+	/// メモリに存在する画像ハンドルの取得
+	/// </summary>
+	/// <param name="tag">取得する画像ハンドルのタグ</param>
+	/// <returns>画像ハンドル</returns>
+	ImageHandle imgFromMem(std::wstring tag);
 
+	/// <summary>
+	/// メモリに存在する画像ハンドルの削除
+	/// </summary>
+	/// <param name="tag">削除する画像ハンドルのタグ</param>
+	void deleteImgFromMem(std::wstring tag);
 
 	int snd(std::wstring path);
 

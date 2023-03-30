@@ -27,7 +27,7 @@ extern int GetRainbowColorForRadar(int val, int th);
 extern void DrawHexagon(short, short, short, short, short, short);
 
 extern void OptionValueChange(Option* Option, int option_select, int add);
-extern void DrawOptionSentence(Option* Option, int option_select, Config config, int FontHandle);
+extern void DrawOptionSentence(Option* Option, OptionItem::Name option_select, Config config, int FontHandle);
 
 extern int clearStateConverter(int clearState);
 

@@ -66,7 +66,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWindowSizeChangeEnableFlag(TRUE);//サイズ変更許可
 
 	wchar_t WindowTitle[30];
-	swprintf_s(WindowTitle, L"nature prhysm ver %.2f", VERSION);
+	swprintf_s(WindowTitle, L"nature prhysm ver %.2f", APPLICATION_VERSION);
 	SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
 	SetWindowIconID(333);//ウィンドウアイコンの設定
 #endif

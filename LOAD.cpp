@@ -524,7 +524,7 @@ void SearchThemeSkin(Option *op) {//テーマスキン読み込み
 	//メモリ確保(ノートスキンの種類分)
 	op->theme = new wchar_t*[op->THEME_NUM];
 
-	op->ArrayOptionKindName[op->OP_THEME] = op->theme;//選曲画面で使うオプションの種類→名称の配列にアドレスを格納
+	op->ArrayOptionKindName[(int)OptionItem::Name::THEME] = op->theme;//選曲画面で使うオプションの種類→名称の配列にアドレスを格納
 
 
 	//実際の名前を入れていく
@@ -581,7 +581,7 @@ void SearchNoteSkin(Option* op) {//ノートスキン読み込み
 	//メモリ確保(ノートスキンの種類分)
 	op->note = new wchar_t* [op->NOTE_NUM];
 
-	op->ArrayOptionKindName[op->OP_NOTE] = op->note;//選曲画面で使うオプションの種類→名称の配列にアドレスを格納
+	op->ArrayOptionKindName[(int)OptionItem::Name::NOTE] = op->note;//選曲画面で使うオプションの種類→名称の配列にアドレスを格納
 
 
 	//実際の名前を入れていく
@@ -639,7 +639,7 @@ void SearchHitSoundSkin(Option *op) {//ヒット音スキン読み込み
 	//メモリ確保(ノートスキンの種類分)
 	op->hitSound = new wchar_t*[op->HITSOUND_NUM];
 
-	op->ArrayOptionKindName[op->OP_HITSOUND] = op->hitSound;
+	op->ArrayOptionKindName[(int)OptionItem::Name::HITSOUND] = op->hitSound;
 
 	//実際の名前を入れていく
 	op->HITSOUND_NUM = 0;

@@ -1246,21 +1246,21 @@ void GAME_LOAD(int song_number,
 
 
 	//オプションで加工された譜面をcopyに格納、その後noteに戻す
-	if (Option->op.lane == Option->OP_LANE_NONE) {//NONE
+	if (Option->op.lane == OptionItem::Lane::NONE) {//NONE
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= nc[i] - 1; j++) {
 				copy[i][j] = note[i][j];
 			}
 		}
 	}
-	if (Option->op.lane == Option->OP_LANE_MIRROR) {//MIRROR
+	if (Option->op.lane == OptionItem::Lane::MIRROR) {//MIRROR
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= nc[i] - 1; j++) {
 				copy[3 - i][j] = note[i][j];
 			}
 		}
 	}
-	if (Option->op.lane == Option->OP_LANE_RANDOM) {//RANDOM
+	if (Option->op.lane == OptionItem::Lane::RANDOM) {//RANDOM
 		random_kaburanai(op_lane, 4, 0, 3, ln_use_s, ln_use_c);
 
 		while ((op_lane[0] == 0 && op_lane[1] == 1 && op_lane[2] == 2 && op_lane[3] == 3) ||//正規または鏡譜面になってしまったときはやり直し
@@ -1283,7 +1283,7 @@ void GAME_LOAD(int song_number,
 	//nc_c[c] x列の今処理しているコピー先の音符番号
 	//op_lane[x] 入力x(0~3)を0~3に変化させるための配列
 
-	if (Option->op.lane == Option->OP_LANE_SUPER_RAND) {//SUPER_RANDOM
+	if (Option->op.lane == OptionItem::Lane::SUPER_RAND) {//SUPER_RANDOM
 		while (nc[0] != nc_s[0] || nc[1] != nc_s[1] || nc[2] != nc_s[2] || nc[3] != nc_s[3]) {//各列全ての音符の配置を変えるまで
 			random_kaburanai(op_lane, 4, 0, 3, ln_use_s, ln_use_c);//op_lane[]にコピー先レーン番号を入れる
 			//printfDx(L"tc:%d\n", tc);
@@ -1350,7 +1350,7 @@ void GAME_LOAD(int song_number,
 
 
 
-	if (Option->op.color == Option->OP_COLOR_RGB_CHANGE) {//RGB CHANGE
+	if (Option->op.color == OptionItem::Color::RGB_CHANGE) {//RGB CHANGE
 		k = rand() % 5;//0~4
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
@@ -1360,7 +1360,7 @@ void GAME_LOAD(int song_number,
 		}
 	}
 
-	if (Option->op.color == Option->OP_COLOR_RGB_RAND) {//RGB RAND
+	if (Option->op.color == OptionItem::Color::RGB_RAND) {//RGB RAND
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
@@ -1417,7 +1417,7 @@ void GAME_LOAD(int song_number,
 	}
 	*/
 
-	if (Option->op.color == Option->OP_COLOR_SUPER_RAND) {//SUPER RAND
+	if (Option->op.color == OptionItem::Color::SUPER_RAND) {//SUPER RAND
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
@@ -1439,7 +1439,7 @@ void GAME_LOAD(int song_number,
 
 
 
-	if (Option->op.color == Option->OP_COLOR_RGB_ONLY) {//RGB OMLY
+	if (Option->op.color == OptionItem::Color::RGB_ONLY) {//RGB OMLY
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
@@ -1486,7 +1486,7 @@ void GAME_LOAD(int song_number,
 		}
 	}
 
-	if (Option->op.color == Option->OP_COLOR_CMY_ONLY) {//CMY OMLY
+	if (Option->op.color == OptionItem::Color::CMY_ONLY) {//CMY OMLY
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
@@ -1531,7 +1531,7 @@ void GAME_LOAD(int song_number,
 		}
 	}
 
-	if (Option->op.color == Option->OP_COLOR_W_ONLY) {//W OMLY
+	if (Option->op.color == OptionItem::Color::W_ONLY) {//W OMLY
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
@@ -1542,7 +1542,7 @@ void GAME_LOAD(int song_number,
 		}
 	}
 
-	if (Option->op.color == Option->OP_COLOR_RAINBOW) {//RAINBOW
+	if (Option->op.color == OptionItem::Color::RAINBOW) {//RAINBOW
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {

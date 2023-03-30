@@ -1632,7 +1632,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 							}
 
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);//黒終端ロングノートのグラデーション表示
-							if (show->data.note.LN_k[i] == 1 && option->op.blackGradation == option->OP_BLACK_GRADATION_ON) {
+							if (show->data.note.LN_k[i] == 1 && option->op.blackGradation == OptionItem::BlackGradation::ON) {
 								DrawRectExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (score_cell_find_before_note(show, i)->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
 									0, 0, 256, 256, H_LNOTE[8], TRUE);
 							}

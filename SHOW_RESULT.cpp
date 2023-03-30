@@ -176,7 +176,7 @@ void SHOW_RESULT(RESULT res,
 	wchar_t *Rainbow[2] = { L"",L"_虹" };
 	int RainbowUse = 0;
 
-	if (option->op.color == option->OP_COLOR_RAINBOW) {
+	if (option->op.color == OptionItem::Color::RAINBOW) {
 		RainbowUse = 1;
 	}
 	else {
@@ -231,11 +231,11 @@ void SHOW_RESULT(RESULT res,
 		CreateDirectory(str, NULL);//スコア保存用の種類ディレクトリ(official)作成
 		CreateDirectory(Music[song_number].SaveFolder, NULL);//スコア保存用の曲ディレクトリ作成
 
-		if (option->op.color != option->OP_COLOR_RAINBOW) {//通常モードだったら
+		if (option->op.color != OptionItem::Color::RAINBOW) {//通常モードだったら
 			sprintfDx(filename, L"%s/result_%s.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 			sprintfDx(filenameLatest, L"%s/latest_result_%s.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 		}
-		if (option->op.color == option->OP_COLOR_RAINBOW) {//虹モードだったら
+		if (option->op.color == OptionItem::Color::RAINBOW) {//虹モードだったら
 			sprintfDx(filename, L"%s/result_%s_r.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 			sprintfDx(filenameLatest, L"%s/latest_result_%s_r.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 		}
@@ -296,9 +296,9 @@ void SHOW_RESULT(RESULT res,
 		}
 
 		//ONLYオプションを使用しているかどうか
-		BOOL isOnlyOption = option->op.color == option->OP_COLOR_RGB_ONLY || 
-			option->op.color == option->OP_COLOR_CMY_ONLY ||
-			option->op.color == option->OP_COLOR_W_ONLY;
+		BOOL isOnlyOption = option->op.color == OptionItem::Color::RGB_ONLY || 
+			option->op.color == OptionItem::Color::CMY_ONLY ||
+			option->op.color == OptionItem::Color::W_ONLY;
 
 		if (firstplay == 0) {//2回目以降のプレイ
 
@@ -401,7 +401,7 @@ void SHOW_RESULT(RESULT res,
 
 		}
 
-		if (option->op.color == option->OP_COLOR_RAINBOW) {//虹オプションなら難易度+4しておく(今はしてない)
+		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションなら難易度+4しておく(今はしてない)
 			save.difficulty = difficulty;
 		}
 
@@ -433,8 +433,8 @@ void SHOW_RESULT(RESULT res,
 		writeSaveData(saveData);
 
 		//インターネットランキング送信用スコアの保存、送信
-		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color == option->OP_COLOR_RAINBOW, isOnlyOption, config);
-		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
+		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color == OptionItem::Color::RAINBOW, isOnlyOption, config);
+		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == OptionItem::Color::RAINBOW, config);
 
 	}
 	else if(*debug == 0 && SkillTestFlag == SHOW_SKILL_TEST_RESULT){//段位スコア保存
@@ -651,7 +651,7 @@ void SHOW_RESULT(RESULT res,
 	}
 	else {
 		if (res.clear == CLEARTYPE_PLAY) {
-			if (option->op.gauge == option->OP_GAUGE_SKILL_TEST) {//段位認定ゲージ
+			if (option->op.gauge == OptionItem::Gauge::SKILL_TEST) {//段位認定ゲージ
 				H_CLEARED = LoadGraph(L"img/cleared.png");
 			}
 			else {
@@ -749,10 +749,10 @@ void SHOW_RESULT(RESULT res,
 
 	wchar_t WindowTitle[128];
 	if (*debug == 1) {
-		swprintf_s(WindowTitle, L"nature prhysm ver %.2f  PrtSc:スクリーンショット", VERSION);
+		swprintf_s(WindowTitle, L"nature prhysm ver %.2f  PrtSc:スクリーンショット", APPLICATION_VERSION);
 	}
 	else {
-		swprintf_s(WindowTitle, L"nature prhysm ver %.2f  F11:Twitterに投稿  PrtSc:スクリーンショット", VERSION);
+		swprintf_s(WindowTitle, L"nature prhysm ver %.2f  F11:Twitterに投稿  PrtSc:スクリーンショット", APPLICATION_VERSION);
 	}
 	SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
 
@@ -819,8 +819,8 @@ void SHOW_RESULT(RESULT res,
 
 			if (Key[KEY_INPUT_F2] == 1 && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {//スコア再送信&ランキング表示
 				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
-				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == option->OP_COLOR_RAINBOW, config);
-				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == option->OP_COLOR_RAINBOW, config);
+				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == OptionItem::Color::RAINBOW, config);
+				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == OptionItem::Color::RAINBOW, config);
 			}
 
 			if (Key[KEY_INPUT_F11] == 1 && *debug == 0) {//ツイート
@@ -838,7 +838,7 @@ void SHOW_RESULT(RESULT res,
 				};
 				
 				if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-					if (option->op.color == option->OP_COLOR_RAINBOW) {//RAINBOWモードは「虹」追加
+					if (option->op.color == OptionItem::Color::RAINBOW) {//RAINBOWモードは「虹」追加
 						sprintfDx(rainbow_sent, L",虹");
 					}
 
@@ -1022,7 +1022,7 @@ void SHOW_RESULT(RESULT res,
 		DrawGraph(0, int(0 + (1 - draw_alpha) * 50), H_SCORE_BOARD, TRUE);//ボード
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
 
-		if (option->op.color == option->OP_COLOR_RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
+		if (option->op.color == OptionItem::Color::RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 			//SetDrawBright(brightness2, brightness2, brightness2);
 			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R_OUT, TRUE);//R_out
 			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R_IN, TRUE);//R_in
@@ -1283,17 +1283,17 @@ void SHOW_RESULT(RESULT res,
 		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, option->speed[option->op.speed], GetColor(0, 0, 0));//speed
 		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, option->speed[option->op.speed], GetColor(255, 255, 255));//speed
 
-		StrLength = GetDrawStringWidth(option->gauge[option->op.gauge], wcslen(option->gauge[option->op.gauge]));
-		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, option->gauge[option->op.gauge], GetColor(0, 0, 0));//gauge
-		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, option->gauge[option->op.gauge], GetColor(255, 255, 255));//gauge
+		StrLength = GetDrawStringWidth(option->gauge[(int)option->op.gauge], wcslen(option->gauge[(int)option->op.gauge]));
+		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, option->gauge[(int)option->op.gauge], GetColor(0, 0, 0));//gauge
+		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, option->gauge[(int)option->op.gauge], GetColor(255, 255, 255));//gauge
 
-		StrLength = GetDrawStringWidth(option->lane[option->op.lane], wcslen(option->lane[option->op.lane]));
-		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, option->lane[option->op.lane], GetColor(0, 0, 0));//lane
-		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, option->lane[option->op.lane], GetColor(255, 255, 255));//lane
+		StrLength = GetDrawStringWidth(option->lane[(int)option->op.lane], wcslen(option->lane[(int)option->op.lane]));
+		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, option->lane[(int)option->op.lane], GetColor(0, 0, 0));//lane
+		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, option->lane[(int)option->op.lane], GetColor(255, 255, 255));//lane
 
-		StrLength = GetDrawStringWidth(option->color[option->op.color], wcslen(option->color[option->op.color]));
-		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, option->color[option->op.color], GetColor(0, 0, 0));//color
-		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, option->color[option->op.color], GetColor(255, 255, 255));//color
+		StrLength = GetDrawStringWidth(option->color[(int)option->op.color], wcslen(option->color[(int)option->op.color]));
+		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, option->color[(int)option->op.color], GetColor(0, 0, 0));//color
+		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, option->color[(int)option->op.color], GetColor(255, 255, 255));//color
 
 
 
@@ -1334,7 +1334,7 @@ void SHOW_RESULT(RESULT res,
 				InitSoundMem();//
 
 				wchar_t WindowTitle[30];
-				swprintf_s(WindowTitle, L"nature prhysm ver %.2f", VERSION);
+				swprintf_s(WindowTitle, L"nature prhysm ver %.2f", APPLICATION_VERSION);
 				SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
 				return;
 			}

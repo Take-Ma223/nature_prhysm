@@ -1,25 +1,167 @@
 ﻿#ifndef _STRUCT_OP
 #define _STRUCT_OP
 
+namespace OptionItem {
+	enum class Name : int {
+		SPEED,
+		GAUGE,
+		LANE,
+		COLOR,
+		WINDBREAK,
+		FAST_SLOW,
+		BARLINE,
+		DARKNESS,
+		GRADATION,
+		NOTE_OFFSET,
+		SCORETARGET,
+		TARGETSCORE1,
+		TARGETSCORE2,
+		THEME,
+		NOTE,
+		HITSOUND,
+		SORT
+	};
+
+	enum class Gauge : int {
+		NORMAL,
+		HARD,
+		SUPER_HARD,
+		FC_ATTACK,
+		PFC_ATTACK,
+		NO_FAIL,
+		SKILL_TEST
+	};
+
+	enum class Lane : int {
+		NONE,
+		MIRROR,
+		RANDOM,
+		SUPER_RAND
+	};
+
+	enum class Color : int {
+		NONE,
+		RGB_CHANGE,
+		RGB_RAND,
+		SUPER_RAND,
+		RGB_ONLY,
+		CMY_ONLY,
+		W_ONLY,
+		RAINBOW
+	};
+
+	enum class Windbreak : int {
+		CLOSE_0,
+		CLOSE_10,
+		CLOSE_20,
+		CLOSE_30,
+		CLOSE_40,
+		CLOSE_50,
+		CLOSE_60,
+		CLOSE_70,
+		CLOSE_80,
+		CLOSE_90,
+		CLOSE_100
+	};
+
+	enum class FastSlow : int {
+		OFF,
+		ON_FAST_CYAN,
+		ON_FAST_RED
+	};
+
+	enum class Barline : int {
+		ON,
+		OFF
+	};
+
+	enum class Darkness : int {
+		DARKNESS_0,
+		DARKNESS_25,
+		DARKNESS_50,
+		DARKNESS_75,
+		DARKNESS_100
+	};
+
+	enum class BlackGradation : int {
+		ON,
+		OFF
+	};
+
+	enum class ScoreGraph : int {
+		OFF,
+		ON
+	};
+
+	enum class TargetScore1 : int {
+		E,
+		D,
+		C,
+		B,
+		A,
+		S,
+		POINT_10000,
+		MAX
+	};
+
+	enum class TargetScore2 : int {
+		RIVAL,
+		AVERAGE,
+		MEDIAN,
+		NEXTRANK,
+		TOP,
+		LATEST
+	};
+
+	enum class Sort : int {
+		NAME,
+		LEVEL,
+		SCORE,
+		CLEAR_STATE,
+		MIN_MISS,
+		PLAY_COUNT,
+		RADAR,
+		GLOBAL,
+		LOCAL,
+		CHAIN,
+		UNSTABILITY,
+		STREAK,
+		COLOR,
+		RED_DENSITY,
+		GREEN_DENSITY,
+		BLUE_DENSITY,
+		CYAN_DENSITY,
+		MAGENTA_DENSITY,
+		YELLOW_DENSITY,
+		WHITE_DENSITY,
+		BLACK_DENSITY,
+		RAINBOW_DENSITY,
+		MAX_BPM,
+		MIN_BPM,
+		MAX_CHORDS,
+		VERSION,
+	};
+}
+
 typedef struct OP {//オプション構造体(ロード時に渡す値)
 	int speed = 11;//ハイスピード番号
 	double speedVal = 1;//ハイスピ倍率
-	int gauge = 0;//ゲージタイプ(0:ノーマルゲージ(青) 1:ハードゲージ(緑) 2:スーパーハードゲージ(赤) 3:FCゲージ(銀) 4:PFCゲージ(金))
-	int lane = 0;//レーンオプション
-	int color = 0;//色オプション
+	OptionItem::Gauge gauge = OptionItem::Gauge::NORMAL;//ゲージタイプ(0:ノーマルゲージ(青) 1:ハードゲージ(緑) 2:スーパーハードゲージ(赤) 3:FCゲージ(銀) 4:PFCゲージ(金))
+	OptionItem::Lane lane = OptionItem::Lane::NONE;//レーンオプション
+	OptionItem::Color color = OptionItem::Color::NONE;//色オプション
 	int note = 0;//ノートスキン
 	int hitSound = 0;//ヒット音スキン
-	int barline = 0;//小節線表示
-	int darkness = 0;//演奏画面の背景の暗さ
-	int scoreGraph = 0;//スコアグラフ表示するかどうか
-	int sort = 0;//選曲画面のソート種類
-	int blackGradation = 0;//黒終端ノーツのグラデーション
+	OptionItem::Barline barline = OptionItem::Barline::ON;//小節線表示
+	OptionItem::Darkness darkness = OptionItem::Darkness::DARKNESS_0;//演奏画面の背景の暗さ
+	OptionItem::ScoreGraph scoreGraph = OptionItem::ScoreGraph::OFF;//スコアグラフ表示するかどうか
+	OptionItem::Sort sort = OptionItem::Sort::NAME;//選曲画面のソート種類
+	OptionItem::BlackGradation blackGradation = OptionItem::BlackGradation::ON;//黒終端ノーツのグラデーション
 	int theme = 0;//テーマスキン
-	int targetScore1 = 0;//TARGET SCORE1
-	int targetScore2 = 0;//TARGET SCORE2
-	int fastSlow = 1;//FAST/SLOW
+	OptionItem::TargetScore1 targetScore1 = OptionItem::TargetScore1::E;//TARGET SCORE1
+	OptionItem::TargetScore2 targetScore2 = OptionItem::TargetScore2::RIVAL;//TARGET SCORE2
+	OptionItem::FastSlow fastSlow = OptionItem::FastSlow::ON_FAST_CYAN;//FAST/SLOW
 	int noteOffset = 6;//音符オフセット調整
-	int windbreak = 0;//レーンカバー初期位置
+	OptionItem::Windbreak windbreak = OptionItem::Windbreak::CLOSE_0;//レーンカバー初期位置
 }OP;
 
 typedef struct Option {//オプション構造体(全体)
@@ -49,121 +191,7 @@ typedef struct Option {//オプション構造体(全体)
 	static const int SORT_NUM = 26;//曲ソート種類の数
 	int THEME_NUM = 0;//テーマオプションの数
 
-	const int OP_SPEED = 0;
-	const int OP_GAUGE = 1;
-	const int OP_LANE = 2;
-	const int OP_COLOR = 3;
-	const int OP_WINDBREAK = 4;
-	const int OP_FAST_SLOW = 5;
-	const int OP_BARLINE = 6;
-	const int OP_DARKNESS = 7;
-	const int OP_GRADATION = 8;
-	const int OP_NOTE_OFFSET = 9;
-	const int OP_SCORETARGET = 10;
-	const int OP_TARGETSCORE1 = 11;
-	const int OP_TARGETSCORE2 = 12;
-	const int OP_THEME = 13;
-	const int OP_NOTE = 14;
-	const int OP_HITSOUND = 15;
-	const int OP_SORT = 16;
-
-
-
-	const int OP_GAUGE_NORMAL = 0;
-	const int OP_GAUGE_HARD = 1;
-	const int OP_GAUGE_SUPER_HARD = 2;
-	const int OP_GAUGE_FC_ATTACK = 3;
-	const int OP_GAUGE_PFC_ATTACK = 4;
-	const int OP_GAUGE_NO_FAIL = 5;
-	const int OP_GAUGE_SKILL_TEST = 6;
-
-
-	const int OP_LANE_NONE = 0;
-	const int OP_LANE_MIRROR = 1;
-	const int OP_LANE_RANDOM = 2;
-	const int OP_LANE_SUPER_RAND = 3;
-
-	const int OP_COLOR_NONE = 0;
-	const int OP_COLOR_RGB_CHANGE = 1;
-	const int OP_COLOR_RGB_RAND = 2;
-	const int OP_COLOR_SUPER_RAND = 3;
-	const int OP_COLOR_RGB_ONLY = 4;
-	const int OP_COLOR_CMY_ONLY = 5;
-	const int OP_COLOR_W_ONLY = 6;
-	const int OP_COLOR_RAINBOW = 7;
-
-	const int OP_WINDBREAK_0 = 0;
-	const int OP_WINDBREAK_10 = 1;
-	const int OP_WINDBREAK_20 = 2;
-	const int OP_WINDBREAK_30 = 3;
-	const int OP_WINDBREAK_40 = 4;
-	const int OP_WINDBREAK_50 = 5;
-	const int OP_WINDBREAK_60 = 6;
-	const int OP_WINDBREAK_70 = 7;
-	const int OP_WINDBREAK_80 = 8;
-	const int OP_WINDBREAK_90 = 9;
-	const int OP_WINDBREAK_100 = 10;
-
-
-	const int OP_FAST_SLOW_OFF = 0;
-	const int OP_FAST_SLOW_ON_FAST_CYAN = 1;
-	const int OP_FAST_SLOW_ON_FAST_RED = 2;
-
-	const int OP_BARLINE_ON = 0;
-	const int OP_BARLINE_OFF = 1;
-
-	const int OP_DARKNESS_50 = 2;
-	const int OP_DARKNESS_75 = 3;
-	const int OP_DARKNESS_100 = 4;
-
-	const int OP_BLACK_GRADATION_ON = 0;
-	const int OP_BLACK_GRADATION_OFF = 1;
-
-	const int OP_SCORE_GRAPH_OFF = 0;
-	const int OP_SCORE_GRAPH_ON = 1;
-
-	const int OP_TARGET_SCORE1_E = 0;
-	const int OP_TARGET_SCORE1_D = 1;
-	const int OP_TARGET_SCORE1_C = 2;
-	const int OP_TARGET_SCORE1_B = 3;
-	const int OP_TARGET_SCORE1_A = 4;
-	const int OP_TARGET_SCORE1_S = 5;
-	const int OP_TARGET_SCORE1_10000 = 6;
-	const int OP_TARGET_SCORE1_MAX = 7;
-
-	const int OP_TARGET_SCORE2_RIVAL = 0;
-	const int OP_TARGET_SCORE2_AVERAGE = 1;
-	const int OP_TARGET_SCORE2_MEDIAN = 2;
-	const int OP_TARGET_SCORE2_NEXTRANK = 3;
-	const int OP_TARGET_SCORE2_TOP = 4;
-	const int OP_TARGET_SCORE2_LATEST = 5;
-
-	const int OP_SORT_NAME = 0;
-	const int OP_SORT_LEVEL = 1;
-	const int OP_SORT_SCORE = 2;
-	const int OP_SORT_CLEAR_STATE = 3;
-	const int OP_SORT_MIN_MISS = 4;
-	const int OP_SORT_PLAY_COUNT = 5;
-	const int OP_SORT_RADAR = 6;
-	const int OP_SORT_GLOBAL = 7;
-	const int OP_SORT_LOCAL = 8;
-	const int OP_SORT_CHAIN = 9;
-	const int OP_SORT_UNSTABILITY = 10;
-	const int OP_SORT_STREAK = 11;
-	const int OP_SORT_COLOR = 12;
-	const int OP_SORT_RED_DENSITY = 13;
-	const int OP_SORT_GREEN_DENSITY = 14;
-	const int OP_SORT_BLUE_DENSITY = 15;
-	const int OP_SORT_CYAN_DENSITY = 16;
-	const int OP_SORT_MAGENTA_DENSITY = 17;
-	const int OP_SORT_YELLOW_DENSITY = 18;
-	const int OP_SORT_WHITE_DENSITY = 19;
-	const int OP_SORT_BLACK_DENSITY = 20;
-	const int OP_SORT_RAINBOW_DENSITY = 21;
-	const int OP_SORT_MAX_BPM = 22;
-	const int OP_SORT_MIN_BPM = 23;
-	const int OP_SORT_MAX_CHORDS = 24;
-	const int OP_SORT_VERSION = 25;
+	
 
 	double speedVal[SPEED_NUM] = {
 		10,
@@ -668,24 +696,24 @@ typedef struct Option {//オプション構造体(全体)
 
 	int* ArrayValue[OPTION_NUM] = {
 		&(op.speed),
-		&(op.gauge),
-		&(op.lane),
-		&(op.color),
-		&(op.windbreak),
-		&(op.fastSlow),
-		&(op.barline),
-		&(op.darkness),
-		&(op.blackGradation),
+		(int*)&(op.gauge),
+		(int*)&(op.lane),
+		(int*)&(op.color),
+		(int*)&(op.windbreak),
+		(int*)&(op.fastSlow),
+		(int*)&(op.barline),
+		(int*)&(op.darkness),
+		(int*)&(op.blackGradation),
 		&(op.noteOffset),
-		&(op.scoreGraph),
-		&(op.targetScore1),
-		&(op.targetScore2),
+		(int*)&(op.scoreGraph),
+		(int*)&(op.targetScore1),
+		(int*)&(op.targetScore2),
 		&(op.theme),
 		&(op.note),
 		&(op.hitSound),
-		&(op.sort) };//選んでいるオプションの値
+		(int*)&(op.sort) };//選んでいるオプションの値
 
-
-}Option;
+	
+ }Option;
 
 #endif

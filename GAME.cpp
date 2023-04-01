@@ -212,7 +212,7 @@ void GAME(int song_number, int difficulty,
 	double hit_good[4] = { 0,0,0,0 };//判定画像のGOODを表示するカウンタ
 	double hit_miss[4] = { 0,0,0,0 };//判定画像のMISSを表示するカウンタ
 	double combo_draw_counter = 0;//コンボ画像を表示するカウンタ
-	double c_m_draw_counter = 0;//中心カバー画像を表示するカウンタ
+	double c_m_draw_counter = 0;//中心カバー画像を表示するカウンタ(0~1 0:スタート前、終了後 1:プレイ中)
 	double str_draw_counter = -1;//CLEARED FAILED画像を表示するカウンタ
 	int TimeFromEndOfGameToResult = 4000;//CLEARED FAILEDが表示されてからリザルトに移るまでの時間(ms)
 
@@ -310,7 +310,10 @@ void GAME(int song_number, int difficulty,
 	double beat_percent = 0;//前の拍から何パーセント拍進んでいるか
 	int bgmplay = 0;//BGMを流したかどうか(最初に一回だけ再生するためのフラグ)
 	int FirstBgmPlay = 1;//今から流すBGMが最初の再生かどうかのフラグ
-					//int level_s;//計算で出したレベル目安
+
+	int isMoviePlaying = 0;//BGAを流したかどうか(最初に一回だけ再生するためのフラグ)
+	int FirstMoviePlay = 1;//今から流すBGAが最初の再生かどうかのフラグ
+
 	CALCDIFF Cdiff;//計算で出した難易度要素目安
 
 	int bcc = 0;//bpmchangeのカウンタ
@@ -766,9 +769,9 @@ void GAME(int song_number, int difficulty,
 	SetUseASyncLoadFlag(TRUE);
 	SH_SONG = LoadSoundMem(Music[song_number].wavpath[difficulty]);
 
-	int MovieGraphHandle;
-	MovieGraphHandle = LoadGraph(L"mov.mp4");
-
+	int MovieGraphHandle = LoadGraph(Music[song_number].moviePath[difficulty]);
+	bool isExistMovie;
+	isExistMovie = strcmpDx(Music[song_number].moviePath[difficulty], L"") != 0;//動画パスが存在すれば動画を再生すると見なす
 
 
 	SetUseASyncLoadFlag(FALSE);
@@ -814,6 +817,7 @@ void GAME(int song_number, int difficulty,
 		MAX_COMBO = 0;
 		gauge = 100;
 		bgmplay = 0;
+		
 		bcc = 0;
 		scc = 0;
 		cscroll = scrollchange[0].scroll;
@@ -879,6 +883,12 @@ void GAME(int song_number, int difficulty,
 			AllowSound[1][i] = 1;
 			AllowSound[2][i] = 1;
 		}
+	};
+
+	//透過度の取得 Movieを再生するかによって変わります
+	auto getAlpha = [&](int alphaGeneral, int alphaForMovie, int alphaInit = 255) {
+		if (isExistMovie) { return alphaInit - (alphaInit - alphaForMovie) * c_m_draw_counter; }
+		else { return alphaInit - (alphaInit - alphaGeneral) * c_m_draw_counter; }
 	};
 
 	//----曲名表示前処理----
@@ -1521,12 +1531,17 @@ void GAME(int song_number, int difficulty,
 					initVariableProcess();
 				}
 			}
+			if (Key[KEY_INPUT_LEFT] == -1 || Key[KEY_INPUT_RIGHT] == -1 || Key[KEY_INPUT_UP] == -1 || Key[KEY_INPUT_DOWN] == -1) {
+				isMoviePlaying = 0;
+				PauseMovieToGraph(MovieGraphHandle);
+			}
 
 			if (Key[KEY_INPUT_SPACE] == 1) {//再生停止(開始)
 				if (debug_stop == 0) {
 					debug_stop = 1;
 					debug_stoped_time = GetNowCount_d(config);
 					bgmplay = 0;
+					isMoviePlaying = 0;
 				}
 				else {
 					if (debug_stop == 1) {
@@ -1536,6 +1551,7 @@ void GAME(int song_number, int difficulty,
 					}
 				}
 				StopSoundMem(SH_SONG);
+				PauseMovieToGraph(MovieGraphHandle);
 			}
 
 			if (debug_stop == 1) {
@@ -1579,6 +1595,8 @@ void GAME(int song_number, int difficulty,
 				cbpm = Music[song_number].bpm[difficulty];//最初のBPM
 
 				initVariableProcess();
+				isMoviePlaying = 0;
+				PauseMovieToGraph(MovieGraphHandle);
 			}
 
 			if (Key[KEY_INPUT_F3] == 1) {//叩いた音を鳴らさない
@@ -1620,7 +1638,9 @@ void GAME(int song_number, int difficulty,
 					debug_stop = 1;
 					debug_stoped_time = GetNowCount_d(config);
 					bgmplay = 0;
+					isMoviePlaying = 0;
 					StopSoundMem(SH_SONG);
+					PauseMovieToGraph(MovieGraphHandle);
 				}
 				double EDIT_passed_time = (GAME_passed_time - Music[song_number].noteoffset[difficulty])*pitch;
 				if (EDIT_passed_time < 0) {
@@ -2787,6 +2807,7 @@ void GAME(int song_number, int difficulty,
 
 			CloseHandle(hComm);//シリアル通信の終了
 			StopSoundMem(SH_SONG);//曲の再生停止
+			PauseMovieToGraph(MovieGraphHandle);
 			InitGraph();//メモリ開放
 			InitSoundMem();//
 			DeleteFontToHandle(FontHandle);
@@ -3071,14 +3092,23 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(0.5 * 255 - 195 * (c_m_draw_counter)+195 * ((double)1 - (gauge_draw_counter / 100))));
+
+
+		int sideCoverAlphaRatioGeneral = 195;
+		if (isExistMovie)sideCoverAlphaRatioGeneral = 255;
+		double dangerRatio = ((double)1 - (gauge_draw_counter / 100));//降水確率
+
+		int sideCoverAlpha = int(getAlpha(60, 0));
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sideCoverAlpha);
 		DrawGraph(0, 0, H_COVER, TRUE);//カバー表示
 		DrawGraph(960, 0, H_COVER, TRUE);//右側
 
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(0.5 * flash* FLASH_COVER_VALUE* (1 - (double)option->op.darkness / 5)));
-		DrawGraph(0, 0, H_COVER_FLASH, TRUE);//カバーフラッシュ表示
-		DrawGraph(960, 0, H_COVER_FLASH, TRUE);//右側
+		if (!isExistMovie) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_COVER_VALUE * (1 - (double)option->op.darkness / 5)));
+			DrawGraph(0, 0, H_COVER_FLASH, TRUE);//カバーフラッシュ表示
+			DrawGraph(960, 0, H_COVER_FLASH, TRUE);//右側
+		}
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 
@@ -3093,10 +3123,10 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
+		//ゲージ描画
+		int gaugeAlphaGeneral = getAlpha(255, 255 * dangerRatio);
 
-
-		//DrawGraph(960, 0, H_COVER_STR, TRUE);//右側の文字
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255* 0.25);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gaugeAlphaGeneral);
 		
 		DrawGraph(0, 0, H_GAUGE_BOX, TRUE);//ゲージボックス (左上95,105)大きさ130*510
 		gauge_draw_hosei = xtosinx(gauge_draw_counter);
@@ -3119,35 +3149,38 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(160, 560, pop, 25, 0, 0, H_POP_NUMBER);
 
 		//コントローラ画像描画
+		int controllerAlphaGeneral = getAlpha(255, 128);
+		int controllerBrightAlphaGeneral = getAlpha(230, 115);
+
 		for (j = 0; j <= 3; j++) {//B
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
 			DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[0][j], 2)), 620 + 0 * 32, H_BUTTON_B, TRUE);
 			if (Key[Button[0][j]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 230));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerBrightAlphaGeneral));
 				DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[0][j], 2)), 620 + 0 * 32, H_BUTTON_PRESS, TRUE);//押してたら光らせる
 			}
 		}
 		for (j = 0; j <= 3; j++) {//G
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
 			DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[1][j], 2)), 620 + 1 * 32, H_BUTTON_G, TRUE);
 			if (Key[Button[1][j]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 230));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerBrightAlphaGeneral));
 				DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[1][j], 2)), 620 + 1 * 32, H_BUTTON_PRESS, TRUE);//押してたら光らせる
 			}
 		}
 		for (j = 0; j <= 3; j++) {//R
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
 			DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[2][j], 2)), 620 + 2 * 32, H_BUTTON_R, TRUE);
 			if (Key[Button[2][j]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 230));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerBrightAlphaGeneral));
 				DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[2][j], 2)), 620 + 2 * 32, H_BUTTON_PRESS, TRUE);//押してたら光らせる
 			}
 		}
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 * 0.75);
-		
-
         //時間描画
+		int timeAlphaGeneral = getAlpha(255, 128);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, timeAlphaGeneral);
+
 		if (PassedTime_Hours <= 9) {//6~9のとき
 			DrawGraph(130 - 20, 0, H_TIME_COLON, TRUE);
 		}
@@ -3177,16 +3210,17 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
-
-
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 * 0.75);
 		//スコア描画
+		int scoreAlphaGeneral = getAlpha(255, 128);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, scoreAlphaGeneral);
 		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションのときR表示
-								 //SetDrawBright(190, 190, 190);
 			DrawGraph(960, -3, H_R_OUT, TRUE);
 			DrawGraph(960, -3, H_R_IN, TRUE);
-			//SetDrawBright(255, 255, 255);
 		}
+
+		//コンボ描画
+		int comboAlphaGeneral = getAlpha(255, 128);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, comboAlphaGeneral);
 
 		if (option->op.color != OptionItem::Color::RAINBOW) {
 			for (i = 0; i <= 4; i++) {
@@ -3207,19 +3241,21 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//難易度画像描画
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 * 0.2);
+		int simbolAlphaGeneral = getAlpha(255, 0);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, simbolAlphaGeneral);
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
+		int scoreGraphAlphaGeneral = getAlpha(160, 128, 160);
+
 		if (option->op.scoreGraph != OptionItem::ScoreGraph::OFF) {
-			//グラフ名ボックス描画
-			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), 160, 255);//現在のスコア
-			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), 160, 255);//ハイスコア
-			DrawBoxWithLine(960 + 160, 482, 960 + 80 + 160, 482 + 40, GetColor(255, 50, 50), 160, 255);//ターゲットスコア
-			DrawBoxWithLine(960 + 240, 482, 960 + 80 + 240, 482 + 40, GetColor(200, 200, 50), 160, 255);//前回のスコア
+			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), scoreGraphAlphaGeneral, 255);//現在のスコア
+			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), scoreGraphAlphaGeneral, 255);//ハイスコア
+			DrawBoxWithLine(960 + 160, 482, 960 + 80 + 160, 482 + 40, GetColor(255, 50, 50), scoreGraphAlphaGeneral, 255);//ターゲットスコア
+			DrawBoxWithLine(960 + 240, 482, 960 + 80 + 240, 482 + 40, GetColor(200, 200, 50), scoreGraphAlphaGeneral, 255);//前回のスコア
 
 			//スコアグラフ描画
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 160);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, scoreGraphAlphaGeneral);
 
 			//ボーダーライン描画
 			for (i = 0; i < 320; i++) {
@@ -3238,24 +3274,27 @@ void GAME(int song_number, int difficulty,
 			DrawBox(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482 - 0.04 * targetScore2, GetColor(100, 100, 50), TRUE);
 			if (HitingNoteCount != 0) {
 				//リアルタイムグラフ
-				DrawBoxWithLine(960, int(482 - 0.04 * score), 960 + 80, 482, GetColor(50, 50, 255), 160, 255);
-				DrawBoxWithLine(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482, GetColor(50, 255, 50), 160, 255);
-				DrawBoxWithLine(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482, GetColor(255, 50, 50), 160, 255);
-				DrawBoxWithLine(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), 160, 255);
+				DrawBoxWithLine(960, int(482 - 0.04 * score), 960 + 80, 482, GetColor(50, 50, 255), scoreGraphAlphaGeneral, 255);
+				DrawBoxWithLine(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482, GetColor(50, 255, 50), scoreGraphAlphaGeneral, 255);
+				DrawBoxWithLine(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482, GetColor(255, 50, 50), scoreGraphAlphaGeneral, 255);
+				DrawBoxWithLine(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), scoreGraphAlphaGeneral, 255);
 			}
 		}
 
+		int judgeBoxAlphaGeneral = getAlpha(80, 60, 80);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeBoxAlphaGeneral);
+
 		//判定数表示欄
-		DrawBoxWithLine(976, 540, 1110, 580, GetColor(50, 255, 255), 80, 255);//SKY_PERFECT
-		DrawBoxWithLine(976, 580, 1110, 620, GetColor(255, 255, 50), 80, 255);//PERFECT
-		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), 80, 255);//GOOD
-		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), 80, 255);//MISS
+		DrawBoxWithLine(976, 540, 1110, 580, GetColor(50, 255, 255), judgeBoxAlphaGeneral, 255);//SKY_PERFECT
+		DrawBoxWithLine(976, 580, 1110, 620, GetColor(255, 255, 50), judgeBoxAlphaGeneral, 255);//PERFECT
+		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), judgeBoxAlphaGeneral, 255);//GOOD
+		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), judgeBoxAlphaGeneral, 255);//MISS
 
 		//BPM描画欄
-		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), 80, 255);//MAXBPM
-		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), 80, 255);//BPM
-		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), 80, 255);//MINBPM
-		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), 80, 255);//SPEED
+		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), judgeBoxAlphaGeneral, 255);//MAXBPM
+		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), judgeBoxAlphaGeneral, 255);//BPM
+		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), judgeBoxAlphaGeneral, 255);//MINBPM
+		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), judgeBoxAlphaGeneral, 255);//SPEED
 
 		//判定、BPM文字表示
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
@@ -3266,6 +3305,8 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//数値表示
+		int judgeNumberAlphaGeneral = getAlpha(255, 192);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeNumberAlphaGeneral);
 		DrawNumber(1094, 536, SKY_PERFECT, 25, 1, 0, H_SMALL_NUMBER_CYAN);
 		DrawNumber(1094, 576, PERFECT, 25, 1, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1094, 616, GOOD, 25, 1, 0, H_SMALL_NUMBER_RED);
@@ -3546,8 +3587,6 @@ void GAME(int song_number, int difficulty,
 
 			PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);//曲の再生開始
 
-			PlayMovieToGraph(MovieGraphHandle);//動画の再生開始
-
 			bgmplay = 1;
 			FirstBgmPlay = 0;
 		}
@@ -3555,6 +3594,28 @@ void GAME(int song_number, int difficulty,
 			if (FirstBgmPlay == 0 && CheckSoundMem(SH_SONG) == 0) {
 				FirstBgmPlay = 1;
 				SetCurrentPositionSoundMem(0, SH_SONG);
+			}
+		}
+
+		BOOL isOverMoviePlayTiming = (GAME_passed_time + LOOP_passed_time > Music[song_number].movieoffset[difficulty]);
+		if (isOverMoviePlayTiming
+			&& (debug_stop == 0)
+			&& (ClearFlag == 0)
+			&& (isMoviePlaying == 0)) {
+			// 1/60sの後ろずれを防ぐためフレーム時間分前倒しで再生
+			if (FirstMoviePlay == 0) {//最初のBGM再生でないときのみ再生位置変更処理を行う(先頭が削れて再生されるのを防ぐため)
+				SeekMovieToGraph(MovieGraphHandle, int((double)pitch * ((GAME_passed_time + TimePerFrame) - Music[song_number].movieoffset[difficulty])));
+			}
+
+			PlayMovieToGraph(MovieGraphHandle);//動画の再生開始
+
+			isMoviePlaying = 1;
+			FirstMoviePlay = 0;
+		}
+		if (!isOverMoviePlayTiming) {
+			if (FirstMoviePlay == 0) {
+				FirstMoviePlay = 1;
+				SeekMovieToGraph(MovieGraphHandle, 0);
 			}
 		}
 

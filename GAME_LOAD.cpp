@@ -325,7 +325,7 @@ void GAME_LOAD(int song_number,
 		if (wcscmp(L"#TITLE", sharp1) == 0) {
 			wchar_t DefaultTitle[] = L"\0";
 			free(Music[song_number].title[difficulty]);
-			if (wcscmp(L"\0", sharp2) == 0) {//何も書かれていなかったらデフォルトジングル
+			if (wcscmp(L"\0", sharp2) == 0) {
 				Music[song_number].title[difficulty] = (wchar_t*)calloc(strlenDx(DefaultTitle) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].title[difficulty], L"%s", DefaultTitle);
 			}
@@ -337,7 +337,7 @@ void GAME_LOAD(int song_number,
 		if (wcscmp(L"#ARTIST", sharp1) == 0) {
 			wchar_t DefaultArtist[] = L"\0";
 			free(Music[song_number].artist[difficulty]);
-			if (wcscmp(L"\0", sharp2) == 0) {//何も書かれていなかったらデフォルトジングル
+			if (wcscmp(L"\0", sharp2) == 0) {
 				Music[song_number].artist[difficulty] = (wchar_t*)calloc(strlenDx(DefaultArtist) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].artist[difficulty], L"%s", DefaultArtist);
 			}
@@ -350,7 +350,7 @@ void GAME_LOAD(int song_number,
 			wchar_t DefaultGenre[] = L"\0";
 
 			free(Music[song_number].genre[difficulty]);
-			if (wcscmp(L"\0", sharp2) == 0) {//何も書かれていなかったらデフォルトジングル
+			if (wcscmp(L"\0", sharp2) == 0) {
 				Music[song_number].genre[difficulty] = (wchar_t*)calloc(strlenDx(DefaultGenre) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].genre[difficulty], L"%s", DefaultGenre);
 			}
@@ -362,7 +362,7 @@ void GAME_LOAD(int song_number,
 		if (wcscmp(L"#WAV", sharp1) == 0) {
 			wchar_t DefaultWav[] = L"\0";
 			free(Music[song_number].wavpath[difficulty]);
-			if (wcscmp(L"\0", sharp2) == 0) {//何も書かれていなかったらデフォルトジングル
+			if (wcscmp(L"\0", sharp2) == 0) {
 				Music[song_number].wavpath[difficulty] = (wchar_t*)calloc(strlenDx(DefaultWav) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].wavpath[difficulty], L"%s", DefaultWav);
 			}
@@ -386,7 +386,6 @@ void GAME_LOAD(int song_number,
 				Music[song_number].jinglepath[difficulty] = (wchar_t*)calloc(strlenDx(Music[song_number].FolderPath) + strlenDx(L"/") + strlenDx(sharp2) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].jinglepath[difficulty], L"%s/%s", Music[song_number].FolderPath, sharp2);
 			}
-			//printfDx(L"%s\n", Music[song_number].jinglepath[difficulty]);
 
 		}
 		if (wcscmp(L"#JACKET", sharp1) == 0) {
@@ -394,7 +393,7 @@ void GAME_LOAD(int song_number,
 
 			free(Music[song_number].jacketpath[difficulty]);
 
-			if (wcscmp(L"\0", sharp2) == 0) {//何も書かれていなかったらデフォルトジングル
+			if (wcscmp(L"\0", sharp2) == 0) {
 				Music[song_number].jacketpath[difficulty] = (wchar_t*)calloc(strlenDx(DefaultJacket) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].jacketpath[difficulty], L"%s", DefaultJacket);
 			}
@@ -403,7 +402,6 @@ void GAME_LOAD(int song_number,
 				Music[song_number].jacketpath[difficulty] = (wchar_t*)calloc(strlenDx(Music[song_number].FolderPath) + strlenDx(L"/") + strlenDx(sharp2) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].jacketpath[difficulty], L"%s/%s", Music[song_number].FolderPath, sharp2);
 			}
-			//printfDx(L"%s\n", Music[song_number].jacketpath[difficulty]);
 		}
 
 		if (wcscmp(L"#JACKET2", sharp1) == 0) {
@@ -420,10 +418,23 @@ void GAME_LOAD(int song_number,
 				Music[song_number].jacketpath2[difficulty] = (wchar_t*)calloc(strlenDx(Music[song_number].FolderPath) + strlenDx(L"/") + strlenDx(sharp2) + 1, sizeof(wchar_t));
 				sprintfDx(Music[song_number].jacketpath2[difficulty], L"%s/%s", Music[song_number].FolderPath, sharp2);
 			}
-			//printfDx(L"%s\n", Music[song_number].jacketpath[difficulty]);
 
 		}
+		if (wcscmp(L"#MOVIE", sharp1) == 0) {
+			wchar_t DefaultMovie[] = L"\0";
 
+			free(Music[song_number].moviePath[difficulty]);
+
+			if (wcscmp(L"\0", sharp2) == 0) {
+				Music[song_number].moviePath[difficulty] = (wchar_t*)calloc(strlenDx(DefaultMovie) + 1, sizeof(wchar_t));
+				sprintfDx(Music[song_number].moviePath[difficulty], L"%s", DefaultMovie);
+			}
+			else {
+
+				Music[song_number].moviePath[difficulty] = (wchar_t*)calloc(strlenDx(Music[song_number].FolderPath) + strlenDx(L"/") + strlenDx(sharp2) + 1, sizeof(wchar_t));
+				sprintfDx(Music[song_number].moviePath[difficulty], L"%s/%s", Music[song_number].FolderPath, sharp2);
+			}
+		}
 
 		if (wcscmp(L"#BPM", sharp1) == 0) {
 			Music[song_number].bpm[difficulty] = _wtof(sharp2);
@@ -483,6 +494,11 @@ void GAME_LOAD(int song_number,
 			//printfDx(L"%f\n", Music[song_number].noteoffset[difficulty]);
 
 		}
+		if (wcscmp(L"#MOVIEOFFSET", sharp1) == 0) {
+			Music[song_number].movieoffset[difficulty] = int((double)_wtoi(sharp2) / pitch);
+			//printfDx(L"%f\n", Music[song_number].songoffset[difficulty]);
+
+		}
 		if (wcscmp(L"#DEMOSTART", sharp1) == 0) {
 			Music[song_number].demostart[difficulty] = int(_wtof(sharp2)*1000);
 			//printfDx(L"%f\n", Music[song_number].demostart[difficulty]);
@@ -534,7 +550,6 @@ void GAME_LOAD(int song_number,
 			MusicSub->editable[difficulty] = _wtoi(sharp2);
 		}
 
-		//ScreenFlip();
 	}
 	if (readflag == 1) {
 		free(bpmList);

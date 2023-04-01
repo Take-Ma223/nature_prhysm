@@ -30,6 +30,7 @@ public:
 	wchar_t* jacketpath[5] = { NULL,NULL,NULL,NULL,NULL };//ジャケット画像のパス(難易度によって画像変えたり？できるように10個分)
 	wchar_t* jacketpath2[5] = { NULL,NULL,NULL,NULL,NULL };//ジャケット2画像のパス(難易度によって画像変えたり？できるように10個分)
 	wchar_t* jinglepath[5] = { NULL,NULL,NULL,NULL,NULL };//ジングル音源
+	wchar_t* moviePath[5] = { NULL,NULL,NULL,NULL,NULL };//ムービーパス
 
 	double bpm[5];//最初のBPM
 	short bpmmin[5];//選曲画面で表示するBPMの最大値
@@ -38,6 +39,7 @@ public:
 	unsigned char level[5];//レベル(降水確率)
 	int songoffset[5];
 	int noteoffset[5];
+	int movieoffset[5];
 	int demostart[5];//テキストでは秒で指定するが内部ではミリ秒で指定
 	int TimeToEnd[5];//演奏終了タイミング
 

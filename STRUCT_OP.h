@@ -160,8 +160,9 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItem::TargetScore1 targetScore1 = OptionItem::TargetScore1::E;//TARGET SCORE1
 	OptionItem::TargetScore2 targetScore2 = OptionItem::TargetScore2::RIVAL;//TARGET SCORE2
 	OptionItem::FastSlow fastSlow = OptionItem::FastSlow::ON_FAST_CYAN;//FAST/SLOW
-	int noteOffset = 6;//音符オフセット調整
+	int noteOffset_DepregatedVer1_33 = 6;//音符オフセット調整(非推奨)
 	OptionItem::Windbreak windbreak = OptionItem::Windbreak::CLOSE_0;//レーンカバー初期位置
+	int noteOffset = 20;//音符オフセット調整
 }OP;
 
 typedef struct Option {//オプション構造体(全体)
@@ -181,7 +182,7 @@ typedef struct Option {//オプション構造体(全体)
 	static const int BARLINE_NUM = 2;//小節線オプションの数
 	static const int DARKNESS_NUM = 5;//黒背景オプションの数
 	static const int BLACK_GRADATION_NUM = 2;//黒終端ロング表示オプションの数
-	static const int NOTE_OFFSET_NUM = 13;//音符オフセットオプションの数
+	static const int NOTE_OFFSET_NUM = 41;//音符オフセットオプションの数
 
 	static const int SCORE_GRAPH_NUM = 2;//スコアグラフオプションの数
 	static const int TARGET_SCORE1_NUM = 8;//スコアグラフターゲットオプションの数
@@ -380,6 +381,20 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t* barline[BARLINE_NUM] = { L"ON",L"OFF"};
 	wchar_t* darkness[DARKNESS_NUM] = { L"0%",L"25%",L"50%",L"75%",L"100%" };
 	wchar_t* noteOffset[NOTE_OFFSET_NUM] = {
+		L"-100ms",
+		L"-95ms",
+		L"-90ms",
+		L"-85ms",
+		L"-80ms",
+		L"-75ms",
+		L"-70ms",
+		L"-65ms",
+		L"-60ms",
+		L"-55ms",
+		L"-50ms",
+		L"-45ms",
+		L"-40ms",
+		L"-35ms",
 		L"-30ms",
 		L"-25ms",
 		L"-20ms",
@@ -392,10 +407,38 @@ typedef struct Option {//オプション構造体(全体)
 		L"+15ms",
 		L"+20ms",
 		L"+25ms",
-		L"+30ms"
+		L"+30ms",
+		L"+35ms",
+		L"+40ms",
+		L"+45ms",
+		L"+50ms",
+		L"+55ms",
+		L"+60ms",
+		L"+65ms",
+		L"+70ms",
+		L"+75ms",
+		L"+80ms",
+		L"+85ms",
+		L"+90ms",
+		L"+95ms",
+		L"+100ms"
 	};
 
 	double noteOffsetVal[NOTE_OFFSET_NUM] = {
+		-100,
+		-95,
+		-90,
+		-85,
+		-80,
+		-75,
+		-70,
+		-65,
+		-60,
+		-55,
+		-50,
+		-45,
+		-40,
+		-35,
 		-30,
 		-25,
 		-20,
@@ -408,7 +451,21 @@ typedef struct Option {//オプション構造体(全体)
 		+15,
 		+20,
 		+25,
-		+30 
+		+30,
+		+35,
+		+40,
+		+45,
+		+50,
+		+55,
+		+60,
+		+65,
+		+70,
+		+75,
+		+80,
+		+85,
+		+90,
+		+95,
+		+100
 	};
 
 	wchar_t* scoreTarget[SCORE_GRAPH_NUM] = { L"OFF", L"ON"};
@@ -561,6 +618,20 @@ typedef struct Option {//オプション構造体(全体)
 
 	wchar_t* sent_noteOffset[NOTE_OFFSET_NUM] =
 	{
+		L"音符の流れるタイミングを100ミリ秒早くします",
+		L"音符の流れるタイミングを95ミリ秒早くします",
+		L"音符の流れるタイミングを90ミリ秒早くします",
+		L"音符の流れるタイミングを85ミリ秒早くします",
+		L"音符の流れるタイミングを80ミリ秒早くします",
+		L"音符の流れるタイミングを75ミリ秒早くします",
+		L"音符の流れるタイミングを70ミリ秒早くします",
+		L"音符の流れるタイミングを65ミリ秒早くします",
+		L"音符の流れるタイミングを60ミリ秒早くします",
+		L"音符の流れるタイミングを55ミリ秒早くします",
+		L"音符の流れるタイミングを50ミリ秒早くします",
+		L"音符の流れるタイミングを45ミリ秒早くします",
+		L"音符の流れるタイミングを40ミリ秒早くします",
+		L"音符の流れるタイミングを35ミリ秒早くします",
 		L"音符の流れるタイミングを30ミリ秒早くします",
 		L"音符の流れるタイミングを25ミリ秒早くします",
 		L"音符の流れるタイミングを20ミリ秒早くします",
@@ -573,7 +644,21 @@ typedef struct Option {//オプション構造体(全体)
 		L"音符の流れるタイミングを15ミリ秒遅くします",
 		L"音符の流れるタイミングを20ミリ秒遅くします",
 		L"音符の流れるタイミングを25ミリ秒遅くします",
-		L"音符の流れるタイミングを30ミリ秒遅くします"
+		L"音符の流れるタイミングを30ミリ秒遅くします",
+		L"音符の流れるタイミングを35ミリ秒遅くします",
+		L"音符の流れるタイミングを40ミリ秒遅くします",
+		L"音符の流れるタイミングを45ミリ秒遅くします",
+		L"音符の流れるタイミングを50ミリ秒遅くします",
+		L"音符の流れるタイミングを55ミリ秒遅くします",
+		L"音符の流れるタイミングを60ミリ秒遅くします",
+		L"音符の流れるタイミングを65ミリ秒遅くします",
+		L"音符の流れるタイミングを70ミリ秒遅くします",
+		L"音符の流れるタイミングを75ミリ秒遅くします",
+		L"音符の流れるタイミングを80ミリ秒遅くします",
+		L"音符の流れるタイミングを85ミリ秒遅くします",
+		L"音符の流れるタイミングを90ミリ秒遅くします",
+		L"音符の流れるタイミングを95ミリ秒遅くします",
+		L"音符の流れるタイミングを100ミリ秒遅くします"
 	};
 
 	wchar_t* sent_scoreTarget[SCORE_GRAPH_NUM] = 

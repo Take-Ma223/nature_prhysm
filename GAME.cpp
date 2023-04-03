@@ -3096,9 +3096,9 @@ void GAME(int song_number, int difficulty,
 
 		int sideCoverAlphaRatioGeneral = 195;
 		if (isExistMovie)sideCoverAlphaRatioGeneral = 255;
-		double dangerRatio = ((double)1 - (gauge_draw_counter / 100));//降水確率
+		double dangerRatio = ((double)1 - (gauge_draw_hosei / 100));//降水確率
 
-		int sideCoverAlpha = int(getAlpha(60, 0));
+		int sideCoverAlpha = int(getAlpha(60 + sideCoverAlphaRatioGeneral * dangerRatio, 0));
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sideCoverAlpha);
 		DrawGraph(0, 0, H_COVER, TRUE);//カバー表示
 		DrawGraph(960, 0, H_COVER, TRUE);//右側

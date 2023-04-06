@@ -1020,7 +1020,9 @@ void SHOW_RESULT(RESULT res,
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 127));
 		DrawGraph(0, int(0 + (1 - draw_alpha) * 50), H_SCORE_BOARD, TRUE);//ボード
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
+
+		int entireAlpha = 170;
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
 
 		if (option->op.color == OptionItem::Color::RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 			//SetDrawBright(brightness2, brightness2, brightness2);
@@ -1055,7 +1057,7 @@ void SHOW_RESULT(RESULT res,
 				}
 				SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
 
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
 				if (res.clear == 0) {
 					if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 						DrawExtendGraph(939, int(375 + (1 - draw_alpha) * 50), int(939 + 96 * 4.2), int(375 + 15 * 4.2), H_FAILED, TRUE);//FAILED
@@ -1106,33 +1108,21 @@ void SHOW_RESULT(RESULT res,
 
 
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
 
 
 		DrawGraph(0, int(0 + (1 - draw_alpha) * 50), H_STR, TRUE);//文字
-		//SetFontSize(35);
-		//Music[res.song_number].title
-		//printfDx(L"%d\n",res.score);
-		//printfDx(L"%d\n", res.good);
-		//printfDx(L"%d\n", res.miss);
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 200));
 
 		if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 			DrawGraph(0, int(60 + 2 + (1 - draw_alpha) * 50), H_TITLE_IMG, TRUE);//タイトル画像表示
-
-
-			//ShowExtendedStrFit(640, int(65 + 2 + (1 - draw_alpha) * 50), Music[song_number].title[difficulty], title_width, 800, config,
-				//Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//タイトル表示
 		}
 		else {
 			DrawGraph(0, int(170 + 2 + (1 - draw_alpha) * 50), H_TITLE_IMG, TRUE);//タイトル画像表示
-
-			//ShowExtendedStrFit(640, int(175 + 2 + (1 - draw_alpha) * 50), STList->title[list_number], title_width, 800, config,
-				//STList->Color[list_number], STList->ShadowColor[list_number]);//コース名表示
 		}
 
-		/*
-		DrawString(int(643 - ((double)title_width / 2)) + 2, int(65 + 2 + (1 - draw_alpha) * 50), Music[song_number].title[difficulty], GetColor(0, 0, 0));//タイトル(影)
-		DrawString(int(643 - ((double)title_width / 2)), int(65 + (1 - draw_alpha) * 50), Music[song_number].title[difficulty], GetColor(255, 255, 255));//タイトル
-		*/
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
 
 		//score表示
 		if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
@@ -1142,32 +1132,6 @@ void SHOW_RESULT(RESULT res,
 			DrawNumber(232 + SkillTestShowSlide.x, int(SkillTestShowSlide.y + 209 + (1 - draw_alpha) * 50), res.score, 25, 1, 5, H_SCORE_NUMBER);
 		}
 
-
-		/*
-		if (res.score == 0) {//score表示
-			for (i = 0; i <= 4; i++) {
-				if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-					DrawGraph(220 - i * 25, int(209 + (1 - draw_alpha) * 50), H_SCORE_NUMBER[score_digit[i]], TRUE);
-				}
-				else {
-					DrawGraph(220 + SkillTestShowSlide.x - i * 25, int(209 + SkillTestShowSlide.y + (1 - draw_alpha) * 50), H_SCORE_NUMBER[score_digit[i]], TRUE);
-				}
-			}
-		}
-		else {
-			for (i = 0; i <= 4; i++) {
-				if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-					DrawGraph(220 - i * 25, int(209 + (1 - draw_alpha) * 50), H_SCORE_NUMBER[score_digit[i]], TRUE);
-				}
-				else {
-					DrawGraph(220 + SkillTestShowSlide.x - i * 25, int(209 + SkillTestShowSlide.y + (1 - draw_alpha) * 50), H_SCORE_NUMBER[score_digit[i]], TRUE);
-				}
-			}
-		}
-		*/
-
-		//DrawGraph(int(HighScorePos.x + 240 - i * 25), int(HighScorePos.y + 155), H_HIGH_SCORE_NUMBER[up_digit[i]], TRUE);
-		
 		//sky_perfect数表示
 		ShowJudgeNumber(res.sky_perfect,
 			250,
@@ -1235,7 +1199,7 @@ void SHOW_RESULT(RESULT res,
 
 			}
 
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, entireAlpha);
 			if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 				DrawGraph(int(HighScorePos.x), int(HighScorePos.y), H_HIGH_SCORE_BANNER, TRUE);//ハイスコアバナー
 			}
@@ -1263,17 +1227,14 @@ void SHOW_RESULT(RESULT res,
 
 		//下に天気、降水、MAX_COMBO表示
 		if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
 			for (i = 0; i <= 5; i++) {
 				DrawExtendGraph(315 + i * 120, int(545 + (1 - draw_alpha) * 50), 315 + 50 + i * 120, int(545 + 50 + (1 - draw_alpha) * 50), H_WEATHER[res.weather[i]], TRUE);//天気
 
 				DrawNumber(340 + i * 120, int(604 + (1 - draw_alpha) * 50), res.pop[i], 25, 0, 0, H_POP_NUMBER);
 
 			}
-			for (i = 0; i <= 3; i++) {
-				DrawNumber(379 +6 * 120, int(604 + (1 - draw_alpha) * 50), res.max_combo, 25, 1, 4, H_MAX_COMBO_NUMBER);
-			}
-
+			DrawNumber(379 +6 * 120, int(604 + (1 - draw_alpha) * 50), res.max_combo, 25, 1, 4, H_MAX_COMBO_NUMBER);
 		}
 
 		//オプション名称描画

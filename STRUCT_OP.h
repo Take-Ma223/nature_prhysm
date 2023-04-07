@@ -141,6 +141,13 @@ namespace OptionItem {
 		MAX_CHORDS,
 		VERSION,
 	};
+
+	enum class Movie : int {
+		OFF,
+		ON_NORMAL,
+		ON_CLEAR,
+		ON_CLEAR_UP,
+	};
 }
 
 typedef struct OP {//オプション構造体(ロード時に渡す値)
@@ -163,14 +170,16 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	int noteOffset_DepregatedVer1_33 = 6;//音符オフセット調整(非推奨)
 	OptionItem::Windbreak windbreak = OptionItem::Windbreak::CLOSE_0;//レーンカバー初期位置
 	int noteOffset = 20;//音符オフセット調整
+	OptionItem::Movie movie = OptionItem::Movie::ON_CLEAR;//ムービー再生方法
+
 }OP;
 
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 17;//オプションの数
+	static const int OPTION_NUM = 18;//オプションの数
 
-	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"WINDBREAK",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"NOTE",L"HIT SOUND",L"SORT"};
+	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"WINDBREAK",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"NOTE",L"HIT SOUND",L"MOVIE",L"SORT"};
 
 	static const int SPEED_NUM = 78;//ハイスピの数
 	static const int GAUGE_NUM = 6;//ゲージ種類の数
@@ -191,6 +200,8 @@ typedef struct Option {//オプション構造体(全体)
 	int HITSOUND_NUM = 0;//ヒット音オプションの数
 	static const int SORT_NUM = 26;//曲ソート種類の数
 	int THEME_NUM = 0;//テーマオプションの数
+
+	static const int MOVIE_NUM = 4;//ムービー表示方法の数
 
 	
 
@@ -479,6 +490,9 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t* blackGradation[BLACK_GRADATION_NUM] = { L"ON", L"OFF" };
 	wchar_t** theme = 0;//名前はフォルダ名から取る パスの役割も果たす
 
+	wchar_t* movie[MOVIE_NUM] = { L"OFF", L"ON:NORMAL", L"ON:CLEAR", L"ON:CLEAR UP" };
+
+
 	//説明文
 	wchar_t *sent_speed[SPEED_NUM] = {
 		L"音符の速さを10に合わせます",
@@ -719,6 +733,8 @@ typedef struct Option {//オプション構造体(全体)
 
 	wchar_t* sent_theme = L"テーマスキンを変更します";
 
+	wchar_t* sent_movie[MOVIE_NUM] = { L"動画を再生しません", L"動画を再生します", L"動画を再生します(ゲージ量が多い時にゲージを非表示)", L"動画を再生します(音符以外非表示)" };
+
 	int H_SENT;//画像ハンドル
 
 	//選曲画面で使うオプション名称配列
@@ -739,6 +755,7 @@ typedef struct Option {//オプション構造体(全体)
 		&THEME_NUM,
 		&NOTE_NUM,
 		&HITSOUND_NUM,
+		&MOVIE_NUM,
 		&SORT_NUM };//各オプションの数
 
 	wchar_t** ArrayOptionSent[OPTION_NUM] = {
@@ -758,6 +775,7 @@ typedef struct Option {//オプション構造体(全体)
 		&sent_theme,
 		&sent_note,
 		&sent_hitSound,
+		sent_movie,
 		sent_sort };//説明文
 
 	wchar_t** ArrayOptionKindName[OPTION_NUM] = { 
@@ -777,6 +795,7 @@ typedef struct Option {//オプション構造体(全体)
 		theme,
 		note,
 		hitSound,
+		movie,
 		sort };//オプション名称
 
 	int* ArrayValue[OPTION_NUM] = {
@@ -796,6 +815,7 @@ typedef struct Option {//オプション構造体(全体)
 		&(op.theme),
 		&(op.note),
 		&(op.hitSound),
+		(int*)&(op.movie),
 		(int*)&(op.sort) };//選んでいるオプションの値
 
 	

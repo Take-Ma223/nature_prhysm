@@ -37,10 +37,11 @@ void LoadOptionState(Option *option) {
 	}
 
 	//異常な値を収める
+	Option defaultOption;
 	int i = 0;
 	for (i = 0; i < option->OPTION_NUM; i++) {
 		if (*(option->ArrayValue[i]) < 0 || *(option->ArrayValue[i]) > * (option->ArrayOptionNum[i]) - 1) {//オプションの最小、最大値を超えていたら0にする
-			*option->ArrayValue[i] = 0;
+			*option->ArrayValue[i] = *(defaultOption.ArrayValue[i]);
 		}
 
 	}

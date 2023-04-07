@@ -769,10 +769,13 @@ void GAME(int song_number, int difficulty,
 	SetUseASyncLoadFlag(TRUE);
 	SH_SONG = LoadSoundMem(Music[song_number].wavpath[difficulty]);
 
-	int MovieGraphHandle = LoadGraph(Music[song_number].moviePath[difficulty]);
-	bool isExistMovie;
-	isExistMovie = strcmpDx(Music[song_number].moviePath[difficulty], L"") != 0;//動画パスが存在すれば動画を再生すると見なす
+	bool isPlayMovie;
+	isPlayMovie = strcmpDx(Music[song_number].moviePath[difficulty], L"") != 0;//動画パスが存在すれば動画を再生すると見なす
+	if (option->op.movie == OptionItem::Movie::OFF)isPlayMovie = false;
 
+	int MovieGraphHandle = 0;
+	if(isPlayMovie)MovieGraphHandle = LoadGraph(Music[song_number].moviePath[difficulty]);
+	
 
 	SetUseASyncLoadFlag(FALSE);
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
@@ -886,9 +889,21 @@ void GAME(int song_number, int difficulty,
 	};
 
 	//透過度の取得 Movieを再生するかによって変わります
-	auto getAlpha = [&](int alphaGeneral, int alphaForMovie, int alphaInit = 255) {
-		if (isExistMovie) { return alphaInit - (alphaInit - alphaForMovie) * c_m_draw_counter; }
-		else { return alphaInit - (alphaInit - alphaGeneral) * c_m_draw_counter; }
+	auto getAlpha = [&](int alphaMovieOff, int alphaForMovieNormal, int alphaForMovieClear, int alphaForMovieClearUp, int alphaInit = 255) {
+		int alpha = 255;
+		if (isPlayMovie) { 
+			if (option->op.movie == OptionItem::Movie::ON_NORMAL)alpha = alphaForMovieNormal;
+			if (option->op.movie == OptionItem::Movie::ON_CLEAR)alpha = alphaForMovieClear;
+			if (option->op.movie == OptionItem::Movie::ON_CLEAR_UP)alpha = alphaForMovieClearUp;
+		}
+		else { 
+			alpha = alphaMovieOff;
+		}
+
+		return alphaInit - (alphaInit - alpha) * c_m_draw_counter;
+
+
+
 	};
 
 	//----曲名表示前処理----
@@ -3095,16 +3110,16 @@ void GAME(int song_number, int difficulty,
 
 
 		int sideCoverAlphaRatioGeneral = 195;
-		if (isExistMovie)sideCoverAlphaRatioGeneral = 255;
+		if (isPlayMovie)sideCoverAlphaRatioGeneral = 255;
 		double dangerRatio = ((double)1 - (gauge_draw_hosei / 100));//降水確率
 
-		int sideCoverAlpha = int(getAlpha(60 + sideCoverAlphaRatioGeneral * dangerRatio, 0));
+		int sideCoverAlpha = int(getAlpha(60 + sideCoverAlphaRatioGeneral * dangerRatio, 0, 0, 0));
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sideCoverAlpha);
 		DrawGraph(0, 0, H_COVER, TRUE);//カバー表示
 		DrawGraph(960, 0, H_COVER, TRUE);//右側
 
 
-		if (!isExistMovie) {
+		if (!isPlayMovie) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_COVER_VALUE * (1 - (double)option->op.darkness / 5)));
 			DrawGraph(0, 0, H_COVER_FLASH, TRUE);//カバーフラッシュ表示
 			DrawGraph(960, 0, H_COVER_FLASH, TRUE);//右側
@@ -3124,7 +3139,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//ゲージ描画
-		int gaugeAlphaGeneral = getAlpha(255, 255 * dangerRatio);
+		int gaugeAlphaGeneral = getAlpha(255, 128, 255 * dangerRatio, 255 * dangerRatio);
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gaugeAlphaGeneral);
 		
@@ -3149,8 +3164,8 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(160, 560, pop, 25, 0, 0, H_POP_NUMBER);
 
 		//コントローラ画像描画
-		int controllerAlphaGeneral = getAlpha(255, 128);
-		int controllerBrightAlphaGeneral = getAlpha(230, 115);
+		int controllerAlphaGeneral = getAlpha(255, 128, 128, 0);
+		int controllerBrightAlphaGeneral = getAlpha(230, 115, 115, 0);
 
 		for (j = 0; j <= 3; j++) {//B
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
@@ -3178,7 +3193,7 @@ void GAME(int song_number, int difficulty,
 		}
 
         //時間描画
-		int timeAlphaGeneral = getAlpha(255, 128);
+		int timeAlphaGeneral = getAlpha(255, 128, 128, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, timeAlphaGeneral);
 
 		if (PassedTime_Hours <= 9) {//6~9のとき
@@ -3210,17 +3225,17 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
-		//スコア描画
-		int scoreAlphaGeneral = getAlpha(255, 128);
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, scoreAlphaGeneral);
+		//R描画
+		int rAlphaGeneral = getAlpha(255, 128, 128, 0);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, rAlphaGeneral);
 		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションのときR表示
 			DrawGraph(960, -3, H_R_OUT, TRUE);
 			DrawGraph(960, -3, H_R_IN, TRUE);
 		}
 
-		//コンボ描画
-		int comboAlphaGeneral = getAlpha(255, 128);
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, comboAlphaGeneral);
+		//スコア描画
+		int scoreAlphaGeneral = getAlpha(255, 128, 128, 0);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, scoreAlphaGeneral);
 
 		if (option->op.color != OptionItem::Color::RAINBOW) {
 			for (i = 0; i <= 4; i++) {
@@ -3241,18 +3256,20 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//難易度画像描画
-		int simbolAlphaGeneral = getAlpha(255, 0);
+		int simbolAlphaGeneral = getAlpha(255, 0, 0, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, simbolAlphaGeneral);
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		int scoreGraphAlphaGeneral = getAlpha(160, 128, 160);
+		int boxLineAlphaGeneral = getAlpha(255, 255, 255, 0);
+		int scoreGraphAlphaGeneral = getAlpha(160, 128, 128, 0, 160);
+		int judgeBoxAlphaGeneral = getAlpha(80, 60, 60, 0, 80);
 
 		if (option->op.scoreGraph != OptionItem::ScoreGraph::OFF) {
-			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), scoreGraphAlphaGeneral, 255);//現在のスコア
-			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), scoreGraphAlphaGeneral, 255);//ハイスコア
-			DrawBoxWithLine(960 + 160, 482, 960 + 80 + 160, 482 + 40, GetColor(255, 50, 50), scoreGraphAlphaGeneral, 255);//ターゲットスコア
-			DrawBoxWithLine(960 + 240, 482, 960 + 80 + 240, 482 + 40, GetColor(200, 200, 50), scoreGraphAlphaGeneral, 255);//前回のスコア
+			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//現在のスコア
+			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//ハイスコア
+			DrawBoxWithLine(960 + 160, 482, 960 + 80 + 160, 482 + 40, GetColor(255, 50, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//ターゲットスコア
+			DrawBoxWithLine(960 + 240, 482, 960 + 80 + 240, 482 + 40, GetColor(200, 200, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//前回のスコア
 
 			//スコアグラフ描画
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, scoreGraphAlphaGeneral);
@@ -3274,29 +3291,30 @@ void GAME(int song_number, int difficulty,
 			DrawBox(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482 - 0.04 * targetScore2, GetColor(100, 100, 50), TRUE);
 			if (HitingNoteCount != 0) {
 				//リアルタイムグラフ
-				DrawBoxWithLine(960, int(482 - 0.04 * score), 960 + 80, 482, GetColor(50, 50, 255), scoreGraphAlphaGeneral, 255);
-				DrawBoxWithLine(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482, GetColor(50, 255, 50), scoreGraphAlphaGeneral, 255);
-				DrawBoxWithLine(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482, GetColor(255, 50, 50), scoreGraphAlphaGeneral, 255);
-				DrawBoxWithLine(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), scoreGraphAlphaGeneral, 255);
+				DrawBoxWithLine(960, int(482 - 0.04 * score), 960 + 80, 482, GetColor(50, 50, 255), scoreGraphAlphaGeneral, boxLineAlphaGeneral);
+				DrawBoxWithLine(960 + 80, 482 - 0.04 * highScore.score * noteCountRatio, 960 + 80 + 80, 482, GetColor(50, 255, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);
+				DrawBoxWithLine(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482, GetColor(255, 50, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);
+				DrawBoxWithLine(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);
 			}
 		}
 
-		int judgeBoxAlphaGeneral = getAlpha(80, 60, 80);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeBoxAlphaGeneral);
 
+
 		//判定数表示欄
-		DrawBoxWithLine(976, 540, 1110, 580, GetColor(50, 255, 255), judgeBoxAlphaGeneral, 255);//SKY_PERFECT
-		DrawBoxWithLine(976, 580, 1110, 620, GetColor(255, 255, 50), judgeBoxAlphaGeneral, 255);//PERFECT
-		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), judgeBoxAlphaGeneral, 255);//GOOD
-		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), judgeBoxAlphaGeneral, 255);//MISS
+		DrawBoxWithLine(976, 540, 1110, 580, GetColor(50, 255, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//SKY_PERFECT
+		DrawBoxWithLine(976, 580, 1110, 620, GetColor(255, 255, 50), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//PERFECT
+		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//GOOD
+		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//MISS
 
 		//BPM描画欄
-		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), judgeBoxAlphaGeneral, 255);//MAXBPM
-		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), judgeBoxAlphaGeneral, 255);//BPM
-		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), judgeBoxAlphaGeneral, 255);//MINBPM
-		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), judgeBoxAlphaGeneral, 255);//SPEED
-
+		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//MAXBPM
+		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//BPM
+		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//MINBPM
+		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//SPEED
+		
 		//判定、BPM文字表示
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, boxLineAlphaGeneral);
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
@@ -3305,7 +3323,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//数値表示
-		int judgeNumberAlphaGeneral = getAlpha(255, 192);
+		int judgeNumberAlphaGeneral = getAlpha(255, 192, 192, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeNumberAlphaGeneral);
 		DrawNumber(1094, 536, SKY_PERFECT, 25, 1, 0, H_SMALL_NUMBER_CYAN);
 		DrawNumber(1094, 576, PERFECT, 25, 1, 0, H_SMALL_NUMBER_YELLOW);

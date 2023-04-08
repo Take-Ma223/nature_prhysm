@@ -889,13 +889,11 @@ void GAME(int song_number, int difficulty,
 	};
 
 	//透過度の取得 Movieを再生するかによって変わります
-	auto getAlpha = [&](int alphaMovieOff, int alphaForMovieNormal, int alphaForMovieClear, int alphaForMovieClearUp, int alphaInit = 255) {
+	auto getAlpha = [&](int alphaMovieOff, int alphaForMovieNormal, int alphaForMovieClear, int alphaInit = 255) {
 		int alpha = 255;
 		if (isPlayMovie) { 
 			if (option->op.movie == OptionItem::Movie::ON_NORMAL)alpha = alphaForMovieNormal;
-			if (option->op.movie == OptionItem::Movie::ON_CLEAR)alpha = alphaForMovieClear;
-			if (option->op.movie == OptionItem::Movie::ON_CLEAR_UP)alpha = alphaForMovieClearUp;
-		}
+			if (option->op.movie == OptionItem::Movie::ON_CLEAR)alpha = alphaForMovieClear;		}
 		else { 
 			alpha = alphaMovieOff;
 		}
@@ -3113,7 +3111,7 @@ void GAME(int song_number, int difficulty,
 		if (isPlayMovie)sideCoverAlphaRatioGeneral = 255;
 		double dangerRatio = ((double)1 - (gauge_draw_hosei / 100));//降水確率
 
-		int sideCoverAlpha = int(getAlpha(60 + sideCoverAlphaRatioGeneral * dangerRatio, 0, 0, 0));
+		int sideCoverAlpha = int(getAlpha(60 + sideCoverAlphaRatioGeneral * dangerRatio, 0, 0));
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, sideCoverAlpha);
 		DrawGraph(0, 0, H_COVER, TRUE);//カバー表示
 		DrawGraph(960, 0, H_COVER, TRUE);//右側
@@ -3139,7 +3137,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//ゲージ描画
-		int gaugeAlphaGeneral = getAlpha(255, 128, 255 * dangerRatio, 255 * dangerRatio);
+		int gaugeAlphaGeneral = getAlpha(255, 255 * dangerRatio, 255 * dangerRatio);
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gaugeAlphaGeneral);
 		
@@ -3164,8 +3162,8 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(160, 560, pop, 25, 0, 0, H_POP_NUMBER);
 
 		//コントローラ画像描画
-		int controllerAlphaGeneral = getAlpha(255, 128, 128, 0);
-		int controllerBrightAlphaGeneral = getAlpha(230, 115, 115, 0);
+		int controllerAlphaGeneral = getAlpha(255, 128, 0);
+		int controllerBrightAlphaGeneral = getAlpha(230, 115, 0);
 
 		for (j = 0; j <= 3; j++) {//B
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
@@ -3193,7 +3191,7 @@ void GAME(int song_number, int difficulty,
 		}
 
         //時間描画
-		int timeAlphaGeneral = getAlpha(255, 128, 128, 0);
+		int timeAlphaGeneral = getAlpha(255, 128, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, timeAlphaGeneral);
 
 		if (PassedTime_Hours <= 9) {//6~9のとき
@@ -3226,7 +3224,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//R描画
-		int rAlphaGeneral = getAlpha(255, 128, 128, 0);
+		int rAlphaGeneral = getAlpha(255, 128, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, rAlphaGeneral);
 		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションのときR表示
 			DrawGraph(960, -3, H_R_OUT, TRUE);
@@ -3234,7 +3232,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//スコア描画
-		int scoreAlphaGeneral = getAlpha(255, 128, 128, 0);
+		int scoreAlphaGeneral = getAlpha(255, 128, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, scoreAlphaGeneral);
 
 		if (option->op.color != OptionItem::Color::RAINBOW) {
@@ -3256,14 +3254,14 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//難易度画像描画
-		int simbolAlphaGeneral = getAlpha(255, 0, 0, 0);
+		int simbolAlphaGeneral = getAlpha(255, 0, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, simbolAlphaGeneral);
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		int boxLineAlphaGeneral = getAlpha(255, 255, 255, 0);
-		int scoreGraphAlphaGeneral = getAlpha(160, 128, 128, 0, 160);
-		int judgeBoxAlphaGeneral = getAlpha(80, 60, 60, 0, 80);
+		int boxLineAlphaGeneral = getAlpha(255, 255, 0);
+		int scoreGraphAlphaGeneral = getAlpha(160, 60, 0, 160);
+		int judgeBoxAlphaGeneral = getAlpha(80, 60, 0, 80);
 
 		if (option->op.scoreGraph != OptionItem::ScoreGraph::OFF) {
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//現在のスコア
@@ -3323,7 +3321,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//数値表示
-		int judgeNumberAlphaGeneral = getAlpha(255, 192, 192, 0);
+		int judgeNumberAlphaGeneral = getAlpha(255, 192, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeNumberAlphaGeneral);
 		DrawNumber(1094, 536, SKY_PERFECT, 25, 1, 0, H_SMALL_NUMBER_CYAN);
 		DrawNumber(1094, 576, PERFECT, 25, 1, 0, H_SMALL_NUMBER_YELLOW);

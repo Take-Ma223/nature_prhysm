@@ -146,7 +146,6 @@ namespace OptionItem {
 		OFF,
 		ON_NORMAL,
 		ON_CLEAR,
-		ON_CLEAR_UP,
 	};
 }
 
@@ -170,7 +169,7 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	int noteOffset_DepregatedVer1_33 = 6;//音符オフセット調整(非推奨)
 	OptionItem::Windbreak windbreak = OptionItem::Windbreak::CLOSE_0;//レーンカバー初期位置
 	int noteOffset = 20;//音符オフセット調整
-	OptionItem::Movie movie = OptionItem::Movie::ON_CLEAR;//ムービー再生方法
+	OptionItem::Movie movie = OptionItem::Movie::ON_NORMAL;//ムービー再生方法
 
 }OP;
 
@@ -201,7 +200,7 @@ typedef struct Option {//オプション構造体(全体)
 	static const int SORT_NUM = 26;//曲ソート種類の数
 	int THEME_NUM = 0;//テーマオプションの数
 
-	static const int MOVIE_NUM = 4;//ムービー表示方法の数
+	static const int MOVIE_NUM = 3;//ムービー表示方法の数
 
 	
 
@@ -490,7 +489,7 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t* blackGradation[BLACK_GRADATION_NUM] = { L"ON", L"OFF" };
 	wchar_t** theme = 0;//名前はフォルダ名から取る パスの役割も果たす
 
-	wchar_t* movie[MOVIE_NUM] = { L"OFF", L"ON:NORMAL", L"ON:CLEAR", L"ON:CLEAR UP" };
+	wchar_t* movie[MOVIE_NUM] = { L"OFF", L"ON:NORMAL", L"ON:CLEAR"};
 
 
 	//説明文
@@ -733,7 +732,10 @@ typedef struct Option {//オプション構造体(全体)
 
 	wchar_t* sent_theme = L"テーマスキンを変更します";
 
-	wchar_t* sent_movie[MOVIE_NUM] = { L"動画を再生しません", L"動画を再生します", L"動画を再生します(ゲージ量が多い時にゲージを非表示)", L"動画を再生します(音符以外非表示)" };
+	wchar_t* sent_movie[MOVIE_NUM] = { 
+		L"動画を再生しません", 
+		L"動画を再生します",
+		L"動画を再生するとき、譜面以外を非表示にして動画を見やすくします" };
 
 	int H_SENT;//画像ハンドル
 

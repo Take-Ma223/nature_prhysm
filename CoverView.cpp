@@ -164,7 +164,7 @@ int CoverView::getMiddleCoverBottomY()
 
 double CoverView::getSpeedRatio()
 {
-	int hideRatio = easingInvert(getMiddleCoverBottomY());//‰B‚µ‚Ä‚é•\¦ŠÔ‚ÌŠ„‡
+	int hideRatio = easingInvert(getMiddleCoverBottomY());//‰B‚µ‚Ä‚é—Ìˆæ‚Ì•\¦ŠÔ‚ÌŠ„‡
 	double speed = 1;
 	if (hideRatio == 1000) {
 		speed = 99999;

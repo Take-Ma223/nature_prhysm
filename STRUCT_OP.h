@@ -19,6 +19,7 @@ namespace OptionItem {
 		THEME,
 		NOTE,
 		HITSOUND,
+		MOVIE,
 		SORT
 	};
 

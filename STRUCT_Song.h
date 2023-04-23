@@ -26,6 +26,8 @@ public:
 	wchar_t* title[5] = { NULL,NULL,NULL,NULL,NULL };//タイトル
 	wchar_t* genre[5] = { NULL,NULL,NULL,NULL,NULL };//ジャンル
 	wchar_t* artist[5] = { NULL,NULL,NULL,NULL,NULL };//アーティスト
+	wchar_t* detail[5] = { NULL,NULL,NULL,NULL,NULL };//詳細
+
 	wchar_t* wavpath[5] = { NULL,NULL,NULL,NULL,NULL };//音源のパス(難易度によって音源変えたり？できるように10個分)
 	wchar_t* jacketpath[5] = { NULL,NULL,NULL,NULL,NULL };//ジャケット画像のパス(難易度によって画像変えたり？できるように10個分)
 	wchar_t* jacketpath2[5] = { NULL,NULL,NULL,NULL,NULL };//ジャケット2画像のパス(難易度によって画像変えたり？できるように10個分)

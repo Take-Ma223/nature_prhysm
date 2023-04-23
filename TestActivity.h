@@ -16,11 +16,14 @@ public:
 
 	DrawableInitParam param = DrawableInitParam(Cordinate(100,100));
 	Image img = Image(&activityContext, activityContext.getAsset()->img(L"img/A.png"), param);
-	
+
+	DrawableInitParam backGroundParam = DrawableInitParam(Cordinate(0, 0));
+	Image backGround = Image(&activityContext, activityContext.getAsset()->img(L"img/bg.png"), backGroundParam);
+
 	DrawableInitParam tvp1 = DrawableInitParam(Cordinate(0, 0));
 	TextView testText1 = TextView(
 		&activityContext,
-		TextViewParam(wstring(L"TEST"), FontInfo(wstring(L"メイリオ"), 32, 0, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
+		TextViewParam(wstring(L"曲名表示テストTEST"), FontInfo(wstring(L"メイリオ"), 28, 9, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
 		tvp1
 	);
 
@@ -89,6 +92,7 @@ public:
 	}
 
 	virtual void draw() override {
+		backGround.draw();
 		img.draw();
 		testText1.draw();
 		testNumber1.draw();

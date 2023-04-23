@@ -281,6 +281,7 @@ void GAME(int song_number, int difficulty,
 	int genre_width = 1;//ジャンル横幅
 	int title_width = 1;//曲名横幅
 	int artist_width = 1;//アーティスト横幅
+	int detail_width = 1;//詳細横幅
 	int jingleflag = 0;//ジングルを鳴らすフラグ
 	int openflag = 0;//中心カバーが開くときの音を鳴らすフラグ
 	int cleared_time = 0;//クリアした時間を記録
@@ -907,15 +908,15 @@ void GAME(int song_number, int difficulty,
 	//----曲名表示前処理----
 	gauge_draw_counter = 0;
 
-	int FontHandle = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
-	ChangeFont(L"メイリオ");
-	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(30);
-	SetFontThickness(9);
+	int FontHandleBpm = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
+	int FontHandleCommon = CreateFontToHandle(L"メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
+	int FontHandleDetail = CreateFontToHandle(L"メイリオ", 12, 2, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
 
-	genre_width = GetDrawStringWidth(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]));//ジャンル名の横の長さを入れる
-	title_width = GetDrawStringWidth(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]));//曲名の横の長さを入れる
-	artist_width = GetDrawStringWidth(Music[song_number].artist[difficulty], wcslen(Music[song_number].artist[difficulty]));//アーティスト名の横の長さを入れる
+	genre_width = GetDrawStringWidthToHandle(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]), FontHandleCommon);//ジャンル名の横の長さを入れる
+	title_width = GetDrawStringWidthToHandle(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]), FontHandleCommon);//曲名の横の長さを入れる
+	artist_width = GetDrawStringWidthToHandle(Music[song_number].artist[difficulty], wcslen(Music[song_number].artist[difficulty]), FontHandleCommon);//アーティスト名の横の長さを入れる
+	detail_width = GetDrawStringWidthToHandle(Music[song_number].detail[difficulty], wcslen(Music[song_number].detail[difficulty]), FontHandleDetail);//詳細の横の長さを入れる
+
 
 	double draw_alpha_speed = 1;//段位用Speed表示フラグ(これが0になるまでは開始しない)
 
@@ -1144,10 +1145,10 @@ void GAME(int song_number, int difficulty,
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - sin((3.14 / 2)*c_m_draw_counter)) * 255));
 		}
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-		ShowExtendedStrFit(640, 350, Music[song_number].title[difficulty], title_width, 620,
-		  config, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
-		ShowExtendedStrFit(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config);//アーティスト
-		ShowExtendedStrFit(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config);//ジャンル
+		ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
+		ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
+		ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
+		ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
 		SetDrawMode(DX_DRAWMODE_NEAREST);
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
@@ -1323,7 +1324,7 @@ void GAME(int song_number, int difficulty,
 				int(Music[song_number].bpm_suggested[difficulty] * high_speed + 0.5));
 			
 			SpeedStrWidth = GetDrawStringWidth(SpeedStr, wcslen(SpeedStr));
-			ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandle);
+			ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandleBpm);
 		}
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
@@ -2823,7 +2824,9 @@ void GAME(int song_number, int difficulty,
 			PauseMovieToGraph(MovieGraphHandle);
 			InitGraph();//メモリ開放
 			InitSoundMem();//
-			DeleteFontToHandle(FontHandle);
+			DeleteFontToHandle(FontHandleBpm);
+			DeleteFontToHandle(FontHandleCommon);
+			DeleteFontToHandle(FontHandleDetail);
 
 			free(bpmchange);
 			free(scrollchange);
@@ -3352,10 +3355,11 @@ void GAME(int song_number, int difficulty,
 			}
 			SetFontSize(30);
 			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-			ShowExtendedStrFit(640, 350, Music[song_number].title[difficulty], title_width, 620, config,
-				Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
-			ShowExtendedStrFit(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config);//アーティスト
-			ShowExtendedStrFit(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config);//ジャンル
+			ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
+			ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
+			ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
+			ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
+
 			SetDrawMode(DX_DRAWMODE_NEAREST);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 

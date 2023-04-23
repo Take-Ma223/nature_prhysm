@@ -241,6 +241,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	IR_SETTING ir;
 
 	auto ac = ActivityController(&option, &config);
+	//UIテスト画面の開始
 	//ac.start();
 
 

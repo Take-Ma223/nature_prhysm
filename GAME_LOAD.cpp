@@ -359,6 +359,19 @@ void GAME_LOAD(int song_number,
 				sprintfDx(Music[song_number].genre[difficulty], L"%s", sharp2);
 			}
 		}
+		if (wcscmp(L"#DETAIL", sharp1) == 0) {
+			wchar_t DefaultDetail[] = L"\0";
+
+			free(Music[song_number].detail[difficulty]);
+			if (wcscmp(L"\0", sharp2) == 0) {
+				Music[song_number].detail[difficulty] = (wchar_t*)calloc(strlenDx(DefaultDetail) + 1, sizeof(wchar_t));
+				sprintfDx(Music[song_number].detail[difficulty], L"%s", DefaultDetail);
+			}
+			else {
+				Music[song_number].detail[difficulty] = (wchar_t*)calloc(strlenDx(sharp2) + 1, sizeof(wchar_t));
+				sprintfDx(Music[song_number].detail[difficulty], L"%s", sharp2);
+			}
+		}
 		if (wcscmp(L"#WAV", sharp1) == 0) {
 			wchar_t DefaultWav[] = L"\0";
 			free(Music[song_number].wavpath[difficulty]);

@@ -42,6 +42,16 @@ void ShowExtendedStrFitToHandle(int x, int y, wchar_t *str, int str_width, int a
 	return;
 }
 
+void ShowExtendedStrFitToHandleNoShadow(int x, int y, wchar_t* str, int str_width, int area_width, Config config, int FontHandle, int color) {//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)(影無し)
+	if (str_width <= area_width) {//エリア内に収まっているときは普通に描画
+		DrawStringToHandle(int(x - ((double)str_width / 2)), y, str, color, FontHandle);//表示
+	}
+	else {//収まっていないときは縮小して描画
+		DrawExtendStringToHandle(int(x - ((double)area_width / 2)), y, (double)area_width / (double)str_width, 1, str, color, FontHandle);
+	}
+	return;
+}
+
 /*
 int GetStrFrameColor(int color) {//文字の色から文字の縁を白か黒に決定
 

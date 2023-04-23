@@ -86,6 +86,8 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 			sprintfDx(Music[i].genre[j], L"\0");
 			Music[i].artist[j] = (wchar_t*)calloc(strlenDx(L"\0") + 1, sizeof(wchar_t));
 			sprintfDx(Music[i].artist[j], L"\0");
+			Music[i].detail[j] = (wchar_t*)calloc(strlenDx(L"\0") + 1, sizeof(wchar_t));
+			sprintfDx(Music[i].detail[j], L"\0");
 			Music[i].wavpath[j] = (wchar_t*)calloc(strlenDx(L"\0") + 1, sizeof(wchar_t));
 			sprintfDx(Music[i].wavpath[j], L"\0");
 			Music[i].jacketpath[j] = (wchar_t*)calloc(strlenDx(L"\0") + 1, sizeof(wchar_t));

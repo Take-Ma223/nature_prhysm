@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DetailView.cpp" />
     <ClCompile Include="NumberImageHandles.cpp" />
     <ClCompile Include="NumberViewFormat.cpp" />
     <ClCompile Include="ActionEvent.cpp" />
@@ -232,6 +233,7 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DetailView.h" />
     <ClInclude Include="NumberImageHandles.h" />
     <ClInclude Include="NumberViewFormat.h" />
     <ClInclude Include="ActionEvent.h" />

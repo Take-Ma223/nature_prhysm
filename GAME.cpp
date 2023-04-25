@@ -34,6 +34,7 @@
 #include "CoverView.h"
 #include "Asset.h"
 #include "AppContext.h"
+#include "DetailView.h"
 
 using namespace std;
 
@@ -51,6 +52,12 @@ void GAME(int song_number, int difficulty,
 	int AllowExit
 	)
 {
+	Asset asset;//使う画像セット
+	//コンテキスト
+	AppContext appContext = AppContext(NULL, option, &config);
+	ActivityContext context = ActivityContext(&appContext, &asset);
+
+
 	HANDLE hComm, hEvent;
 	setupSerial(&hComm);//シリアル通信設定
 	STATE LED_state;
@@ -78,12 +85,6 @@ void GAME(int song_number, int difficulty,
 	double CounterRemainTime = 0;////カウンターの値を1msずつ変動するための時間　1msずつ引かれて小数以下は蓄積する
 	double time_cash = 0;//LOOP_passed_timeを算出するための記憶変数
 	double TimePerFrame = 1000.0 / config.Fps;//1フレームの時間
-
-	Asset asset;//使う画像セット
-
-	//コンテキスト
-	AppContext appContext = AppContext(NULL, option, &config);
-	ActivityContext context = ActivityContext(&appContext, &asset);
 
 
 	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
@@ -910,12 +911,14 @@ void GAME(int song_number, int difficulty,
 
 	int FontHandleBpm = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
 	int FontHandleCommon = CreateFontToHandle(L"メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
-	int FontHandleDetail = CreateFontToHandle(L"メイリオ", 12, 2, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
 
 	genre_width = GetDrawStringWidthToHandle(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]), FontHandleCommon);//ジャンル名の横の長さを入れる
 	title_width = GetDrawStringWidthToHandle(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]), FontHandleCommon);//曲名の横の長さを入れる
 	artist_width = GetDrawStringWidthToHandle(Music[song_number].artist[difficulty], wcslen(Music[song_number].artist[difficulty]), FontHandleCommon);//アーティスト名の横の長さを入れる
-	detail_width = GetDrawStringWidthToHandle(Music[song_number].detail[difficulty], wcslen(Music[song_number].detail[difficulty]), FontHandleDetail);//詳細の横の長さを入れる
+
+	DrawableInitParam detailViewParam = DrawableInitParam(Cordinate(320,500));
+	DetailView detailView = DetailView(&context, detailViewParam);
+	detailView.setText(Music[song_number].detail[difficulty]);
 
 
 	double draw_alpha_speed = 1;//段位用Speed表示フラグ(これが0になるまでは開始しない)
@@ -1069,7 +1072,8 @@ void GAME(int song_number, int difficulty,
 		number_digit(int(PassedTime_Minutes), time_minutes_digit, 2);//分を桁ごとに格納
 		
 	    //Draw
-		ClearDrawScreen();
+		SetDrawScreen(appContext.baseHandle.getHandle());
+		ClearDrawScreen();//グラフィックを初期化
 		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
 
@@ -1148,7 +1152,8 @@ void GAME(int song_number, int difficulty,
 		ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
 		ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
 		ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
-		ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
+		//ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
+		detailView.draw();
 		SetDrawMode(DX_DRAWMODE_NEAREST);
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
@@ -2826,7 +2831,6 @@ void GAME(int song_number, int difficulty,
 			InitSoundMem();//
 			DeleteFontToHandle(FontHandleBpm);
 			DeleteFontToHandle(FontHandleCommon);
-			DeleteFontToHandle(FontHandleDetail);
 
 			free(bpmchange);
 			free(scrollchange);
@@ -2865,6 +2869,7 @@ void GAME(int song_number, int difficulty,
 		//gauge = double(50 * (1 + sin((double)GAME_passed_time / 1000)));
 
 		//----Draw-----------------------------------------------------------------------------------/////////////////
+		SetDrawScreen(appContext.baseHandle.getHandle());
 		ClearDrawScreen();//グラフィックを初期化
 		DrawGraph(0, 0, H_BG, TRUE);//背景
 		show_cloud(H_CLOUD, &pos_cloud, (stopFlag != 1)*cbpm / 150, LOOP_passed_time);//雲
@@ -3358,8 +3363,8 @@ void GAME(int song_number, int difficulty,
 			ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
 			ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
 			ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
-			ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
-
+			//ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
+			detailView.draw();
 			SetDrawMode(DX_DRAWMODE_NEAREST);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 

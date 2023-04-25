@@ -282,7 +282,7 @@ void GAME_LOAD(int song_number,
 	Music[song_number].season[difficulty] = 0;//デフォルトは無季節
 	Music[song_number].StrColor[difficulty] = GetColor(255, 255, 255);//デフォルト色は白
 	Music[song_number].StrShadowColor[difficulty] = GetColor(0, 0, 0);//デフォルト枠色は黒
-
+	Music[song_number].detail = vector<vector<wstring>>(5);//detailメモリ確保
 
 	wcscpy_s(filename, Music[song_number].SongPath[difficulty]);
 	
@@ -360,16 +360,13 @@ void GAME_LOAD(int song_number,
 			}
 		}
 		if (wcscmp(L"#DETAIL", sharp1) == 0) {
-			wchar_t DefaultDetail[] = L"\0";
+			wchar_t DefaultDetail[] = L"";
 
-			free(Music[song_number].detail[difficulty]);
 			if (wcscmp(L"\0", sharp2) == 0) {
-				Music[song_number].detail[difficulty] = (wchar_t*)calloc(strlenDx(DefaultDetail) + 1, sizeof(wchar_t));
-				sprintfDx(Music[song_number].detail[difficulty], L"%s", DefaultDetail);
+				Music[song_number].detail[difficulty].push_back(DefaultDetail);
 			}
 			else {
-				Music[song_number].detail[difficulty] = (wchar_t*)calloc(strlenDx(sharp2) + 1, sizeof(wchar_t));
-				sprintfDx(Music[song_number].detail[difficulty], L"%s", sharp2);
+				Music[song_number].detail[difficulty].push_back(sharp2);
 			}
 		}
 		if (wcscmp(L"#WAV", sharp1) == 0) {

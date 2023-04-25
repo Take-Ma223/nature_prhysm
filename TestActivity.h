@@ -5,6 +5,7 @@
 #include "CoverView.h"
 #include "TextView.h"
 #include "NumberView.h"
+#include "DetailView.h"
 
 /// <summary>
 /// フレームワークのテスト用アクティビティ
@@ -46,6 +47,11 @@ public:
 	int SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
 	int SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
 
+	DrawableInitParam detailViewParam = DrawableInitParam(Cordinate(320, 500));
+	DetailView detailView = DetailView(&activityContext, detailViewParam);
+	
+	vector<wstring> str = { L"atghdrdiky"};
+
 	TestActivity(AppContext* ac) : Activity(ac) {
 
 	}
@@ -53,6 +59,7 @@ public:
 	TestActivity(AppContext* ac, int input) : Activity(ac) {
 		a = input;
 		testNumber1.setCenterRatio(0, 0);
+		
 	}
 
 	virtual void onCreate() override {
@@ -68,6 +75,8 @@ public:
 		controller.setKey7TapHandler([this] {buttonLoop(); });
 
 		buttonAnimation();
+
+		detailView.setText(str);
 	}
 
 	virtual void onStart() override {
@@ -92,11 +101,12 @@ public:
 	}
 
 	virtual void draw() override {
-		backGround.draw();
-		img.draw();
-		testText1.draw();
-		testNumber1.draw();
-		buttonBB.draw();
+		//backGround.draw();
+		//img.draw();
+		//testText1.draw();
+		//testNumber1.draw();
+		//buttonBB.draw();
+		detailView.draw();
 	}
 
 private:

@@ -25,6 +25,9 @@ public:
     TextView(ActivityContext* c, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(c, drawableInitParam) {
         setText(textViewInitParam);
     }
+    TextView(Drawable* parent, ActivityContext* c, TextViewParam textViewInitParam = TextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) : View(parent, c, drawableInitParam) {
+        setText(textViewInitParam);
+    }
     ~TextView() {
         DeleteGraph(textImageHandle.getHandle());
     }

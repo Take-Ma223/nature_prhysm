@@ -133,6 +133,9 @@
     <Filter Include="ソース ファイル\Util\Intent">
       <UniqueIdentifier>{ec0775e6-394c-4302-a733-8c93f0ae7e3f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\GAME\DetailView">
+      <UniqueIdentifier>{ebd73b9c-4ccf-45e0-8138-ba6a51e89455}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -350,6 +353,9 @@
     </ClCompile>
     <ClCompile Include="TextViewParam.cpp">
       <Filter>ソース ファイル\Util\Ui\View\TextView</Filter>
+    </ClCompile>
+    <ClCompile Include="DetailView.cpp">
+      <Filter>ソース ファイル\GAME\DetailView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -627,6 +633,9 @@
     </ClInclude>
     <ClInclude Include="TextViewParam.h">
       <Filter>ソース ファイル\Util\Ui\View\TextView</Filter>
+    </ClInclude>
+    <ClInclude Include="DetailView.h">
+      <Filter>ソース ファイル\GAME\DetailView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

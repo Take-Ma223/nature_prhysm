@@ -16,9 +16,23 @@ private:
 	std::vector<Drawable*> drawables;
 
 protected:
+
+	/// <summary>
+	/// 子Drawableの追加
+	/// </summary>
+	/// <param name="d"></param>
 	void addDrawable(Drawable* d) {
 		drawables.push_back(d);
 	}
+
+	/// <summary>
+	/// 子Drawableの削除
+	/// </summary>
+	/// <param name="d"></param>
+	void removeDrawable() {
+		drawables.clear();
+	}
+
 
 	/// <summary>
 	/// このViewを描画するスクリーンの用意 継承先のコンストラクタで呼び出してください
@@ -27,7 +41,7 @@ protected:
 	void makeScreen(Size s);
 
 	/// <summary>
-	/// drawが呼ばれるたびにこのViewのスクリーンを用意する処理 継承先で必ず実装してください
+	/// 子Drawableのdrawが呼ばれる直前に行う処理を書きます 継承先で実装してください
 	/// </summary>
 	/// <param name="drawScreen">描画先</param>
 	virtual void beforeDrawProcess(int drawScreen) = 0;

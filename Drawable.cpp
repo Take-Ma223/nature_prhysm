@@ -69,9 +69,9 @@ void Drawable::setPlaySpeedAll(double playSpeed) {
 	action.setPlaySpeed(playSpeed);
 }
 
-void Drawable::setScreen(int drawScreen)
+int Drawable::setScreen(int drawScreen)
 {
-	SetDrawScreen(drawScreen);
+	return SetDrawScreen(drawScreen);
 }
 
 void Drawable::drawWithProcessing()
@@ -82,6 +82,7 @@ void Drawable::drawWithProcessing()
 	alpha.process();
 	action.process();
 
+	SetDrawMode(DX_DRAWMODE_ANISOTROPIC);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.value);
 	SetDrawBright(brightnessR.value, brightnessG.value, brightnessB.value);
 	if (visible.value && alpha.value != 0) {

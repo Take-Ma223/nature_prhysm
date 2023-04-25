@@ -46,6 +46,7 @@ class ActivityController
 	}
 
 	void activityProcess() {
+		SetDrawScreen(context.baseHandle.getHandle());
 		ClearDrawScreen();//グラフィックを初期化
 		if (!activities.empty())activities.top()->process();
 		ScreenFlip();//画面の反映

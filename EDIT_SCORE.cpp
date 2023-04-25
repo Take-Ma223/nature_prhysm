@@ -1439,7 +1439,8 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 
 		//----DRAW----
-
+		SetDrawScreen(appContext.baseHandle.getHandle());
+		ClearDrawScreen();//グラフィックを初期化
 		DrawGraph(0, 0, H_BG, TRUE);
 		
 

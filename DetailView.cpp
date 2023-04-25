@@ -1,0 +1,1 @@
+#include "DetailView.h"

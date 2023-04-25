@@ -26,6 +26,8 @@
 #include "SaveDataSaveLoad.h"
 #include"STRUCT_IR_SETTING.h"
 #include "IR_process.h"
+#include "AppContext.h"
+#include "ActivityContext.h"
 
 using namespace std;
 
@@ -39,7 +41,10 @@ void SONG_SELECT(int *l_n,
 	int *debug, int *NumberOfSongs,
 	int *result_count,int *result_rank_buf,SECRET *secret, ANDROID_CONTROLLER *AC,int *StageCount, SkillTestList *STList,
 	Config config, IR_SETTING* ir) {
-
+	Asset asset;//使う画像セット
+	//コンテキスト
+	AppContext appContext = AppContext(NULL, option, &config);
+	ActivityContext context = ActivityContext(&appContext, &asset);
 
 
 	int list_number_base = *l_n;//曲フォルダのソート配列のインデックスに対する番号 選択したときにSortを使ってlist_number変換する
@@ -2734,7 +2739,8 @@ void SONG_SELECT(int *l_n,
 		//printfDx(L"LOOP4:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
 
 		//DRAW
-		ClearDrawScreen();
+		SetDrawScreen(appContext.baseHandle.getHandle());
+		ClearDrawScreen();//グラフィックを初期化
 
 		DrawGraph(0, 0, H_BG, TRUE);//背景表示
 

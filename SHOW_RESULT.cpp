@@ -18,6 +18,8 @@
 #include <string>
 #include "SaveDataSaveLoad.h"
 #include "IR_process.h"
+#include "AppContext.h"
+#include "ActivityContext.h"
 using namespace std;
 
 void SHOW_RESULT(RESULT res,
@@ -37,6 +39,12 @@ void SHOW_RESULT(RESULT res,
 	Config config,
 	IR_SETTING* ir,
 	int SkillTestFlag) {
+	Asset asset;//使う画像セット
+	//コンテキスト
+	AppContext appContext = AppContext(NULL, option, &config);
+	ActivityContext context = ActivityContext(&appContext, &asset);
+
+
 	RESULT high_score;//現在のハイスコア
 	RESULT save;//実際に保存するデータ
 	int H_BG = 0;
@@ -992,7 +1000,8 @@ void SHOW_RESULT(RESULT res,
 		number_digit(res.score - high_score.score, up_digit, 5);
 
 		//Draw
-		ClearDrawScreen();
+		SetDrawScreen(appContext.baseHandle.getHandle());
+		ClearDrawScreen();//グラフィックを初期化
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 

@@ -23,6 +23,11 @@
 using namespace std;
 
 void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, Config config, Option *option, IR_SETTING *ir) {
+	Asset asset;//使う画像セット
+	//コンテキスト
+	AppContext appContext = AppContext(NULL, option, &config);
+	ActivityContext context = ActivityContext(&appContext, &asset);
+	
 	int H_BG;//背景画像
 	int H_CLOUD;//雲画像
 	int H_TITLE_LOGO;//ロゴ画像
@@ -114,13 +119,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	SH_TEST[1] = LoadSoundMem(L"sound/2.wav", 1);
 	SH_TEST[2] = LoadSoundMem(L"sound/3.wav", 1);
 	*/
-	
-	Asset asset;//使う画像セット
-
-	AppContext appContext = AppContext(NULL, option, &config);
-	ActivityContext context = ActivityContext(&appContext ,&asset);
-
-	
 
 	ChangeFont(L"メイリオ");
 	SetFontThickness(9);
@@ -456,7 +454,8 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		if (start == 1 && LOGO_draw_alpha == 0) break;
 
 		//Draw
-		ClearDrawScreen();
+		SetDrawScreen(appContext.baseHandle.getHandle());
+		ClearDrawScreen();//グラフィックを初期化
 		SetDrawBright(255, 255, 255);
 
 		for (i = 0; i < CRTBuf; i++) {

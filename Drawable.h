@@ -16,6 +16,7 @@ class ActivityContext;
 /// </summary>
 struct DrawableInitParam {
 	Cordinate cordinate = Cordinate(0, 0);
+	CenterRatio centerRatio = CenterRatio(0, 0);
 	bool visible = 1;
 	int alpha = 255;
 
@@ -26,21 +27,24 @@ struct DrawableInitParam {
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	/// <param name="c">座標</param>
+	/// <param name="co">座標</param>
+	/// <param name="cr">中心座標</param>
 	/// <param name="v">可視性</param>
 	/// <param name="a">アルファ値</param>
 	/// <param name="bR">輝度R</param>
 	/// <param name="bG">輝度G</param>
 	/// <param name="bB">輝度B</param>
 	DrawableInitParam(
-		Cordinate c = Cordinate(0, 0),
+		Cordinate co = Cordinate(0, 0),
+		CenterRatio cr = CenterRatio(0, 0),
 		bool v = TRUE,
 		int a = 255,
 		int bR = 255,
 		int bG = 255,
 		int bB = 255
 	) {
-		cordinate = c;
+		cordinate = co;
+		centerRatio = cr;
 		visible = v;
 		alpha = a;
 		brightnessR = bR;
@@ -106,7 +110,7 @@ protected:
 
 	ImageHandle handle;//表示する画像ハンドル情報
 
-	void setScreen(int drawScreen);
+	int setScreen(int drawScreen);
 	
 	void drawWithProcessing();
 
@@ -125,6 +129,9 @@ private:
 		Drawable::X.eSet(param.cordinate.x);
 		Drawable::Y.eSet(param.cordinate.y);
 		Drawable::alpha.eSet(param.alpha);
+
+		Drawable::centerRatioX = param.centerRatio.x;
+		Drawable::centerRatioY = param.centerRatio.y;
 
 		Drawable::brightnessR.eSet(param.brightnessR);
 		Drawable::brightnessG.eSet(param.brightnessG);

@@ -16,6 +16,7 @@
 
 #define SEND_EXIST_SCORE_TO_IR 0//F3で既存スコアをIRに送信
 
+#define ENABLE_GENERATING_LERNING_DATA 0//学習用データ生成
 
 const wchar_t RUN_PASS[] = L"223210";
 

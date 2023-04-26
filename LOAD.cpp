@@ -21,6 +21,7 @@
 #include"SongCacheSaveLoad.h"
 #include"STRUCT_IR_SETTING.h"
 #include"IR_process.h"
+#include"LearningDataGenarator.h"
 
 void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, Option *op, Config config, IR_SETTING* ir) {
 	int i = 0, j = 0;
@@ -48,6 +49,12 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	int hash = 0;
 	int TimeToEndScrollDummy=0;
 	int playing_time_dummy = 0;
+
+	//学習用データ生成
+#if ENABLE_GENERATING_LERNING_DATA
+	LearningDataGenarator learningDataGenerator = LearningDataGenarator();
+	learningDataGenerator.openFile();
+#endif // ENABLE_GENERATING_LERNING_DATA
 
 	NOTE **note;
 	note = (NOTE**)calloc(4, sizeof(NOTE));
@@ -276,6 +283,11 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 							writeMusicToCache(&Cache, Music, i, j);
 							SaveSongCache(Cache, Music, i, j);
 						}
+
+#if ENABLE_GENERATING_LERNING_DATA
+						//学習用データ生成
+						learningDataGenerator.writeData(&Music[i],j);
+#endif
 
 						folder_insert(song_folder, i, j, Music);
 						folder_insert_radar(song_folder, i, j, Music);

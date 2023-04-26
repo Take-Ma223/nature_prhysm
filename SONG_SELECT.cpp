@@ -28,6 +28,7 @@
 #include "IR_process.h"
 #include "AppContext.h"
 #include "ActivityContext.h"
+#include "LearningDataGenarator.h"
 
 using namespace std;
 
@@ -1374,6 +1375,12 @@ void SONG_SELECT(int *l_n,
 
 				IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, IrScore, difficulty, Music[song_number].season[difficulty], option->op.color == OptionItem::Color::RAINBOW, 0, config);
 				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == OptionItem::Color::RAINBOW, config);
+			}
+
+			if (Key[KEY_INPUT_F4] == 1) {
+				LearningDataGenarator predDataGenerator = LearningDataGenarator();
+				predDataGenerator.openFile();
+				predDataGenerator.writeData(&Music[song_number], difficulty);
 			}
 
 			if (Key[Button_Shutter] == 1) {//スクリーンショット

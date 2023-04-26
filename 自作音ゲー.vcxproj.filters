@@ -357,6 +357,9 @@
     <ClCompile Include="DetailView.cpp">
       <Filter>ソース ファイル\GAME\DetailView</Filter>
     </ClCompile>
+    <ClCompile Include="LearningDataGenarator.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -636,6 +639,9 @@
     </ClInclude>
     <ClInclude Include="DetailView.h">
       <Filter>ソース ファイル\GAME\DetailView</Filter>
+    </ClInclude>
+    <ClInclude Include="LearningDataGenarator.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

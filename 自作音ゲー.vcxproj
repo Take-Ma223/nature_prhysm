@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DetailView.cpp" />
+    <ClCompile Include="LearningDataGenarator.cpp" />
     <ClCompile Include="NumberImageHandles.cpp" />
     <ClCompile Include="NumberViewFormat.cpp" />
     <ClCompile Include="ActionEvent.cpp" />
@@ -234,6 +235,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DetailView.h" />
+    <ClInclude Include="LearningDataGenarator.h" />
     <ClInclude Include="NumberImageHandles.h" />
     <ClInclude Include="NumberViewFormat.h" />
     <ClInclude Include="ActionEvent.h" />

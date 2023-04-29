@@ -1215,7 +1215,7 @@ void SHOW_RESULT(RESULT res,
 			else {
 				DrawGraph(int(HighScorePos.x + SkillTestShowSlide.x), int(HighScorePos.y + SkillTestShowSlide.y), H_HIGH_SCORE_BANNER, TRUE);//ハイスコアバナー
 			}
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, entireAlpha);
 			if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 				DrawGraph(int(HighScorePos.x), int(HighScorePos.y), H_HIGH_SCORE_BANNER_ALLOW, TRUE);//ハイスコアバナー矢印
 			}
@@ -1223,7 +1223,7 @@ void SHOW_RESULT(RESULT res,
 				DrawGraph(int(HighScorePos.x + SkillTestShowSlide.x), int(HighScorePos.y + SkillTestShowSlide.y), H_HIGH_SCORE_BANNER_ALLOW, TRUE);//ハイスコアバナー矢印
 			}
 
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, entireAlpha);
 			for (i = 0; i <= int(log10(res.score - high_score.score)); i++) {//ハイスコア増分表示
 				if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 					DrawGraph(int(HighScorePos.x + 220 - i * 25), int(HighScorePos.y + 155), H_HIGH_SCORE_NUMBER[up_digit[i]], TRUE);

@@ -770,6 +770,7 @@ void GAME(int song_number, int difficulty,
 	//曲データは非同期で読み込む
 	SetUseASyncLoadFlag(TRUE);
 	SH_SONG = LoadSoundMem(Music[song_number].wavpath[difficulty]);
+	BOOL isOverSongPlayTiming = false;
 
 	bool isPlayMovie;
 	isPlayMovie = strcmpDx(Music[song_number].moviePath[difficulty], L"") != 0;//動画パスが存在すれば動画を再生すると見なす
@@ -777,7 +778,7 @@ void GAME(int song_number, int difficulty,
 
 	int MovieGraphHandle = 0;
 	if(isPlayMovie)MovieGraphHandle = LoadGraph(Music[song_number].moviePath[difficulty]);
-	
+	BOOL isOverMoviePlayTiming = false;
 
 	SetUseASyncLoadFlag(FALSE);
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
@@ -2874,7 +2875,9 @@ void GAME(int song_number, int difficulty,
 		DrawGraph(0, 0, H_BG, TRUE);//背景
 		show_cloud(H_CLOUD, &pos_cloud, (stopFlag != 1)*cbpm / 150, LOOP_passed_time);//雲
 
-		DrawGraph(0, 0, MovieGraphHandle, FALSE);
+		int movieLayer = H_DARKNESS;
+		if (isOverMoviePlayTiming)movieLayer = MovieGraphHandle;
+		if(isPlayMovie)DrawGraph(0, 0, movieLayer, FALSE);
 
 	    //後ろに落ちるものの表示と削除
 		if (head.next != NULL) {//最低1つあるとき
@@ -3595,12 +3598,11 @@ void GAME(int song_number, int difficulty,
 
 			BGM_VolTowardResult = 1 - (double)(GAME_passed_time - cleared_time) / (double)TimeFromEndOfGameToResult;
 		}
-
-		ChangeVolumeSoundMem(int(((double)1 - cos(volume * (3.1415 / 2))) * BGM_VolTowardResult * 255 * debug_music), SH_SONG);//曲の音量セット
+		if(!CheckHandleASyncLoad(SH_SONG))ChangeVolumeSoundMem(int(((double)1 - cos(volume * (3.1415 / 2))) * BGM_VolTowardResult * 255 * debug_music), SH_SONG);//曲の音量セット
 
 		//printfDx("%d\n", int(((double)44100 * (GAME_passed_time - Music[song_number].songoffset[difficulty])) / 1000));
 
-		BOOL isOverSongPlayTiming = (GAME_passed_time + LOOP_passed_time > Music[song_number].songoffset[difficulty]);
+		isOverSongPlayTiming = (GAME_passed_time + LOOP_passed_time > Music[song_number].songoffset[difficulty]);
 		if (isOverSongPlayTiming
 			&& (CheckSoundMem(SH_SONG) == 0 && debug_stop == 0)
 			&& (ClearFlag == 0) 
@@ -3622,7 +3624,7 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
-		BOOL isOverMoviePlayTiming = (GAME_passed_time + LOOP_passed_time > Music[song_number].movieoffset[difficulty]);
+		isOverMoviePlayTiming = (GAME_passed_time + LOOP_passed_time > Music[song_number].movieoffset[difficulty]);
 		if (isOverMoviePlayTiming
 			&& (debug_stop == 0)
 			&& (ClearFlag == 0)

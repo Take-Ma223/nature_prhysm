@@ -7,6 +7,7 @@ void folder_insert(LIST *song_folder, int song_number, int difficulty, Song *Mus
 	if (Music[song_number].exist[difficulty] == 1) {
 		level = (Music[song_number].level[difficulty] / 5);//5~100%を1~20に変換
 		folder = level + FolderIndex::DIFFICULTY_5 - 1;//1~20を難易度別フォルダの番号に変換(0~6はALL SONGS~NOT SEASONALで使われてる)
+		if (folder > 33) {folder = 33;}
 
 		song_folder->folder[folder][song_folder->folder_c[folder]].song_number = song_number;
 		song_folder->folder[folder][song_folder->folder_c[folder]].difficulty = difficulty;

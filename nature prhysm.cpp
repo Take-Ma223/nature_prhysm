@@ -24,7 +24,7 @@
 #include "STRUCT_IR_SETTING.h"
 #include "IR_process.h"
 #include "ActivityController.h"
-
+#include "torch/torch.h"
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
 void EffekseerInitProcess();
@@ -269,8 +269,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	//GAME();
 	free(Music);
-	
-	WaitKey();				// キー入力待ち
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 

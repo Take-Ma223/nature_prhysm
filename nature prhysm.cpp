@@ -39,7 +39,7 @@ int android_main(void) {
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 #endif // !__ANDROID__
 
-
+	_wchdir(L"../");//作業ディレクトリをprogramsから親ディレクトリに移す
 
 	wchar_t DX_PASSWORD[] = L"ntps";
 	SetDXArchiveKeyString(DX_PASSWORD);

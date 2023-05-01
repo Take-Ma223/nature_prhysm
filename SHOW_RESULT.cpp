@@ -1030,7 +1030,7 @@ void SHOW_RESULT(RESULT res,
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 127));
 		DrawGraph(0, int(0 + (1 - draw_alpha) * 50), H_SCORE_BOARD, TRUE);//ボード
 
-		int entireAlpha = 170;
+		int entireAlpha = 200;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
 
 		if (option->op.color == OptionItem::Color::RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {

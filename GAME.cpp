@@ -35,6 +35,7 @@
 #include "Asset.h"
 #include "AppContext.h"
 #include "DetailView.h"
+#include "AutoDifficultyPrediction.h"
 
 using namespace std;
 
@@ -317,6 +318,10 @@ void GAME(int song_number, int difficulty,
 	int FirstMoviePlay = 1;//今から流すBGAが最初の再生かどうかのフラグ
 
 	CALCDIFF Cdiff;//計算で出した難易度要素目安
+	AutoDifficultyPrediction adp;
+	wstring autoDifficultyPredictionResult;
+	if(*debug == 1)	autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
+
 
 	int bcc = 0;//bpmchangeのカウンタ
 	int scc = 0;//scrollchangeのカウンタ
@@ -1617,6 +1622,7 @@ void GAME(int song_number, int difficulty,
 				initVariableProcess();
 				isMoviePlaying = 0;
 				PauseMovieToGraph(MovieGraphHandle);
+				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 			}
 
 			if (Key[KEY_INPUT_F3] == 1) {//叩いた音を鳴らさない
@@ -1716,7 +1722,7 @@ void GAME(int song_number, int difficulty,
 				LOOP_passed_time = ((double)GetNowCount_d(config) - GAME_start_time) - time_cash;//1ループにかかった時間を算出
 				time_cash = ((double)GetNowCount_d(config) - GAME_start_time);
 				GAME_passed_time_scroll = (sc_timing + ((GAME_passed_time_for_draw - stop_time - stop_time_sum) - real_timing)*(cscroll));
-
+				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 			}
 		}
 		//scrollchangeのインクリメント
@@ -3561,6 +3567,8 @@ void GAME(int song_number, int difficulty,
 
 			printfDx(L"想定難易度:%d%%\n", Cdiff.level);
 			printfDx(L"想定局所難易度:%d%%\n", Cdiff.level_local);
+			printfDx(L"AI 難易度予測:%s\n", autoDifficultyPredictionResult.c_str());
+
 			printfDx(L"行:%d,%d,%d,%d%\n", note[0][j_n_n[0]].textLine
 				, note[1][j_n_n[1]].textLine
 				, note[2][j_n_n[2]].textLine

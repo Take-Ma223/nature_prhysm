@@ -136,6 +136,9 @@
     <Filter Include="ソース ファイル\GAME\DetailView">
       <UniqueIdentifier>{ebd73b9c-4ccf-45e0-8138-ba6a51e89455}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\GAME\AutoDifficultyPrediction">
+      <UniqueIdentifier>{ae0ee367-200e-49e3-ad47-53fd00fca481}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -362,6 +365,9 @@
     </ClCompile>
     <ClCompile Include="DifficultyRadar.cpp">
       <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoDifficultyPrediction.cpp">
+      <Filter>ソース ファイル\GAME\AutoDifficultyPrediction</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -648,6 +654,9 @@
     </ClInclude>
     <ClInclude Include="DifficultyRadar.h">
       <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoDifficultyPrediction.h">
+      <Filter>ソース ファイル\GAME\AutoDifficultyPrediction</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -24,7 +24,6 @@
 #include "STRUCT_IR_SETTING.h"
 #include "IR_process.h"
 #include "ActivityController.h"
-#include "torch/torch.h"
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
 void EffekseerInitProcess();

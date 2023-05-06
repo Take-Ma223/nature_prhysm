@@ -144,6 +144,35 @@ void ConfigLoad(Config *config) {//Configƒtƒ@ƒCƒ‹‚Ì“Ç‚İ‚İ
 			config->FullScreen = _wtoi(Val);//”’lŠi”[
 		}
 
+		if (wcscmp(L"SOUND_OUTPUT_TYPE", sharp1) == 0) {
+			wchar_t Val[9];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->SoundOutputType = _wtoi(Val);//”’lŠi”[
+		}
+
+		if (wcscmp(L"WASAPI_EXCLUSIVE", sharp1) == 0) {
+			wchar_t Val[9];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->WasapiExclusive = _wtoi(Val);//”’lŠi”[
+		}
+
+		if (wcscmp(L"ASIO_DRIVER", sharp1) == 0) {
+			wchar_t Val[9];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->AsioDriver = _wtoi(Val);//”’lŠi”[
+		}
+
+		if (wcscmp(L"BUFFER", sharp1) == 0) {
+			wchar_t Val[9];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->Buffer = _wtoi(Val);//”’lŠi”[
+		}
+
+
 		if (wcscmp(L"#END", sharp1) == 0) {
 			break;
 		}

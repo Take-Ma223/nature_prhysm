@@ -1,6 +1,17 @@
 #ifndef _STRUCT_CONFIG
 #define _STRUCT_CONFIG
 
+enum SoundOutputType {
+	DirectSound,
+	WASAPI,
+	ASIO
+};
+
+enum WasapiExclusive {
+	NotExclusive,
+	Exclusive
+};
+
 typedef struct Config {//コンフィグデータ
 	int FullScreen = 0;
 	int Vsync = 1;
@@ -14,6 +25,12 @@ typedef struct Config {//コンフィグデータ
 	int ShowDebug = 1;//デモモード (1の時にプレイ画面でDEBUG MODEが表示されないようになる)
 	int Local = 0;//ソケット通信の接続先IPアドレスをローカルにする
 	int UsePy = 0;//utilフォルダのプログラムにpyファイルを使用する
+
+	int SoundOutputType = 0;
+	int WasapiExclusive = 0;
+	int AsioDriver = 0;
+	int Buffer = 256;
+
 } Config;
 
 #endif

@@ -60,4 +60,18 @@ public:
 
 	};
 
+	void show() {
+
+	}
+
+	void hide() {
+
+	}
+
+
+
+
+
+
+
 };

@@ -38,11 +38,14 @@ int android_main(void) {
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 #endif // !__ANDROID__
 
-	_wchdir(L"../");//作業ディレクトリをprogramsから親ディレクトリに移す
+	_wchdir(L"../../");//作業ディレクトリをapplicationから親の親ディレクトリに移す
 
 	wchar_t DX_PASSWORD[] = L"ntps";
 	SetDXArchiveKeyString(DX_PASSWORD);
-	SetOutApplicationLogValidFlag(FALSE);//ログ出力を行わない
+
+	//ログ出力
+	SetOutApplicationLogValidFlag(FALSE);
+
 
 	SetGraphMode(1280, 720, 32);//画面サイズは1280*720
 
@@ -69,9 +72,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
 	SetWindowIconID(333);//ウィンドウアイコンの設定
 #endif
-	//SetEnableXAudioFlag(TRUE);//サウンドデバイスを何使うか
-	//SetEnableASIOFlag(TRUE);
-	//SetEnableWASAPIFlag(TRUE);
+	//SetEnableXAudioFlag(TRUE);
+	
+	//サウンドデバイスを何使うか
+	if (config.SoundOutputType == (int)SoundOutputType::DirectSound) {
+
+	}
+	else if (config.SoundOutputType == (int)SoundOutputType::WASAPI) {
+		SetEnableWASAPIFlag(TRUE, config.WasapiExclusive);
+	}
+	else if (config.SoundOutputType == (int)SoundOutputType::ASIO) {
+		SetUseASIODriverIndex(config.AsioDriver);
+		SetEnableASIOFlag(TRUE, config.Buffer);
+	}
+
 
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{

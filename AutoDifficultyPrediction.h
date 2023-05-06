@@ -20,7 +20,7 @@ public:
 		wchar_t passbuf[512] = L"";
 
 		wchar_t* command = {
-		L"./programs/NPADP_pred.exe"
+		L"./programs/application/auto_difficulty_prediction/NPADP_pred.exe"
 		};
 
 		sprintfDx(passbuf, L"%s %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", command,

@@ -3565,9 +3565,9 @@ void GAME(int song_number, int difficulty,
 			printfDx(L"↑↓:MOVE\n");
 			printfDx(L"←→:PITCH:%d ×%.3f\n", pitch_step,pitch);
 
+			printfDx(L"AI 難易度予測:%s\n", autoDifficultyPredictionResult.c_str());
 			printfDx(L"想定難易度:%d%%\n", Cdiff.level);
 			printfDx(L"想定局所難易度:%d%%\n", Cdiff.level_local);
-			printfDx(L"AI 難易度予測:%s\n", autoDifficultyPredictionResult.c_str());
 
 			printfDx(L"行:%d,%d,%d,%d%\n", note[0][j_n_n[0]].textLine
 				, note[1][j_n_n[1]].textLine

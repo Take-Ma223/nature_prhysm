@@ -45,6 +45,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//ログ出力
 	SetOutApplicationLogValidFlag(FALSE);
+#ifdef _DEBUG
+	SetOutApplicationLogValidFlag(TRUE);
+#endif
 
 
 	SetGraphMode(1280, 720, 32);//画面サイズは1280*720

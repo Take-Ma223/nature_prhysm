@@ -24,6 +24,7 @@
 #include "STRUCT_IR_SETTING.h"
 #include "IR_process.h"
 #include "ActivityController.h"
+#include "DxLibUtil.h"
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
 void EffekseerInitProcess();
@@ -230,8 +231,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	while (1) {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 		}
 		
 		int res = 0;
@@ -262,9 +262,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 
 	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config, &ir);
+	if (ProcessMessage() != 0) {dxLibFinishProcess();return -1;}
 	TITLE(Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
+	if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
 	int StageCount = 0;
 	while (1) {
+		if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
 		SONG_SELECT(&list_number,
 			&song_number, &difficulty,
 			&option,
@@ -286,7 +289,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//GAME();
 	free(Music);
 
-	DxLib_End();				// ＤＸライブラリ使用の終了処理
+	dxLibFinishProcess();				// ＤＸライブラリ使用の終了処理
 
 	return 0;				// ソフトの終了 
 }
@@ -462,7 +465,7 @@ void EffekseerInitProcess() {
 	// 引数には画面に表示する最大パーティクル数を設定する。
 	if (Effekseer_Init(8000) == -1)
 	{
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 

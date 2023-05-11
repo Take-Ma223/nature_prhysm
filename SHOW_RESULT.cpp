@@ -20,6 +20,8 @@
 #include "IR_process.h"
 #include "AppContext.h"
 #include "ActivityContext.h"
+#include "DxLibUtil.h"
+
 using namespace std;
 
 void SHOW_RESULT(RESULT res,
@@ -799,8 +801,7 @@ void SHOW_RESULT(RESULT res,
 	SetFontSize(28);//オプション描画フォントサイズの設定
 	while (1) {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -1294,8 +1295,7 @@ void SHOW_RESULT(RESULT res,
 				PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
 				for (i = 0; i <= 1500; i++) {//1.5s待つ
 					if (ProcessMessage() != 0) {
-						DxLib_End();
-						exit(0);
+						dxLibFinishProcess();
 						return;
 					}
 					Sleep(1);
@@ -1511,7 +1511,7 @@ void GetBG(wchar_t *SearchPass, wchar_t *ImagePass) {//背景画像を指定フ�
 	hFind_Images = FindFirstFile(pass, &lp);//hit_soundフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを除いて通常のファイルを見つけた
@@ -1519,7 +1519,7 @@ void GetBG(wchar_t *SearchPass, wchar_t *ImagePass) {//背景画像を指定フ�
 		}
 	} while (FindNextFile(hFind_Images, &lp));//何も見つからなかったら0になりループを抜ける
 	if (FindClose(hFind_Images) == 0) {
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 
@@ -1533,7 +1533,7 @@ void GetBG(wchar_t *SearchPass, wchar_t *ImagePass) {//背景画像を指定フ�
 	hFind_Images = FindFirstFile(pass, &lp);//notesフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
@@ -1545,7 +1545,7 @@ void GetBG(wchar_t *SearchPass, wchar_t *ImagePass) {//背景画像を指定フ�
 		}
 	} while (FindNextFile(hFind_Images, &lp));//何も見つからなかったら0になりループを抜ける
 	if (FindClose(hFind_Images) == 0) {
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 

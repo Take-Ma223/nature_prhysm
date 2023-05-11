@@ -22,6 +22,7 @@
 #include"STRUCT_IR_SETTING.h"
 #include"IR_process.h"
 #include"LearningDataGenarator.h"
+#include "DxLibUtil.h"
 
 void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, Option *op, Config config, IR_SETTING* ir) {
 	int i = 0, j = 0;
@@ -109,7 +110,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 
 
 	if (ProcessMessage() != 0) {
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 	i = 0;
@@ -119,7 +120,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	hFind_Folders = FindFirstFile(L"songs/*", &folder_lp);//Songsフォルダの最初の探索
 	if (hFind_Folders == INVALID_HANDLE_VALUE) {
 		ShowError(L"songsフォルダがありません。");
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 	do {
@@ -130,12 +131,12 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 			hFind_Songs = FindFirstFile(Path, &song_lp);//Song/~~~フォルダの最初の探索
 			if (hFind_Songs == INVALID_HANDLE_VALUE) {
 				ShowError(L"songsフォルダの各フォルダ中の探索に失敗しました。");
-				DxLib_End();
+				dxLibFinishProcess();
 				return;
 			}
 			do {
 				if (ProcessMessage() != 0) {
-					DxLib_End();
+					dxLibFinishProcess();
 					return;
 				}
 
@@ -229,7 +230,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 					hFind_nps = FindFirstFile(Path, &file_lp);
 					if (hFind_nps == INVALID_HANDLE_VALUE) {
 						ShowError(L"npsファイルが一つもない曲フォルダがあります。");
-						DxLib_End();
+						dxLibFinishProcess();
 						return;
 					}
 					do {
@@ -321,14 +322,14 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 					ScreenFlip();
 
 					if (FindClose(hFind_nps) == 0) {
-						DxLib_End();
+						dxLibFinishProcess();
 						return;
 					}
 				}
 			} while (FindNextFile(hFind_Songs, &song_lp));//何も見つからなかったら0になりループを抜ける
 
 			if (FindClose(hFind_Songs) == 0) {
-				DxLib_End();
+				dxLibFinishProcess();
 				return;
 			}
 		}
@@ -336,7 +337,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	}while(FindNextFile(hFind_Folders, &folder_lp));//何も見つからなかったら0になりループを抜ける
 
 	if (FindClose(hFind_Folders) == 0) {
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 
@@ -346,7 +347,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	hFind_Songs = FindFirstFile(L"songs/user/*", &lp);//Songフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -412,7 +413,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 			//song_folder->folder_c[0]++;
 			i++;//曲番号
 			if (FindClose(hFind_nps) == 0) {
-				DxLib_End();
+				dxLibFinishProcess();
 				return;
 			}
 		}
@@ -494,7 +495,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	printfDx(L"曲数:%d\n", NumberOfSongs);
 	for (i = 0; i <= *NumberOfSongs - 1; i++) {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		//printfDx("%s\n", Music[i].SongPath[1]);
@@ -522,7 +523,7 @@ void SearchThemeSkin(Option *op) {//テーマスキン読み込み
 	hFind_Themes = FindFirstFile(L"img/themes/*", &lp);//notesフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
@@ -531,7 +532,7 @@ void SearchThemeSkin(Option *op) {//テーマスキン読み込み
 	} while (FindNextFile(hFind_Themes, &lp));//何も見つからなかったら0になりループを抜ける
 	if (FindClose(hFind_Themes) == 0) {
 		ShowError(L"テーマ画像フォルダがありません。");
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 
@@ -546,7 +547,7 @@ void SearchThemeSkin(Option *op) {//テーマスキン読み込み
 	hFind_Themes = FindFirstFile(L"img/themes/*", &lp);//notesフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
@@ -563,7 +564,7 @@ void SearchThemeSkin(Option *op) {//テーマスキン読み込み
 
 
 	if (FindClose(hFind_Themes) == 0) {
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 }
@@ -579,7 +580,7 @@ void SearchNoteSkin(Option* op) {//ノートスキン読み込み
 	hFind_Notes = FindFirstFile(L"img/notes/*", &lp);//notesフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
@@ -588,7 +589,7 @@ void SearchNoteSkin(Option* op) {//ノートスキン読み込み
 	} while (FindNextFile(hFind_Notes, &lp));//何も見つからなかったら0になりループを抜ける
 	if (FindClose(hFind_Notes) == 0) {
 		ShowError(L"音符画像フォルダがありません。");
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 
@@ -603,7 +604,7 @@ void SearchNoteSkin(Option* op) {//ノートスキン読み込み
 	hFind_Notes = FindFirstFile(L"img/notes/*", &lp);//notesフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
@@ -620,7 +621,7 @@ void SearchNoteSkin(Option* op) {//ノートスキン読み込み
 
 
 	if (FindClose(hFind_Notes) == 0) {
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 }
@@ -637,7 +638,7 @@ void SearchHitSoundSkin(Option *op) {//ヒット音スキン読み込み
 	hFind_HitSounds = FindFirstFile(L"sound/hit_sound/*", &lp);//hit_soundフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
@@ -646,7 +647,7 @@ void SearchHitSoundSkin(Option *op) {//ヒット音スキン読み込み
 	} while (FindNextFile(hFind_HitSounds, &lp));//何も見つからなかったら0になりループを抜ける
 	if (FindClose(hFind_HitSounds) == 0) {
 		ShowError(L"ヒット音フォルダがありません。");
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 
@@ -660,7 +661,7 @@ void SearchHitSoundSkin(Option *op) {//ヒット音スキン読み込み
 	hFind_HitSounds = FindFirstFile(L"sound/hit_sound/*", &lp);//notesフォルダの最初の探索
 	do {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
+			dxLibFinishProcess();
 			return;
 		}
 		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
@@ -674,7 +675,7 @@ void SearchHitSoundSkin(Option *op) {//ヒット音スキン読み込み
 	} while (FindNextFile(hFind_HitSounds, &lp));//何も見つからなかったら0になりループを抜ける
 
 	if (FindClose(hFind_HitSounds) == 0) {
-		DxLib_End();
+		dxLibFinishProcess();
 		return;
 	}
 }

@@ -208,6 +208,7 @@
     <ClCompile Include="AutoDifficultyPrediction.cpp" />
     <ClCompile Include="DetailView.cpp" />
     <ClCompile Include="DifficultyRadar.cpp" />
+    <ClCompile Include="DxLibUtil.cpp" />
     <ClCompile Include="LearningDataGenarator.cpp" />
     <ClCompile Include="NumberImageHandles.cpp" />
     <ClCompile Include="NumberViewFormat.cpp" />
@@ -289,6 +290,7 @@
     <ClInclude Include="AutoDifficultyPrediction.h" />
     <ClInclude Include="DetailView.h" />
     <ClInclude Include="DifficultyRadar.h" />
+    <ClInclude Include="DxLibUtil.h" />
     <ClInclude Include="LearningDataGenarator.h" />
     <ClInclude Include="NumberImageHandles.h" />
     <ClInclude Include="NumberViewFormat.h" />

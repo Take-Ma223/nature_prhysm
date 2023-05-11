@@ -24,9 +24,10 @@ public:
 	DetailView::DetailView(ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : View(c, param)
 	{
 		makeScreen(Size(sizeX, sizeY));
+		alpha.value = 0;
 	}
 
-	FontInfo font = FontInfo(wstring(L"メイリオ"), 15, 1, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo font = FontInfo(wstring(L"メイリオ"), 17, 1, FontType::ANTIALIASING_EDGE_16X16);
 	//vector<TextView> detailText;
 
 	/// <summary>
@@ -60,12 +61,22 @@ public:
 
 	};
 
+	/// <summary>
+	/// 表示
+	/// </summary>
 	void show() {
-
+		alpha.clearEvent();
+		alpha.eChange(Point(0), Point(255), Converter(Linear), 0, 900);
+		alpha.play();
 	}
 
+	/// <summary>
+	/// 非表示
+	/// </summary>
 	void hide() {
-
+		alpha.clearEvent();
+		alpha.eChange(Point(255), Point(0), Converter(Linear), 0, 900);
+		alpha.play();
 	}
 
 

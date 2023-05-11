@@ -139,6 +139,9 @@
     <Filter Include="ソース ファイル\GAME\AutoDifficultyPrediction">
       <UniqueIdentifier>{ae0ee367-200e-49e3-ad47-53fd00fca481}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\DxLibUtil">
+      <UniqueIdentifier>{937d3344-24ae-48e7-b75a-0a4af144a0e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -368,6 +371,9 @@
     </ClCompile>
     <ClCompile Include="AutoDifficultyPrediction.cpp">
       <Filter>ソース ファイル\GAME\AutoDifficultyPrediction</Filter>
+    </ClCompile>
+    <ClCompile Include="DxLibUtil.cpp">
+      <Filter>ソース ファイル\Util\DxLibUtil</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -657,6 +663,9 @@
     </ClInclude>
     <ClInclude Include="AutoDifficultyPrediction.h">
       <Filter>ソース ファイル\GAME\AutoDifficultyPrediction</Filter>
+    </ClInclude>
+    <ClInclude Include="DxLibUtil.h">
+      <Filter>ソース ファイル\Util\DxLibUtil</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

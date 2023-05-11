@@ -15,7 +15,7 @@
 #include <algorithm>
 #include "EDIT_SCORE.h"
 #include "NPStringUtil.h"
-
+#include "DxLibUtil.h"
 
 void GAME_LOAD(int song_number,
 	int difficulty,
@@ -606,8 +606,7 @@ void GAME_LOAD(int song_number,
 	i = 0;
 	while (wcscmp(L"#END", sharp1) != 0) {//譜面読み込み部
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 		ClearDrawScreen();
@@ -1589,8 +1588,7 @@ void GAME_LOAD(int song_number,
 	/*
 	while (1) {
 	if (ProcessMessage() != 0) {
-	DxLib_End();
-	exit(0);
+	dxLibFinishProcess();
 	return;
 	}
 	}

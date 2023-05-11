@@ -15,6 +15,7 @@
 #include "Asset.h"
 #include "NotesModeView.h"
 #include "AppContext.h"
+#include "DxLibUtil.h"
 
 using namespace std;
 
@@ -348,8 +349,8 @@ void EDIT_SCORE(SCORE_CELL* head,
 	while (1) {
 		appContext.updateTime();
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
+
 			return;
 		}
 

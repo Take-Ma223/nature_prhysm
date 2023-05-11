@@ -7,6 +7,7 @@
 #include "TestActivity.h"
 #include"Log.h"
 #include "Intent.h"
+#include "DxLibUtil.h"
 
 class ActivityController
 {
@@ -33,8 +34,7 @@ class ActivityController
 
 	void handleProcessMessage() {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 	}

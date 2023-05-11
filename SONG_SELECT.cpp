@@ -29,6 +29,7 @@
 #include "AppContext.h"
 #include "ActivityContext.h"
 #include "LearningDataGenarator.h"
+#include "DxLibUtil.h"
 
 using namespace std;
 
@@ -527,8 +528,7 @@ void SONG_SELECT(int *l_n,
 	//段位認定リザルト読み込み
 	for (i = 0; i <= NUMBER_OF_COURSES - 2; i++) {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -573,8 +573,7 @@ void SONG_SELECT(int *l_n,
 		for (i = 0; i <= *NumberOfSongs - 1; i++) {//曲番号
 			for (j = 0; j <= 9; j++) {//難易度
 				if (ProcessMessage() != 0) {
-					DxLib_End();
-					exit(0);
+					dxLibFinishProcess();
 					return;
 				}
 
@@ -1286,8 +1285,7 @@ void SONG_SELECT(int *l_n,
 		PlaySoundMem(SH_ALARM, DX_PLAYTYPE_BACK, TRUE);
 		while (CheckSoundMem(SH_ALARM) == 1) {//なり終わるまで待機
 			if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE) {//ESCでゲーム終了
-				DxLib_End();
-				exit(0);
+				dxLibFinishProcess();
 				return;
 			}
 		}
@@ -1299,8 +1297,7 @@ void SONG_SELECT(int *l_n,
 	int Announse_show_time_base = GetNowCount() + 1500;//アナウンス表示の基準時間
 	while (1) {
 		if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE && flag != FLAG_END_FUNCTION_STATE) {//ESCでゲーム終了
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -2255,8 +2252,7 @@ void SONG_SELECT(int *l_n,
 			for (i = 0; i <= 40; i++) {
                 /*
 				if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE) {//ESCでゲーム終了
-					DxLib_End();
-					exit(0);
+					dxLibFinishProcess();
 					return;
 				}
              	*/

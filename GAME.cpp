@@ -36,6 +36,7 @@
 #include "AppContext.h"
 #include "DetailView.h"
 #include "AutoDifficultyPrediction.h"
+#include "DxLibUtil.h"
 
 using namespace std;
 
@@ -965,13 +966,11 @@ void GAME(int song_number, int difficulty,
 		targetScore2 = LoadTargetScore(Music[song_number].SaveFolder);
 	}
 
-
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {
 		appContext.updateTime();
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -1067,6 +1066,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		if ((gauge_draw_counter >= gauge - 0.001) && (CheckHandleASyncLoad(SH_SONG) != TRUE) && draw_alpha_speed == 0) {//ゲージが上まで描写されて曲の読み込みが完了して(エラーでも続行)段位ようspeed表示が消えたら演奏開始
+			detailView.hide();
 			break;
 		}
 
@@ -1343,6 +1343,8 @@ void GAME(int song_number, int difficulty,
 		if (jingleflag == 0) {
 			PlaySoundMem(SH_JINGLE, DX_PLAYTYPE_BACK, TRUE);
 			jingleflag = 1;
+
+			detailView.show();
 		}
 
 		soundHitSound();
@@ -1387,8 +1389,7 @@ void GAME(int song_number, int difficulty,
 		appContext.updateTime();
 		if (ProcessMessage() != 0) {
 			turn_off_LED(hComm, &LED_state, &dwWritten, &ovl);//LEDを消す
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 

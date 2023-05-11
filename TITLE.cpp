@@ -19,6 +19,8 @@
 #include "NumberView.h"
 #include "CoverView.h"
 #include "AppContext.h"
+#include <EffekseerForDXLib.h>
+#include "DxLibUtil.h"
 
 using namespace std;
 
@@ -133,8 +135,9 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		appContext.updateTime();
 
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			InitSoundMem();
+			Effkseer_End();
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -663,8 +666,7 @@ void OPEN_COVER(int difficulty,Config config) {
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -723,8 +725,7 @@ void CLOSE_COVER(int difficulty, Config config, Option* option) {
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {
 		if (ProcessMessage() != 0) {
-			DxLib_End();
-			exit(0);
+			dxLibFinishProcess();
 			return;
 		}
 
@@ -745,8 +746,7 @@ void CLOSE_COVER(int difficulty, Config config, Option* option) {
 			PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
 			for (i = 0; i <= 1500; i++) {//1.5s待つ
 				if (ProcessMessage() != 0) {
-					DxLib_End();
-					exit(0);
+					dxLibFinishProcess();
 					return;
 				}
 				Sleep(1);

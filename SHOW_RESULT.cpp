@@ -608,19 +608,19 @@ void SHOW_RESULT(RESULT res,
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_POP_NUMBER);
 	LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_MAX_COMBO_NUMBER);
 
-	H_WEATHER[3] = LoadGraph(L"img/sunny.png");
-	H_WEATHER[2] = LoadGraph(L"img/cloudy.png");
+	H_WEATHER[3] = LoadGraph(L"img/weather/sunny.png");
+	H_WEATHER[2] = LoadGraph(L"img/weather/cloudy.png");
 	if (Music[song_number].season[difficulty] != 4) {//冬じゃないなら
-		H_WEATHER[1] = LoadGraph(L"img/rainy.png");
+		H_WEATHER[1] = LoadGraph(L"img/weather/rainy.png");
 	}
 	else {
-		H_WEATHER[1] = LoadGraph(L"img/snowy.png");
+		H_WEATHER[1] = LoadGraph(L"img/weather/snowy.png");
 	}
 	if (Music[song_number].season[difficulty] != 4) {//冬じゃないなら
-		H_WEATHER[0] = LoadGraph(L"img/thunder.png");
+		H_WEATHER[0] = LoadGraph(L"img/weather/thunder.png");
 	}
 	else {
-		H_WEATHER[0] = LoadGraph(L"img/snowstorm.png");
+		H_WEATHER[0] = LoadGraph(L"img/weather/snowstorm.png");
 	}
 
 	H_HIGH_SCORE_BANNER = LoadGraph(L"img/HighScoreBanner.png");
@@ -628,28 +628,28 @@ void SHOW_RESULT(RESULT res,
 
 	if (difficulty == 1) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
-		H_DIFFICULTY = LoadGraph(L"img/sunny.png");
+		H_DIFFICULTY = LoadGraph(L"img/weather/sunny.png");
 	}
 	if (difficulty == 2) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
-		H_DIFFICULTY = LoadGraph(L"img/cloudy.png");
+		H_DIFFICULTY = LoadGraph(L"img/weather/cloudy.png");
 	}
 	if (difficulty == 3) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//冬じゃないなら
-			H_DIFFICULTY = LoadGraph(L"img/rainy.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/rainy.png");
 		}
 		else {
-			H_DIFFICULTY = LoadGraph(L"img/snowy.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/snowy.png");
 		}
 	}
 	if (difficulty == 4) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//冬じゃないなら
-			H_DIFFICULTY = LoadGraph(L"img/thunder.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/thunder.png");
 		}
 		else {
-			H_DIFFICULTY = LoadGraph(L"img/snowstorm.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/snowstorm.png");
 		}
 	}
 

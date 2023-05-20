@@ -389,19 +389,19 @@ void SONG_SELECT(int *l_n,
 
 	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 	H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
-	H_DIFFICULTY[1] = LoadGraph(L"img/sunny.png");
+	H_DIFFICULTY[1] = LoadGraph(L"img/weather/sunny.png");
 	
 	H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
-	H_DIFFICULTY[2] = LoadGraph(L"img/cloudy.png");
+	H_DIFFICULTY[2] = LoadGraph(L"img/weather/cloudy.png");
 
 	H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
-	H_DIFFICULTY[3] = LoadGraph(L"img/rainy.png");
+	H_DIFFICULTY[3] = LoadGraph(L"img/weather/rainy.png");
 
 	H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
-	H_DIFFICULTY[4] = LoadGraph(L"img/thunder.png");
+	H_DIFFICULTY[4] = LoadGraph(L"img/weather/thunder.png");
 
-	H_DIFFICULTY[5] = LoadGraph(L"img/snowy.png");
-	H_DIFFICULTY[6] = LoadGraph(L"img/snowstorm.png");
+	H_DIFFICULTY[5] = LoadGraph(L"img/weather/snowy.png");
+	H_DIFFICULTY[6] = LoadGraph(L"img/weather/snowstorm.png");
 
 	H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
 	H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
@@ -3135,13 +3135,13 @@ void SONG_SELECT(int *l_n,
 		if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
 			DrawGraph(1180, 100, H_PERCENT, TRUE);
 			for (i = 0; i <= int(log10(Music[song_number].level[difficulty])); i++) {
-				DrawGraph(10 + 1115 - i * 40, 100, H_SCORE_NUMBER[level_digit[i]], TRUE);
+				DrawGraph(10 + 1120 - i * 40, 100, H_SCORE_NUMBER[level_digit[i]], TRUE);
 			}
 		}
 		else if (SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2) {//段位難易度
 			DrawGraph(1145, 100, H_PERCENT, TRUE);
 			for (i = 0; i <= int(log10(STList->pop[list_number])); i++) {
-				DrawGraph(10 + 1040 - i * 40, 100, H_SCORE_NUMBER[level_digit[i]], TRUE);
+				DrawGraph(10 + 1060 - i * 40, 100, H_SCORE_NUMBER[level_digit[i]], TRUE);
 			}
 		}
 

@@ -587,28 +587,28 @@ void GAME(int song_number, int difficulty,
 
 	if (difficulty == 1) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
-		H_DIFFICULTY = LoadGraph(L"img/sunny.png");
+		H_DIFFICULTY = LoadGraph(L"img/weather/sunny.png");
 	}
 	if (difficulty == 2) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
-		H_DIFFICULTY = LoadGraph(L"img/cloudy.png");
+		H_DIFFICULTY = LoadGraph(L"img/weather/cloudy.png");
 	}
 	if (difficulty == 3) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//雪じゃないとき
-			H_DIFFICULTY = LoadGraph(L"img/rainy.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/rainy.png");
 		}
 		else {
-			H_DIFFICULTY = LoadGraph(L"img/snowy.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/snowy.png");
 		}
 	}
 	if (difficulty == 4) {
 		H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
 		if (Music[song_number].season[difficulty] != 4) {//雪じゃないとき		
-			H_DIFFICULTY = LoadGraph(L"img/thunder.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/thunder.png");
 		}
 		else {
-			H_DIFFICULTY = LoadGraph(L"img/snowstorm.png");
+			H_DIFFICULTY = LoadGraph(L"img/weather/snowstorm.png");
 		}
 	}
 
@@ -636,7 +636,7 @@ void GAME(int song_number, int difficulty,
 	LoadDivGraph(L"img/FULL_COMBO.png", 6, 1, 6, 640, 100, H_FULL_COMBO);
 	H_PFC = LoadGraph(L"img/PERFECT_FULLCOMBO.png");
 
-	LoadDivGraph(L"img/combo_number.png", 10, 10, 1, 64, 100, H_COMBO_NUMBER);
+	LoadDivGraph(L"img/score_number.png", 10, 10, 1, 64, 100, H_COMBO_NUMBER);
 	LoadDivGraph(L"img/score_number.png", 10, 10, 1, 64, 100, H_SCORE_NUMBER);
 	LoadDivGraph(L"img/time_number.png", 10, 10, 1, 64, 100, H_TIME_NUMBER);
 	H_TIME_COLON = LoadGraph(L"img/time_colon.png");
@@ -3415,7 +3415,7 @@ void GAME(int song_number, int difficulty,
 		if (SkillTestFlag != 0)ComboBuf = *CourseCombo;//コースモードの時はコース全体のコンボで表示
 
 		if (combo_draw_counter > 0 && ComboBuf > 0) {//コンボ描画
-			DrawExtendGraph(640, int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 640 + 256, int(320 + 128 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO, TRUE);
+			DrawExtendGraph(    640,          int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 640 + 256,         int(320 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO, TRUE);
 			for (i = 0; i <= int(log10(ComboBuf)); i++) {
 				DrawExtendGraph(540 - i * 40, int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 540 + 64 - i * 40, int(320 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO_NUMBER[combo_digit[i]], TRUE);
 			}

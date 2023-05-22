@@ -142,6 +142,9 @@
     <Filter Include="ソース ファイル\Util\DxLibUtil">
       <UniqueIdentifier>{937d3344-24ae-48e7-b75a-0a4af144a0e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\SONG_SELECT\OptionListView">
+      <UniqueIdentifier>{eb57c179-a2fd-4ccf-8177-5f28c86141b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -374,6 +377,9 @@
     </ClCompile>
     <ClCompile Include="DxLibUtil.cpp">
       <Filter>ソース ファイル\Util\DxLibUtil</Filter>
+    </ClCompile>
+    <ClCompile Include="OptionListView.cpp">
+      <Filter>ソース ファイル\SONG_SELECT\OptionListView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -666,6 +672,9 @@
     </ClInclude>
     <ClInclude Include="DxLibUtil.h">
       <Filter>ソース ファイル\Util\DxLibUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionListView.h">
+      <Filter>ソース ファイル\SONG_SELECT\OptionListView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -75,7 +75,7 @@ public:
 	};
 
 	void startActivity(Activity* activity) {
-		Log(L"size:" + to_wstring(activities.size()));
+		//Log(L"size:" + to_wstring(activities.size()));
 		if(!activities.empty())activities.top()->onPause();
 		activities.push(activity);
 		activities.top()->onCreate();
@@ -83,7 +83,7 @@ public:
 	};
 
 	void finish() {
-		Log(L"size:" + to_wstring(activities.size()));
+		//Log(L"size:" + to_wstring(activities.size()));
 
 		activities.top()->onPause();
 		activities.top()->onDestroy();

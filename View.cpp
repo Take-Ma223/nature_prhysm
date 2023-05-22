@@ -4,7 +4,7 @@
 
 void View::deleteGraph()
 {
-	Log(wstring(L"削除            :") + to_wstring(handle.getHandle()));
+	//Log(wstring(L"削除            :") + to_wstring(handle.getHandle()));
 
 	DeleteGraph(handle.getHandle());
 }
@@ -25,16 +25,16 @@ void View::draw()
 
 void View::draw(int drawScreen)
 {
-	Log(wstring(L"draw実行        :") + to_wstring(drawScreen));
+	//Log(wstring(L"draw実行        :") + to_wstring(drawScreen));
 
 
 	//Viewの描画
 	int test = setScreen(handle.getHandle());
-	Log(wstring(L"setScreen       :") + to_wstring(handle.getHandle()));
-	Log(wstring(L"setScreen 成功  :") + to_wstring(test));
+	//Log(wstring(L"setScreen       :") + to_wstring(handle.getHandle()));
+	//Log(wstring(L"setScreen 成功  :") + to_wstring(test));
 
 	ClearDrawScreen();
-	Log(wstring(L"ClearDrawScreen :") + to_wstring(GetDrawScreen()));
+	//Log(wstring(L"ClearDrawScreen :") + to_wstring(GetDrawScreen()));
 
 	beforeDrawProcess(handle.getHandle());
 
@@ -46,8 +46,8 @@ void View::draw(int drawScreen)
 	//View全体を指定されたスクリーンへ描画
 
 	test = setScreen(drawScreen);
-	Log(wstring(L"setScreen       :") + to_wstring(drawScreen));
-	Log(wstring(L"setScreen 成功  :") + to_wstring(test));
+	//Log(wstring(L"setScreen       :") + to_wstring(drawScreen));
+	//Log(wstring(L"setScreen 成功  :") + to_wstring(test));
 
 	drawWithProcessing();
 }

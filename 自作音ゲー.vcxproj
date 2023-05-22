@@ -253,6 +253,7 @@
     <ClCompile Include="NumberViewShowType.cpp" />
     <ClCompile Include="number_digit.cpp" />
     <ClCompile Include="number_ring.cpp" />
+    <ClCompile Include="OptionListView.cpp" />
     <ClCompile Include="OptionStateSaveLoad.cpp" />
     <ClCompile Include="PlayHitSound.cpp" />
     <ClCompile Include="GetValueFromController.cpp" />
@@ -322,6 +323,7 @@
     <ClInclude Include="NPTimer.h" />
     <ClInclude Include="NumberView.h" />
     <ClInclude Include="NumberViewShowType.h" />
+    <ClInclude Include="OptionListView.h" />
     <ClInclude Include="OptionStateSaveLoad.h" />
     <ClInclude Include="GetValueFromController.h" />
     <ClInclude Include="Processable.h" />

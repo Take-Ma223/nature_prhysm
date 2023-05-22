@@ -30,6 +30,7 @@
 #include "ActivityContext.h"
 #include "LearningDataGenarator.h"
 #include "DxLibUtil.h"
+#include "OptionListView.h"
 
 using namespace std;
 
@@ -75,6 +76,7 @@ void SONG_SELECT(int *l_n,
 	int H_BANNER_D_BUTTON[6];
 	int H_BANNER_SELECT;
 	int H_BANNER_SEASON[4];
+	int H_OPTION_BANNER;
 	int H_COVER_HIGH_SCORE;
 	int H_COVER_POP;
 	int H_COVER_SKILL_TEST_POP;
@@ -309,6 +311,9 @@ void SONG_SELECT(int *l_n,
 	Des1_width = GetDrawStringWidth(Des1, wcslen(Des1));
 	Des2_width = GetDrawStringWidth(Des2, wcslen(Des2));
 
+	DrawableInitParam optionListParam = DrawableInitParam(Cordinate(0, 0));
+	OptionListView optionListView(option, &context, optionListParam);
+
 
 	//ShowExtendedStrFitToHandle(int x, int y, char *str, int str_width, int area_width, int FontHandle, int color, int shadow_color);
 
@@ -417,6 +422,7 @@ void SONG_SELECT(int *l_n,
 	H_BANNER_BACK = LoadGraph(L"img/banner_back.png");
 	H_BANNER_BACK_NE = LoadGraph(L"img/banner_back_ne.png");
 
+	H_OPTION_BANNER = LoadGraph(L"img/option_banner.png");
 	H_BANNER_FLAME = LoadGraph(L"img/banner_flame.png");
 	H_BANNER_FLAME_SECRET = LoadGraph(L"img/banner_flame_secret.png");
 	LoadDivGraph(L"img/banner_d_button.png", 6, 1, 6, 108, 80, H_BANNER_D_BUTTON);
@@ -1810,6 +1816,8 @@ void SONG_SELECT(int *l_n,
 
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						time_base_str = int(GetNowCount_d(config));
+
+						optionListView.update(option_select);
 					}
 					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
 						option_select++;
@@ -1827,6 +1835,8 @@ void SONG_SELECT(int *l_n,
 
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						time_base_str = int(GetNowCount_d(config));
+
+						optionListView.update(option_select);
 					}
 
 					if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
@@ -1869,6 +1879,8 @@ void SONG_SELECT(int *l_n,
 							H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
 							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 						}
+
+						optionListView.update(option_select);
 					}
 
 					if (Key[Button[1][0]] > PressFrame || Key[KEY_INPUT_LEFT] > PressFrame) {//押し続けたとき
@@ -1914,6 +1926,8 @@ void SONG_SELECT(int *l_n,
 								H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 							}
 						}
+
+						optionListView.update(option_select);
 					}
 
 					if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
@@ -1956,6 +1970,8 @@ void SONG_SELECT(int *l_n,
 							H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
 							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 						}
+
+						optionListView.update(option_select);
 					}
 
 
@@ -2002,6 +2018,8 @@ void SONG_SELECT(int *l_n,
 								H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 							}
 						}
+
+						optionListView.update(option_select);
 					}
 				}
 
@@ -3444,7 +3462,7 @@ void SONG_SELECT(int *l_n,
 			//}
 		}
 		
-		int OptionY_Base = 150;
+		int OptionY_Base = 155;
 		int dist = 90;
 		//オプション描画
 		cache = int(cos((3.14159265) / 2 * (option_draw_counter - 1)) * 320 - 320);
@@ -3453,8 +3471,8 @@ void SONG_SELECT(int *l_n,
 		DrawGraph(cache, 0, H_OPTION, TRUE);//オプションカバー
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 		for (i = 0; i < OptionShowAmount; i++) {
-			DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_BACK, TRUE);
-			DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_FLAME, TRUE);
+			DrawGraph(cache, OptionY_Base - 24 + i * dist, H_OPTION_BANNER, TRUE);
+			//DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_FLAME, TRUE);
 		}
 		
 
@@ -3514,6 +3532,12 @@ void SONG_SELECT(int *l_n,
 		if (OptionShowStart != 0) {//表示範囲の上にまだオプションがあるとき↑のカーソル表示
 			DrawReverseGraph(cache, 92 + int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE, FALSE, TRUE);
 		}
+
+
+		optionListView.draw();
+
+
+
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 		cache = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280);//リザルトカバー

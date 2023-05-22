@@ -36,19 +36,19 @@ public:
 	};
 
 	virtual void onCreate() {
-		Log(L"onCreate\n");
+		//Log(L"onCreate\n");
 		ActivityState activityState = ActivityState::Waiting;
 	};
 	virtual void onStart() {
-		Log(L"onStart\n");
+		//Log(L"onStart\n");
 		ActivityState activityState = ActivityState::Running;
 	};
 	virtual void onPause() {
-		Log(L"onPause\n");
+		//Log(L"onPause\n");
 		ActivityState activityState = ActivityState::Pausing;
 	};
 	virtual void onDestroy() {
-		Log(L"onDestroy\n");
+		//Log(L"onDestroy\n");
 		//assetâï˙èàóù
 	};
 

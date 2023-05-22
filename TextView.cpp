@@ -7,10 +7,10 @@ void TextView::beforeDrawProcess(int drawScreen)
 	SetDrawBright(255,255,255);
 	SetDrawMode(DX_DRAWMODE_ANISOTROPIC);
 	int test = setScreen(handle.getHandle());
-	Log(wstring(L"描画対象        :") + to_wstring(GetDrawScreen()));
+	//Log(wstring(L"描画対象        :") + to_wstring(GetDrawScreen()));
 
-	Log(wstring(L"setScreentext   :") + to_wstring(handle.getHandle()));
-	Log(wstring(L"setScreen 成功  :") + to_wstring(test));
+	//Log(wstring(L"setScreentext   :") + to_wstring(handle.getHandle()));
+	//Log(wstring(L"setScreen 成功  :") + to_wstring(test));
 	DrawGraph(0, 0, textImageHandle.getHandle(), TRUE);
 }
 
@@ -29,12 +29,13 @@ void TextView::setText(TextViewParam p) {
 
 	int height = fh.getSize() + 5;//小さいフォントサイズだと下が欠けるため縦サイズは1多めにとる
 	//テキスト画像の用意
+	DeleteGraph(textImageHandle.getHandle());
 	int screenHandle = MakeScreen(width, height, TRUE);
 	Size size = Size(width, height);
 	textImageHandle = ImageHandle(screenHandle, size);
 	int err = setScreen(textImageHandle.getHandle());
-	Log(wstring(L"セットエラー    :") + to_wstring(err));
-	Log(wstring(L"描画対象        :") + to_wstring(GetDrawScreen()));
+	//Log(wstring(L"セットエラー    :") + to_wstring(err));
+	//Log(wstring(L"描画対象        :") + to_wstring(GetDrawScreen()));
 
 	SetDrawMode(DX_DRAWMODE_ANISOTROPIC);
 
@@ -46,7 +47,7 @@ void TextView::setText(TextViewParam p) {
 		param.getColor(),
 		fh.getHandle()
 	);
-	Log(wstring(L"描画エラー      :") + to_wstring(err));
+	//Log(wstring(L"描画エラー      :") + to_wstring(err));
 
 
 	makeScreen(size);

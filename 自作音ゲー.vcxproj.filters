@@ -145,6 +145,12 @@
     <Filter Include="ソース ファイル\SONG_SELECT\OptionListView">
       <UniqueIdentifier>{eb57c179-a2fd-4ccf-8177-5f28c86141b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\NPUtil">
+      <UniqueIdentifier>{cb488ec4-276a-4b85-905e-eefe7dc4ad2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\NPUtil\NPTextView">
+      <UniqueIdentifier>{162f384d-59da-4fad-92ec-6e048faf1ab6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -380,6 +386,12 @@
     </ClCompile>
     <ClCompile Include="OptionListView.cpp">
       <Filter>ソース ファイル\SONG_SELECT\OptionListView</Filter>
+    </ClCompile>
+    <ClCompile Include="NPTextView.cpp">
+      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
+    </ClCompile>
+    <ClCompile Include="NPTextViewParam.cpp">
+      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -675,6 +687,12 @@
     </ClInclude>
     <ClInclude Include="OptionListView.h">
       <Filter>ソース ファイル\SONG_SELECT\OptionListView</Filter>
+    </ClInclude>
+    <ClInclude Include="NPTextView.h">
+      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
+    </ClInclude>
+    <ClInclude Include="NPTextViewParam.h">
+      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

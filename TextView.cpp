@@ -48,7 +48,7 @@ void TextView::setText(TextViewParam p) {
 		fh.getHandle()
 	);
 	//Log(wstring(L"ï`âÊÉGÉâÅ[      :") + to_wstring(err));
-
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 	makeScreen(size);
 

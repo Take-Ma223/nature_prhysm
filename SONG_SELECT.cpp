@@ -1302,6 +1302,7 @@ void SONG_SELECT(int *l_n,
 	GAME_start_time = GetNowCount_d(config);
 	int Announse_show_time_base = GetNowCount() + 1500;//アナウンス表示の基準時間
 	while (1) {
+		appContext.updateTime();
 		if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE && flag != FLAG_END_FUNCTION_STATE) {//ESCでゲーム終了
 			dxLibFinishProcess();
 			return;
@@ -1818,6 +1819,7 @@ void SONG_SELECT(int *l_n,
 						time_base_str = int(GetNowCount_d(config));
 
 						optionListView.update(option_select);
+						optionListView.moveToSelectUp();
 					}
 					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
 						option_select++;
@@ -1837,6 +1839,7 @@ void SONG_SELECT(int *l_n,
 						time_base_str = int(GetNowCount_d(config));
 
 						optionListView.update(option_select);
+						optionListView.moveToSelectDown();
 					}
 
 					if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
@@ -3462,59 +3465,59 @@ void SONG_SELECT(int *l_n,
 			//}
 		}
 		
-		int OptionY_Base = 155;
-		int dist = 90;
-		//オプション描画
-		cache = int(cos((3.14159265) / 2 * (option_draw_counter - 1)) * 320 - 320);
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
-		DrawGraph(cache, 0, H_OPTION, TRUE);//オプションカバー
-		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-		for (i = 0; i < OptionShowAmount; i++) {
-			DrawGraph(cache, OptionY_Base - 24 + i * dist, H_OPTION_BANNER, TRUE);
-			//DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_FLAME, TRUE);
-		}
+		//int OptionY_Base = 155;
+		//int dist = 90;
+		////オプション描画
+		//cache = int(cos((3.14159265) / 2 * (option_draw_counter - 1)) * 320 - 320);
+		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+		//DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
+		//DrawGraph(cache, 0, H_OPTION, TRUE);//オプションカバー
+		//SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+		//for (i = 0; i < OptionShowAmount; i++) {
+		//	DrawGraph(cache, OptionY_Base - 24 + i * dist, H_OPTION_BANNER, TRUE);
+		//	//DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_FLAME, TRUE);
+		//}
 		
 
-		SetDrawBright(brightness, brightness, brightness);
-		DrawExtendGraph(cache + 35, OptionY_Base + (option_select - OptionShowStart) * dist, cache + 280, OptionY_Base + 53 + (option_select - OptionShowStart) * dist, H_BANNER_SELECT, TRUE);//選択枠
-		SetDrawBright(255, 255, 255);
-		SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+		//SetDrawBright(brightness, brightness, brightness);
+		//DrawExtendGraph(cache + 35, OptionY_Base + (option_select - OptionShowStart) * dist, cache + 280, OptionY_Base + 53 + (option_select - OptionShowStart) * dist, H_BANNER_SELECT, TRUE);//選択枠
+		//SetDrawBright(255, 255, 255);
+		//SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
 
 
-		//オプション種類名称描画
-		
-		int index = 0;
-		for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
-			cache2 = GetDrawStringWidth(option->OptionName[index], wcslen(option->OptionName[index]));
-			if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base - 33 + i * dist + 2, option->OptionName[index], GetColor(0, 0, 0));
-			DrawString(cache + 160 - (cache2 / 2), OptionY_Base - 33 + i * dist, option->OptionName[index], GetColor(255, 128, 0));
-		}
+		////オプション種類名称描画
+		//
+		//int index = 0;
+		//for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
+		//	cache2 = GetDrawStringWidth(option->OptionName[index], wcslen(option->OptionName[index]));
+		//	if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base - 33 + i * dist + 2, option->OptionName[index], GetColor(0, 0, 0));
+		//	DrawString(cache + 160 - (cache2 / 2), OptionY_Base - 33 + i * dist, option->OptionName[index], GetColor(255, 128, 0));
+		//}
 
 
-		//オプション名称描画
-		for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
-			wchar_t* OptionStrAddress = option->ArrayOptionKindName[index][*(option->ArrayValue[index])];//i番目のオプションで現在選んでいる名称を表す文字列の先頭アドレス
+		////オプション名称描画
+		//for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
+		//	wchar_t* OptionStrAddress = option->ArrayOptionKindName[index][*(option->ArrayValue[index])];//i番目のオプションで現在選んでいる名称を表す文字列の先頭アドレス
 
-			cache2 = GetDrawStringWidth(OptionStrAddress, wcslen(OptionStrAddress));
-			if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base + 9 + i * dist + 2, OptionStrAddress, GetColor(0, 0, 0));
-			DrawString(cache + 160 - (cache2 / 2), OptionY_Base + 9 + i * dist, OptionStrAddress, GetColor(255, 255, 255));
-		}
+		//	cache2 = GetDrawStringWidth(OptionStrAddress, wcslen(OptionStrAddress));
+		//	if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base + 9 + i * dist + 2, OptionStrAddress, GetColor(0, 0, 0));
+		//	DrawString(cache + 160 - (cache2 / 2), OptionY_Base + 9 + i * dist, OptionStrAddress, GetColor(255, 255, 255));
+		//}
 
-		if (SelectingTarget == SELECTING_COURSE) {//段位選択中は使えないオプションを暗くする
-			SetDrawBright(0, 0, 0);
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-			int shadowLocateIndex;
-			shadowLocateIndex = 1 - OptionShowStart;//GAUGE
-			if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
-			shadowLocateIndex = 2 - OptionShowStart;//LANE
-			if (shadowLocateIndex >= 0 && 
-				!((option->op.lane == OptionItem::Lane::NONE) || (option->op.lane == OptionItem::Lane::MIRROR)))DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
-			shadowLocateIndex = 3 - OptionShowStart;//COLOR
-			if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-			SetDrawBright(255, 255, 255);
-		}									
+		//if (SelectingTarget == SELECTING_COURSE) {//段位選択中は使えないオプションを暗くする
+		//	SetDrawBright(0, 0, 0);
+		//	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+		//	int shadowLocateIndex;
+		//	shadowLocateIndex = 1 - OptionShowStart;//GAUGE
+		//	if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
+		//	shadowLocateIndex = 2 - OptionShowStart;//LANE
+		//	if (shadowLocateIndex >= 0 && 
+		//		!((option->op.lane == OptionItem::Lane::NONE) || (option->op.lane == OptionItem::Lane::MIRROR)))DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
+		//	shadowLocateIndex = 3 - OptionShowStart;//COLOR
+		//	if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
+		//	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+		//	SetDrawBright(255, 255, 255);
+		//}									
 
 		//NOTEを選択しているときはプレビュー画像を表示
 		if (OptionOpen == 1 && option_select == (int)OptionItem::Name::NOTE) {
@@ -3524,15 +3527,16 @@ void SONG_SELECT(int *l_n,
 			SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
 		}
 
-		//オプション欄の上下にカーソルを表示
-		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
-		if (OptionShowEnd != option->OPTION_NUM - 1) {//表示範囲の下にまだオプションがあるとき↓のカーソル表示
-			DrawGraph(cache, 655 - int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE);
-		}
-		if (OptionShowStart != 0) {//表示範囲の上にまだオプションがあるとき↑のカーソル表示
-			DrawReverseGraph(cache, 92 + int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE, FALSE, TRUE);
-		}
+		////オプション欄の上下にカーソルを表示
+		////SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		//if (OptionShowEnd != option->OPTION_NUM - 1) {//表示範囲の下にまだオプションがあるとき↓のカーソル表示
+		//	DrawGraph(cache, 655 - int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE);
+		//}
+		//if (OptionShowStart != 0) {//表示範囲の上にまだオプションがあるとき↑のカーソル表示
+		//	DrawReverseGraph(cache, 92 + int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE, FALSE, TRUE);
+		//}
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 		optionListView.draw();
 

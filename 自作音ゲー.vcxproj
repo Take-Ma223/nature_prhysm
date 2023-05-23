@@ -211,6 +211,8 @@
     <ClCompile Include="DifficultyRadar.cpp" />
     <ClCompile Include="DxLibUtil.cpp" />
     <ClCompile Include="LearningDataGenarator.cpp" />
+    <ClCompile Include="NPTextView.cpp" />
+    <ClCompile Include="NPTextViewParam.cpp" />
     <ClCompile Include="NumberImageHandles.cpp" />
     <ClCompile Include="NumberViewFormat.cpp" />
     <ClCompile Include="ActionEvent.cpp" />
@@ -294,6 +296,8 @@
     <ClInclude Include="DifficultyRadar.h" />
     <ClInclude Include="DxLibUtil.h" />
     <ClInclude Include="LearningDataGenarator.h" />
+    <ClInclude Include="NPTextView.h" />
+    <ClInclude Include="NPTextViewParam.h" />
     <ClInclude Include="NumberImageHandles.h" />
     <ClInclude Include="NumberViewFormat.h" />
     <ClInclude Include="ActionEvent.h" />

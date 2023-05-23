@@ -83,7 +83,7 @@ void Drawable::drawWithProcessing()
 	action.process();
 
 	SetDrawMode(DX_DRAWMODE_ANISOTROPIC);
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.value);
+	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, alpha.value);
 	SetDrawBright(brightnessR.value, brightnessG.value, brightnessB.value);
 	if (visible.value && alpha.value != 0) {
 		DrawGraph(
@@ -92,6 +92,9 @@ void Drawable::drawWithProcessing()
 			handle.getHandle(),
 			TRUE);
 	}
+
+	//èÊéZçœÇ›ÉAÉãÉtÉ@Ç©ÇÁå≥Ç…ñﬂÇ∑
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha.value);
 }
 
 void Drawable::process()

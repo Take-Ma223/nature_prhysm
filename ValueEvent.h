@@ -8,7 +8,8 @@ enum ConvertMode {
 	HalfCosine,
 	QuarterSine,
 	QuarterCosine,
-	Exponential
+	Exponential,
+	ExponentialSlider
 };
 
 class Converter {

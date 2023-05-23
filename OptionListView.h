@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "NPTextView.h"
 
 using namespace std;
 
@@ -19,26 +20,34 @@ class OptionListView : public View
 
 	int selectingRow = 0;//ビューで選択しているオプションの番号
 
-	int rowDuration = 96;
+	const int rowDuration = 90;
+	const int rowCount = 19;//必ず奇数にする
+	const int rowCenter = rowCount / 2;
 
-	vector<unique_ptr<TextView>> detailText;
+	const int notSelectedFrameAlpha = 128;
+
+	const int optionNameY = -35;
 
 	wstring themeStr1;
 	wstring themeStr2;
 
 	unique_ptr<Image> backGround;
-	vector<unique_ptr<Image>> listFrame = vector<unique_ptr<Image>>(7);
-	vector<unique_ptr<TextView>> listOptionName = vector<unique_ptr<TextView>>(7);
-	vector<unique_ptr<TextView>> listItemName = vector<unique_ptr<TextView>>(7);
+	vector<unique_ptr<Image>> listFrame = vector<unique_ptr<Image>>(rowCount);
+	vector<unique_ptr<TextView>> listOptionName = vector<unique_ptr<TextView>>(rowCount);
+	vector<unique_ptr<NPTextView>> listItemName = vector<unique_ptr<NPTextView>>(rowCount);
 
-	FontInfo fontOptionName = FontInfo(wstring(L"メイリオ"), 17, 1, FontType::ANTIALIASING_EDGE_16X16);
-	FontInfo fontItemName = FontInfo(wstring(L"メイリオ"), 25, 4, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo fontOptionName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo fontItemName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
 
 	Option* option;
+
+	TransValue moveRatio;
 public:
 
 	OptionListView::OptionListView(Option* op, ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : View(c, param)
 	{
+		moveRatio = TransValue(c);
+
 		option = op;
 
 		makeScreen(Size(sizeX, sizeY));
@@ -51,26 +60,28 @@ public:
 		addDrawable(backGround.get());
 
 
-		for (int i = 0; i < 7; i++) {
-			int optionIndex = getIndex(i - 3, option->OPTION_NUM);
-
+		for (int i = 0; i < rowCount; i++) {
+			int optionIndex = getIndex(i - rowCenter, option->OPTION_NUM);
 			DrawableInitParam drawableParam = DrawableInitParam(Cordinate(160, getYPos(i)), CenterRatio(0.5, 0.5));
 			listFrame[i] = unique_ptr<Image>(new Image(c, c->getAsset()->img(L"img/option_banner.png"), drawableParam));
+			if (i != rowCenter)listFrame[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listFrame[i].get());
 		
 
 
 			TextViewParam textViewParam = TextViewParam(option->OptionName[optionIndex], fontOptionName, GetColor(255, 255, 255));
-			drawableParam = DrawableInitParam(Cordinate(50, getYPos(i) - 30), CenterRatio(0, 0.5));
+			drawableParam = DrawableInitParam(Cordinate(40, getYPos(i) + optionNameY), CenterRatio(0, 0.5));
 			listOptionName[i] = unique_ptr<TextView>(new TextView(this, context, textViewParam, drawableParam));
+			if (i != rowCenter)listOptionName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listOptionName[i].get());
 
 
-			textViewParam = TextViewParam(
+			NPTextViewParam itemNameTextViewParam = NPTextViewParam(
 				option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
-				fontItemName, GetColor(255, 255, 255));
+				fontItemName, GetColor(255, 255, 255), GetColor(0, 0, 0));
 			drawableParam = DrawableInitParam(Cordinate(162, getYPos(i)), CenterRatio(0.5, 0.5));
-			listItemName[i] = unique_ptr<TextView>(new TextView(this, context, textViewParam, drawableParam));
+			listItemName[i] = unique_ptr<NPTextView>(new NPTextView(this, context, itemNameTextViewParam, drawableParam));
+			if (i != rowCenter)listItemName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listItemName[i].get());
 
 
@@ -79,7 +90,7 @@ public:
 	}
 
 	int getYPos(int ind) {
-		return (ind - 3) * rowDuration + 360;
+		return (ind - rowCenter) * rowDuration + 360;
 	}
 
 	
@@ -98,8 +109,8 @@ public:
 	/// 今のオプション選択値で項目の更新
 	/// </summary>
 	void update(int selectingOption) {
-		for (int i = 0; i < 7; i++) {
-			int optionIndex = getIndex(i - 3 + selectingOption, option->OPTION_NUM);
+		for (int i = 0; i < rowCount; i++) {
+			int optionIndex = getIndex(i - rowCenter + selectingOption, option->OPTION_NUM);
 		
 			listOptionName[i].get()->setText(
 				TextViewParam(
@@ -108,18 +119,22 @@ public:
 			);
 
 			listItemName[i].get()->setText(
-				TextViewParam(
+				NPTextViewParam(
 					option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
-					fontItemName, GetColor(255, 255, 255))
+					fontItemName, GetColor(255, 255, 255), GetColor(0, 0, 0))
 			);
 		
 		}
 	}
 
-
-
 	virtual void beforeDrawProcess(int drawScreen) override {
+		moveRatio.process();
 
+		for (int i = 0; i < rowCount; i++) {
+			listFrame[i].get()->Y.value = getYPos(i) + moveRatio.value;
+			listOptionName[i].get()->Y.value = getYPos(i) + moveRatio.value + optionNameY;
+			listItemName[i].get()->Y.value = getYPos(i) + moveRatio.value;
+		}
 	};
 
 	/// <summary>
@@ -141,8 +156,29 @@ public:
 	}
 
 
+	void moveToSelectUp() {
+		move(true);
+	}
 
+	void moveToSelectDown() {
+		move(false);
+	}
 
+	void move(bool isUp) {
+		double expBase = 1.5;
+		int time = 600;
+		moveRatio.clearEvent();
+		if (isUp) moveRatio.value -= rowDuration;
+		else moveRatio.value += rowDuration;
+
+		//選択中のリストの中心からの離れ具合が大きい程早く動くように移動時間を決める
+		//double distance = (abs(moveRatio.value) / rowDuration);//1~3くらい 4で画面外にある
+		//time = time - distance*75;
+		//if (time <= 0)time = 1;
+
+		moveRatio.eChangeTo(Point(0), Converter(ExponentialSlider, expBase), 0, time);
+		moveRatio.play();
+	}
 
 
 

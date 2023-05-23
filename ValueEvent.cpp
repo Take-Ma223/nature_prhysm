@@ -123,6 +123,14 @@ void ValueEvent::determinValueFrom(int nowVal, BOOL isReverse)
 
 double ValueEvent::easing(double input) {
 	double output = 0;
+
+	double startExpY = 1;
+	double endExpY = 4;
+	double base = converter.getParamA();
+
+	if (input <= 0)return 0;
+	else if (input >= 1)return 1;
+
 	switch (converter.getMode()) {
 	case ConvertMode::Teleportation:
 		if (input < 1) {
@@ -146,9 +154,6 @@ double ValueEvent::easing(double input) {
 		break;
 	case ConvertMode::Exponential:
 		output = 0;
-		double startExpY = 1;
-		double endExpY = 4;
-		double base = converter.getParamA();
 
 		if (base == 1 || base <= 0) {
 			output = input;
@@ -162,6 +167,37 @@ double ValueEvent::easing(double input) {
 			startExpY = 0;
 			endExpY = 1 - pow(base, 1);
 			output = (1 - pow(base, input)) / endExpY;
+		}
+		break;
+	case ConvertMode::ExponentialSlider:
+		output = 0;
+
+		auto expSliderFunc = [&base](double x) {
+			if (x <= 0) {
+				return 0.0;
+			}else if (x <= 0.5) {
+				return pow(base, x) - 1;
+			}
+			else if (x < 1) {
+				return -pow(base, -x + 1) + 2 * (pow(base, 0.5)) - 1;
+			}
+			else {
+				return -pow(base, -1 + 1) + 2 * (pow(base, 0.5)) - 1;
+			}
+		};
+
+		if (base == 1 || base <= 0) {
+			output = input;
+		}
+		else if (base > 1) {
+			startExpY = 0;
+			endExpY = expSliderFunc(1);
+			output = expSliderFunc(input) / endExpY;
+		}
+		else if (base < 1) {
+			startExpY = 0;
+			endExpY = -expSliderFunc(1);
+			output = -expSliderFunc(input) / endExpY;
 		}
 		break;
 	}

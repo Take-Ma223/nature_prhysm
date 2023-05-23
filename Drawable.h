@@ -105,6 +105,10 @@ public:
 	// Processable ‚ğ‰î‚µ‚ÄŒp³‚³‚ê‚Ü‚µ‚½
 	virtual void process() override;
 
+	Size getSize() {
+		return handle.getSize();
+	}
+
 protected:
 	ActivityContext* context = NULL;
 

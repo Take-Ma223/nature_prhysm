@@ -15,37 +15,10 @@ using namespace std;
 /// </summary>
 class OptionListView : public View
 {
-	int sizeX = 320;
-	int sizeY = 720;
-
-	int selectingRow = 0;//ビューで選択しているオプションの番号
-
-	const int rowDuration = 90;
-	const int rowCount = 19;//必ず奇数にする
-	const int rowCenter = rowCount / 2;
-
-	const int notSelectedFrameAlpha = 128;
-
-	const int optionNameY = -35;
-
-	wstring themeStr1;
-	wstring themeStr2;
-
-	unique_ptr<Image> backGround;
-	vector<unique_ptr<Image>> listFrame = vector<unique_ptr<Image>>(rowCount);
-	vector<unique_ptr<TextView>> listOptionName = vector<unique_ptr<TextView>>(rowCount);
-	vector<unique_ptr<NPTextView>> listItemName = vector<unique_ptr<NPTextView>>(rowCount);
-
-	FontInfo fontOptionName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
-	FontInfo fontItemName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
-
-	Option* option;
-
-	TransValue moveRatio;
 public:
-
 	OptionListView::OptionListView(Option* op, ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : View(c, param)
 	{
+		initXAnimation();
 		moveRatio = TransValue(c);
 
 		option = op;
@@ -89,26 +62,14 @@ public:
 
 	}
 
-	int getYPos(int ind) {
-		return (ind - rowCenter) * rowDuration + 360;
-	}
-
 	
-	int getIndex(int ind, int indexLength) {
-		int result = ind;
-		while (result < 0) {
-			result += indexLength;
-		}
-		while (result >= indexLength) {
-			result -= indexLength;
-		}
-		return result;
-	}
 
 	/// <summary>
 	/// 今のオプション選択値で項目の更新
 	/// </summary>
-	void update(int selectingOption) {
+	void updateListView(int select) {
+		selectingOption = select;
+
 		for (int i = 0; i < rowCount; i++) {
 			int optionIndex = getIndex(i - rowCenter + selectingOption, option->OPTION_NUM);
 		
@@ -125,34 +86,29 @@ public:
 			);
 		
 		}
+
+		updateSkillTestModeView();
+
 	}
 
-	virtual void beforeDrawProcess(int drawScreen) override {
-		moveRatio.process();
+	void setSkillTestMode(bool isTrue) {
+		isSkillTestMode = isTrue;
+		updateSkillTestModeView();
+	}
 
-		for (int i = 0; i < rowCount; i++) {
-			listFrame[i].get()->Y.value = getYPos(i) + moveRatio.value;
-			listOptionName[i].get()->Y.value = getYPos(i) + moveRatio.value + optionNameY;
-			listItemName[i].get()->Y.value = getYPos(i) + moveRatio.value;
-		}
-	};
 
 	/// <summary>
 	/// 表示
 	/// </summary>
 	void show() {
-		alpha.clearEvent();
-		alpha.eChange(Point(0), Point(255), Converter(Linear), 0, 900);
-		alpha.play();
+		X.setReverse(false);
 	}
 
 	/// <summary>
 	/// 非表示
 	/// </summary>
 	void hide() {
-		alpha.clearEvent();
-		alpha.eChange(Point(255), Point(0), Converter(Linear), 0, 900);
-		alpha.play();
+		X.setReverse(true);
 	}
 
 
@@ -164,17 +120,122 @@ public:
 		move(false);
 	}
 
+	
+
+private:
+	int sizeX = 320;
+	int sizeY = 720;
+
+	int selectingRow = 0;//ビューで選択しているオプションの番号
+
+	const int rowDuration = 90;
+	const int rowCount = 19;//必ず奇数にする
+	const int rowCenter = rowCount / 2;
+
+	const int notSelectedFrameAlpha = 128;
+
+
+	const int optionNameY = -35;
+
+	bool isSkillTestMode = false;
+	const int defaultBrightness = 255;
+	const int skillTestModeNotAvailableFrameBrightness = 128;
+
+	wstring themeStr1;
+	wstring themeStr2;
+
+	unique_ptr<Image> backGround;
+	vector<unique_ptr<Image>> listFrame = vector<unique_ptr<Image>>(rowCount);
+	vector<unique_ptr<TextView>> listOptionName = vector<unique_ptr<TextView>>(rowCount);
+	vector<unique_ptr<NPTextView>> listItemName = vector<unique_ptr<NPTextView>>(rowCount);
+
+	FontInfo fontOptionName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo fontItemName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
+
+	Option* option;
+
+	TransValue moveRatio;
+
+	int selectingOption = 0;
+
+
+	int getYPos(int ind) {
+		return (ind - rowCenter) * rowDuration + 360;
+	}
+
+
+	int getIndex(int ind, int indexLength) {
+		int result = ind;
+		while (result < 0) {
+			result += indexLength;
+		}
+		while (result >= indexLength) {
+			result -= indexLength;
+		}
+		return result;
+	}
+
+
+	void updateSkillTestModeView() {
+		for (int i = 0; i < rowCount; i++) {
+			int optionIndex = getIndex(i - rowCenter + selectingOption, option->OPTION_NUM);
+
+			if (!isSkillTestMode) {
+				setBrightnessList(i, defaultBrightness);
+				continue;
+			}
+
+			bool isGauge = optionIndex == (int)OptionItem::Name::GAUGE;
+			bool isLaneRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::RANDOM);
+			bool isLaneSuperRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::SUPER_RAND);
+			bool isColor = optionIndex == (int)OptionItem::Name::COLOR;
+			bool isAvailable = !isGauge && !isLaneRandom && !isLaneSuperRandom && !isColor;
+
+			if (isAvailable) {
+				setBrightnessList(i, defaultBrightness);
+				continue;
+			}
+			setBrightnessList(i, skillTestModeNotAvailableFrameBrightness);
+		}
+	}
+
+	void setBrightnessList(int row, int brightness) {
+		listFrame[row].get()->brightnessR.value = brightness;
+		listFrame[row].get()->brightnessG.value = brightness;
+		listFrame[row].get()->brightnessB.value = brightness;
+
+		listItemName[row].get()->brightnessR.value = brightness;
+		listItemName[row].get()->brightnessG.value = brightness;
+		listItemName[row].get()->brightnessB.value = brightness;
+	}
+
+
+	virtual void beforeDrawProcess(int drawScreen) override {
+		moveRatio.process();
+
+		for (int i = 0; i < rowCount; i++) {
+			listFrame[i].get()->Y.value = getYPos(i) + moveRatio.value;
+			listOptionName[i].get()->Y.value = getYPos(i) + moveRatio.value + optionNameY;
+			listItemName[i].get()->Y.value = getYPos(i) + moveRatio.value;
+		}
+	};
+
+
+	void initXAnimation() {
+		X.clearEvent();
+		X.eChange(Point(-320), Point(0), Converter(QuarterSine), 0, 350);
+		X.setReverse(true);
+		X.play();
+
+	}
+
+
 	void move(bool isUp) {
-		double expBase = 1.5;
-		int time = 600;
+		double expBase = 2;
+		int time = 300;
 		moveRatio.clearEvent();
 		if (isUp) moveRatio.value -= rowDuration;
 		else moveRatio.value += rowDuration;
-
-		//選択中のリストの中心からの離れ具合が大きい程早く動くように移動時間を決める
-		//double distance = (abs(moveRatio.value) / rowDuration);//1~3くらい 4で画面外にある
-		//time = time - distance*75;
-		//if (time <= 0)time = 1;
 
 		moveRatio.eChangeTo(Point(0), Converter(ExponentialSlider, expBase), 0, time);
 		moveRatio.play();

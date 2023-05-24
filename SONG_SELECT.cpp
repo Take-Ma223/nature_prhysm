@@ -311,7 +311,7 @@ void SONG_SELECT(int *l_n,
 	Des1_width = GetDrawStringWidth(Des1, wcslen(Des1));
 	Des2_width = GetDrawStringWidth(Des2, wcslen(Des2));
 
-	DrawableInitParam optionListParam = DrawableInitParam(Cordinate(0, 0));
+	DrawableInitParam optionListParam = DrawableInitParam(Cordinate(-320, 0));
 	OptionListView optionListView(option, &context, optionListParam);
 
 
@@ -1297,7 +1297,7 @@ void SONG_SELECT(int *l_n,
 		}
 	}
 
-	
+	if (SelectingTarget == SELECTING_COURSE)optionListView.setSkillTestMode(true);
 
 	GAME_start_time = GetNowCount_d(config);
 	int Announse_show_time_base = GetNowCount() + 1500;//アナウンス表示の基準時間
@@ -1395,11 +1395,13 @@ void SONG_SELECT(int *l_n,
 			//オプション画面ONOFF処理(この処理を行ったフレームでは他の操作を受け付けない)
 			if (OptionOpen == 0 && (Key[Button[0][0]] == 1 || Key[Button[2][0]] == 1)) {//オプション画面ON
 				OptionOpen = 1;//オプション選択モードにする
+				optionListView.show();
 				PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);
 				time_base_str = int(GetNowCount_d(config));
 			}
 			else if (OptionOpen == 1 && (Key[Button[0][0]] == 1 || Key[Button[2][0]] == 1 || Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1)) {//オプション画面OFF
 				OptionOpen = 0;//選曲モードにする
+				optionListView.hide();
 				PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);
 				time_base_str = int(GetNowCount_d(config));
 			}
@@ -1630,6 +1632,7 @@ void SONG_SELECT(int *l_n,
 						SelectingTarget = SELECTING_FOLDER;
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						widthCalcFlag = 1;
+						optionListView.setSkillTestMode(false);
 					}
 					else {
 						if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
@@ -1683,6 +1686,7 @@ void SONG_SELECT(int *l_n,
 								SelectingTarget = SELECTING_FOLDER;
 								widthCalcFlag = 1;
 								Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
+								optionListView.setSkillTestMode(false);
 							}
 						}
 					}
@@ -1783,6 +1787,7 @@ void SONG_SELECT(int *l_n,
 								list_number = 0;//コース選択番号を0に song_numberは初期化必要無し
 								list_number_base = list_number;
 								SelectingTarget = SELECTING_COURSE;
+								optionListView.setSkillTestMode(true);
 
 							}
 
@@ -1818,7 +1823,7 @@ void SONG_SELECT(int *l_n,
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						time_base_str = int(GetNowCount_d(config));
 
-						optionListView.update(option_select);
+						optionListView.updateListView(option_select);
 						optionListView.moveToSelectUp();
 					}
 					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
@@ -1838,7 +1843,7 @@ void SONG_SELECT(int *l_n,
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						time_base_str = int(GetNowCount_d(config));
 
-						optionListView.update(option_select);
+						optionListView.updateListView(option_select);
 						optionListView.moveToSelectDown();
 					}
 
@@ -1883,7 +1888,7 @@ void SONG_SELECT(int *l_n,
 							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 						}
 
-						optionListView.update(option_select);
+						optionListView.updateListView(option_select);
 					}
 
 					if (Key[Button[1][0]] > PressFrame || Key[KEY_INPUT_LEFT] > PressFrame) {//押し続けたとき
@@ -1930,7 +1935,7 @@ void SONG_SELECT(int *l_n,
 							}
 						}
 
-						optionListView.update(option_select);
+						optionListView.updateListView(option_select);
 					}
 
 					if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
@@ -1974,7 +1979,7 @@ void SONG_SELECT(int *l_n,
 							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 						}
 
-						optionListView.update(option_select);
+						optionListView.updateListView(option_select);
 					}
 
 
@@ -2022,7 +2027,7 @@ void SONG_SELECT(int *l_n,
 							}
 						}
 
-						optionListView.update(option_select);
+						optionListView.updateListView(option_select);
 					}
 				}
 

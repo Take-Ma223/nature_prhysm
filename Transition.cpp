@@ -37,23 +37,23 @@ int Transition::getLastIndex(){
 void Transition::play()
 {
 	if (!transition.empty()) {
-		if (!isReverse) {
-			playStartTime = 0;
+		if (isReverse) {
+			playStartTime = transition.back()->getEndTime();
 			playedTimeOfCaller = getNowTime();
 			Transition::isPlay = TRUE;
 			durationOffset = 0;
-			eventIndex = 0;
+			eventIndex = getLastIndex();
 
 			onPlay(isReverse);
 			//transition[eventIndex].determinValueFrom(value, isReverse);
 			//transition[eventIndex].handler();
 		}
 		else {
-			playStartTime = transition.back()->getEndTime();
+			playStartTime = 0;
 			playedTimeOfCaller = getNowTime();
 			Transition::isPlay = TRUE;
 			durationOffset = 0;
-			eventIndex = getLastIndex();
+			eventIndex = 0;
 
 			onPlay(isReverse);
 			//transition[eventIndex].determinValueFrom(value, isReverse);

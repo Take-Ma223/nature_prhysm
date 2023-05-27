@@ -82,7 +82,7 @@ void Drawable::drawWithProcessing()
 	alpha.process();
 	action.process();
 
-	SetDrawMode(DX_DRAWMODE_ANISOTROPIC);
+	SetDrawMode(DX_DRAWMODE_BILINEAR);
 	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, alpha.value);
 	SetDrawBright(brightnessR.value, brightnessG.value, brightnessB.value);
 	if (visible.value && alpha.value != 0) {

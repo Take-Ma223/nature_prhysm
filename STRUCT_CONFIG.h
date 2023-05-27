@@ -30,6 +30,7 @@ typedef struct Config {//コンフィグデータ
 	int WasapiExclusive = 0;
 	int AsioDriver = 0;
 	int Buffer = 256;
+	int ComPort = 0;
 
 } Config;
 

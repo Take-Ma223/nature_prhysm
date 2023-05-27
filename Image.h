@@ -29,6 +29,14 @@ public:
 		//DeleteGraph(handle.getHandle());
 	}
 
+	/// <summary>
+	/// ‰æ‘œ‚ğ•ÏX‚·‚é
+	/// </summary>
+	/// <param name="handle">‰æ‘œƒnƒ“ƒhƒ‹</param>
+	void setImage(ImageHandle handle) {
+		Drawable::handle = handle;
+	}
+
 	void draw() override;
 	void draw(int drawScreen) override;
 };

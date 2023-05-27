@@ -61,7 +61,7 @@ void GAME(int song_number, int difficulty,
 
 
 	HANDLE hComm, hEvent;
-	setupSerial(&hComm);//シリアル通信設定
+	setupSerial(&hComm, config);//シリアル通信設定
 	STATE LED_state;
 	OVERLAPPED ovl;
 	DWORD dwWritten;
@@ -1599,8 +1599,11 @@ void GAME(int song_number, int difficulty,
 
 
 			if (Key[KEY_INPUT_F2] == 1) {//譜面再読み込み
+				int startTime = GetNowCount_d(config);
+
 				debug_warp = 1;
 				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 				Music[song_number].hash[difficulty] = hash;
 				res->hash = hash;//ハッシュ値を格納
 				score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1620,10 +1623,10 @@ void GAME(int song_number, int difficulty,
 				if (gauge_dec <= gauge_dec_MIN)gauge_dec = gauge_dec_MIN;
 				cbpm = Music[song_number].bpm[difficulty];//最初のBPM
 
-				initVariableProcess();
 				isMoviePlaying = 0;
 				PauseMovieToGraph(MovieGraphHandle);
-				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
+				if (debug_stop == 1)debug_stop_time += GetNowCount_d(config) - startTime;
+				initVariableProcess();
 			}
 
 			if (Key[KEY_INPUT_F3] == 1) {//叩いた音を鳴らさない
@@ -1693,13 +1696,16 @@ void GAME(int song_number, int difficulty,
 					&measure_start_step,
 					&SwingBackBeatTime,
 					AC, config, SH_SONG);
-	
+
 				debug_time_passed = debug_time_passed_in_EDIT_SCORE / pitch;//今の再生速度での時間に戻す
 				debug_stop_time = GetNowCount_d(config) - debug_stoped_time;//debug_stop_timeの更新ができていなかったのでする
+				int startTime = GetNowCount_d(config);
 
 				//譜面再読み込み
 				debug_warp = 1;
 				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
+
 				Music[song_number].hash[difficulty] = hash;
 				res->hash = hash;//ハッシュ値を格納
 				score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1719,11 +1725,11 @@ void GAME(int song_number, int difficulty,
 				if (gauge_dec <= gauge_dec_MIN)gauge_dec = gauge_dec_MIN;
 				cbpm = Music[song_number].bpm[difficulty];//最初のBPM
 
+				debug_stop_time += GetNowCount_d(config) - startTime;
 				initVariableProcess();
 				LOOP_passed_time = ((double)GetNowCount_d(config) - GAME_start_time) - time_cash;//1ループにかかった時間を算出
 				time_cash = ((double)GetNowCount_d(config) - GAME_start_time);
 				GAME_passed_time_scroll = (sc_timing + ((GAME_passed_time_for_draw - stop_time - stop_time_sum) - real_timing)*(cscroll));
-				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 			}
 		}
 		//scrollchangeのインクリメント

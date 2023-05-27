@@ -494,18 +494,18 @@ void GAME_LOAD(int song_number,
 
 		}
 		if (wcscmp(L"#SONGOFFSET", sharp1) == 0) {
-			Music[song_number].songoffset[difficulty] = int((double)_wtoi(sharp2)/pitch);
+			Music[song_number].songoffset[difficulty] = int((double)_wtoi(sharp2)/pitch) + 17;
 			//printfDx(L"%f\n", Music[song_number].songoffset[difficulty]);
 
 		}
 		if (wcscmp(L"#NOTEOFFSET", sharp1) == 0) {
-			Music[song_number].noteoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + Option->noteOffsetVal[Option->op.noteOffset];
+			Music[song_number].noteoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + 17 + Option->noteOffsetVal[Option->op.noteOffset];
 			note_offset_scroll = Music[song_number].noteoffset[difficulty] * scroll;//表示用オフセット
 			//printfDx(L"%f\n", Music[song_number].noteoffset[difficulty]);
 
 		}
 		if (wcscmp(L"#MOVIEOFFSET", sharp1) == 0) {
-			Music[song_number].movieoffset[difficulty] = int((double)_wtoi(sharp2) / pitch);
+			Music[song_number].movieoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + 17;
 			//printfDx(L"%f\n", Music[song_number].songoffset[difficulty]);
 
 		}

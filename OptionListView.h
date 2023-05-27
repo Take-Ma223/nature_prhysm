@@ -16,8 +16,9 @@ using namespace std;
 class OptionListView : public View
 {
 public:
-	OptionListView::OptionListView(Option* op, ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : View(c, param)
+	OptionListView::OptionListView(Option* op, ActivityContext* context, DrawableInitParam param = DrawableInitParam()) : View(context, param)
 	{
+		c = context;
 		initXAnimation();
 		moveRatio = TransValue(c);
 
@@ -36,15 +37,16 @@ public:
 		for (int i = 0; i < rowCount; i++) {
 			int optionIndex = getIndex(i - rowCenter, option->OPTION_NUM);
 			DrawableInitParam drawableParam = DrawableInitParam(Cordinate(160, getYPos(i)), CenterRatio(0.5, 0.5));
-			listFrame[i] = unique_ptr<Image>(new Image(c, c->getAsset()->img(L"img/option_banner.png"), drawableParam));
+			listFrame[i] = unique_ptr<Image>(new Image(c, c->getAsset()->img(L"img/option_banner/green.png"), drawableParam));
 			if (i != rowCenter)listFrame[i].get()->alpha.value = notSelectedFrameAlpha;
+			updateFrame(i, optionIndex);
 			addDrawable(listFrame[i].get());
 		
 
 
 			TextViewParam textViewParam = TextViewParam(option->OptionName[optionIndex], fontOptionName, GetColor(255, 255, 255));
 			drawableParam = DrawableInitParam(Cordinate(40, getYPos(i) + optionNameY), CenterRatio(0, 0.5));
-			listOptionName[i] = unique_ptr<TextView>(new TextView(this, context, textViewParam, drawableParam));
+			listOptionName[i] = unique_ptr<TextView>(new TextView(this, c, textViewParam, drawableParam));
 			if (i != rowCenter)listOptionName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listOptionName[i].get());
 
@@ -72,7 +74,9 @@ public:
 
 		for (int i = 0; i < rowCount; i++) {
 			int optionIndex = getIndex(i - rowCenter + selectingOption, option->OPTION_NUM);
-		
+
+			updateFrame(i, optionIndex);
+
 			listOptionName[i].get()->setText(
 				TextViewParam(
 					option->OptionName[optionIndex],
@@ -90,6 +94,8 @@ public:
 		updateSkillTestModeView();
 
 	}
+
+
 
 	void setSkillTestMode(bool isTrue) {
 		isSkillTestMode = isTrue;
@@ -120,26 +126,33 @@ public:
 		move(false);
 	}
 
-	
+	void setCoverImage() {
+		themeStr1 = wstring(L"img/themes/");
+		themeStr2 = wstring(option->theme[option->op.theme]);
+		backGround.get()->setImage(c->getAsset()->img((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str()));
+	}
 
 private:
-	int sizeX = 320;
-	int sizeY = 720;
+	ActivityContext* c;
+
+	static const int sizeX = 320;
+	static const int sizeY = 720;
 
 	int selectingRow = 0;//ビューで選択しているオプションの番号
 
-	const int rowDuration = 90;
-	const int rowCount = 19;//必ず奇数にする
-	const int rowCenter = rowCount / 2;
+	static const int rowDuration = 90;
+	static const int rowCount = 19;//必ず奇数にする
+	static const int rowCenter = rowCount / 2;
 
-	const int notSelectedFrameAlpha = 128;
+	static const int selectedFrameAlpha = 255;
+	static const int notSelectedFrameAlpha = 128;
 
 
-	const int optionNameY = -35;
+	static const int optionNameY = -35;
 
 	bool isSkillTestMode = false;
-	const int defaultBrightness = 255;
-	const int skillTestModeNotAvailableFrameBrightness = 128;
+	static const int defaultBrightness = 255;
+	static const int skillTestModeNotAvailableFrameBrightness = 128;
 
 	wstring themeStr1;
 	wstring themeStr2;
@@ -175,6 +188,22 @@ private:
 		return result;
 	}
 
+	void updateFrame(int row, int optionIndex)
+	{
+		std::unordered_map<OptionItem::BannerColor, std::wstring> mapping = {
+			{OptionItem::BannerColor::RED,wstring(L"img/option_banner/red.png")},
+			{OptionItem::BannerColor::GREEN,wstring(L"img/option_banner/green.png")},
+			{OptionItem::BannerColor::BLUE,wstring(L"img/option_banner/blue.png")},
+			{OptionItem::BannerColor::CYAN,wstring(L"img/option_banner/cyan.png")},
+			{OptionItem::BannerColor::MAGENTA,wstring(L"img/option_banner/magenta.png")},
+			{OptionItem::BannerColor::YELLOW,wstring(L"img/option_banner/yellow.png")},
+			{OptionItem::BannerColor::WHITE,wstring(L"img/option_banner/white.png")},
+			{OptionItem::BannerColor::BLACK,wstring(L"img/option_banner/black.png")},
+		};
+
+		listFrame[row].get()->setImage(c->getAsset()->img(mapping[option->bannerColor[optionIndex]].c_str()));
+
+	}
 
 	void updateSkillTestModeView() {
 		for (int i = 0; i < rowCount; i++) {
@@ -239,7 +268,29 @@ private:
 
 		moveRatio.eChangeTo(Point(0), Converter(ExponentialSlider, expBase), 0, time);
 		moveRatio.play();
+
+		int next = isUp ? 1 : -1;
+		listFrame[rowCenter].get()->alpha.eChange(Point(notSelectedFrameAlpha), Point(selectedFrameAlpha), Converter(Linear), 0, 100);
+		listOptionName[rowCenter].get()->alpha.eChange(Point(notSelectedFrameAlpha), Point(selectedFrameAlpha), Converter(Linear), 0, 100);
+		listItemName[rowCenter].get()->alpha.eChange(Point(notSelectedFrameAlpha), Point(selectedFrameAlpha), Converter(Linear), 0, 100);
+
+		listFrame[rowCenter].get()->alpha.play();
+		listOptionName[rowCenter].get()->alpha.play();
+		listItemName[rowCenter].get()->alpha.play();
+
+		int centerAlphaValue = listFrame[rowCenter].get()->alpha.value;
+
+		listFrame[rowCenter + next].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, 100);
+		listOptionName[rowCenter + next].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, 100);
+		listItemName[rowCenter + next].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, 100);
+
+		listFrame[rowCenter + next].get()->alpha.play();
+		listOptionName[rowCenter + next].get()->alpha.play();
+		listItemName[rowCenter + next].get()->alpha.play();
+
 	}
+
+
 
 
 

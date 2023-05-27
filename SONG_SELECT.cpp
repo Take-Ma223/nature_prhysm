@@ -1806,29 +1806,10 @@ void SONG_SELECT(int *l_n,
 				}
 
 				if (OptionOpen == 1) {//オプション選択画面の時
-					if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
-						option_select--;
+					auto changeRow = [&](bool isSelectUp) {
+						if (isSelectUp)option_select--;
+						else option_select++;
 						option_select = number_ring((int)option_select, option->OPTION_NUM - 1);//OPTION_NUM収める
-						DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
-
-						if (option_select > OptionShowEnd) {
-							OptionShowEnd = option_select;
-							OptionShowStart = option_select - (OptionShowAmount - 1);
-						}
-						else if(option_select < OptionShowStart){
-							OptionShowEnd = option_select + (OptionShowAmount - 1);
-							OptionShowStart = option_select;
-						}
-
-						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
-						time_base_str = int(GetNowCount_d(config));
-
-						optionListView.updateListView(option_select);
-						optionListView.moveToSelectUp();
-					}
-					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
-						option_select++;
-						option_select = number_ring(option_select, option->OPTION_NUM - 1);//0~3に収める
 						DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
 
 						if (option_select > OptionShowEnd) {
@@ -1844,103 +1825,46 @@ void SONG_SELECT(int *l_n,
 						time_base_str = int(GetNowCount_d(config));
 
 						optionListView.updateListView(option_select);
-						optionListView.moveToSelectDown();
+						if (isSelectUp)optionListView.moveToSelectUp();
+						else optionListView.moveToSelectDown();
+						
+					};
+
+					if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+						changeRow(true);
 					}
-
-					if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
-						time_base_str = int(GetNowCount_d(config));
-						OptionValueChange(option, option_select, -1);
-						DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
-						if(option_select != (int)OptionItem::Name::HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
-
-						if (option_select == (int)OptionItem::Name::COLOR || option_select == (int)OptionItem::Name::SORT) {
-							//元のlist_numberと同じ番号を指すlist_number_baseを探す
-							int now_list_number = list_number;
-							for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-								if (now_list_number == SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][SearchListNumberBase].index) {
-									list_number_base = SearchListNumberBase;
-								}
-							}
-							widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
-						}
-
-						if (option_select == (int)OptionItem::Name::NOTE) {
-							sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
-							H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
-							sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[8]);
-							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
-						}
-						if (option_select == (int)OptionItem::Name::HITSOUND) {
-							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
-							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
-							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
-						}
-						if (option_select == (int)OptionItem::Name::THEME) {
-							wstring themeStr1(L"img/themes/");
-							wstring themeStr2(option->theme[option->op.theme]);
-							H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
-							H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
-							H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
-							H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
-							H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
-							H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
-							H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
-							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
-						}
-
-						optionListView.updateListView(option_select);
-					}
-
-					if (Key[Button[1][0]] > PressFrame || Key[KEY_INPUT_LEFT] > PressFrame) {//押し続けたとき
+					if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] > PressFrame) {
 						if (roll_counter == 0) {
-							time_base_str = int(GetNowCount_d(config));
-							OptionValueChange(option, option_select, -1);
-							DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
-							if (option_select != (int)OptionItem::Name::HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+							changeRow(true);
 							roll_counter = 1;
-
-							if (option_select == (int)OptionItem::Name::COLOR || option_select == (int)OptionItem::Name::SORT) {
-								//元のlist_numberと同じ番号を指すlist_number_baseを探す
-								int now_list_number = list_number;
-								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-									if (now_list_number == SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][SearchListNumberBase].index) {
-										list_number_base = SearchListNumberBase;
-									}
-								}
-								widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
-							}
-
-							if (option_select == (int)OptionItem::Name::NOTE) {
-								sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
-								H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
-								sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[8]);
-								H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
-							}
-							if (option_select == (int)OptionItem::Name::HITSOUND) {
-								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
-								SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
-								PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
-							}
-							if (option_select == (int)OptionItem::Name::THEME) {
-								wstring themeStr1(L"img/themes/");
-								wstring themeStr2(option->theme[option->op.theme]);
-								H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
-								H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
-								H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
-								H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
-								H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
-								H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
-								H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
-								H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
-							}
 						}
-
-						optionListView.updateListView(option_select);
+					}
+					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+						changeRow(false);
+					}
+					if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] > PressFrame) {
+						if (roll_counter == 0) {
+							changeRow(false);
+							roll_counter = 1;
+						}
 					}
 
-					if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
+					//メモリ解放
+					auto deleteCoverImage = [&]() {
+						DeleteGraph(H_BG);
+						DeleteGraph(H_BG);
+						DeleteGraph(H_COVER[1]);
+						DeleteGraph(H_COVER[2]);
+						DeleteGraph(H_COVER[3]);
+						DeleteGraph(H_COVER[4]);
+						DeleteGraph(H_COVER_SKILL_TEST);
+						DeleteGraph(H_COVER_OPTION);
+						DeleteGraph(H_COVER_MIDDLE);
+					};
+
+					auto changeOption = [&](int indexStep) {
 						time_base_str = int(GetNowCount_d(config));
-						OptionValueChange(option, option_select, 1);
+						OptionValueChange(option, option_select, indexStep);
 						DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
 						if (option_select != (int)OptionItem::Name::HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 
@@ -1956,17 +1880,21 @@ void SONG_SELECT(int *l_n,
 						}
 
 						if (option_select == (int)OptionItem::Name::NOTE) {
+							DeleteGraph(H_OPTION_NOTE_PREVIEW[0]);
+							DeleteGraph(H_OPTION_NOTE_PREVIEW[1]);
 							sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
 							H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
 							sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[8]);
 							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 						}
 						if (option_select == (int)OptionItem::Name::HITSOUND) {
+							DeleteSoundMem(SH_OPTION_HITSOUND_PREVIEW);
 							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
 							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
 							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
 						}
 						if (option_select == (int)OptionItem::Name::THEME) {
+							deleteCoverImage();
 							wstring themeStr1(L"img/themes/");
 							wstring themeStr2(option->theme[option->op.theme]);
 							H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
@@ -1977,57 +1905,34 @@ void SONG_SELECT(int *l_n,
 							H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
 							H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
 							H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+							optionListView.setCoverImage();
 						}
 
 						optionListView.updateListView(option_select);
+					};
+
+
+					if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
+						changeOption(-1);
+					}
+
+					if (Key[Button[1][0]] > PressFrame || Key[KEY_INPUT_LEFT] > PressFrame) {//押し続けたとき
+						if (roll_counter == 0) {
+							changeOption(-1);
+							roll_counter = 1;
+						}
+					}
+
+					if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
+						changeOption(1);
 					}
 
 
 					if (Key[Button[1][3]] > PressFrame || Key[KEY_INPUT_RIGHT] > PressFrame) {//押し続けたとき
 						if (roll_counter == 0) {
-							time_base_str = int(GetNowCount_d(config));
-							OptionValueChange(option, option_select, 1);
-							DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
-							if (option_select != (int)OptionItem::Name::HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+							changeOption(1);
 							roll_counter = 1;
-
-							if (option_select == (int)OptionItem::Name::COLOR || option_select == (int)OptionItem::Name::SORT) {
-								//元のlist_numberと同じ番号を指すlist_number_baseを探す
-								int now_list_number = list_number;
-								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-									if (now_list_number == SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][SearchListNumberBase].index) {
-										list_number_base = SearchListNumberBase;
-									}
-								}
-								widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
-							}
-
-							if (option_select == (int)OptionItem::Name::NOTE) {
-								sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
-								H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
-								sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[8]);
-								H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
-							}
-							if (option_select == (int)OptionItem::Name::HITSOUND) {
-								sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
-								SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
-								PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
-							}
-							if (option_select == (int)OptionItem::Name::THEME) {
-								wstring themeStr1(L"img/themes/");
-								wstring themeStr2(option->theme[option->op.theme]);
-								H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
-								H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
-								H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
-								H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
-								H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
-								H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
-								H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
-								H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
-							}
 						}
-
-						optionListView.updateListView(option_select);
 					}
 				}
 

@@ -31,10 +31,12 @@ std::vector<ImageHandle> ImageSet::getImageHandles(std::wstring path, int allNum
 }
 
 void ImageSet::registImage(std::wstring path) {
+	SetUsePremulAlphaConvertLoad(true);//乗算済みアルファ画像として読み込む
 	int handle = LoadGraph(path.c_str());
 	if (handle == -1) {
 		throw std::runtime_error("画像ファイルの読み込みに失敗しました");
 	}
+	SetUsePremulAlphaConvertLoad(false);//元に戻しておく
 
 	int x, y;
 	GetGraphSize(handle, &x, &y);
@@ -42,10 +44,12 @@ void ImageSet::registImage(std::wstring path) {
 }
 
 void ImageSet::registImages(std::wstring path, int allNum, int XNum, int YNum, int XSize, int YSize) {
+	SetUsePremulAlphaConvertLoad(true);//乗算済みアルファ画像として読み込む
 	std::vector<int> handles(allNum);
 	if (LoadDivGraph(path.c_str(), allNum, XNum, YNum, XSize, YSize, &handles[0]) == -1) {
 		throw std::runtime_error("画像ファイルの読み込みに失敗しました");
 	}
+	SetUsePremulAlphaConvertLoad(false);//元に戻しておく
 
 	std::vector<ImageHandle> singleScreens;
 	int x, y;

@@ -148,6 +148,17 @@ namespace OptionItem {
 		ON_NORMAL,
 		ON_CLEAR,
 	};
+
+	enum class BannerColor : int {
+		RED,
+		GREEN,
+		BLUE,
+		CYAN,
+		MAGENTA,
+		YELLOW,
+		WHITE,
+		BLACK
+	};
 }
 
 typedef struct OP {//オプション構造体(ロード時に渡す値)
@@ -180,6 +191,31 @@ typedef struct Option {//オプション構造体(全体)
 	static const int OPTION_NUM = 18;//オプションの数
 
 	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"WINDBREAK",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"NOTE",L"HIT SOUND",L"MOVIE",L"SORT"};
+
+	OptionItem::BannerColor bannerColor[OPTION_NUM] = {
+		OptionItem::BannerColor::GREEN,
+		OptionItem::BannerColor::GREEN,
+		OptionItem::BannerColor::GREEN,
+		OptionItem::BannerColor::GREEN,
+
+		OptionItem::BannerColor::BLUE,
+		OptionItem::BannerColor::BLUE,
+		OptionItem::BannerColor::BLUE,
+		OptionItem::BannerColor::BLUE,
+		OptionItem::BannerColor::BLUE,
+		OptionItem::BannerColor::BLUE,
+
+		OptionItem::BannerColor::RED,
+		OptionItem::BannerColor::RED,
+		OptionItem::BannerColor::RED,
+
+		OptionItem::BannerColor::YELLOW,
+		OptionItem::BannerColor::YELLOW,
+		OptionItem::BannerColor::YELLOW,
+		OptionItem::BannerColor::YELLOW,
+
+		OptionItem::BannerColor::CYAN,
+	};
 
 	static const int SPEED_NUM = 78;//ハイスピの数
 	static const int GAUGE_NUM = 6;//ゲージ種類の数

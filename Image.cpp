@@ -9,5 +9,5 @@ void Image::draw()
 
 void Image::draw(int drawScreen) {
 	setScreen(drawScreen);
-	drawWithProcessing();
+	drawWithProcessing(drawScreen);
 }

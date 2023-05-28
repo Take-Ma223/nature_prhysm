@@ -26,11 +26,8 @@ public:
         makeScreen(Size(frontText.get()->getSize().x + 2, frontText.get()->getSize().y + 2));
     }
 
-private:
-    unique_ptr<TextView> frontText;
-    unique_ptr<TextView> shadowText;
-
-    void initText(ActivityContext* c, NPTextViewParam npTextViewInitParam = NPTextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) {
+protected:
+    virtual void initText(ActivityContext* c, NPTextViewParam npTextViewInitParam = NPTextViewParam(), DrawableInitParam drawableInitParam = DrawableInitParam()) {
 
         DrawableInitParam frontDrawableParam = DrawableInitParam(Cordinate(0, 0));
         frontText = unique_ptr<TextView>(new
@@ -51,10 +48,14 @@ private:
         );
 
         makeScreen(Size(frontText.get()->getSize().x + 2, frontText.get()->getSize().y + 2));
-        
+
         addDrawable(shadowText.get());
         addDrawable(frontText.get());
     }
+
+private:
+    unique_ptr<TextView> frontText;
+    unique_ptr<TextView> shadowText;
 
     TextViewParam getFrontTextViewParam(NPTextViewParam p) {
         return TextViewParam(p.getString(), p.getFontInfo(), p.getFrontColor());

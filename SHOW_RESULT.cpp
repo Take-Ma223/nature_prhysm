@@ -79,6 +79,21 @@ void SHOW_RESULT(RESULT res,
 
 	int H_WHITE_WALL;
 
+	//グラデーション画像の用意
+	int screenHandle;
+	screenHandle = MakeScreen(1280, 100, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	int err = SetDrawScreen(screenHandle);
+	// 乗算済みアルファ用アルファブレンドのブレンドモードに設定する
+	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+	SetDrawBright(255, 255, 255);
+
+	err = DrawExtendGraph(0, 6, 1280, 45,
+		context.getAsset()->img(L"img/gradation.png").getHandle(),
+		true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+
 	int SH_CLOSE;
 	int SH_CLOSED;
 	int SH_OPEN;
@@ -795,6 +810,8 @@ void SHOW_RESULT(RESULT res,
 		ShowExtendedStrFit(640, 5, STList->title[list_number], title_width, 800, config,
 			STList->Color[list_number], STList->ShadowColor[list_number]);//コース名描画
 	}
+	GraphBlend(H_TITLE_IMG, screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+
 	SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
 	SetDrawMode(DX_DRAWMODE_NEAREST);
 

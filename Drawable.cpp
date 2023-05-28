@@ -74,7 +74,7 @@ int Drawable::setScreen(int drawScreen)
 	return SetDrawScreen(drawScreen);
 }
 
-void Drawable::drawWithProcessing()
+void Drawable::drawWithProcessing(int drawScreen)
 {
 	visible.process();
 	X.process();
@@ -86,11 +86,16 @@ void Drawable::drawWithProcessing()
 	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, alpha.value);
 	SetDrawBright(brightnessR.value, brightnessG.value, brightnessB.value);
 	if (visible.value && alpha.value != 0) {
-		DrawGraph(
-			X.value - handle.getSize().x * centerRatioX, 
-			Y.value - handle.getSize().y * centerRatioY,
-			handle.getHandle(),
-			TRUE);
+		if (blendModeParam.mode != BlendMode::GRAPH_BLEND_NORMAL) {
+			GraphBlend(drawScreen, handle.getHandle(), blendModeParam.blendRatio.value, blendModeParam.convert());
+		}
+		else {
+			DrawGraph(
+				X.value - handle.getSize().x * centerRatioX,
+				Y.value - handle.getSize().y * centerRatioY,
+				handle.getHandle(),
+				TRUE);
+		}
 	}
 
 	//èÊéZçœÇ›ÉAÉãÉtÉ@Ç©ÇÁå≥Ç…ñﬂÇ∑

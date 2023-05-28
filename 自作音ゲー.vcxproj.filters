@@ -148,8 +148,14 @@
     <Filter Include="ソース ファイル\NPUtil">
       <UniqueIdentifier>{cb488ec4-276a-4b85-905e-eefe7dc4ad2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\NPUtil\NPTextView">
+    <Filter Include="ソース ファイル\NPUtil\TextView">
+      <UniqueIdentifier>{2e2e4ef9-e0cc-43ef-a4ac-ee81b7c8cae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\NPUtil\TextView\NPTextView">
       <UniqueIdentifier>{162f384d-59da-4fad-92ec-6e048faf1ab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\NPUtil\TextView\NPGradTextView">
+      <UniqueIdentifier>{61b4485d-80da-43be-b7e4-2bddca334cf3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -354,9 +360,6 @@
     <ClCompile Include="Log.cpp">
       <Filter>ソース ファイル\Util\Log</Filter>
     </ClCompile>
-    <ClCompile Include="Intent.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="NumberViewFormat.cpp">
       <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
     </ClCompile>
@@ -388,10 +391,16 @@
       <Filter>ソース ファイル\SONG_SELECT\OptionListView</Filter>
     </ClCompile>
     <ClCompile Include="NPTextView.cpp">
-      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
+      <Filter>ソース ファイル\NPUtil\TextView\NPTextView</Filter>
     </ClCompile>
     <ClCompile Include="NPTextViewParam.cpp">
-      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
+      <Filter>ソース ファイル\NPUtil\TextView\NPTextView</Filter>
+    </ClCompile>
+    <ClCompile Include="NPGradTextView.cpp">
+      <Filter>ソース ファイル\NPUtil\TextView\NPGradTextView</Filter>
+    </ClCompile>
+    <ClCompile Include="Intent.cpp">
+      <Filter>ソース ファイル\Util\Intent</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -655,9 +664,6 @@
     <ClInclude Include="Log.h">
       <Filter>ソース ファイル\Util\Log</Filter>
     </ClInclude>
-    <ClInclude Include="Intent.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="NumberViewFormat.h">
       <Filter>ソース ファイル\Util\Ui\View\NumberView</Filter>
     </ClInclude>
@@ -689,10 +695,16 @@
       <Filter>ソース ファイル\SONG_SELECT\OptionListView</Filter>
     </ClInclude>
     <ClInclude Include="NPTextView.h">
-      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
+      <Filter>ソース ファイル\NPUtil\TextView\NPTextView</Filter>
     </ClInclude>
     <ClInclude Include="NPTextViewParam.h">
-      <Filter>ソース ファイル\NPUtil\NPTextView</Filter>
+      <Filter>ソース ファイル\NPUtil\TextView\NPTextView</Filter>
+    </ClInclude>
+    <ClInclude Include="NPGradTextView.h">
+      <Filter>ソース ファイル\NPUtil\TextView\NPGradTextView</Filter>
+    </ClInclude>
+    <ClInclude Include="Intent.h">
+      <Filter>ソース ファイル\Util\Intent</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

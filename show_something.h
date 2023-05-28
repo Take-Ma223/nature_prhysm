@@ -16,4 +16,6 @@ void DrawNumber(int x, int y, int value, int interval, int showType, int zeroFil
 void DrawFloatNumber(int x, int y, int value, int interval, int zeroFilingDigit, double decimalShift, int* NUMBER_IMAGE_HANDLE, int NUMBER_DECIMAL_HANDLE);
 extern int GetRainbowColor(double val, double range);
 
+unsigned int colorRatio(int r, int g, int b);
+
 #endif

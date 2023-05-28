@@ -186,3 +186,9 @@ int GetRainbowColor(double val, double range) {//虹色のコードを得る関�
 	return color;
 }
 
+
+unsigned int colorRatio(int r, int g, int b) {
+	double ratio = 0.5;
+	int bias = 32;
+	return  GetColor(bias + ratio * r, bias + ratio * g, bias + ratio * b);
+};//覆い焼きで色を加工するので事前に色の範囲を狭めています

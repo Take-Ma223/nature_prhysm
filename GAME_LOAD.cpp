@@ -16,6 +16,7 @@
 #include "EDIT_SCORE.h"
 #include "NPStringUtil.h"
 #include "DxLibUtil.h"
+#include "show_something.h"
 
 void GAME_LOAD(int song_number,
 	int difficulty,
@@ -285,10 +286,10 @@ void GAME_LOAD(int song_number,
 	Music[song_number].detail = vector<vector<wstring>>(5);//detailメモリ確保
 
 	wcscpy_s(filename, Music[song_number].SongPath[difficulty]);
-	
 
-
-
+	//デフォルト色
+	Music[song_number].StrColor[difficulty] = colorRatio(255, 255, 255);
+	Music[song_number].StrShadowColor[difficulty] = colorRatio(0, 0, 0);
 
 	fp = FileRead_open(filename);
 	if (fp == 0) {//無かったら戻る
@@ -525,7 +526,7 @@ void GAME_LOAD(int song_number,
 		}
 		if (wcscmp(L"#COLOR", sharp1) == 0) {
 			if (wcscmp(L"\0", sharp2) == 0) {//何も書かれていなかったら白
-				Music[song_number].StrColor[difficulty] = GetColor(255,255,255);
+				Music[song_number].StrColor[difficulty] = colorRatio(255,255,255);
 			}
 			else {
 				wchar_t rgb[3][5];
@@ -534,13 +535,13 @@ void GAME_LOAD(int song_number,
 					rgb[1], _countof(rgb[1]),
 					rgb[2], _countof(rgb[2]));
 
-				Music[song_number].StrColor[difficulty] = GetColor(_wtoi(rgb[0]), _wtoi(rgb[1]), _wtoi(rgb[2]));
+				Music[song_number].StrColor[difficulty] = colorRatio(_wtoi(rgb[0]), _wtoi(rgb[1]), _wtoi(rgb[2]));
 			}
 			//printfDx(L"%d\n", Music[song_number].StrColor[difficulty]);
 		}
 		if (wcscmp(L"#SHADOWCOLOR", sharp1) == 0) {
 			if (wcscmp(L"\0", sharp2) == 0) {//何も書かれていなかったら白
-				Music[song_number].StrShadowColor[difficulty] = GetColor(0, 0, 0);
+				Music[song_number].StrShadowColor[difficulty] = colorRatio(0, 0, 0);
 			}
 			else {
 				wchar_t rgb[3][5];
@@ -549,7 +550,7 @@ void GAME_LOAD(int song_number,
 					rgb[1], _countof(rgb[1]),
 					rgb[2], _countof(rgb[2]));
 
-				Music[song_number].StrShadowColor[difficulty] = GetColor(_wtoi(rgb[0]), _wtoi(rgb[1]), _wtoi(rgb[2]));
+				Music[song_number].StrShadowColor[difficulty] = colorRatio(_wtoi(rgb[0]), _wtoi(rgb[1]), _wtoi(rgb[2]));
 			}
 			//printfDx(L"%d\n", Music[song_number].StrColor[difficulty]);
 		}
@@ -609,7 +610,6 @@ void GAME_LOAD(int song_number,
 			dxLibFinishProcess();
 			return;
 		}
-		ClearDrawScreen();
 
 		do {//空行は無視
 			FileRead_gets(str, 256, fp);//一行取得(\nは入らない)

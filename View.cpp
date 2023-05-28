@@ -49,5 +49,5 @@ void View::draw(int drawScreen)
 	//Log(wstring(L"setScreen       :") + to_wstring(drawScreen));
 	//Log(wstring(L"setScreen ê¨å˜  :") + to_wstring(test));
 
-	drawWithProcessing();
+	drawWithProcessing(drawScreen);
 }

@@ -7,6 +7,7 @@
 #include <string>
 #include <memory>
 #include "NPTextView.h"
+#include "NPGradTextView.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ public:
 		
 
 
-			TextViewParam textViewParam = TextViewParam(option->OptionName[optionIndex], fontOptionName, GetColor(255, 255, 255));
+			TextViewParam textViewParam = TextViewParam(option->OptionName[optionIndex], fontOptionName, optionNameColor);
 			drawableParam = DrawableInitParam(Cordinate(40, getYPos(i) + optionNameY), CenterRatio(0, 0.5));
 			listOptionName[i] = unique_ptr<TextView>(new TextView(this, c, textViewParam, drawableParam));
 			if (i != rowCenter)listOptionName[i].get()->alpha.value = notSelectedFrameAlpha;
@@ -53,9 +54,9 @@ public:
 
 			NPTextViewParam itemNameTextViewParam = NPTextViewParam(
 				option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
-				fontItemName, GetColor(255, 255, 255), GetColor(0, 0, 0));
+				fontItemName, itemNameColor, itemNameShadowColor);
 			drawableParam = DrawableInitParam(Cordinate(162, getYPos(i)), CenterRatio(0.5, 0.5));
-			listItemName[i] = unique_ptr<NPTextView>(new NPTextView(this, context, itemNameTextViewParam, drawableParam));
+			listItemName[i] = unique_ptr<NPGradTextView>(new NPGradTextView(this, context, itemNameTextViewParam, drawableParam));
 			if (i != rowCenter)listItemName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listItemName[i].get());
 
@@ -80,13 +81,13 @@ public:
 			listOptionName[i].get()->setText(
 				TextViewParam(
 					option->OptionName[optionIndex],
-					fontOptionName, GetColor(255, 255, 255))
+					fontOptionName, optionNameColor)
 			);
 
 			listItemName[i].get()->setText(
 				NPTextViewParam(
 					option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
-					fontItemName, GetColor(255, 255, 255), GetColor(0, 0, 0))
+					fontItemName, itemNameColor, itemNameShadowColor)
 			);
 		
 		}
@@ -154,13 +155,17 @@ private:
 	static const int defaultBrightness = 255;
 	static const int skillTestModeNotAvailableFrameBrightness = 128;
 
+	const int optionNameColor = GetColor(255, 255, 255);
+	const int itemNameColor = GetColor(160,160,160);
+	const int itemNameShadowColor = GetColor(0,0,0);
+
 	wstring themeStr1;
 	wstring themeStr2;
 
 	unique_ptr<Image> backGround;
 	vector<unique_ptr<Image>> listFrame = vector<unique_ptr<Image>>(rowCount);
 	vector<unique_ptr<TextView>> listOptionName = vector<unique_ptr<TextView>>(rowCount);
-	vector<unique_ptr<NPTextView>> listItemName = vector<unique_ptr<NPTextView>>(rowCount);
+	vector<unique_ptr<NPGradTextView>> listItemName = vector<unique_ptr<NPGradTextView>>(rowCount);
 
 	FontInfo fontOptionName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
 	FontInfo fontItemName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);

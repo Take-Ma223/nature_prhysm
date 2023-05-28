@@ -177,8 +177,8 @@ void SONG_SELECT(int *l_n,
 	int title_shadow_color[20 + 1];//曲名の縁の色(白or黒)
 	int H_TITLE_STR[20 + 1];//画像として保存された曲名の画像ハンドル
 	for (i = 0; i <= 20; i++) {//初期化
-		title_color[i] = GetColor(255, 255, 255);
-		title_shadow_color[i] = GetColor(0, 0, 0);
+		title_color[i] = colorRatio(255, 255, 255);
+		title_shadow_color[i] = colorRatio(0, 0, 0);
 		H_TITLE_STR[i] = MakeScreen(640, 48, TRUE);
 	}
 
@@ -503,6 +503,17 @@ void SONG_SELECT(int *l_n,
 	H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
 	sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[8]);
 	H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+
+	//グラデーション画像の用意
+	int screenHandle;
+	screenHandle = MakeScreen(640, 48, TRUE);
+	int err = SetDrawScreen(screenHandle);
+	// 乗算済みアルファ用アルファブレンドのブレンドモードに設定する
+	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, 255);
+	err = DrawExtendGraph(0, 6, 640, 42,
+		context.getAsset()->img(L"img/gradation.png").getHandle(),
+		true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
 	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");
@@ -2547,8 +2558,10 @@ void SONG_SELECT(int *l_n,
 						title_color[i],
 						title_shadow_color[i]);//曲名描画
 
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 					SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
 					SetDrawMode(DX_DRAWMODE_NEAREST);
+					GraphBlend(H_TITLE_STR[i], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
 
 				}
 
@@ -2597,8 +2610,7 @@ void SONG_SELECT(int *l_n,
 						title_shadow_color[i]);//曲名描画
 
 					SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
-
-
+					GraphBlend(H_TITLE_STR[i], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
 				}
 
 				widthCalcFlag = 0;
@@ -2617,14 +2629,15 @@ void SONG_SELECT(int *l_n,
 					ClearDrawScreen();//前に描かれていた文字を消す
 									  //画像として一時的に描画
 					
-					ShowExtendedStrFitToHandle(320, 7, 
+					ShowExtendedStrFitToHandle(320, 7,
 						folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)],
-						folder_name_width[i], 
+						folder_name_width[i],
 						620, config,
-						FontHandle);//フォルダ名表示
+						FontHandle, colorRatio(255, 255, 255), colorRatio(0, 0, 0));//フォルダ名表示
 
 					SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
-				
+					GraphBlend(H_TITLE_STR[i], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+
 				}
 				widthCalcFlag = 0;
 			}

@@ -8,8 +8,65 @@
 #include "STRUCT_OP.h"
 #include "Processable.h"
 #include "ActivityContext.h"
+#include <map>
 
 class ActivityContext;
+
+enum class BlendMode {
+	GRAPH_BLEND_NORMAL,
+	GRAPH_BLEND_RGBA_SELECT_MIX,
+	GRAPH_BLEND_MULTIPLE,
+	GRAPH_BLEND_DIFFERENCE,
+	GRAPH_BLEND_ADD,
+	GRAPH_BLEND_SCREEN,
+	GRAPH_BLEND_OVERLAY,
+	GRAPH_BLEND_DODGE,
+	GRAPH_BLEND_BURN,
+	GRAPH_BLEND_DARKEN,
+	GRAPH_BLEND_LIGHTEN,
+	GRAPH_BLEND_SOFTLIGHT,
+	GRAPH_BLEND_HARDLIGHT,
+	GRAPH_BLEND_EXCLUSION
+};
+
+struct BlendModeParam {
+	BlendMode mode = BlendMode::GRAPH_BLEND_NORMAL;
+	TransValue blendRatio;
+
+	BlendModeParam(
+		BlendMode m = BlendMode::GRAPH_BLEND_NORMAL,
+		int br = 255
+	) {
+		mode = m;
+		blendRatio.value = br;
+	}
+
+	int convert() {
+		map<BlendMode, int> convertMap = {
+			{BlendMode::GRAPH_BLEND_NORMAL, DX_GRAPH_BLEND_NORMAL},
+			{BlendMode::GRAPH_BLEND_RGBA_SELECT_MIX, DX_GRAPH_BLEND_RGBA_SELECT_MIX},
+			{BlendMode::GRAPH_BLEND_MULTIPLE, DX_GRAPH_BLEND_MULTIPLE},
+			{BlendMode::GRAPH_BLEND_DIFFERENCE, DX_GRAPH_BLEND_DIFFERENCE},
+			{BlendMode::GRAPH_BLEND_ADD, DX_GRAPH_BLEND_ADD},
+			{BlendMode::GRAPH_BLEND_SCREEN, DX_GRAPH_BLEND_SCREEN},
+			{BlendMode::GRAPH_BLEND_OVERLAY, DX_GRAPH_BLEND_OVERLAY},
+			{BlendMode::GRAPH_BLEND_DODGE, DX_GRAPH_BLEND_DODGE},
+			{BlendMode::GRAPH_BLEND_BURN, DX_GRAPH_BLEND_BURN},
+			{BlendMode::GRAPH_BLEND_DARKEN, DX_GRAPH_BLEND_DARKEN},
+			{BlendMode::GRAPH_BLEND_LIGHTEN, DX_GRAPH_BLEND_LIGHTEN},
+			{BlendMode::GRAPH_BLEND_SOFTLIGHT, DX_GRAPH_BLEND_SOFTLIGHT},
+			{BlendMode::GRAPH_BLEND_HARDLIGHT, DX_GRAPH_BLEND_HARDLIGHT},
+			{BlendMode::GRAPH_BLEND_EXCLUSION, DX_GRAPH_BLEND_EXCLUSION}
+		};
+
+		return convertMap[mode];
+	}
+};
+
+	
+
+
+
 
 /// <summary>
 /// Drawableクラスの初期化パラメータ
@@ -23,6 +80,8 @@ struct DrawableInitParam {
 	int brightnessR = 255;
 	int brightnessG = 255;
 	int brightnessB = 255;
+
+	BlendModeParam blendModeParam = BlendModeParam();
 
 	/// <summary>
 	/// コンストラクタ
@@ -41,7 +100,8 @@ struct DrawableInitParam {
 		int a = 255,
 		int bR = 255,
 		int bG = 255,
-		int bB = 255
+		int bB = 255,
+		BlendModeParam bm = BlendModeParam()
 	) {
 		cordinate = co;
 		centerRatio = cr;
@@ -50,6 +110,7 @@ struct DrawableInitParam {
 		brightnessR = bR;
 		brightnessG = bG;
 		brightnessB = bB;
+		blendModeParam = bm;
 	}
 };
 
@@ -70,10 +131,16 @@ public:
 	TransValue brightnessG;
 	TransValue brightnessB;
 
+	BlendModeParam blendModeParam;
+
 	TransAction action;
 
 	double centerRatioX = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
 	double centerRatioY = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
+
+	bool isExtend = false;
+	double extendRatioX = 1;
+	double extendRatioY = 1;
 
 	Drawable() {};
 
@@ -116,7 +183,7 @@ protected:
 
 	int setScreen(int drawScreen);
 	
-	void drawWithProcessing();
+	void drawWithProcessing(int drawScreen);
 
 	ImageHandle parentHandle;//このDrawableを描画する対象のハンドル(親がいない場合はDX_SCREEN_BACK)
 
@@ -149,6 +216,8 @@ private:
 		Drawable::brightnessR.value = param.brightnessR;
 		Drawable::brightnessG.value = param.brightnessG;
 		Drawable::brightnessB.value = param.brightnessB;
+
+		Drawable::blendModeParam = param.blendModeParam;
 	}
 
 	void setParentHandle(ImageHandle h) {

@@ -143,6 +143,30 @@ void GAME(int song_number, int difficulty,
 	int FullComboFXBaseTime = 0;
 	int FullComboFXFrame = 0;
 
+
+	int H_TITLE_STR;//画像として保存された曲名の画像ハンドル
+	H_TITLE_STR = MakeScreen(640, 48, TRUE);
+	
+	int H_GENRE_STR;//画像として保存されたジャンルの画像ハンドル
+	H_GENRE_STR = MakeScreen(640, 48, TRUE);
+
+	int H_ARTIST_STR;//画像として保存されたアーティストの画像ハンドル
+	H_ARTIST_STR = MakeScreen(640, 48, TRUE);
+
+	//グラデーション画像の用意
+	int screenHandle;
+	screenHandle = MakeScreen(640, 48, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	int err = SetDrawScreen(screenHandle);
+	// 乗算済みアルファ用アルファブレンドのブレンドモードに設定する
+	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+	SetDrawBright(255, 255, 255);
+
+	err = DrawExtendGraph(0, 0, 640, 35,
+		context.getAsset()->img(L"img/gradation.png").getHandle(),
+		true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
 	GAME_SH SH;
 	int AllowSound[3][4] = { { 1,1,1,1 },{ 1,1,1,1 },{ 1,1,1,1 } };//そのフレームでコントローラを叩いた時の音を出すか コントローラの並び順と同じ(0:B 1:G 2:R)
 	double HitAreaBright[3][4] = { {0,0,0,0},{0,0,0,0},{0,0,0,0} };//コントローラを叩いた時の判定枠の各色の光具合
@@ -432,6 +456,7 @@ void GAME(int song_number, int difficulty,
 	SpeedBuffer speedBuffer = SpeedBuffer(note, j_n_n);
 
 	GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
+	
 	Music[song_number].hash[difficulty] = hash;
 	res->hash = hash;//ハッシュ値を格納
 
@@ -914,6 +939,8 @@ void GAME(int song_number, int difficulty,
 	};
 
 	//----曲名表示前処理----
+
+
 	gauge_draw_counter = 0;
 
 	int FontHandleBpm = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
@@ -922,6 +949,21 @@ void GAME(int song_number, int difficulty,
 	genre_width = GetDrawStringWidthToHandle(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]), FontHandleCommon);//ジャンル名の横の長さを入れる
 	title_width = GetDrawStringWidthToHandle(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]), FontHandleCommon);//曲名の横の長さを入れる
 	artist_width = GetDrawStringWidthToHandle(Music[song_number].artist[difficulty], wcslen(Music[song_number].artist[difficulty]), FontHandleCommon);//アーティスト名の横の長さを入れる
+	
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+	SetDrawScreen(H_TITLE_STR);
+	ShowExtendedStrFitToHandle(320, 1, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
+
+	GraphBlend(H_TITLE_STR, screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+
+	SetDrawScreen(H_ARTIST_STR);
+	ShowExtendedStrFitToHandle(320, 1, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
+	
+	SetDrawScreen(H_GENRE_STR);
+	ShowExtendedStrFitToHandle(320, 1, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
+	
+	SetDrawScreen(DX_SCREEN_BACK);
 
 	DrawableInitParam detailViewParam = DrawableInitParam(Cordinate(320,500));
 	DetailView detailView = DetailView(&context, detailViewParam);
@@ -1155,9 +1197,15 @@ void GAME(int song_number, int difficulty,
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - sin((3.14 / 2)*c_m_draw_counter)) * 255));
 		}
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-		ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
-		ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
-		ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
+
+		DrawGraph(320, 350, H_TITLE_STR, TRUE);
+		DrawGraph(320, 450, H_ARTIST_STR, TRUE);
+		DrawGraph(320, 260, H_GENRE_STR, TRUE);
+		//DrawGraph(320, 100, context.getAsset()->img(L"img/gradation.png").getHandle(), TRUE);
+
+		//ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
+		//ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
+		//ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
 		//ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
 		detailView.draw();
 		SetDrawMode(DX_DRAWMODE_NEAREST);
@@ -3376,9 +3424,12 @@ void GAME(int song_number, int difficulty,
 			}
 			SetFontSize(30);
 			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-			ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
-			ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
-			ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
+			DrawGraph(320, 350, H_TITLE_STR, TRUE);
+			DrawGraph(320, 450, H_ARTIST_STR, TRUE);
+			DrawGraph(320, 260, H_GENRE_STR, TRUE);
+			//ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
+			//ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
+			//ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
 			//ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
 			detailView.draw();
 			SetDrawMode(DX_DRAWMODE_NEAREST);

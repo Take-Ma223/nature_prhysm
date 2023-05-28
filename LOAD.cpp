@@ -431,8 +431,8 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 		Music[*NumberOfSongs].title[i] = (wchar_t*) calloc(strlenDx(StrBackToFolderSelect) + 1, sizeof(wchar_t));
 		sprintfDx(Music[*NumberOfSongs].title[i], L"%s", StrBackToFolderSelect);
 		Music[*NumberOfSongs].exist[i] = 0;
-		Music[*NumberOfSongs].StrColor[i] = GetColor(180, 180, 180);
-		Music[*NumberOfSongs].StrShadowColor[i] = GetColor(0, 0, 0);
+		Music[*NumberOfSongs].StrColor[i] = colorRatio(180, 180, 180);
+		Music[*NumberOfSongs].StrShadowColor[i] = colorRatio(0, 0, 0);
 
 	}
 	

@@ -99,7 +99,6 @@ typedef struct SongSub {//演奏画面でしか使わない情報
 
 	unsigned short objOfLane[5][4];//レーン毎の要素数
 	unsigned short totalMeasures[5];//小節数
-	char editable[5] = { 0,0,0,0,0 };//編集可能
 }SongSub;
 
 

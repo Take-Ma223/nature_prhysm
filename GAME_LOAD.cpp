@@ -557,9 +557,6 @@ void GAME_LOAD(int song_number,
 		if (wcscmp(L"#VERSION", sharp1) == 0) {
 			Music[song_number].version[difficulty] = int(_wtof(sharp2)*100 + 0.005);
 		}
-		if (wcscmp(L"#EDITABLE", sharp1) == 0) {
-			MusicSub->editable[difficulty] = _wtoi(sharp2);
-		}
 
 	}
 	if (readflag == 1) {

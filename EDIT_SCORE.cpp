@@ -374,7 +374,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 		int PushTimeTh = 35;//長押し閾値
 
 		if (Key[KEY_INPUT_ESCAPE] == 1) {
-			if (MusicSub->editable[difficulty] == 1) {//編集可能
+			if (config.Editable == 1) {//編集可能
 				if (SAVE_EDIT_SCORE(head, Music, song_number, difficulty, 1) == 0) {//正常に保存出来たら戻る
 					double insert_p_time = calc_insert_passed_time(Music[song_number].bpm[difficulty], init_scroll, head, insert);
 
@@ -1759,11 +1759,11 @@ void EDIT_SCORE(SCORE_CELL* head,
 			printfDx(L"保存できません　別のプログラムでnpsファイルが開かれている可能性があります\n");
 		}
 
-		if (MusicSub->editable[difficulty] != 1 && isInstructionAppear) {
+		if (config.Editable != 1 && isInstructionAppear) {
 			setPrintColorDx(GetColor(255, 0, 0), GetColor(0, 0, 0)); 
-			printfDx(L"この譜面は編集できません\n");
-			printfDx(L"編集するには #EDITABLE:1 を\n");
-			printfDx(L"npsファイルに追加してください\n");
+			printfDx(L"譜面を編集できません\n");
+			printfDx(L"「譜面を編集可能にする」にチェックを付けて\n");
+			printfDx(L"起動すると編集できます\n");
 			printfDx(L"\n");
 			setPrintColorDx(GetColor(255, 255, 255), GetColor(0, 0, 0));
 		}

@@ -31,7 +31,7 @@ typedef struct Config {//コンフィグデータ
 	int AsioDriver = 0;
 	int Buffer = 256;
 	int ComPort = 0;
-
+	int Editable = 0;
 } Config;
 
 #endif

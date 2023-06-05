@@ -36,10 +36,10 @@ public:
 
 
 		for (int i = 0; i < rowCount; i++) {
-			int optionIndex = getIndex(i - rowCenter, option->OPTION_NUM);
+			int optionIndex = getOptionIndex(i - rowCenterIndex);
 			DrawableInitParam drawableParam = DrawableInitParam(Cordinate(160, getYPos(i)), CenterRatio(0.5, 0.5));
 			listFrame[i] = unique_ptr<Image>(new Image(c, c->getAsset()->img(L"img/option_banner/green.png"), drawableParam));
-			if (i != rowCenter)listFrame[i].get()->alpha.value = notSelectedFrameAlpha;
+			if (i != rowCenterIndex)listFrame[i].get()->alpha.value = notSelectedFrameAlpha;
 			updateFrame(i, optionIndex);
 			addDrawable(listFrame[i].get());
 		
@@ -48,7 +48,7 @@ public:
 			TextViewParam textViewParam = TextViewParam(option->OptionName[optionIndex], fontOptionName, optionNameColor);
 			drawableParam = DrawableInitParam(Cordinate(40, getYPos(i) + optionNameY), CenterRatio(0, 0.5));
 			listOptionName[i] = unique_ptr<TextView>(new TextView(this, c, textViewParam, drawableParam));
-			if (i != rowCenter)listOptionName[i].get()->alpha.value = notSelectedFrameAlpha;
+			if (i != rowCenterIndex)listOptionName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listOptionName[i].get());
 
 
@@ -57,7 +57,7 @@ public:
 				fontItemName, itemNameColor, itemNameShadowColor);
 			drawableParam = DrawableInitParam(Cordinate(162, getYPos(i)), CenterRatio(0.5, 0.5));
 			listItemName[i] = unique_ptr<NPGradTextView>(new NPGradTextView(this, context, itemNameTextViewParam, drawableParam));
-			if (i != rowCenter)listItemName[i].get()->alpha.value = notSelectedFrameAlpha;
+			if (i != rowCenterIndex)listItemName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listItemName[i].get());
 
 
@@ -68,39 +68,52 @@ public:
 	
 
 	/// <summary>
-	/// 今のオプション選択値で項目の更新
+	/// 今のオプション選択値でリスト全ての更新
 	/// </summary>
-	void updateListView(int select) {
-		selectingOption = select;
+	/// <param name="select">今のオプション選択値</param>
+	//void updateListView() {
+	//	for (int i = 0; i < rowCount; i++) {
+	//		int listIndex = getListIndex(i + rotationIndex);
+	//		int optionIndex = getOptionIndex(i - rowCenterIndex + selectingOption);
+	//		updateItem(i, optionIndex);
+	//	}
+	//}
 
-		for (int i = 0; i < rowCount; i++) {
-			int optionIndex = getIndex(i - rowCenter + selectingOption, option->OPTION_NUM);
-
-			updateFrame(i, optionIndex);
-
-			listOptionName[i].get()->setText(
-				TextViewParam(
-					option->OptionName[optionIndex],
-					fontOptionName, optionNameColor)
-			);
-
-			listItemName[i].get()->setText(
-				NPTextViewParam(
-					option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
-					fontItemName, itemNameColor, itemNameShadowColor)
-			);
-		
-		}
-
-		updateSkillTestModeView();
-
+	/// <summary>
+	/// 指定したオプション番号でリストの指定した行一つを更新
+	/// </summary>
+	/// <param name="listIndex">内部リストインデックス</param>
+	/// <param name="optionIndex">オプション番号</param>
+	void updateItem(int listIndex, int optionIndex)
+	{
+		updateFrame(listIndex, optionIndex);
+		updateOptionName(listIndex, optionIndex);
+		updateItemName(listIndex, optionIndex);
+		updateBrightness(listIndex, optionIndex);
 	}
 
+	
+
+
+	/// <summary>
+	/// 今選んでいるオプション選択値の更新
+	/// </summary>
+	void updateSelectedOptionItem() {
+		const int targetIndex = getListIndex(rowCenterIndex + rotationIndex);
+
+		updateItemName(targetIndex, selectingOption);
+		updateBrightness(targetIndex, selectingOption);
+	}
 
 
 	void setSkillTestMode(bool isTrue) {
 		isSkillTestMode = isTrue;
-		updateSkillTestModeView();
+		for (int i = 0; i < rowCount; i++) {
+			int listIndex = getListIndex(i + rotationIndex);
+			int optionIndex = getOptionIndex(i - rowCenterIndex + selectingOption);
+			updateBrightness(listIndex, optionIndex);
+
+		}
 	}
 
 
@@ -121,10 +134,12 @@ public:
 
 	void moveToSelectUp() {
 		move(true);
+		rotationIndex = getListIndex(rotationIndex - 1);//上を選ぶとリストは下に動くため注意
 	}
 
 	void moveToSelectDown() {
 		move(false);
+		rotationIndex = getListIndex(rotationIndex + 1);
 	}
 
 	void setCoverImage() {
@@ -139,14 +154,17 @@ private:
 	static const int sizeX = 320;
 	static const int sizeY = 720;
 
-	int selectingRow = 0;//ビューで選択しているオプションの番号
 
 	static const int rowDuration = 90;
 	static const int rowCount = 19;//必ず奇数にする
-	static const int rowCenter = rowCount / 2;
+	static const int rowCenterIndex = rowCount / 2;
+	int selectingOption = 0;//ビューで選択しているオプションの番号
 
 	static const int selectedFrameAlpha = 255;
 	static const int notSelectedFrameAlpha = 128;
+
+	int rotationIndex = 0;//リストがどっちの方向に何回動いたかを表す(+:上方向 -:下方向)(値域:0~+(rowCount-1))
+
 
 
 	static const int optionNameY = -35;
@@ -174,26 +192,34 @@ private:
 
 	TransValue moveRatio;
 
-	int selectingOption = 0;
-
-
 	int getYPos(int ind) {
-		return (ind - rowCenter) * rowDuration + 360;
+		return (ind - rowCenterIndex) * rowDuration + 360;
 	}
 
 
-	int getIndex(int ind, int indexLength) {
+	int getOptionIndex(int ind) {
+		const int length = option->OPTION_NUM;
+		return getRotationCount(ind, length);
+	}
+
+	int getListIndex(int ind) {
+		const int length = rowCount;
+		return getRotationCount(ind, length);
+	}
+
+	int getRotationCount(const int& ind, const int& length)
+	{
 		int result = ind;
 		while (result < 0) {
-			result += indexLength;
+			result += length;
 		}
-		while (result >= indexLength) {
-			result -= indexLength;
+		while (result >= length) {
+			result -= length;
 		}
 		return result;
 	}
 
-	void updateFrame(int row, int optionIndex)
+	void updateFrame(int listIndex, int optionIndex)
 	{
 		std::unordered_map<OptionItem::BannerColor, std::wstring> mapping = {
 			{OptionItem::BannerColor::RED,wstring(L"img/option_banner/red.png")},
@@ -206,41 +232,56 @@ private:
 			{OptionItem::BannerColor::BLACK,wstring(L"img/option_banner/black.png")},
 		};
 
-		listFrame[row].get()->setImage(c->getAsset()->img(mapping[option->bannerColor[optionIndex]].c_str()));
+		listFrame[listIndex].get()->setImage(c->getAsset()->img(mapping[option->bannerColor[optionIndex]].c_str()));
 
 	}
 
-	void updateSkillTestModeView() {
-		for (int i = 0; i < rowCount; i++) {
-			int optionIndex = getIndex(i - rowCenter + selectingOption, option->OPTION_NUM);
+	void updateItemName(int listIndex, int optionIndex)
+	{
+		listItemName[listIndex].get()->setText(
+			NPTextViewParam(
+				option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
+				fontItemName, itemNameColor, itemNameShadowColor)
+		);
+	}
 
-			if (!isSkillTestMode) {
-				setBrightnessList(i, defaultBrightness);
-				continue;
-			}
+	void updateOptionName(int listIndex, int optionIndex)
+	{
+		listOptionName[listIndex].get()->setText(
+			TextViewParam(
+				option->OptionName[optionIndex],
+				fontOptionName, optionNameColor)
+		);
+	}
 
-			bool isGauge = optionIndex == (int)OptionItem::Name::GAUGE;
-			bool isLaneRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::RANDOM);
-			bool isLaneSuperRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::SUPER_RAND);
-			bool isColor = optionIndex == (int)OptionItem::Name::COLOR;
-			bool isAvailable = !isGauge && !isLaneRandom && !isLaneSuperRandom && !isColor;
-
-			if (isAvailable) {
-				setBrightnessList(i, defaultBrightness);
-				continue;
-			}
-			setBrightnessList(i, skillTestModeNotAvailableFrameBrightness);
+	void updateBrightness(int listIndex, int optionIndex) {
+		if (!isSkillTestMode) {
+			setBrightnessList(listIndex, defaultBrightness);
+			return;
 		}
+
+		bool isGauge = optionIndex == (int)OptionItem::Name::GAUGE;
+		bool isLaneRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::RANDOM);
+		bool isLaneSuperRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::SUPER_RAND);
+		bool isColor = optionIndex == (int)OptionItem::Name::COLOR;
+		bool isAvailable = !isGauge && !isLaneRandom && !isLaneSuperRandom && !isColor;
+
+		if (isAvailable) {
+			setBrightnessList(listIndex, defaultBrightness);
+			return;
+		}
+		setBrightnessList(listIndex, skillTestModeNotAvailableFrameBrightness);
+	
 	}
 
-	void setBrightnessList(int row, int brightness) {
-		listFrame[row].get()->brightnessR.value = brightness;
-		listFrame[row].get()->brightnessG.value = brightness;
-		listFrame[row].get()->brightnessB.value = brightness;
+	void setBrightnessList(int listIndex, int brightness) {
+		listFrame[listIndex].get()->brightnessR.value = brightness;
+		listFrame[listIndex].get()->brightnessG.value = brightness;
+		listFrame[listIndex].get()->brightnessB.value = brightness;
 
-		listItemName[row].get()->brightnessR.value = brightness;
-		listItemName[row].get()->brightnessG.value = brightness;
-		listItemName[row].get()->brightnessB.value = brightness;
+		listItemName[listIndex].get()->brightnessR.value = brightness;
+		listItemName[listIndex].get()->brightnessG.value = brightness;
+		listItemName[listIndex].get()->brightnessB.value = brightness;
 	}
 
 
@@ -248,9 +289,11 @@ private:
 		moveRatio.process();
 
 		for (int i = 0; i < rowCount; i++) {
-			listFrame[i].get()->Y.value = getYPos(i) + moveRatio.value;
-			listOptionName[i].get()->Y.value = getYPos(i) + moveRatio.value + optionNameY;
-			listItemName[i].get()->Y.value = getYPos(i) + moveRatio.value;
+			int listIndex = getListIndex(i + rotationIndex);
+
+			listFrame[listIndex].get()->Y.value = getYPos(i) + moveRatio.value;
+			listOptionName[listIndex].get()->Y.value = getYPos(i) + moveRatio.value + optionNameY;
+			listItemName[listIndex].get()->Y.value = getYPos(i) + moveRatio.value;
 		}
 	};
 
@@ -260,39 +303,106 @@ private:
 		X.eChange(Point(-320), Point(0), Converter(QuarterSine), 0, 350);
 		X.setReverse(true);
 		X.play();
-
 	}
 
+	void move(bool isSelectingUp) {
+		setEntireMoveAnimation(isSelectingUp);
+		setSelectingBrightAnimation(isSelectingUp);
+		iterateSelectingOption(isSelectingUp);
+	}
 
-	void move(bool isUp) {
+	void setEntireMoveAnimation(bool isSelectingUp)
+	{
+		setEntireOffset(isSelectingUp);
+
 		double expBase = 2;
 		int time = 300;
 		moveRatio.clearEvent();
-		if (isUp) moveRatio.value -= rowDuration;
+		if (isSelectingUp) moveRatio.value -= rowDuration;
 		else moveRatio.value += rowDuration;
 
 		moveRatio.eChangeTo(Point(0), Converter(ExponentialSlider, expBase), 0, time);
 		moveRatio.play();
+	}
 
-		int next = isUp ? 1 : -1;
-		listFrame[rowCenter].get()->alpha.eChange(Point(notSelectedFrameAlpha), Point(selectedFrameAlpha), Converter(Linear), 0, 100);
-		listOptionName[rowCenter].get()->alpha.eChange(Point(notSelectedFrameAlpha), Point(selectedFrameAlpha), Converter(Linear), 0, 100);
-		listItemName[rowCenter].get()->alpha.eChange(Point(notSelectedFrameAlpha), Point(selectedFrameAlpha), Converter(Linear), 0, 100);
+	void setEntireOffset(bool isSelectingUp)
+	{
+		int upperListIndex = getListIndex(0 + rotationIndex);//一番上
+		int downerListIndex = getListIndex(rowCount - 1 + rotationIndex);//一番下
 
-		listFrame[rowCenter].get()->alpha.play();
-		listOptionName[rowCenter].get()->alpha.play();
-		listItemName[rowCenter].get()->alpha.play();
+		int bornIndex;//次に生成されるべき位置を持つインデックス
+		if (isSelectingUp)bornIndex = upperListIndex;
+		else bornIndex = downerListIndex;
 
-		int centerAlphaValue = listFrame[rowCenter].get()->alpha.value;
+		int moveIndex;//bornIndexの位置に移動するインデックス
+		if (isSelectingUp)moveIndex = downerListIndex;
+		else moveIndex = upperListIndex;
 
-		listFrame[rowCenter + next].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, 100);
-		listOptionName[rowCenter + next].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, 100);
-		listItemName[rowCenter + next].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, 100);
+		int frameBornY = listFrame[bornIndex].get()->Y.value;
+		int optionNameBornY = listOptionName[bornIndex].get()->Y.value;
+		int itemNameBornY = listItemName[bornIndex].get()->Y.value;
 
-		listFrame[rowCenter + next].get()->alpha.play();
-		listOptionName[rowCenter + next].get()->alpha.play();
-		listItemName[rowCenter + next].get()->alpha.play();
+		int duration;
+		if (isSelectingUp)duration = rowDuration;
+		else duration = -rowDuration;
 
+		for (int i = 0; i < rowCount; i++) {
+			listFrame[i].get()->Y.value += duration;
+			listOptionName[i].get()->Y.value += duration;
+			listItemName[i].get()->Y.value += duration;
+		}
+
+		listFrame[moveIndex].get()->Y.value = frameBornY;
+		listOptionName[moveIndex].get()->Y.value = optionNameBornY;
+		listItemName[moveIndex].get()->Y.value = itemNameBornY;
+
+		int bornOptionIndex;
+		if (isSelectingUp)bornOptionIndex = getOptionIndex(selectingOption - rowCenterIndex - 1);
+		else bornOptionIndex = getOptionIndex(selectingOption + rowCenterIndex + 1);
+
+		updateItem(moveIndex, bornOptionIndex);
+	}
+
+	void setSelectingBrightAnimation(bool isSelectingUp)
+	{
+		int animeDuration = 100;
+
+		int next = isSelectingUp ? -1 : 1;
+		int targetIndex = getListIndex(rowCenterIndex + rotationIndex);
+		int nextIndex = getListIndex(targetIndex + next);
+
+		int centerAlphaValue = listFrame[targetIndex].get()->alpha.value;
+		int nextAlphaValue = listFrame[nextIndex].get()->alpha.value;
+
+		listFrame[targetIndex].get()->alpha.clearEvent();
+		listOptionName[targetIndex].get()->alpha.clearEvent();
+		listItemName[targetIndex].get()->alpha.clearEvent();
+
+		listFrame[targetIndex].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, animeDuration);
+		listOptionName[targetIndex].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, animeDuration);
+		listItemName[targetIndex].get()->alpha.eChange(Point(centerAlphaValue), Point(notSelectedFrameAlpha), Converter(Linear), 0, animeDuration);
+
+		listFrame[targetIndex].get()->alpha.play();
+		listOptionName[targetIndex].get()->alpha.play();
+		listItemName[targetIndex].get()->alpha.play();
+
+		listFrame[nextIndex].get()->alpha.clearEvent();
+		listOptionName[nextIndex].get()->alpha.clearEvent();
+		listItemName[nextIndex].get()->alpha.clearEvent();
+
+		listFrame[nextIndex].get()->alpha.eChange(Point(nextAlphaValue), Point(selectedFrameAlpha), Converter(Linear), 0, animeDuration);
+		listOptionName[nextIndex].get()->alpha.eChange(Point(nextAlphaValue), Point(selectedFrameAlpha), Converter(Linear), 0, animeDuration);
+		listItemName[nextIndex].get()->alpha.eChange(Point(nextAlphaValue), Point(selectedFrameAlpha), Converter(Linear), 0, animeDuration);
+
+		listFrame[nextIndex].get()->alpha.play();
+		listOptionName[nextIndex].get()->alpha.play();
+		listItemName[nextIndex].get()->alpha.play();
+	}
+
+	void iterateSelectingOption(bool isUp)
+	{
+		if (isUp)selectingOption = getOptionIndex(selectingOption - 1);
+		else selectingOption = getOptionIndex(selectingOption + 1);
 	}
 
 

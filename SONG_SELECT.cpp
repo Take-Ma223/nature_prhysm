@@ -1835,7 +1835,6 @@ void SONG_SELECT(int *l_n,
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						time_base_str = int(GetNowCount_d(config));
 
-						optionListView.updateListView(option_select);
 						if (isSelectUp)optionListView.moveToSelectUp();
 						else optionListView.moveToSelectDown();
 						
@@ -1919,7 +1918,7 @@ void SONG_SELECT(int *l_n,
 							optionListView.setCoverImage();
 						}
 
-						optionListView.updateListView(option_select);
+						optionListView.updateSelectedOptionItem();
 					};
 
 

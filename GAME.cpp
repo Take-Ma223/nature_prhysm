@@ -797,6 +797,7 @@ void GAME(int song_number, int difficulty,
 	sprintfDx(strcash, L"sound/hit_sound/%s/release.wav", option->hitSound[option->op.hitSound]);
 	SH.SH_RELEASE = LoadSoundMem(strcash, 1);
 
+	SH.setVol(255 * (double)option->op.hitSoundVol / (int)OptionItem::HitSoundVol::Vol_100);//効果音音量セット
 
 	//曲データは非同期で読み込む
 	SetUseASyncLoadFlag(TRUE);
@@ -3664,7 +3665,13 @@ void GAME(int song_number, int difficulty,
 
 			BGM_VolTowardResult = 1 - (double)(GAME_passed_time - cleared_time) / (double)TimeFromEndOfGameToResult;
 		}
-		if(!CheckHandleASyncLoad(SH_SONG))ChangeVolumeSoundMem(int(((double)1 - cos(volume * (3.1415 / 2))) * BGM_VolTowardResult * 255 * debug_music), SH_SONG);//曲の音量セット
+		if (!CheckHandleASyncLoad(SH_SONG)) {
+			int maxVol = 255 * (double)option->op.musicVol / (int)OptionItem::MusicVol::Vol_100;
+			double missVolEasing = ((double)1 - cos(volume * (3.1415 / 2)));//0~1
+			int vol = int(maxVol * missVolEasing * BGM_VolTowardResult * debug_music);
+
+			ChangeVolumeSoundMem(vol, SH_SONG);//曲の音量セット
+		}
 
 		//printfDx("%d\n", int(((double)44100 * (GAME_passed_time - Music[song_number].songoffset[difficulty])) / 1000));
 

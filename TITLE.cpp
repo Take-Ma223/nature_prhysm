@@ -21,6 +21,7 @@
 #include "AppContext.h"
 #include <EffekseerForDXLib.h>
 #include "DxLibUtil.h"
+#include "NPLoadSoundMem.h"
 
 using namespace std;
 
@@ -108,14 +109,14 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
 
-	SH_START = LoadSoundMem(L"sound/nature_prhysm_jingle.wav");
-	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
-	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");
+	SH_START = NPLoadBgmSoundMem(L"sound/nature_prhysm_jingle.wav", option);
+	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
+	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
 
-	SH_BGM = LoadSoundMem(L"sound/nature_prhysm_theme.ogg");
-	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
-	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
-	SH_ERROR = LoadSoundMem(L"sound/no.wav");
+	SH_BGM = NPLoadBgmSoundMem(L"sound/nature_prhysm_theme.ogg", option);
+	SH_SHUTTER = NPLoadFxSoundMem(L"sound/shutter.wav", option);
+	SH_SHUTTER_SIGNAL = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
+	SH_ERROR = NPLoadFxSoundMem(L"sound/no.wav", option);
 	/*
 	SH_TEST[0] = LoadSoundMem(L"sound/1.wav", 1);
 	SH_TEST[1] = LoadSoundMem(L"sound/2.wav", 1);
@@ -631,7 +632,9 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			PlaySoundMem(SH_BGM, DX_PLAYTYPE_BACK, TRUE);
 			BGMPlay = 1;
 		}
-		ChangeVolumeSoundMem(int(LOGO_draw_alpha*LOGO_draw_alpha * 255), SH_BGM);
+		int bgmMaxVol = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::BgmSoundVol::Vol_100;
+
+		ChangeVolumeSoundMem(int(LOGO_draw_alpha*LOGO_draw_alpha * bgmMaxVol), SH_BGM);
 
 		//Sleep(1);
 	}
@@ -719,8 +722,8 @@ void CLOSE_COVER(int difficulty, Config config, Option* option) {
 	if (difficulty == 3)H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 
-	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
-	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");
+	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
+	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
 
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {

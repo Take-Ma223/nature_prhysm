@@ -212,6 +212,7 @@
     <ClCompile Include="DxLibUtil.cpp" />
     <ClCompile Include="LearningDataGenarator.cpp" />
     <ClCompile Include="NPGradTextView.cpp" />
+    <ClCompile Include="NPLoadSoundMem.cpp" />
     <ClCompile Include="NPTextView.cpp" />
     <ClCompile Include="NPTextViewParam.cpp" />
     <ClCompile Include="NumberImageHandles.cpp" />
@@ -298,6 +299,7 @@
     <ClInclude Include="DxLibUtil.h" />
     <ClInclude Include="LearningDataGenarator.h" />
     <ClInclude Include="NPGradTextView.h" />
+    <ClInclude Include="NPLoadSoundMem.h" />
     <ClInclude Include="NPTextView.h" />
     <ClInclude Include="NPTextViewParam.h" />
     <ClInclude Include="NumberImageHandles.h" />

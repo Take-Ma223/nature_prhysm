@@ -20,7 +20,8 @@ namespace OptionItem {
 		NOTE,
 		HITSOUND,
 		HITSOUNDVOL,
-		MUSICVOL,
+		FXSOUNDVOL,
+		BGMSOUNDVOL,
 		MOVIE,
 		SORT
 	};
@@ -159,7 +160,21 @@ namespace OptionItem {
 		Vol_100
 	};
 
-	enum class MusicVol : int {
+	enum class FxSoundVol : int {
+		Vol_0,
+		Vol_10,
+		Vol_20,
+		Vol_30,
+		Vol_40,
+		Vol_50,
+		Vol_60,
+		Vol_70,
+		Vol_80,
+		Vol_90,
+		Vol_100
+	};
+
+	enum class BgmSoundVol : int {
 		Vol_0,
 		Vol_10,
 		Vol_20,
@@ -213,7 +228,8 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItem::Windbreak windbreak = OptionItem::Windbreak::CLOSE_0;//レーンカバー初期位置
 	int noteOffset = 20;//音符オフセット調整
 	OptionItem::HitSoundVol hitSoundVol = OptionItem::HitSoundVol::Vol_100;//ヒット音音量
-	OptionItem::MusicVol musicVol = OptionItem::MusicVol::Vol_100;//曲の音量
+	OptionItem::FxSoundVol fxSoundVol = OptionItem::FxSoundVol::Vol_100;//効果音音量
+	OptionItem::BgmSoundVol bgmSoundVol = OptionItem::BgmSoundVol::Vol_100;//曲の音量
 
 
 	OptionItem::Movie movie = OptionItem::Movie::ON_NORMAL;//ムービー再生方法
@@ -223,9 +239,9 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 20;//オプションの数
+	static const int OPTION_NUM = 21;//オプションの数
 
-	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"WINDBREAK",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"NOTE",L"HIT SOUND",L"HIT SOUND VOL",L"MUSIC VOL",L"MOVIE",L"SORT"};
+	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"WINDBREAK",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"NOTE",L"HIT SOUND",L"HIT SOUND VOL",L"FX VOL",L"BGM VOL",L"MOVIE",L"SORT"};
 
 	OptionItem::BannerColor bannerColor[OPTION_NUM] = {
 		OptionItem::BannerColor::GREEN,
@@ -244,6 +260,7 @@ typedef struct Option {//オプション構造体(全体)
 		OptionItem::BannerColor::RED,
 		OptionItem::BannerColor::RED,
 
+		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
@@ -275,7 +292,8 @@ typedef struct Option {//オプション構造体(全体)
 	int THEME_NUM = 0;//テーマオプションの数
 
 	static const int HIT_SOUND_VOL_NUM = 11;//ヒット音音量の数
-	static const int MUSIC_VOL_NUM = 11;//曲音量の数
+	static const int FX_SOUND_VOL_NUM = 11;//ヒット音音量の数
+	static const int BGM_SOUND_VOL_NUM = 11;//曲音量の数
 
 	static const int MOVIE_NUM = 3;//ムービー表示方法の数
 
@@ -567,7 +585,9 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t** theme = 0;//名前はフォルダ名から取る パスの役割も果たす
 
 	wchar_t* hitSoundVol[HIT_SOUND_VOL_NUM] = { L"0%", L"10%", L"20%", L"30%", L"40%", L"50%", L"60%", L"70%", L"80%", L"90%", L"100%" };
-	wchar_t* musicVol[MUSIC_VOL_NUM] = { L"0%", L"10%", L"20%", L"30%", L"40%", L"50%", L"60%", L"70%", L"80%", L"90%", L"100%" };
+	wchar_t* fxSoundVol[FX_SOUND_VOL_NUM] = { L"0%", L"10%", L"20%", L"30%", L"40%", L"50%", L"60%", L"70%", L"80%", L"90%", L"100%" };
+	wchar_t* bgmSoundVol[BGM_SOUND_VOL_NUM] = { L"0%", L"10%", L"20%", L"30%", L"40%", L"50%", L"60%", L"70%", L"80%", L"90%", L"100%" };
+
 	wchar_t* movie[MOVIE_NUM] = { L"OFF", L"ON:NORMAL", L"ON:CLEAR"};
 
 
@@ -812,7 +832,7 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t* sent_theme = L"テーマスキンを変更します";
 
 	wchar_t* sent_hit_sound_vol[HIT_SOUND_VOL_NUM] = {
-	L"音符を叩いた時に音を鳴らしません",
+	L"音符を叩いた時に音量を0%にします",
 	L"音符を叩いた時の音量を10%にします",
 	L"音符を叩いた時の音量を20%にします",
 	L"音符を叩いた時の音量を30%にします",
@@ -824,18 +844,31 @@ typedef struct Option {//オプション構造体(全体)
 	L"音符を叩いた時の音量を90%にします",
 	L"音符を叩いた時の音量を100%にします", };
 
-	wchar_t* sent_music_vol[MUSIC_VOL_NUM] = {
-	L"演奏時に曲を流しません",
-	L"演奏時に流す曲の音量を10%にします",
-	L"演奏時に流す曲の音量を20%にします",
-	L"演奏時に流す曲の音量を30%にします",
-	L"演奏時に流す曲の音量を40%にします",
-	L"演奏時に流す曲の音量を50%にします",
-	L"演奏時に流す曲の音量を60%にします",
-	L"演奏時に流す曲の音量を70%にします",
-	L"演奏時に流す曲の音量を80%にします",
-	L"演奏時に流す曲の音量を90%にします",
-	L"演奏時に流す曲の音量を100%にします", };
+	wchar_t* sent_fx_sound_vol[FX_SOUND_VOL_NUM] = {
+	L"効果音の音量を0%にします",
+	L"効果音の音量を10%にします",
+	L"効果音の音量を20%にします",
+	L"効果音の音量を30%にします",
+	L"効果音の音量を40%にします",
+	L"効果音の音量を50%にします",
+	L"効果音の音量を60%にします",
+	L"効果音の音量を70%にします",
+	L"効果音の音量を80%にします",
+	L"効果音の音量を90%にします",
+	L"効果音の音量を100%にします", };
+
+	wchar_t* sent_bgm_sound_vol[BGM_SOUND_VOL_NUM] = {
+	L"BGMの音量を0%にします",
+	L"BGMの音量を10%にします",
+	L"BGMの音量を20%にします",
+	L"BGMの音量を30%にします",
+	L"BGMの音量を40%にします",
+	L"BGMの音量を50%にします",
+	L"BGMの音量を60%にします",
+	L"BGMの音量を70%にします",
+	L"BGMの音量を80%にします",
+	L"BGMの音量を90%にします",
+	L"BGMの音量を100%にします", };
 
 	wchar_t* sent_movie[MOVIE_NUM] = { 
 		L"動画を再生しません", 
@@ -863,7 +896,8 @@ typedef struct Option {//オプション構造体(全体)
 		&NOTE_NUM,
 		&HITSOUND_NUM,
 		&HIT_SOUND_VOL_NUM,
-		&MUSIC_VOL_NUM,
+		&FX_SOUND_VOL_NUM,
+		&BGM_SOUND_VOL_NUM,
 		&MOVIE_NUM,
 		&SORT_NUM };//各オプションの数
 
@@ -885,7 +919,8 @@ typedef struct Option {//オプション構造体(全体)
 		&sent_note,
 		&sent_hitSound,
 		sent_hit_sound_vol,
-		sent_music_vol,
+		sent_fx_sound_vol,
+		sent_bgm_sound_vol,
 		sent_movie,
 		sent_sort };//説明文
 
@@ -907,7 +942,8 @@ typedef struct Option {//オプション構造体(全体)
 		note,
 		hitSound,
 		hitSoundVol,
-		musicVol,
+		fxSoundVol,
+		bgmSoundVol,
 		movie,
 		sort };//オプション名称
 
@@ -929,7 +965,8 @@ typedef struct Option {//オプション構造体(全体)
 		&(op.note),
 		&(op.hitSound),
 		(int*)&(op.hitSoundVol),
-		(int*)&(op.musicVol),
+		(int*)&(op.fxSoundVol),
+		(int*)&(op.bgmSoundVol),
 		(int*)&(op.movie),
 		(int*)&(op.sort) };//選んでいるオプションの値
 

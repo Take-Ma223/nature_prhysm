@@ -16,6 +16,7 @@
 #include "NotesModeView.h"
 #include "AppContext.h"
 #include "DxLibUtil.h"
+#include "NPLoadSoundMem.h"
 
 using namespace std;
 
@@ -205,44 +206,44 @@ void EDIT_SCORE(SCORE_CELL* head,
 	
 	
 	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_S = NPLoadHitSoundMem(strcash, option, 1);
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_R_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_R_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_R_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_R_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_R_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_R_S = NPLoadHitSoundMem(strcash, option, 1);
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_G_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_G_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_G_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_G_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_G_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_G_S = NPLoadHitSoundMem(strcash, option, 1);
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_B_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_B_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_B_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_B_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_B_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_B_S = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_K = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_K = NPLoadHitSoundMem(strcash, option, 1);
 
 
 
 
-	SH_STEP_CHANGE = LoadSoundMem(L"sound/difficulty_select.wav");
-	SH_STEP_INC_DEC = LoadSoundMem(L"sound/song_select.wav");
-	SH_SAVE = LoadSoundMem(L"sound/shutter_signal.wav");
-	SH_NO = LoadSoundMem(L"sound/no.wav");
-	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
-	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
+	SH_STEP_CHANGE = NPLoadFxSoundMem(L"sound/difficulty_select.wav", option);
+	SH_STEP_INC_DEC = NPLoadFxSoundMem(L"sound/song_select.wav", option);
+	SH_SAVE = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
+	SH_NO = NPLoadFxSoundMem(L"sound/no.wav", option);
+	SH_SHUTTER = NPLoadFxSoundMem(L"sound/shutter.wav", option);
+	SH_SHUTTER_SIGNAL = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
 
 	int Keylist[4][4] = { { KEY_INPUT_V,KEY_INPUT_B,KEY_INPUT_N,KEY_INPUT_M },
 	{ KEY_INPUT_F,KEY_INPUT_G,KEY_INPUT_H,KEY_INPUT_J },

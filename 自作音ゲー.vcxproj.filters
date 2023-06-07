@@ -402,6 +402,9 @@
     <ClCompile Include="Intent.cpp">
       <Filter>ソース ファイル\Util\Intent</Filter>
     </ClCompile>
+    <ClCompile Include="NPLoadSoundMem.cpp">
+      <Filter>ソース ファイル\NPUtil</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -705,6 +708,9 @@
     </ClInclude>
     <ClInclude Include="Intent.h">
       <Filter>ソース ファイル\Util\Intent</Filter>
+    </ClInclude>
+    <ClInclude Include="NPLoadSoundMem.h">
+      <Filter>ソース ファイル\NPUtil</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -31,6 +31,7 @@
 #include "LearningDataGenarator.h"
 #include "DxLibUtil.h"
 #include "OptionListView.h"
+#include "NPLoadSoundMem.h"
 
 using namespace std;
 
@@ -515,23 +516,45 @@ void SONG_SELECT(int *l_n,
 		true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
-	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
-	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");
-	SH_OPEN = LoadSoundMem(L"sound/open.wav");
-	SH_NO = LoadSoundMem(L"sound/no.wav");
-	SH_SONG_SELECT = LoadSoundMem(L"sound/song_select.wav");
-	SH_DIFFICULTY_SELECT = LoadSoundMem(L"sound/difficulty_select.wav");
-	SH_SONG = LoadSoundMem(Music[song_number].wavpath[difficulty]);//曲デモ用音声
+	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
+	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
+	SH_OPEN = NPLoadFxSoundMem(L"sound/open.wav", option);
+	SH_NO = NPLoadFxSoundMem(L"sound/no.wav", option);
+	SH_SONG_SELECT = NPLoadFxSoundMem(L"sound/song_select.wav", option);
+	SH_DIFFICULTY_SELECT = NPLoadFxSoundMem(L"sound/difficulty_select.wav", option);
+	SH_SONG = NPLoadBgmSoundMem(Music[song_number].wavpath[difficulty], option);//曲デモ用音声
 	double demo_vol = 1;//デモの音量
-	SH_FOLDER_SELECT = LoadSoundMem(L"sound/folder_select.wav");
-	SH_ALARM = LoadSoundMem(L"sound/alarm.wav");
-	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
-	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
+	SH_FOLDER_SELECT = NPLoadFxSoundMem(L"sound/folder_select.wav", option);
+	SH_ALARM = NPLoadBgmSoundMem(L"sound/alarm.wav", option);
+	SH_SHUTTER = NPLoadFxSoundMem(L"sound/shutter.wav", option);
+	SH_SHUTTER_SIGNAL = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
-	SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
+	SH_OPTION_HITSOUND_PREVIEW = NPLoadFxSoundMem(strcash, option, 1);//HIT SOUNDプレビュー音声読み込み
 	
-	double bgm_vol = 1;//BGMの音量
+	double bgm_vol_ratio = 1;//BGMの音量
+
+	auto updateVolume = [&]() {
+		const int fxVolume = 255 * (double)option->op.fxSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+		const int bgmVolume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+
+		ChangeVolumeSoundMem(fxVolume,  SH_CLOSE);
+		ChangeVolumeSoundMem(fxVolume,  SH_CLOSED);
+		ChangeVolumeSoundMem(fxVolume,  SH_OPEN);
+		ChangeVolumeSoundMem(fxVolume,  SH_NO);
+		ChangeVolumeSoundMem(fxVolume,  SH_SONG_SELECT);
+		ChangeVolumeSoundMem(fxVolume,  SH_DIFFICULTY_SELECT);
+		ChangeVolumeSoundMem(bgmVolume, SH_SONG);
+		ChangeVolumeSoundMem(fxVolume,  SH_FOLDER_SELECT);
+		ChangeVolumeSoundMem(bgmVolume, SH_ALARM);
+		ChangeVolumeSoundMem(fxVolume,  SH_SHUTTER);
+		ChangeVolumeSoundMem(fxVolume,  SH_SHUTTER_SIGNAL);
+		ChangeVolumeSoundMem(fxVolume,  SH_OPTION_HITSOUND_PREVIEW);
+		ChangeVolumeSoundMem(bgmVolume, SH_BGM);
+
+	};
+
+
 
 
 	H_JACKET = LoadGraph(Music[song_number].jacketpath[difficulty]);//ジャケットの読み込み
@@ -1242,22 +1265,22 @@ void SONG_SELECT(int *l_n,
 
 	if (secret->song_appear_number == -1) {
 		if (rank_point == 14) {//ランクの合計が丁度14だったら (Sを二回連続で取るとなる BBCでもなる)
-			SH_BGM = LoadSoundMem(L"sound/song_select_bgm2.ogg");//選曲BGMの読み込み
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_bgm2.ogg", option);//選曲BGMの読み込み
 		}
 		else if(rank_point >= 12) {//A二回連続またはBBE,CCC等
-			SH_BGM = LoadSoundMem(L"sound/song_select_bgm3.ogg");//選曲BGMの読み込み
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_bgm3.ogg", option);//選曲BGMの読み込み
 
 		}
 		else {
-			SH_BGM = LoadSoundMem(L"sound/song_select_bgm.ogg");//選曲BGMの読み込み
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_bgm.ogg", option);//選曲BGMの読み込み
 		}
 		H_CLOUD = LoadGraph(L"img/cloud.png");
 	}else if (secret->song_appear_number != -1){//隠し曲演出時
 		if (wcscmp(L"\0", secret->BGM) == 0) {//何も指定されていなかったら
-			SH_BGM = LoadSoundMem(L"sound/song_select_secret_bgm.ogg");//隠し曲選曲BGMの読み込み
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_secret_bgm.ogg", option);//隠し曲選曲BGMの読み込み
 		}
 		else {
-			SH_BGM = LoadSoundMem(secret->BGM);//専用選曲BGMの読み込み
+			SH_BGM = NPLoadBgmSoundMem(secret->BGM, option);//専用選曲BGMの読み込み
 		}
 		H_CLOUD = LoadGraph(L"img/cloud_black.png");//隠し曲演出なら黒い雲
 	}
@@ -1325,7 +1348,8 @@ void SONG_SELECT(int *l_n,
 			BGM_play = 1;
 		}
 		if (flag != FLAG_END_FUNCTION_STATE) {//シャッター閉まったらここではBGMの音量調整は行わない
-			ChangeVolumeSoundMem(int(bgm_vol * 255), SH_BGM);
+			int bgmVolume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+			ChangeVolumeSoundMem(int(bgm_vol_ratio * bgmVolume), SH_BGM);
 		}
 
 		//CALC
@@ -1918,6 +1942,19 @@ void SONG_SELECT(int *l_n,
 							optionListView.setCoverImage();
 						}
 
+						if (option_select == (int)OptionItem::Name::HITSOUNDVOL) {
+							updateVolume();
+						}
+
+						if (option_select == (int)OptionItem::Name::FXSOUNDVOL) {
+							updateVolume();
+						}
+
+						if (option_select == (int)OptionItem::Name::BGMSOUNDVOL) {
+							updateVolume();
+						}
+
+
 						optionListView.updateSelectedOptionItem();
 					};
 
@@ -2091,11 +2128,11 @@ void SONG_SELECT(int *l_n,
 
 			if (SelectingTarget == SELECTING_FOLDER || SelectingTarget == SELECTING_COURSE) {//フォルダ,コースセレクト時
 				if (BGM_continue == 0) {
-					if (bgm_vol < 1) {
-						bgm_vol += 0.001;
+					if (bgm_vol_ratio < 1) {
+						bgm_vol_ratio += 0.001;
 					}
-					if (bgm_vol >= 1) {
-						bgm_vol = 1;
+					if (bgm_vol_ratio >= 1) {
+						bgm_vol_ratio = 1;
 					}
 				}
 			}
@@ -2103,11 +2140,11 @@ void SONG_SELECT(int *l_n,
 
 			if (SelectingTarget == SELECTING_SONG) {//曲選択時はBGMの音量0になめらかに移行
 				if (BGM_continue == 0) {
-					if (bgm_vol > 0) {
-						bgm_vol -= 0.01;
+					if (bgm_vol_ratio > 0) {
+						bgm_vol_ratio -= 0.01;
 					}
-					if (bgm_vol <= 0) {
-						bgm_vol = 0;
+					if (bgm_vol_ratio <= 0) {
+						bgm_vol_ratio = 0;
 					}
 				}
 			}
@@ -2121,7 +2158,7 @@ void SONG_SELECT(int *l_n,
 
 				SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMPRESS);
 				DeleteSoundMem(SH_SONG);
-				SH_SONG = LoadSoundMem(Music[song_number].wavpath[difficulty]);
+				SH_SONG = NPLoadBgmSoundMem(Music[song_number].wavpath[difficulty],option);
 
 				SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
 
@@ -2179,12 +2216,15 @@ void SONG_SELECT(int *l_n,
 			if (demo_vol < 0) {
 				demo_vol = 0;
 			}
-			ChangeVolumeSoundMem(int(demo_vol * 255), SH_SONG);//デモの音量は曲決定後にフェードアウト
+			int bgmVolume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+
+			ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_SONG);//デモの音量は曲決定後にフェードアウト
 			if (BGM_continue == 1) {
-				ChangeVolumeSoundMem(int(demo_vol * 255), SH_BGM);//BGM有り隠し曲出現時はBGMもフェードアウト
+
+				ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_BGM);//BGM有り隠し曲出現時はBGMもフェードアウト
 			}
 			if (SelectingTarget == SELECTING_COURSE) {
-				ChangeVolumeSoundMem(int(demo_vol * 255), SH_BGM);//段位コース選んだ時はBGMもフェードアウト
+				ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_BGM);//段位コース選んだ時はBGMもフェードアウト
 			}
 		}
 

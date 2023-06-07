@@ -37,6 +37,7 @@
 #include "DetailView.h"
 #include "AutoDifficultyPrediction.h"
 #include "DxLibUtil.h"
+#include "NPLoadSoundMem.h"
 
 using namespace std;
 
@@ -766,42 +767,40 @@ void GAME(int song_number, int difficulty,
 	};
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/f2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/f1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_S = NPLoadHitSoundMem(strcash, option, 1);
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/r2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_R_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_R_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/r3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_R_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_R_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/r1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_R_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_R_S = NPLoadHitSoundMem(strcash, option, 1);
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/g2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_G_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_G_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/g3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_G_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_G_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/g1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_G_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_G_S = NPLoadHitSoundMem(strcash, option, 1);
 
 	sprintfDx(strcash, L"sound/hit_sound/%s/b2.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_B_N = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_B_N = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/b3.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_B_L = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_B_L = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/b1.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_B_S = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_B_S = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/k.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_HIT_K = LoadSoundMem(strcash, 1);
+	SH.SH_HIT_K = NPLoadHitSoundMem(strcash, option, 1);
 	sprintfDx(strcash, L"sound/hit_sound/%s/release.wav", option->hitSound[option->op.hitSound]);
-	SH.SH_RELEASE = LoadSoundMem(strcash, 1);
-
-	SH.setVol(255 * (double)option->op.hitSoundVol / (int)OptionItem::HitSoundVol::Vol_100);//効果音音量セット
+	SH.SH_RELEASE = NPLoadHitSoundMem(strcash, option, 1);
 
 	//曲データは非同期で読み込む
 	SetUseASyncLoadFlag(TRUE);
-	SH_SONG = LoadSoundMem(Music[song_number].wavpath[difficulty]);
+	SH_SONG = NPLoadBgmSoundMem(Music[song_number].wavpath[difficulty], option);
 	BOOL isOverSongPlayTiming = false;
 
 	bool isPlayMovie;
@@ -813,11 +812,11 @@ void GAME(int song_number, int difficulty,
 	BOOL isOverMoviePlayTiming = false;
 
 	SetUseASyncLoadFlag(FALSE);
-	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
-	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");
-	SH_OPEN = LoadSoundMem(L"sound/open.wav");
-	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
-	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
+	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
+	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
+	SH_OPEN = NPLoadFxSoundMem(L"sound/open.wav", option);
+	SH_SHUTTER = NPLoadFxSoundMem(L"sound/shutter.wav", option);
+	SH_SHUTTER_SIGNAL = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
 	/*
 	SH_R[0] = LoadSoundMem(L"sound/hit_R.wav");
 	SH_G[0] = LoadSoundMem(L"sound/hit_G.wav");
@@ -834,7 +833,7 @@ void GAME(int song_number, int difficulty,
 	*/
 
 	//printfDx("%s\n", Music[song_number].jinglepath[difficulty]);
-	SH_JINGLE = LoadSoundMem(Music[song_number].jinglepath[difficulty]);
+	SH_JINGLE = NPLoadBgmSoundMem(Music[song_number].jinglepath[difficulty], option);
 
 	//重複処理ラムダ式
 
@@ -3666,7 +3665,7 @@ void GAME(int song_number, int difficulty,
 			BGM_VolTowardResult = 1 - (double)(GAME_passed_time - cleared_time) / (double)TimeFromEndOfGameToResult;
 		}
 		if (!CheckHandleASyncLoad(SH_SONG)) {
-			int maxVol = 255 * (double)option->op.musicVol / (int)OptionItem::MusicVol::Vol_100;
+			int maxVol = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::BgmSoundVol::Vol_100;
 			double missVolEasing = ((double)1 - cos(volume * (3.1415 / 2)));//0~1
 			int vol = int(maxVol * missVolEasing * BGM_VolTowardResult * debug_music);
 

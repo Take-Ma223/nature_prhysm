@@ -21,6 +21,7 @@
 #include "AppContext.h"
 #include "ActivityContext.h"
 #include "DxLibUtil.h"
+#include "NPLoadSoundMem.h"
 
 using namespace std;
 
@@ -727,19 +728,19 @@ void SHOW_RESULT(RESULT res,
 
 	H_WHITE_WALL = LoadGraph(L"img/WhiteWall.png");
 
-	SH_CLOSE = LoadSoundMem(L"sound/close.wav");
-	SH_CLOSED = LoadSoundMem(L"sound/closed.wav");
-	SH_OPEN = LoadSoundMem(L"sound/open.wav");
-	SH_SHUTTER = LoadSoundMem(L"sound/shutter.wav");
-	SH_SHUTTER_SIGNAL = LoadSoundMem(L"sound/shutter_signal.wav");
+	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
+	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
+	SH_OPEN = NPLoadFxSoundMem(L"sound/open.wav", option);
+	SH_SHUTTER = NPLoadFxSoundMem(L"sound/shutter.wav", option);
+	SH_SHUTTER_SIGNAL = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
 
 	if (res.clear == 0 || (SkillTestFlag == SHOW_SKILL_TEST_RESULT && res.clear == 0)) {//failed時
-		SH_RESULT = LoadSoundMem(L"sound/result_failed.wav");
-		SH_RANK = LoadSoundMem(L"sound/result_failed_p.wav");
+		SH_RESULT = NPLoadBgmSoundMem(L"sound/result_failed.wav", option);
+		SH_RANK = NPLoadBgmSoundMem(L"sound/result_failed_p.wav", option);
 	}
 	if (res.clear != 0 || (SkillTestFlag == SHOW_SKILL_TEST_RESULT && res.clear == 1)) {
-		SH_RESULT = LoadSoundMem(L"sound/result_clear.wav");
-		SH_RANK = LoadSoundMem(L"sound/result_clear_p.wav");
+		SH_RESULT = NPLoadBgmSoundMem(L"sound/result_clear.wav", option);
+		SH_RANK = NPLoadBgmSoundMem(L"sound/result_clear_p.wav", option);
 	}
 
 

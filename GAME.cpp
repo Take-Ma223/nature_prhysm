@@ -1647,7 +1647,7 @@ void GAME(int song_number, int difficulty,
 
 
 			if (Key[KEY_INPUT_F2] == 1) {//譜面再読み込み
-				int startTime = GetNowCount_d(config);
+				double startTime = GetNowCount_d(config);
 
 				debug_warp = 1;
 				GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
@@ -1747,7 +1747,7 @@ void GAME(int song_number, int difficulty,
 
 				debug_time_passed = debug_time_passed_in_EDIT_SCORE / pitch;//今の再生速度での時間に戻す
 				debug_stop_time = GetNowCount_d(config) - debug_stoped_time;//debug_stop_timeの更新ができていなかったのでする
-				int startTime = GetNowCount_d(config);
+				double startTime = GetNowCount_d(config);
 
 				//譜面再読み込み
 				debug_warp = 1;

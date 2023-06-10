@@ -3,7 +3,7 @@
 
 #define NOTE_MAX_NUMBER 10000//1レーンの最大音符数 6500は無理 6000ぐらいまでいけた
 #define BARLINE_MAX_NUMBER 50000//小節線の最大数
-constexpr auto SONG_MAX_NUMBER = 1000;//最大曲数 2300までいける
+constexpr auto SONG_MAX_NUMBER = 9999;//最大曲数
 #define APPLICATION_VERSION 1.34        //バージョン
 
 #define SECRET_SONG_APPEAR_CYCLE 3//3曲Aを連続で取れば隠し曲が一回出現

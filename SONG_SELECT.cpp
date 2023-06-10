@@ -183,6 +183,39 @@ void SONG_SELECT(int *l_n,
 		H_TITLE_STR[i] = MakeScreen(640, 48, TRUE);
 	}
 
+	auto cycleIndex = [](const int value, const int range) {
+		int v = value;
+		if (v >= range)v -= range;
+		if (v < 0)v += range;
+		return v;
+	};
+
+	class TitleCycleIndex {
+	public:
+		TitleCycleIndex(int range) {
+			indexRange = range;
+		}
+		
+		int index = 0;
+		int indexRange = 1;
+		void plus() {
+			index += 1;
+			if (index >= indexRange)index -= indexRange;
+		}
+		void minus() {
+			index -= 1;
+			if (index < 0)index += indexRange;
+		}
+	};
+	TitleCycleIndex titleCycleIndex(config.SongSelectRowNumber);
+
+	enum TitleStrUpdateFlag {
+		TOP,
+		ALL, 
+		BOTTOM,
+	};
+	TitleStrUpdateFlag titleStrUpdateFlag = ALL;
+
 	int genre_width = 1;//ジャンル名の幅
 	int artist_width = 1;//アーティスト名の幅
 	int brightness = 0;
@@ -1464,6 +1497,7 @@ void SONG_SELECT(int *l_n,
 						jacket_show_counter = 1;//ジャケットの読み込み
 						jacket_alpha = 0;
 						widthCalcFlag = 1;
+						titleStrUpdateFlag = ALL;
 					}
 					else {
 						if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
@@ -1486,7 +1520,7 @@ void SONG_SELECT(int *l_n,
 									jacket_alpha = 0;
 								}
 								widthCalcFlag = 1;
-
+								titleStrUpdateFlag = ALL;
 								//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
 								int now_list_number = list_number;
 								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
@@ -1519,7 +1553,7 @@ void SONG_SELECT(int *l_n,
 									jacket_alpha = 0;
 								}
 								widthCalcFlag = 1;
-
+								titleStrUpdateFlag = ALL;
 								//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
 								int now_list_number = list_number;
 								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
@@ -1558,6 +1592,8 @@ void SONG_SELECT(int *l_n,
 							jacket_show_counter = 1;//ジャケットの読み込み
 							jacket_alpha = 0;
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = TOP;
+							titleCycleIndex.minus();
 						}
 						if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
 							StopSoundMem(SH_SONG);
@@ -1579,6 +1615,8 @@ void SONG_SELECT(int *l_n,
 							jacket_show_counter = 1;//ジャケットの読み込み
 							jacket_alpha = 0;
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = BOTTOM;
+							titleCycleIndex.plus();
 						}
 
 
@@ -1604,6 +1642,8 @@ void SONG_SELECT(int *l_n,
 								jacket_show_counter = 1;//ジャケットの読み込み
 								jacket_alpha = 0;
 								widthCalcFlag = 1;
+								titleStrUpdateFlag = TOP;
+								titleCycleIndex.minus();
 							}
 						}
 						if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
@@ -1628,6 +1668,8 @@ void SONG_SELECT(int *l_n,
 								jacket_show_counter = 1;//ジャケットの読み込み
 								jacket_alpha = 0;
 								widthCalcFlag = 1;
+								titleStrUpdateFlag = BOTTOM;
+								titleCycleIndex.plus();
 							}
 						}
 
@@ -1655,6 +1697,7 @@ void SONG_SELECT(int *l_n,
 								jacket_show_counter = 1;//ジャケットの読み込み
 								jacket_alpha = 0;
 								widthCalcFlag = 1;
+								titleStrUpdateFlag = ALL;
 								Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
 							}
 						}
@@ -1668,6 +1711,7 @@ void SONG_SELECT(int *l_n,
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						widthCalcFlag = 1;
 						optionListView.setSkillTestMode(false);
+						titleStrUpdateFlag = ALL;
 					}
 					else {
 						if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
@@ -1677,6 +1721,8 @@ void SONG_SELECT(int *l_n,
 							bn_draw_counter--;
 							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = TOP;
+							titleCycleIndex.minus();
 						}
 						if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
 							list_number++;
@@ -1685,6 +1731,8 @@ void SONG_SELECT(int *l_n,
 							bn_draw_counter++;
 							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = BOTTOM;
+							titleCycleIndex.plus();
 						}
 
 
@@ -1697,6 +1745,8 @@ void SONG_SELECT(int *l_n,
 								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 								widthCalcFlag = 1;
 								roll_counter = 1;
+								titleStrUpdateFlag = TOP;
+								titleCycleIndex.minus();
 							}
 						}
 						if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
@@ -1708,6 +1758,9 @@ void SONG_SELECT(int *l_n,
 								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 								widthCalcFlag = 1;
 								roll_counter = 1;
+								titleStrUpdateFlag = BOTTOM;
+								titleCycleIndex.plus();
+
 							}
 						}
 
@@ -1720,6 +1773,7 @@ void SONG_SELECT(int *l_n,
 								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 								SelectingTarget = SELECTING_FOLDER;
 								widthCalcFlag = 1;
+								titleStrUpdateFlag = ALL;
 								Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
 								optionListView.setSkillTestMode(false);
 							}
@@ -1734,6 +1788,7 @@ void SONG_SELECT(int *l_n,
 						if (difficulty != 1) {
 							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = ALL;
 						}
 						difficulty--;
 						if (difficulty > 4)difficulty = 4;
@@ -1744,6 +1799,7 @@ void SONG_SELECT(int *l_n,
 						if (difficulty != 4) {
 							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = ALL;
 						}
 						difficulty++;
 						if (difficulty > 4)difficulty = 4;
@@ -1764,6 +1820,8 @@ void SONG_SELECT(int *l_n,
 
 
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = TOP;
+							titleCycleIndex.minus();
 						}
 						if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
 							folder->selected_folder++;
@@ -1774,6 +1832,8 @@ void SONG_SELECT(int *l_n,
 
 
 							widthCalcFlag = 1;
+							titleStrUpdateFlag = BOTTOM;
+							titleCycleIndex.plus();
 						}
 
 
@@ -1785,6 +1845,8 @@ void SONG_SELECT(int *l_n,
 								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 								widthCalcFlag = 1;
 								roll_counter = 1;
+								titleStrUpdateFlag = TOP;
+								titleCycleIndex.minus();
 								//time_base_str = GetNowCount_d(config);
 							}
 						}
@@ -1796,6 +1858,8 @@ void SONG_SELECT(int *l_n,
 								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 								widthCalcFlag = 1;
 								roll_counter = 1;
+								titleStrUpdateFlag = BOTTOM;
+								titleCycleIndex.plus();
 								//time_base_str = GetNowCount_d(config);
 							}
 						}
@@ -1837,6 +1901,7 @@ void SONG_SELECT(int *l_n,
 						jacket_alpha = 0;
 
 						widthCalcFlag = 1;
+						titleStrUpdateFlag = ALL;
 					}
 				}
 
@@ -1911,6 +1976,7 @@ void SONG_SELECT(int *l_n,
 								}
 							}
 							widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
+							titleStrUpdateFlag = ALL;
 						}
 
 						if (option_select == (int)OptionItem::Name::NOTE) {
@@ -2530,11 +2596,6 @@ void SONG_SELECT(int *l_n,
 						//タイトル
 						title_buf[i] =
 							Music[sn_buf].title[difficulty_buf];//曲名の先頭ポインタを配列に格納
-						title_width[i] =
-							GetDrawStringWidthToHandle(//文字長を取得
-								Music[sn_buf].title[difficulty_buf], //タイトルを出す
-								wcslen(Music[sn_buf].title[difficulty_buf]),//同じようにその文字数も引数として入れてやる
-								FontHandle);
 						title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
 
 						title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
@@ -2544,12 +2605,6 @@ void SONG_SELECT(int *l_n,
 							//タイトル
 							title_buf[i] =
 								Music[sn_buf].title[difficulty_buf];//曲名の先頭ポインタを配列に格納
-
-							title_width[i] =
-								GetDrawStringWidthToHandle(//文字長を取得
-									Music[sn_buf].title[difficulty_buf], //タイトルを出す
-									wcslen(Music[sn_buf].title[difficulty_buf]),//同じようにその文字数も引数として入れてやる
-									FontHandle);
 							title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
 							title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
 						}
@@ -2558,12 +2613,6 @@ void SONG_SELECT(int *l_n,
 								
 								title_buf[i] =
 									secret_str;//曲名の先頭ポインタを配列に格納
-
-								title_width[i] =
-									GetDrawStringWidthToHandle(//文字長を取得
-										secret_str, //タイトルを出す
-										wcslen(secret_str),//同じようにその文字数も引数として入れてやる
-										FontHandle);
 								title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
 								title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
 							}
@@ -2571,12 +2620,6 @@ void SONG_SELECT(int *l_n,
 								//タイトル
 								title_buf[i] =
 									Music[sn_buf].title[difficulty_buf];//曲名の先頭ポインタを配列に格納
-
-								title_width[i] =
-									GetDrawStringWidthToHandle(//文字長を取得
-										Music[sn_buf].title[difficulty_buf], //タイトルを出す
-										wcslen(Music[sn_buf].title[difficulty_buf]),//同じようにその文字数も引数として入れてやる
-										FontHandle);
 								title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
 								title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
 							}
@@ -2584,14 +2627,26 @@ void SONG_SELECT(int *l_n,
 
 
 					}
+					int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+					if (titleStrUpdateFlag == TOP) {
+						if (index != cycleIndex(0 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+					}
+					if (titleStrUpdateFlag == BOTTOM) {
+						if (index != cycleIndex(config.SongSelectRowNumber - 1 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+					}
+					title_width[index] =
+						GetDrawStringWidthToHandle(//文字長を取得
+							title_buf[i], //タイトルを出す
+							wcslen(title_buf[i]),//同じようにその文字数も引数として入れてやる
+							FontHandle);
 
 					SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-					SetDrawScreen(H_TITLE_STR[i]);//曲名画像を描画対象に
+					SetDrawScreen(H_TITLE_STR[index]);//曲名画像を描画対象に
 					ClearDrawScreen();//前に描かれていた文字を消す
 					//画像として一時的に描画
 					ShowExtendedStrFitToHandle(320, 7,
 						title_buf[i],
-						title_width[i],
+						title_width[index],
 						620, config,
 						FontHandle,
 						title_color[i],
@@ -2600,7 +2655,7 @@ void SONG_SELECT(int *l_n,
 					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 					SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
 					SetDrawMode(DX_DRAWMODE_NEAREST);
-					GraphBlend(H_TITLE_STR[i], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+					GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
 
 				}
 
@@ -2628,28 +2683,39 @@ void SONG_SELECT(int *l_n,
 					int sn_buf = number_ring(list_number + (i - Column / 2), NUMBER_OF_COURSES - 1);//list_numberの情報から曲番号を算出
 					
 					title_buf[i] = STList->title[sn_buf];
-					title_width[i] =
+					title_color[i] = STList->Color[sn_buf];//色を配列に格納
+					title_shadow_color[i] = STList->ShadowColor[sn_buf];//色を配列に格納
+				
+					int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+					if (titleStrUpdateFlag == TOP) {
+						if (index != cycleIndex(0 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+					}
+					if (titleStrUpdateFlag == BOTTOM) {
+						if (index != cycleIndex(config.SongSelectRowNumber - 1 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+					}
+
+					title_width[index] =
 						GetDrawStringWidthToHandle(//文字長を取得
 							title_buf[i], //タイトルを出す
 							wcslen(title_buf[i]),//同じようにその文字数も引数として入れてやる
 							FontHandle);
-					title_color[i] = STList->Color[sn_buf];//色を配列に格納
-					title_shadow_color[i] = STList->ShadowColor[sn_buf];//色を配列に格納
-				
 
-					SetDrawScreen(H_TITLE_STR[i]);//段位認定コース名画像を描画対象に
+					SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+					SetDrawScreen(H_TITLE_STR[index]);//段位認定コース名画像を描画対象に
 					ClearDrawScreen();//前に描かれていた文字を消す
-									  //画像として一時的に描画
+					//画像として一時的に描画
 					ShowExtendedStrFitToHandle(320, 7,
 						title_buf[i],
-						title_width[i],
+						title_width[index],
 						620, config,
 						FontHandle,
 						title_color[i],
 						title_shadow_color[i]);//曲名描画
 
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 					SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
-					GraphBlend(H_TITLE_STR[i], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+					SetDrawMode(DX_DRAWMODE_NEAREST);
+					GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
 				}
 
 				widthCalcFlag = 0;
@@ -2660,22 +2726,31 @@ void SONG_SELECT(int *l_n,
 		if (SelectingTarget == SELECTING_FOLDER) {
 			if (widthCalcFlag == 1) {//上下左右のキーを押して曲,難易度が変わっていたら
 				for (i = 0; i <= Column; i++) {//Column/2が中心
-					folder_name_width[i] = GetDrawStringWidthToHandle(folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)],
+					int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+					if (titleStrUpdateFlag == TOP) {
+						if (index != cycleIndex(0 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+					}
+					if (titleStrUpdateFlag == BOTTOM) {
+						if (index != cycleIndex(config.SongSelectRowNumber - 1 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+					}
+
+					folder_name_width[index] = GetDrawStringWidthToHandle(folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)],
 						wcslen(folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)]),FontHandle);
 					//printfDx(L"i:%d num:%d ring:%d\n",i, song_number + (i - 8), number_ring(song_number + (i - 8), NumberOfSongs-1));
-				
-					SetDrawScreen(H_TITLE_STR[i]);//フォルダ名画像を描画対象に
+
+
+					SetDrawScreen(H_TITLE_STR[index]);//フォルダ名画像を描画対象に
 					ClearDrawScreen();//前に描かれていた文字を消す
 									  //画像として一時的に描画
 					
 					ShowExtendedStrFitToHandle(320, 7,
 						folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)],
-						folder_name_width[i],
+						folder_name_width[index],
 						620, config,
 						FontHandle, colorRatio(255, 255, 255), colorRatio(0, 0, 0));//フォルダ名表示
 
 					SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
-					GraphBlend(H_TITLE_STR[i], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+					GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
 
 				}
 				widthCalcFlag = 0;
@@ -2871,8 +2946,8 @@ void SONG_SELECT(int *l_n,
 				}
 				//文字列を求める処理が重い
 				//title_buf[i];曲名の先頭ポインタが配列に格納されている
-
-				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[i], TRUE);
+				int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
 				/*
 				ShowExtendedStrFitToHandle(640, int(7 + 336 + (bn_draw_counter + i - Column / 2) * 48), 
 					title_buf[i] ,
@@ -2898,14 +2973,16 @@ void SONG_SELECT(int *l_n,
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		if (SelectingTarget == SELECTING_COURSE) {//段位認定コース名表示
 			for (i = 0; i <= Column; i++) {
-				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[i], TRUE);		
+				int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
 			}
 		}
 
 
 		if (SelectingTarget == SELECTING_FOLDER) {//フォルダ名表示
 			for (i = 0; i <= Column; i++) {
-				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[i], TRUE);
+				int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
 			}
 			/*
 			for (i = 0; i <= Column; i++) {

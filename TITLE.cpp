@@ -135,14 +135,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	while (1) {
 		appContext.updateTime();
 
-		if (ProcessMessage() != 0) {
-			InitSoundMem();
-			Effkseer_End();
-			dxLibFinishProcess();
-			return;
-		}
-
-
 		//Calc
 		GAME_passed_time = GetNowCount_d(config) - GAME_start_time;//経過時間計算
 		LOOP_passed_time = GAME_passed_time - time_cash;//1ループにかかった時間を算出
@@ -155,6 +147,13 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
 
 		Get_Key_State(Buf, Key, AC);
+
+		if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1) {//ESCでゲーム終了
+			InitSoundMem();
+			Effkseer_End();
+			dxLibFinishProcess();
+			return;
+		}
 
 		/*
 		if (stat == STATE_PRESS_ANY_KEY) {
@@ -199,7 +198,6 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			}
 		}
 		*/
-
 		if (stat == STATE_PRESS_ANY_KEY) {
 			if (Key[Button[0][0]] || Key[Button[0][1]] || Key[Button[0][2]] || Key[Button[0][3]] ||
 				Key[Button[1][0]] || Key[Button[1][1]] || Key[Button[1][2]] || Key[Button[1][3]] ||

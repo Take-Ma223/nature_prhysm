@@ -811,6 +811,28 @@ void GAME(int song_number, int difficulty,
 	if(isPlayMovie)MovieGraphHandle = LoadGraph(Music[song_number].moviePath[difficulty]);
 	BOOL isOverMoviePlayTiming = false;
 
+	int movieHeight;
+	int movieWidth;
+	GetGraphSize(MovieGraphHandle, &movieWidth, &movieHeight);
+
+	const int drawAreaX = 1280;
+	const int drawAreaY = 720;
+	double movieScale = 1;
+	const double drawAreaAspecRatio = (double)drawAreaX / drawAreaY;
+	const double movieAspectRatio = (double)movieWidth / movieHeight;
+	if (movieAspectRatio >= drawAreaAspecRatio) {//横長の動画
+		movieScale = (double)drawAreaX / movieWidth;
+	}
+	else {//縦長の動画
+		movieScale = (double)drawAreaY / movieHeight;
+	}
+
+	const int movieX1 = (int)(640 - 0.5 * movieWidth * movieScale);
+	const int movieY1 = (int)(360 - 0.5 * movieHeight * movieScale);
+	const int movieX2 = (int)(640 + 0.5 * movieWidth * movieScale);
+	const int movieY2 = (int)(360 + 0.5 * movieHeight * movieScale);
+
+
 	SetUseASyncLoadFlag(FALSE);
 	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
 	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
@@ -2938,7 +2960,10 @@ void GAME(int song_number, int difficulty,
 
 		int movieLayer = H_DARKNESS;
 		if (isOverMoviePlayTiming)movieLayer = MovieGraphHandle;
-		if(isPlayMovie)DrawGraph(0, 0, movieLayer, FALSE);
+		if (isPlayMovie) {
+			DrawGraph(0, 0, H_DARKNESS, TRUE);//動画再生時の黒背景
+			DrawExtendGraph(movieX1, movieY1, movieX2, movieY2, movieLayer, FALSE);
+		}
 
 	    //後ろに落ちるものの表示と削除
 		if (head.next != NULL) {//最低1つあるとき

@@ -80,6 +80,10 @@ void SHOW_RESULT(RESULT res,
 
 	int H_WHITE_WALL;
 
+	bool isUpdateClear = false;
+	bool isUpdateScore = false;
+
+
 	//グラデーション画像の用意
 	int screenHandle;
 	screenHandle = MakeScreen(1280, 100, TRUE);
@@ -376,6 +380,7 @@ void SHOW_RESULT(RESULT res,
 
 			if (res.clear > high_score.clear) {
 				save.clear = res.clear;//クリア状態更新
+				isUpdateClear = true;
 			}
 
 			if (res.score > high_score.score && !isOnlyOption) {//ONLYオプションを付けていなくてハイスコア更新
@@ -393,6 +398,7 @@ void SHOW_RESULT(RESULT res,
 				}
 				
 				bestscore = 1;
+				isUpdateScore = true;
 			}
 			if (res.max_combo > high_score.max_combo) {//MaxCombo更新
 				save.max_combo = res.max_combo;
@@ -418,11 +424,15 @@ void SHOW_RESULT(RESULT res,
 				if (res.clear >= CLEARTYPE_CLEARED || res.clear == CLEARTYPE_PLAY) {//クリア、PLAYしたとき　MinMiss保存
 					save.min_miss = res.miss;
 				}
-
 			}
 			else {
 				save.clear = res.clear;//灰クリアだけ記録
 			}
+
+			if (res.clear >= CLEARTYPE_EASY_CLEARED) {//初クリア時にジャケット表示
+				isUpdateClear = true;
+			}
+
 			save.save_data_version = RESULT_DATA_VERSION;//セーブデータバージョン書き込み
 
 		}
@@ -558,7 +568,12 @@ void SHOW_RESULT(RESULT res,
 		}
 	}
 	else {
-		if (((res.rank == 7) || Music[song_number].secret == 1) && res.clear != 0) {//クリアしててSのとき または隠し曲初クリア時
+		bool isClearAndRankS = (res.rank == 7) && res.clear != 0;
+		//bool isFirstClearSecretSong = Music[song_number].secret == 1 && res.clear != 0;
+		bool isClearAndUpdateScore = isUpdateScore && res.clear != 0;
+		H_JACKET = -1;
+
+		if (isClearAndRankS || isUpdateClear || isClearAndUpdateScore) {//クリアしててS, クリア更新,　クリアしててスコア更新時にジャケット表示
 			if (wcscmp(L"\0", Music[song_number].jacketpath2[difficulty]) == 0) {//リザルト専用ジャケットが無い
 				H_JACKET = LoadGraph(Music[song_number].jacketpath[difficulty]);//通常ジャケットの読み込み
 				H_JACKET_GAUSS = LoadGraph(Music[song_number].jacketpath[difficulty]);//通常ジャケット(ぼかし用)の読み込み
@@ -567,9 +582,9 @@ void SHOW_RESULT(RESULT res,
 				H_JACKET = LoadGraph(Music[song_number].jacketpath2[difficulty]);//ジャケットの読み込み
 				H_JACKET_GAUSS = LoadGraph(Music[song_number].jacketpath2[difficulty]);//ジャケット(ぼかし用)の読み込み
 			}
-
+			//ジャケットが読み込み失敗した場合H_JACKETは-1になる
 		}
-		if (!(((res.rank == 7) || Music[song_number].secret == 1) && res.clear != 0) || H_JACKET == -1) {//汎用リザルト画像読み込み
+		if (H_JACKET == -1) {//汎用リザルト画像読み込み
 			
 			wchar_t ImageFolderPass[128];
 			wchar_t ImagePass[128];

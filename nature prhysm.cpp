@@ -25,6 +25,7 @@
 #include "IR_process.h"
 #include "ActivityController.h"
 #include "DxLibUtil.h"
+#include "AutoDifficultyPrediction.h"
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
 void EffekseerInitProcess();
@@ -40,6 +41,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif // !__ANDROID__
 
 	_wchdir(L"../../");//作業ディレクトリをapplicationから親の親ディレクトリに移す
+
+	AutoDifficultyPrediction adp;
+	adp.bootServer();//難易度算出用サーバーを立てる
 
 	wchar_t DX_PASSWORD[] = L"ntps";
 	SetDXArchiveKeyString(DX_PASSWORD);

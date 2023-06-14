@@ -345,7 +345,7 @@ void GAME(int song_number, int difficulty,
 
 	CALCDIFF Cdiff;//計算で出した難易度要素目安
 	AutoDifficultyPrediction adp;
-	wstring autoDifficultyPredictionResult;
+	double autoDifficultyPredictionResult;
 	if(*debug == 1)	autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 
 
@@ -3648,7 +3648,7 @@ void GAME(int song_number, int difficulty,
 			printfDx(L"↑↓:MOVE\n");
 			printfDx(L"←→:PITCH:%d ×%.3f\n", pitch_step,pitch);
 
-			printfDx(L"AI 難易度予測:%s\n", autoDifficultyPredictionResult.c_str());
+			printfDx(L"AI 難易度予測:%.2f\n", autoDifficultyPredictionResult);
 			printfDx(L"想定難易度:%d%%\n", Cdiff.level);
 			printfDx(L"想定局所難易度:%d%%\n", Cdiff.level_local);
 

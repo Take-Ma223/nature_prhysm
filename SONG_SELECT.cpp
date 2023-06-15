@@ -64,6 +64,7 @@ void SONG_SELECT(int *l_n,
 	int H_COVER_OPTION;
 	int H_OPTION;
 	int H_RESULT;
+	int H_RESULT_OBJ;
 	int H_COVER_MIDDLE;//中心カバー
 	int H_DIFFICULTY[10];//難易度画像
 	int H_BANNER_UD;
@@ -446,7 +447,8 @@ void SONG_SELECT(int *l_n,
 	H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
 
 	H_OPTION = LoadGraph(L"img/cover_option_str.png");
-	H_RESULT = LoadGraph(L"img/cover_result_obj.png");
+	H_RESULT = LoadGraph(L"img/cover_result.png");
+	H_RESULT_OBJ = LoadGraph(L"img/cover_result_obj.png");
 
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 	H_BANNER_UD = LoadGraph(L"img/banner_ud.png");
@@ -3583,11 +3585,13 @@ void SONG_SELECT(int *l_n,
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
-		cache = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280);//リザルトカバー
+		cache = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280 + 0.5);//リザルトカバー
 
 		DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
-		if ((SelectingTarget == SELECTING_SONG) || (SelectingTarget == SELECTING_COURSE))DrawGraph(cache, 0, H_RESULT, TRUE);//リザルトカバー
-
+		if ((SelectingTarget == SELECTING_SONG) || (SelectingTarget == SELECTING_COURSE)) {
+			DrawGraph(cache, 0, H_RESULT, TRUE);//リザルトタイトル
+			DrawGraph(cache, 0, H_RESULT_OBJ, TRUE);//リザルトボード
+		}
 
 		if ((Music[song_number].exist[difficulty] == 1 && SelectingTarget == SELECTING_SONG) || SelectingTarget == SELECTING_COURSE) {//曲選択状態で譜面が存在するときか、段位選択のとき
 			int SkyPerfectBuf = 0;

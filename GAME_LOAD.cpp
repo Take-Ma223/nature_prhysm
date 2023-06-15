@@ -17,6 +17,7 @@
 #include "NPStringUtil.h"
 #include "DxLibUtil.h"
 #include "show_something.h"
+#include "AutoDifficultyPrediction.h"
 
 void GAME_LOAD(int song_number,
 	int difficulty,
@@ -39,6 +40,16 @@ void GAME_LOAD(int song_number,
 	SCORE_CELL *score_cell_head,//EDIT_SCORE関数用の譜面情報格納リスト
 	int SkillTestFlag
 	) {//譜面の読み込み
+
+	AutoDifficultyPrediction adp;
+	float autoDifficultyPredictionResult = 0;
+	auto setAiPredictedDifficultyIfEnable = [&]() {
+		//自動難易度算出
+		if (config.UseAiPredictedDifficulty == 1) {
+			autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
+			Music[song_number].level[difficulty] = autoDifficultyPredictionResult;
+		}
+	};
 
 	double step_counter = 0;//score_cellのstep値を保存
 	SCORE_CELL *score_cell_insert = score_cell_head;//このポインタの次にscore_cellセルを挿入
@@ -560,6 +571,8 @@ void GAME_LOAD(int song_number,
 
 	}
 	if (readflag == 1) {
+		setAiPredictedDifficultyIfEnable();
+
 		free(bpmList);
 		free(timing_same);
 
@@ -1599,7 +1612,7 @@ void GAME_LOAD(int song_number,
 	note[i][0].bpm = 120;
 	}
 	*/
-
+	setAiPredictedDifficultyIfEnable();
 
 	//printfDx(L"ハッシュ値:%d\n", *hash);
 	//ScreenFlip();

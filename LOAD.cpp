@@ -23,7 +23,6 @@
 #include"IR_process.h"
 #include"LearningDataGenarator.h"
 #include "DxLibUtil.h"
-#include "AutoDifficultyPrediction.h"
 
 void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, SkillTestList *STList, Option *op, Config config, IR_SETTING* ir) {
 	int i = 0, j = 0;
@@ -107,10 +106,6 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 			sprintfDx(Music[i].moviePath[j], L"\0");
 		}
 	}
-
-
-	AutoDifficultyPrediction adp;
-	float autoDifficultyPredictionResult = 0;
 
 	if (ProcessMessage() != 0) {
 		dxLibFinishProcess();
@@ -286,12 +281,6 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 							Cache.writeTime = file_lp.ftLastWriteTime;
 							writeMusicToCache(&Cache, Music, i, j);
 							SaveSongCache(Cache, Music, i, j);
-						}
-
-						//自動難易度算出
-						if (config.UseAiPredictedDifficulty == 1) {
-							autoDifficultyPredictionResult = adp.getDifficulty(Music[i], j);
-							Music[i].level[j] = autoDifficultyPredictionResult;
 						}
 
 #if ENABLE_GENERATING_LERNING_DATA

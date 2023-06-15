@@ -289,8 +289,10 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 						}
 
 						//自動難易度算出
-						autoDifficultyPredictionResult = adp.getDifficulty(Music[i], j);
-						Music[i].level[j] = autoDifficultyPredictionResult;
+						if (config.UseAiPredictedDifficulty == 1) {
+							autoDifficultyPredictionResult = adp.getDifficulty(Music[i], j);
+							Music[i].level[j] = autoDifficultyPredictionResult;
+						}
 
 #if ENABLE_GENERATING_LERNING_DATA
 						//学習用データ生成

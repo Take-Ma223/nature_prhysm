@@ -61,6 +61,9 @@ public:
 		//}
 
 		//getline(ifs, str);
+		if (difficulty < 0) {
+			difficulty = 0;
+		}
 
 		return difficultyValue;
 

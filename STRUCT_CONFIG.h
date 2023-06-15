@@ -32,6 +32,7 @@ typedef struct Config {//コンフィグデータ
 	int Buffer = 256;
 	int ComPort = 0;
 	int Editable = 0;
+	int UseAiPredictedDifficulty = 0;
 } Config;
 
 #endif

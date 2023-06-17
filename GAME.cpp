@@ -3496,13 +3496,32 @@ void GAME(int song_number, int difficulty,
 		int ComboBuf = combo;
 		if (SkillTestFlag != 0)ComboBuf = *CourseCombo;//コースモードの時はコース全体のコンボで表示
 
+
+		int comboYScale = 10 - cos(3.14 / 2 * combo_draw_counter) * 10;
+		int comboNumberX = 485; int comboNumberY = 360; int comboNumberHeight = 100; int comboNumberWidth = 256;
+		int comboNumberTop = comboNumberY - (comboNumberHeight / 2);
+		int comboNumberBottom = comboNumberY + (comboNumberHeight / 2);
+
+		int comboX = 600;
+		int comboWidth = 64;
+		int comboDuration = 40;
+		int comboDigit = int(log10(ComboBuf));
+		int comboXOffset = comboDigit * (comboDuration / 2);
+		int comboAlphaGeneral = getAlpha(255, 128, 0);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, comboAlphaGeneral);
 		if (combo_draw_counter > 0 && ComboBuf > 0) {//コンボ描画
-			DrawExtendGraph(    640,          int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 640 + 256,         int(320 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO, TRUE);
-			for (i = 0; i <= int(log10(ComboBuf)); i++) {
-				DrawExtendGraph(540 - i * 40, int(320 - (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), 540 + 64 - i * 40, int(320 + 100 + (10 - cos(3.14 / 2 * combo_draw_counter) * 10)), H_COMBO_NUMBER[combo_digit[i]], TRUE);
+			DrawExtendGraph(comboX,          int(comboNumberTop - comboYScale), comboX + comboNumberWidth,         int(comboNumberBottom + comboYScale), H_COMBO, TRUE);
+			for (i = 0; i <= comboDigit; i++) {
+				DrawExtendGraph(
+					comboNumberX              - i * comboDuration + comboXOffset,
+					int(comboNumberTop    - comboYScale), 
+					comboNumberX + comboWidth - i * comboDuration + comboXOffset,
+					int(comboNumberBottom + comboYScale), 
+					H_COMBO_NUMBER[combo_digit[i]], TRUE);
 			}
 		}
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		for (i = 0; i <= 3; i++) {//ノートを叩いた時のフラッシュ、判定表示
 			for (j = 0; j <= NOTE_HIT_LARGE_FLASH_NUMBER - 1; j++) {//4個までなら同時に表示
 				if (note_hit_flash[j][i] >= 0)DrawGraph(lane[i], judge_area, H_HIT[11 - (int)note_hit_flash[j][i]], TRUE);//ノートを叩いた時のフラッシュ

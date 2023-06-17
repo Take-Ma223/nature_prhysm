@@ -80,9 +80,11 @@ void SONG_SELECT(int *l_n,
 	int H_BANNER_SEASON[4];
 	int H_OPTION_BANNER;
 	int H_COVER_HIGH_SCORE;
+	int H_COVER_RADAR;
 	int H_COVER_POP;
 	int H_COVER_SKILL_TEST_POP;
-	int H_CPVER_RESULT_STR;
+	int H_COVER_STATUS_STR;
+	int H_COVER_STATUS;
 	int H_SCORE_NUMBER[10];
 	int H_JUDGE_NUMBER[10];
 
@@ -447,7 +449,7 @@ void SONG_SELECT(int *l_n,
 	H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
 
 	H_OPTION = LoadGraph(L"img/cover_option_str.png");
-	H_RESULT = LoadGraph(L"img/cover_result.png");
+	H_RESULT = LoadGraph(L"img/cover_title_result.png");
 	H_RESULT_OBJ = LoadGraph(L"img/cover_result_obj.png");
 
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
@@ -468,11 +470,14 @@ void SONG_SELECT(int *l_n,
 	H_BANNER_SEASON[2] = LoadGraph(L"img/banner_autumn.png");
 	H_BANNER_SEASON[3] = LoadGraph(L"img/banner_winter.png");
 
-	H_COVER_HIGH_SCORE = LoadGraph(L"img/cover_high_score.png");
-	H_COVER_POP = LoadGraph(L"img/cover_pop.png");
-	H_COVER_SKILL_TEST_POP = LoadGraph(L"img/cover_skill_test_pop.png");
+	H_COVER_HIGH_SCORE = LoadGraph(L"img/cover_title_high_score.png");
+	H_COVER_RADAR = LoadGraph(L"img/cover_radar.png");
 
-	H_CPVER_RESULT_STR = LoadGraph(L"img/cover_result_str.png");;
+	H_COVER_POP = LoadGraph(L"img/cover_title_pop.png");
+	H_COVER_SKILL_TEST_POP = LoadGraph(L"img/cover_title_pop.png");
+
+	H_COVER_STATUS_STR = LoadGraph(L"img/cover_status_str.png");
+	H_COVER_STATUS = LoadGraph(L"img/cover_title_status.png");
 
 	LoadDivGraph(L"img/score_number.png", 10, 10, 1, 64, 100, H_SCORE_NUMBER);
 	LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_BPM_NUMBER_MAX);
@@ -2022,6 +2027,8 @@ void SONG_SELECT(int *l_n,
 							updateVolume();
 						}
 
+						if (indexStep == -1)optionListView.pushLeftArrow();
+						if (indexStep == 1)optionListView.pushRightArrow();
 
 						optionListView.updateSelectedOptionItem();
 					};
@@ -2051,6 +2058,14 @@ void SONG_SELECT(int *l_n,
 					}
 				}
 
+			}
+
+			//←→ボタンを離していたらオプションの矢印画像を非活性にする
+			if (Key[Button[1][0]] == 0 && Key[KEY_INPUT_LEFT] == 0) {
+				optionListView.releaseLeftArrow();
+			}
+			if (Key[Button[1][3]] == 0 && Key[KEY_INPUT_RIGHT] == 0) {
+				optionListView.releaseRightArrow();
 			}
 
 			if (option->op.color != OptionItem::Color::RAINBOW) {//虹オプション選択フラグの設定
@@ -3190,9 +3205,9 @@ void SONG_SELECT(int *l_n,
 			DrawGraph(960, 0, H_COVER_SKILL_TEST_POP, TRUE);//右側の文字
 		}
 
-
+		DrawGraph(0, 0, H_COVER_RADAR, TRUE);
 		DrawGraph(0, 0, H_COVER_HIGH_SCORE, TRUE);//左側の文字
-		
+
 		//レベル描画
 		if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
 			DrawGraph(1180, 100, H_PERCENT, TRUE);
@@ -3505,60 +3520,7 @@ void SONG_SELECT(int *l_n,
 					(short)(DRShowColor + 0.5));
 			//}
 		}
-		
-		//int OptionY_Base = 155;
-		//int dist = 90;
-		////オプション描画
-		//cache = int(cos((3.14159265) / 2 * (option_draw_counter - 1)) * 320 - 320);
-		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		//DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
-		//DrawGraph(cache, 0, H_OPTION, TRUE);//オプションカバー
-		//SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-		//for (i = 0; i < OptionShowAmount; i++) {
-		//	DrawGraph(cache, OptionY_Base - 24 + i * dist, H_OPTION_BANNER, TRUE);
-		//	//DrawExtendGraph(cache + 35, OptionY_Base + i * dist, cache + 280, OptionY_Base + 53 + i * dist, H_BANNER_FLAME, TRUE);
-		//}
-		
-
-		//SetDrawBright(brightness, brightness, brightness);
-		//DrawExtendGraph(cache + 35, OptionY_Base + (option_select - OptionShowStart) * dist, cache + 280, OptionY_Base + 53 + (option_select - OptionShowStart) * dist, H_BANNER_SELECT, TRUE);//選択枠
-		//SetDrawBright(255, 255, 255);
-		//SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
-
-
-		////オプション種類名称描画
-		//
-		//int index = 0;
-		//for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
-		//	cache2 = GetDrawStringWidth(option->OptionName[index], wcslen(option->OptionName[index]));
-		//	if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base - 33 + i * dist + 2, option->OptionName[index], GetColor(0, 0, 0));
-		//	DrawString(cache + 160 - (cache2 / 2), OptionY_Base - 33 + i * dist, option->OptionName[index], GetColor(255, 128, 0));
-		//}
-
-
-		////オプション名称描画
-		//for (i = 0, index = OptionShowStart; i < OptionShowAmount; i++, index++) {
-		//	wchar_t* OptionStrAddress = option->ArrayOptionKindName[index][*(option->ArrayValue[index])];//i番目のオプションで現在選んでいる名称を表す文字列の先頭アドレス
-
-		//	cache2 = GetDrawStringWidth(OptionStrAddress, wcslen(OptionStrAddress));
-		//	if (config.ShowStrShadow == TRUE)DrawString(cache + 160 - (cache2 / 2) + 2, OptionY_Base + 9 + i * dist + 2, OptionStrAddress, GetColor(0, 0, 0));
-		//	DrawString(cache + 160 - (cache2 / 2), OptionY_Base + 9 + i * dist, OptionStrAddress, GetColor(255, 255, 255));
-		//}
-
-		//if (SelectingTarget == SELECTING_COURSE) {//段位選択中は使えないオプションを暗くする
-		//	SetDrawBright(0, 0, 0);
-		//	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-		//	int shadowLocateIndex;
-		//	shadowLocateIndex = 1 - OptionShowStart;//GAUGE
-		//	if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
-		//	shadowLocateIndex = 2 - OptionShowStart;//LANE
-		//	if (shadowLocateIndex >= 0 && 
-		//		!((option->op.lane == OptionItem::Lane::NONE) || (option->op.lane == OptionItem::Lane::MIRROR)))DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
-		//	shadowLocateIndex = 3 - OptionShowStart;//COLOR
-		//	if (shadowLocateIndex >= 0)DrawExtendGraph(cache + 35, OptionY_Base + shadowLocateIndex * dist, cache + 280, OptionY_Base + 53 + shadowLocateIndex * dist, H_BANNER_BACK, TRUE);
-		//	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		//	SetDrawBright(255, 255, 255);
-		//}									
+								
 
 		//NOTEを選択しているときはプレビュー画像を表示
 		if (OptionOpen == 1 && option_select == (int)OptionItem::Name::NOTE) {
@@ -3568,21 +3530,8 @@ void SONG_SELECT(int *l_n,
 			SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
 		}
 
-		////オプション欄の上下にカーソルを表示
-		////SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
-		//if (OptionShowEnd != option->OPTION_NUM - 1) {//表示範囲の下にまだオプションがあるとき↓のカーソル表示
-		//	DrawGraph(cache, 655 - int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE);
-		//}
-		//if (OptionShowStart != 0) {//表示範囲の上にまだオプションがあるとき↑のカーソル表示
-		//	DrawReverseGraph(cache, 92 + int(((double)1 - button_draw_counter) * 10), H_CURSOR, TRUE, FALSE, TRUE);
-		//}
-
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-
 		optionListView.draw();
-
-
-
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 		cache = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280 + 0.5);//リザルトカバー
@@ -3679,7 +3628,9 @@ void SONG_SELECT(int *l_n,
 			DrawBoxWithLine((cache - 960) + 976, 660, (cache - 960) + 1264, 660 + boxHeight, GetColor(50, 50, 50));
 
 			//文字
-			DrawGraph((cache - 960), 0, H_CPVER_RESULT_STR, TRUE);
+			DrawGraph((cache), 0, H_COVER_STATUS_STR, TRUE);
+			DrawGraph((cache), 0, H_COVER_STATUS, TRUE);
+
 			//DrawGraph((cache - 960) + 960, 250, H_VERSION_STR, TRUE);
 
 
@@ -3781,21 +3732,22 @@ void SONG_SELECT(int *l_n,
 
 		//DrawGraph(int(960 + ((double)i - 1.5) * 128) - 16, int(0 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_B, TRUE);//右Bボタン
 
-
-		if (difficulty >= 2) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-			DrawGraph(320 - 16 + int(((double)1 - button_draw_counter) * 32) - 32, 360 - 16, H_BUTTON_G, TRUE);//左Gボタン
-			if (Key[Button[1][0]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-				DrawGraph(320 - 16 + int(((double)1 - button_draw_counter) * 32) - 32, 360 - 16, H_BUTTON_PRESS, TRUE);//左Gボタン
+		if (OptionOpen == 0) {
+			if (difficulty >= 2) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+				DrawGraph(320 - 16 + int(((double)1 - button_draw_counter) * 32) - 32, 360 - 16, H_BUTTON_G, TRUE);//左Gボタン
+				if (Key[Button[1][0]] >= 1) {
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+					DrawGraph(320 - 16 + int(((double)1 - button_draw_counter) * 32) - 32, 360 - 16, H_BUTTON_PRESS, TRUE);//左Gボタン
+				}
 			}
-		}
-		if (difficulty <= 3) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-			DrawGraph(960 - 16 + int(((double)button_draw_counter - 1) * 32) + 32, 360 - 16, H_BUTTON_G, TRUE);//右Gボタン
-			if (Key[Button[1][3]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-				DrawGraph(960 - 16 + int(((double)button_draw_counter - 1) * 32) + 32, 360 - 16, H_BUTTON_PRESS, TRUE);//右Gボタン
+			if (difficulty <= 3) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+				DrawGraph(960 - 16 + int(((double)button_draw_counter - 1) * 32) + 32, 360 - 16, H_BUTTON_G, TRUE);//右Gボタン
+				if (Key[Button[1][3]] >= 1) {
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+					DrawGraph(960 - 16 + int(((double)button_draw_counter - 1) * 32) + 32, 360 - 16, H_BUTTON_PRESS, TRUE);//右Gボタン
+				}
 			}
 		}
 

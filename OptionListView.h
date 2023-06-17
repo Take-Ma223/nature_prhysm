@@ -34,11 +34,10 @@ public:
 		backGround = unique_ptr<Image>(new Image(c, c->getAsset()->img((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str())));
 		addDrawable(backGround.get());
 
-
 		for (int i = 0; i < rowCount; i++) {
 			int optionIndex = getOptionIndex(i - rowCenterIndex);
 			DrawableInitParam drawableParam = DrawableInitParam(Cordinate(160, getYPos(i)), CenterRatio(0.5, 0.5));
-			listFrame[i] = unique_ptr<Image>(new Image(c, c->getAsset()->img(L"img/option_banner/green.png"), drawableParam));
+			listFrame[i] = unique_ptr<Image>(new Image(c, c->getAsset()->img(L"img/option_list/green.png"), drawableParam));
 			if (i != rowCenterIndex)listFrame[i].get()->alpha.value = notSelectedFrameAlpha;
 			updateFrame(i, optionIndex);
 			addDrawable(listFrame[i].get());
@@ -63,21 +62,20 @@ public:
 
 		}
 
+		title = unique_ptr<Image>(new Image(c, c->getAsset()->img(wstring(L"img/option_list/cover_title_option.png").c_str())));
+		addDrawable(title.get());
+
+		arrowLeft = unique_ptr<Image>(new Image(c, c->getAsset()->img(wstring(L"img/option_list/arrow_left_release.png").c_str())));
+		arrowLeft.get()->Y.value = 360;
+		arrowLeft.get()->centerRatioY = 0.5;
+		addDrawable(arrowLeft.get());
+
+		arrowRight = unique_ptr<Image>(new Image(c, c->getAsset()->img(wstring(L"img/option_list/arrow_right_release.png").c_str())));
+		arrowRight.get()->Y.value = 360;
+		arrowRight.get()->centerRatioY = 0.5;
+		addDrawable(arrowRight.get());
 	}
 
-	
-
-	/// <summary>
-	/// 今のオプション選択値でリスト全ての更新
-	/// </summary>
-	/// <param name="select">今のオプション選択値</param>
-	//void updateListView() {
-	//	for (int i = 0; i < rowCount; i++) {
-	//		int listIndex = getListIndex(i + rotationIndex);
-	//		int optionIndex = getOptionIndex(i - rowCenterIndex + selectingOption);
-	//		updateItem(i, optionIndex);
-	//	}
-	//}
 
 	/// <summary>
 	/// 指定したオプション番号でリストの指定した行一つを更新
@@ -148,6 +146,23 @@ public:
 		backGround.get()->setImage(c->getAsset()->img((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str()));
 	}
 
+	void pushLeftArrow() {
+		arrowLeft.get()->setImage(c->getAsset()->img(L"img/option_list/arrow_left_push.png"));
+	}
+
+	void releaseLeftArrow() {
+		arrowLeft.get()->setImage(c->getAsset()->img(L"img/option_list/arrow_left_release.png"));
+	}
+
+	void pushRightArrow() {
+		arrowRight.get()->setImage(c->getAsset()->img(L"img/option_list/arrow_right_push.png"));
+	}
+
+	void releaseRightArrow() {
+		arrowRight.get()->setImage(c->getAsset()->img(L"img/option_list/arrow_right_release.png"));
+	}
+
+
 private:
 	ActivityContext* c;
 
@@ -184,6 +199,11 @@ private:
 	vector<unique_ptr<Image>> listFrame = vector<unique_ptr<Image>>(rowCount);
 	vector<unique_ptr<TextView>> listOptionName = vector<unique_ptr<TextView>>(rowCount);
 	vector<unique_ptr<NPGradTextView>> listItemName = vector<unique_ptr<NPGradTextView>>(rowCount);
+
+	unique_ptr<Image> title;
+
+	unique_ptr<Image> arrowLeft;
+	unique_ptr<Image> arrowRight;
 
 	FontInfo fontOptionName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
 	FontInfo fontItemName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
@@ -222,14 +242,14 @@ private:
 	void updateFrame(int listIndex, int optionIndex)
 	{
 		std::unordered_map<OptionItem::BannerColor, std::wstring> mapping = {
-			{OptionItem::BannerColor::RED,wstring(L"img/option_banner/red.png")},
-			{OptionItem::BannerColor::GREEN,wstring(L"img/option_banner/green.png")},
-			{OptionItem::BannerColor::BLUE,wstring(L"img/option_banner/blue.png")},
-			{OptionItem::BannerColor::CYAN,wstring(L"img/option_banner/cyan.png")},
-			{OptionItem::BannerColor::MAGENTA,wstring(L"img/option_banner/magenta.png")},
-			{OptionItem::BannerColor::YELLOW,wstring(L"img/option_banner/yellow.png")},
-			{OptionItem::BannerColor::WHITE,wstring(L"img/option_banner/white.png")},
-			{OptionItem::BannerColor::BLACK,wstring(L"img/option_banner/black.png")},
+			{OptionItem::BannerColor::RED,wstring(L"img/option_list/red.png")},
+			{OptionItem::BannerColor::GREEN,wstring(L"img/option_list/green.png")},
+			{OptionItem::BannerColor::BLUE,wstring(L"img/option_list/blue.png")},
+			{OptionItem::BannerColor::CYAN,wstring(L"img/option_list/cyan.png")},
+			{OptionItem::BannerColor::MAGENTA,wstring(L"img/option_list/magenta.png")},
+			{OptionItem::BannerColor::YELLOW,wstring(L"img/option_list/yellow.png")},
+			{OptionItem::BannerColor::WHITE,wstring(L"img/option_list/white.png")},
+			{OptionItem::BannerColor::BLACK,wstring(L"img/option_list/black.png")},
 		};
 
 		listFrame[listIndex].get()->setImage(c->getAsset()->img(mapping[option->bannerColor[optionIndex]].c_str()));

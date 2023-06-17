@@ -216,7 +216,7 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	int note = 0;//ノートスキン
 	int hitSound = 0;//ヒット音スキン
 	OptionItem::Barline barline = OptionItem::Barline::ON;//小節線表示
-	OptionItem::Darkness darkness = OptionItem::Darkness::DARKNESS_0;//演奏画面の背景の暗さ
+	OptionItem::Darkness darkness = OptionItem::Darkness::DARKNESS_25;//演奏画面の背景の暗さ
 	OptionItem::ScoreGraph scoreGraph = OptionItem::ScoreGraph::OFF;//スコアグラフ表示するかどうか
 	OptionItem::Sort sort = OptionItem::Sort::NAME;//選曲画面のソート種類
 	OptionItem::BlackGradation blackGradation = OptionItem::BlackGradation::ON;//黒終端ノーツのグラデーション
@@ -717,7 +717,7 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t* sent_barline[BARLINE_NUM] = { L"小節線を表示します"
 		,L"小節線を表示しません"};//説明文
 
-	wchar_t* sent_darkness[DARKNESS_NUM] = { L"演奏画面の背景を通常の明るさにします"
+	wchar_t* sent_darkness[DARKNESS_NUM] = { L"演奏画面の背景を暗くしません"
 	,L"演奏画面の背景を25%暗くします"
 	,L"演奏画面の背景を50%暗くします" 
 	,L"演奏画面の背景を75%暗くします" 

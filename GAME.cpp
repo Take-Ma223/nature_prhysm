@@ -173,10 +173,18 @@ void GAME(int song_number, int difficulty,
 	double HitAreaBright[3][4] = { {0,0,0,0},{0,0,0,0},{0,0,0,0} };//コントローラを叩いた時の判定枠の各色の光具合
 
 	int SH_SONG;//曲データのハンドル
+	TransValue songVolume = TransValue(&context);
+	songVolume.value = 255;
+	songVolume.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 0, 800);
+
 	int	SH_CLOSE;
 	int	SH_CLOSED;
 	int	SH_OPEN;
 	int SH_JINGLE;
+
+	TransValue jingleVolume = TransValue(&context);
+	jingleVolume.value = 255;
+	jingleVolume.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 0, 500);
 	int SH_SHUTTER;
 	int SH_SHUTTER_SIGNAL;
 
@@ -1030,6 +1038,7 @@ void GAME(int song_number, int difficulty,
 		targetScore2 = LoadTargetScore(Music[song_number].SaveFolder);
 	}
 
+	bool isSkip = false;
 	GAME_start_time = GetNowCount_d(config);
 	while (1) {
 		appContext.updateTime();
@@ -1064,6 +1073,7 @@ void GAME(int song_number, int difficulty,
 			cleared_time = int(GAME_passed_time);
 			gauge_draw_counter = gauge;
 			draw_alpha = 1;
+			jingleVolume.play();
 			break;
 			/*
 			*escape = 1;
@@ -1075,6 +1085,7 @@ void GAME(int song_number, int difficulty,
 		}
 
 		if (Key[KEY_INPUT_RETURN] == 1) {//エンターでスキップできる
+			isSkip = true;
 			gauge_draw_counter = gauge;
 			for (j = 0; j <= 2; j++) {
 				for (k = 0; k <= 3; k++) {
@@ -1129,8 +1140,13 @@ void GAME(int song_number, int difficulty,
 
 		}
 
-		if ((gauge_draw_counter >= gauge - 0.001) && (CheckHandleASyncLoad(SH_SONG) != TRUE) && draw_alpha_speed == 0) {//ゲージが上まで描写されて曲の読み込みが完了して(エラーでも続行)段位ようspeed表示が消えたら演奏開始
+		bool isGaugeDrawCompleted = (gauge_draw_counter >= gauge - 0.001);
+		bool isSongLoadCompleted = (CheckHandleASyncLoad(SH_SONG) != TRUE);
+		bool isSpeedAlphaZero = draw_alpha_speed == 0;
+		bool isFinishJingle = CheckSoundMem(SH_JINGLE) == 0 || isSkip;
+		if (isGaugeDrawCompleted && isSongLoadCompleted && isSpeedAlphaZero && isFinishJingle) {//ゲージが上まで描写されて曲の読み込みが完了して(エラーでも続行)段位用speed表示が消えてジングル音が再生終了したら演奏開始
 			detailView.hide();
+			jingleVolume.play();
 			break;
 		}
 
@@ -1481,6 +1497,7 @@ void GAME(int song_number, int difficulty,
 			else {
 				coverView.middleCover.setReverseAll(TRUE);//今開いている動作を逆転して閉じる
 			}
+			songVolume.play();
 		}
 		if (Key[Button_Shutter] == 1) {//スクリーンショット
 			ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
@@ -3704,6 +3721,7 @@ void GAME(int song_number, int difficulty,
 		soundHitSound();
 
 		double BGM_VolTowardResult = 1;
+		songVolume.process();
 		if (ClearFlag != 0) {//クリア表示4秒後にゲームの終了(結果発表へ)
 
 			BGM_VolTowardResult = 1 - (double)(GAME_passed_time - cleared_time) / (double)TimeFromEndOfGameToResult;
@@ -3711,10 +3729,13 @@ void GAME(int song_number, int difficulty,
 		if (!CheckHandleASyncLoad(SH_SONG)) {
 			int maxVol = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::BgmSoundVol::Vol_100;
 			double missVolEasing = ((double)1 - cos(volume * (3.1415 / 2)));//0~1
-			int vol = int(maxVol * missVolEasing * BGM_VolTowardResult * debug_music);
+			int vol = int(maxVol * missVolEasing * BGM_VolTowardResult * debug_music * ((double)songVolume.value/255));
 
 			ChangeVolumeSoundMem(vol, SH_SONG);//曲の音量セット
 		}
+
+		jingleVolume.process();
+		ChangeVolumeSoundMem(jingleVolume.value, SH_JINGLE);//ジングル音の音量セット
 
 		//printfDx("%d\n", int(((double)44100 * (GAME_passed_time - Music[song_number].songoffset[difficulty])) / 1000));
 
@@ -3761,6 +3782,8 @@ void GAME(int song_number, int difficulty,
 				SeekMovieToGraph(MovieGraphHandle, 0);
 			}
 		}
+
+
 
 		//printfDx("%f\n",LOOP_passed_time);
 		

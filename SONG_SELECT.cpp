@@ -137,6 +137,17 @@ void SONG_SELECT(int *l_n,
 
 	int H_OPTION_NOTE_PREVIEW[2];
 
+	TransValue viewAlpha = TransValue(&context);
+	viewAlpha.value = 0;
+	bool isViewAlphaAnimationRun = false;
+	auto alphaAnimationOnStart = [&]() {
+		if (isViewAlphaAnimationRun)return;
+		isViewAlphaAnimationRun = true;
+		viewAlpha.clearEvent();
+		viewAlpha.eChange(Point(0), Point(255), Converter(ConvertMode::Linear), 0, 500);
+		viewAlpha.play();
+	};
+
 	int SH_CLOSE;
 	int SH_CLOSED;
 	int SH_OPEN;
@@ -1375,8 +1386,10 @@ void SONG_SELECT(int *l_n,
 
 	GAME_start_time = GetNowCount_d(config);
 	int Announse_show_time_base = GetNowCount() + 1500;//アナウンス表示の基準時間
+	
 	while (1) {
 		appContext.updateTime();
+
 		if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE && flag != FLAG_END_FUNCTION_STATE) {//ESCでゲーム終了
 			dxLibFinishProcess();
 			return;
@@ -1404,6 +1417,8 @@ void SONG_SELECT(int *l_n,
 		Get_Key_State(Buf, Key, AC);
 
 		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
+
+		alphaAnimationOnStart();
 
 		if (flag == FLAG_SELECT_STATE) {
 			int PressFrame = int(25.0 * (17.0 / LOOP_passed_time));//ボタン押し続けてカーソルが動き続けるようになるまでのフレーム
@@ -2399,11 +2414,9 @@ void SONG_SELECT(int *l_n,
 				int CourseMaxCombo = 0;
 
 				int TryCount = 0;//トライ数(クイックリトライするたびに加算)
-
 				do {
 					TryCount++;
 					escape = 0;
-					retryAble = 0;
 
 					GAME(song_number, difficulty,
 						&res, &escape, option, &retryAble,
@@ -2854,11 +2867,11 @@ void SONG_SELECT(int *l_n,
 		//DRAW
 		SetDrawScreen(appContext.baseHandle.getHandle());
 		ClearDrawScreen();//グラフィックを初期化
-
 		DrawGraph(0, 0, H_BG, TRUE);//背景表示
-
-
 		show_cloud(H_CLOUD, &pos_cloud, 1, LOOP_passed_time);//隠し曲演出中なら白い雲表示
+		
+		viewAlpha.process();
+		double viewAlphaRatio = (double)viewAlpha.value / 255;
 
 
 		if (CheckHandleASyncLoad(H_JACKET) == FALSE && CheckHandleASyncLoad(H_JACKET_GAUSS) == FALSE && jacket_show_counter == -1) {//普通とぼかし用どちらも読み込み完了してたらぼかし処理
@@ -3240,6 +3253,7 @@ void SONG_SELECT(int *l_n,
 			DrawGraph(960, 0, H_COVER_SKILL_TEST_POP, TRUE);//右側の文字
 		}
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * 255);
 		DrawGraph(0, 0, H_COVER_RADAR, TRUE);
 		DrawGraph(0, 0, H_COVER_HIGH_SCORE, TRUE);//左側の文字
 
@@ -3308,32 +3322,33 @@ void SONG_SELECT(int *l_n,
 			DrawGraph(0, 97, H_R_IN, TRUE);
 		}
 
-		
-		
+		int boxAlpha = viewAlphaRatio * 80;
+		int boxLineAlpha = viewAlphaRatio * 255;
 		//BPM, VERSION描画
 		//枠の表示
 		if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
 			
 			//BPM用表示枠
-			DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255));
-			DrawBoxWithLine(1130, 200, 1264, 240, GetColor(255, 50, 50));
+			DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255), boxAlpha, boxLineAlpha);
+			DrawBoxWithLine(1130, 200, 1264, 240, GetColor(255, 50, 50), boxAlpha, boxLineAlpha);
 
 			//バージョン用表示枠
-			DrawBoxWithLine(976, 250, 1110, 290, GetColor(50, 255, 50));
+			DrawBoxWithLine(976, 250, 1110, 290, GetColor(50, 255, 50), boxAlpha, boxLineAlpha);
 
 			//最大同時押し数用表示枠
-			DrawBoxWithLine(1130, 250, 1264, 290, GetColor(255, 255, 255));
+			DrawBoxWithLine(1130, 250, 1264, 290, GetColor(255, 255, 255), boxAlpha, boxLineAlpha);
 
 			DrawGraph(960, 200, H_BPM_MINMAX_STR, TRUE);
 			DrawGraph(960, 250, H_VER_MAX_CHORDS_STR, TRUE);
 		}
 		else if (SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2) {//段位
-			DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255));
-			DrawBoxWithLine(1130, 200, 1264, 240, GetColor(255, 50, 50));
+			DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255), boxAlpha, boxLineAlpha);
+			DrawBoxWithLine(1130, 200, 1264, 240, GetColor(255, 50, 50), boxAlpha, boxLineAlpha);
 
 			DrawGraph(960, 200, H_BPM_MINMAX_STR, TRUE);
 		}
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * 255);
 		//BPM, VERSION数値描画
 		if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
 
@@ -3342,49 +3357,12 @@ void SONG_SELECT(int *l_n,
 			DrawFloatNumber(1090, 246, Music[song_number].version[difficulty], 20, 3, 0.5, H_VERSION_NUMBER, H_VERSION_DECIMAL);
 
 			DrawNumber(1235, 246, Music[song_number].maxChords[option->op.color == OptionItem::Color::RAINBOW][difficulty], 25, 0, 0, H_MAX_CHORDS_NUMBER);
-
-
-			/*
-			cash = int(log10(Music[song_number].bpmmax[difficulty]));//桁を格納
-			for (i = 0; i <= cash; i++) {//BPM最大値
-				DrawGraph(1050 - i * 25 + 12.5 * cash, 196, H_BPM_NUMBER_MAX[bpm_max_digit[i]], TRUE);
-			}
-			cash = int(log10(Music[song_number].bpmmin[difficulty]));//桁を格納
-			for (i = 0; i <= cash; i++) {//BPM最小値
-				DrawGraph(1204 - i * 25 + 12.5 * cash, 196, H_BPM_NUMBER_MIN[bpm_min_digit[i]], TRUE);
-
-			}
-			*/
-
-			//DrawGraph(960, 520, H_BPM_SLASH, TRUE);// /の表示
 		}
 		else if(SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2){//段位
 			DrawNumber(1062, 196, STList->bpmmin[list_number], 25, 0, 0, H_BPM_NUMBER_MIN);
 			DrawNumber(1216, 196, STList->bpmmax[list_number], 25, 0, 0, H_BPM_NUMBER_MAX);
-			//DrawFloatNumber(1228, 246, STList->version, 25, 3, 1, H_VERSION_NUMBER, H_VERSION_DECIMAL);
-
-			/*
-			cash = int(log10(STList->bpmmax[list_number]));//桁を格納
-			for (i = 0; i <= cash; i++) {//BPM最大値
-				DrawGraph(1045 - i * 25 + 12.5 * cash, 196, H_BPM_NUMBER_MAX[bpm_max_digit[i]], TRUE);
-			}
-			cash = int(log10(STList->bpmmin[list_number]));//桁を格納
-			for (i = 0; i <= cash; i++) {//BPM最小値
-				DrawGraph(1209 - i * 25 + 12.5 * cash, 196, H_BPM_NUMBER_MIN[bpm_min_digit[i]], TRUE);
-
-			}
-			*/
-			//DrawGraph(960, 520, H_BPM_SLASH, TRUE);// /の表示
 		}
 
-		/*
-		if (SelectingTarget == SELECTING_SONG) {
-			for (i = 0; i <= int(log10(show_bpm)); i++) {//BPM
-				DrawGraph(1130 - i * 40, 570, H_SCORE_NUMBER[bpm_digit[i]], TRUE);
-
-			}
-		}
-		*/
 
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 
@@ -3528,6 +3506,7 @@ void SONG_SELECT(int *l_n,
 			DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
 		}
 
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * 255);
 		//譜面レーダーの数値表示
 		if (SelectingTarget == SELECTING_SONG || SelectingTarget == SELECTING_FOLDER) {
 			int RaderNumberInterval = 15;
@@ -3556,7 +3535,7 @@ void SONG_SELECT(int *l_n,
 			//}
 		}
 								
-
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		//NOTEを選択しているときはプレビュー画像を表示
 		if (OptionOpen == 1 && option_select == (int)OptionItem::Name::NOTE) {
 			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く

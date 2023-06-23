@@ -137,6 +137,25 @@ void GAME(int song_number, int difficulty,
 	int H_GAME_STR_JUDGE_BPM;
 	int H_GAME_STR_SCORE_GRAPH;
 
+	TransValue viewAlpha = TransValue(&context);
+	viewAlpha.value = 255;
+
+	auto playAnimationOnEscAtStart = [&]() {
+		//viewAlpha.clearEvent();
+		//viewAlpha.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 0, 500);
+		//viewAlpha.play();
+	};
+	auto playAnimationOnEscAtPlay = [&]() {
+		//viewAlpha.clearEvent();
+		//viewAlpha.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 1000, 1500);
+		//viewAlpha.play();
+	};
+	auto playAnimationOnFinish = [&]() {
+		viewAlpha.clearEvent();
+		viewAlpha.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 3400, 3900);
+		viewAlpha.play();
+	};
+
 	int FXH_FULLCOMBO = LoadEffekseerEffect(L"img/FullComboFX/FullComboFX.efk", 25.0f);//effekseerエフェクトリソースハンドル
 	// 再生中のエフェクトのハンドルを初期化する。
 	int FXPH_FULLCOMBO = -1;
@@ -1074,6 +1093,7 @@ void GAME(int song_number, int difficulty,
 			gauge_draw_counter = gauge;
 			draw_alpha = 1;
 			jingleVolume.play();
+			playAnimationOnEscAtStart();
 			break;
 			/*
 			*escape = 1;
@@ -1498,6 +1518,7 @@ void GAME(int song_number, int difficulty,
 				coverView.middleCover.setReverseAll(TRUE);//今開いている動作を逆転して閉じる
 			}
 			songVolume.play();
+			playAnimationOnEscAtPlay();
 		}
 		if (Key[Button_Shutter] == 1) {//スクリーンショット
 			ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
@@ -2719,6 +2740,7 @@ void GAME(int song_number, int difficulty,
 			StopSoundMem(SH_SONG);//曲再生停止
 
 			coverView.finishMiddleCover();//カバーを下げる
+			playAnimationOnFinish();
 		}
 		if (GAME_passed_time >= Music[song_number].TimeToEnd[difficulty] && ClearFlag == 0
 			&& note[0][j_n_n[0]].color == 0
@@ -2731,6 +2753,7 @@ void GAME(int song_number, int difficulty,
 			cleared_time = int(GAME_passed_time);
 
 			coverView.finishMiddleCover();//カバーを下げる
+			playAnimationOnFinish();
 		}
 
 		
@@ -2824,7 +2847,21 @@ void GAME(int song_number, int difficulty,
 		number_digit(int(cbpm + 0.5), bpm_digit, 5);//BPMを桁ごとに格納
 
 													//printfDx("%d",ClearFlag);
-		if (ClearFlag != 0 && str_draw_counter == 0 && c_m_draw_counter == 0 && (GAME_passed_time - cleared_time >= TimeFromEndOfGameToResult || *escape == 1)) {//クリア表示4秒後にゲームの終了(結果発表へ)
+		bool isGameFinishStrShowComplete = ClearFlag != 0 &&
+			str_draw_counter == 0 &&
+			c_m_draw_counter == 0;
+
+		bool isShowingFinishStrTimeOver = (GAME_passed_time - cleared_time) >= TimeFromEndOfGameToResult;
+		bool retryRequest = false;
+		if (isGameFinishStrShowComplete && ClearFlag == 2 && !retryRequest) {
+			retryRequest = (Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
+				&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1);
+		}
+
+		bool exitGame = isGameFinishStrShowComplete &&
+			(isShowingFinishStrTimeOver || *escape == 1 || retryRequest);
+
+		if (exitGame) {//クリア表示4秒後にゲームの終了(結果発表へ)
 			if (*escape == 0) {//途中で抜け出してなかったら
 							   //res->song_number = song_number;
 				res->difficulty = difficulty;
@@ -2974,6 +3011,9 @@ void GAME(int song_number, int difficulty,
 		ClearDrawScreen();//グラフィックを初期化
 		DrawGraph(0, 0, H_BG, TRUE);//背景
 		show_cloud(H_CLOUD, &pos_cloud, (stopFlag != 1)*cbpm / 150, LOOP_passed_time);//雲
+
+		viewAlpha.process();
+		double viewAlphaRatio = (double)viewAlpha.value / 255;
 
 		int movieLayer = H_DARKNESS;
 		if (isOverMoviePlayTiming)movieLayer = MovieGraphHandle;
@@ -3232,7 +3272,7 @@ void GAME(int song_number, int difficulty,
 
 
 		if (!isPlayMovie) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_COVER_VALUE * (1 - (double)option->op.darkness / 5)));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(viewAlphaRatio * flash * FLASH_COVER_VALUE * (1 - (double)option->op.darkness / 5)));
 			DrawGraph(0, 0, H_COVER_FLASH, TRUE);//カバーフラッシュ表示
 			DrawGraph(960, 0, H_COVER_FLASH, TRUE);//右側
 		}
@@ -3253,7 +3293,7 @@ void GAME(int song_number, int difficulty,
 		//ゲージ描画
 		int gaugeAlphaGeneral = getAlpha(255, 255 * dangerRatio, 255 * dangerRatio);
 
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, gaugeAlphaGeneral);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * gaugeAlphaGeneral);
 		
 		DrawGraph(0, 0, H_GAUGE_BOX, TRUE);//ゲージボックス (左上95,105)大きさ130*510
 		gauge_draw_hosei = xtosinx(gauge_draw_counter);
@@ -3279,34 +3319,36 @@ void GAME(int song_number, int difficulty,
 		int controllerAlphaGeneral = getAlpha(255, 128, 0);
 		int controllerBrightAlphaGeneral = getAlpha(230, 115, 0);
 
+		int buttonAlpha = int((double)viewAlphaRatio * draw_alpha * controllerAlphaGeneral);
+		int buttonBrightAlpha = int((double)viewAlphaRatio * draw_alpha * controllerBrightAlphaGeneral);
 		for (j = 0; j <= 3; j++) {//B
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, buttonAlpha);
 			DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[0][j], 2)), 620 + 0 * 32, H_BUTTON_B, TRUE);
 			if (Key[Button[0][j]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerBrightAlphaGeneral));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, buttonBrightAlpha);
 				DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[0][j], 2)), 620 + 0 * 32, H_BUTTON_PRESS, TRUE);//押してたら光らせる
 			}
 		}
 		for (j = 0; j <= 3; j++) {//G
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, buttonAlpha);
 			DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[1][j], 2)), 620 + 1 * 32, H_BUTTON_G, TRUE);
 			if (Key[Button[1][j]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerBrightAlphaGeneral));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, buttonBrightAlpha);
 				DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[1][j], 2)), 620 + 1 * 32, H_BUTTON_PRESS, TRUE);//押してたら光らせる
 			}
 		}
 		for (j = 0; j <= 3; j++) {//R
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerAlphaGeneral));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, buttonAlpha);
 			DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[2][j], 2)), 620 + 2 * 32, H_BUTTON_R, TRUE);
 			if (Key[Button[2][j]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * controllerBrightAlphaGeneral));
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, buttonBrightAlpha);
 				DrawGraph(int(96 + j * 32 + 1500 * pow(key_draw_counter[2][j], 2)), 620 + 2 * 32, H_BUTTON_PRESS, TRUE);//押してたら光らせる
 			}
 		}
 
         //時間描画
 		int timeAlphaGeneral = getAlpha(255, 128, 0);
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, timeAlphaGeneral);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * timeAlphaGeneral);
 
 		if (PassedTime_Hours <= 9) {//6~9のとき
 			DrawGraph(130 - 20, 0, H_TIME_COLON, TRUE);
@@ -3339,7 +3381,7 @@ void GAME(int song_number, int difficulty,
 
 		//R描画
 		int rAlphaGeneral = getAlpha(255, 128, 0);
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, rAlphaGeneral);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * rAlphaGeneral);
 		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションのときR表示
 			DrawGraph(960, -3, H_R_OUT, TRUE);
 			DrawGraph(960, -3, H_R_IN, TRUE);
@@ -3347,7 +3389,7 @@ void GAME(int song_number, int difficulty,
 
 		//スコア描画
 		int scoreAlphaGeneral = getAlpha(255, 128, 0);
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, scoreAlphaGeneral);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * scoreAlphaGeneral);
 
 		if (option->op.color != OptionItem::Color::RAINBOW) {
 			for (i = 0; i <= 4; i++) {
@@ -3368,14 +3410,14 @@ void GAME(int song_number, int difficulty,
 		}
 
 		//難易度画像描画
-		int simbolAlphaGeneral = getAlpha(255, 0, 0);
+		int simbolAlphaGeneral = viewAlphaRatio * getAlpha(255, 0, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, simbolAlphaGeneral);
 		DrawGraph(1020, 260, H_DIFFICULTY, TRUE);
 
 		//スコアグラフ描画
-		int boxLineAlphaGeneral = getAlpha(255, 255, 0);
-		int scoreGraphAlphaGeneral = getAlpha(160, 60, 0, 160);
-		int judgeBoxAlphaGeneral = getAlpha(80, 60, 0, 80);
+		int boxLineAlphaGeneral = viewAlphaRatio * getAlpha(255, 255, 0);
+		int scoreGraphAlphaGeneral = viewAlphaRatio * getAlpha(160, 60, 0, 160);
+		int judgeBoxAlphaGeneral = viewAlphaRatio * getAlpha(80, 60, 0, 80);
 
 		if (option->op.scoreGraph != OptionItem::ScoreGraph::OFF) {
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//現在のスコア
@@ -3426,7 +3468,7 @@ void GAME(int song_number, int difficulty,
 		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//SPEED
 		
 		//判定、BPM文字表示
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, boxLineAlphaGeneral);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * boxLineAlphaGeneral);
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
 
 		//SCORE GRAPHがOFF以外の時グラフ文字表示
@@ -3436,7 +3478,7 @@ void GAME(int song_number, int difficulty,
 
 		//数値表示
 		int judgeNumberAlphaGeneral = getAlpha(255, 192, 0);
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeNumberAlphaGeneral);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * judgeNumberAlphaGeneral);
 		DrawNumber(1094, 536, SKY_PERFECT, 25, 1, 0, H_SMALL_NUMBER_CYAN);
 		DrawNumber(1094, 576, PERFECT, 25, 1, 0, H_SMALL_NUMBER_YELLOW);
 		DrawNumber(1094, 616, GOOD, 25, 1, 0, H_SMALL_NUMBER_RED);
@@ -3590,31 +3632,28 @@ void GAME(int song_number, int difficulty,
 		}
 
 
+		int clearMarkAlpha = viewAlphaRatio * int(((double)1 - str_draw_counter) * 255);
 		if (ClearFlag != 0 && str_draw_counter != -1 && c_m_draw_counter == 0) {
 			if (ClearFlag == 1 && MISS == 0) {//ミスなし
 
 				if (GOOD == 0) {//PERFECT FULLCOMBO
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - str_draw_counter) * 255));//PERFECT_FULLCOMBO表示
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, clearMarkAlpha);//PERFECT_FULLCOMBO表示
 					DrawGraph(320, 310, H_PFC, TRUE);
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 				}
 				else {
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - str_draw_counter) * 255));//FULL_COMBO表示
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, clearMarkAlpha);//FULL_COMBO表示
 					DrawGraph(320, 310, H_FULL_COMBO[(int(GAME_passed_time) / 50) % 6], TRUE);
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 				}
 			}
 
 			if (ClearFlag == 1 && MISS != 0 && option->op.gauge != OptionItem::Gauge::NO_FAIL) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - str_draw_counter) * 255));//CLEARED表示
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, clearMarkAlpha);//CLEARED表示
 				DrawGraph(320, 310, H_CLEARED, TRUE);
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 			}
 
 			if (ClearFlag == 2) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(((double)1 - str_draw_counter) * 255));//FAILED表示
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, clearMarkAlpha);//FAILED表示
 				DrawGraph(320, 310, H_FAILED, TRUE);
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 			}
 			for (i = 0; i < CRTBuf; i++) {
 				if (str_draw_counter > 0) {
@@ -3625,24 +3664,6 @@ void GAME(int song_number, int difficulty,
 				}
 			}
 		}
-
-
-
-
-
-		/*
-		SetFontSize(28);
-		if (debug == 1) {
-		DrawString(int(120 - ((double)150 / 2)) + 2, 690 + 2, "DEBUG MODE", GetColor(0, 0, 0));//デバッグ表示(影)
-		DrawString(int(120 - ((double)150 / 2)), 690, "DEBUG MODE", GetColor(255, 255, 255));//デバッグ表示
-		}
-
-
-		if (debug_auto == 1) {
-		DrawString(int(140 - ((double)150 / 2)) + 2, 650 + 2, "AUTO PLAY", GetColor(0, 0, 0));//デバッグ表示(影)
-		DrawString(int(140 - ((double)150 / 2)), 650, "AUTO PLAY", GetColor(255, 255, 255));//デバッグ表示
-		}
-		*/
 
 
 		if (*debug == 1 && SHOW_DEBUG_MODE == 1 && config.ShowDebug == 1) {
@@ -3684,9 +3705,9 @@ void GAME(int song_number, int difficulty,
 			printfDx(L"↑↓:MOVE\n");
 			printfDx(L"←→:PITCH:%d ×%.3f\n", pitch_step,pitch);
 
-			printfDx(L"AI 難易度予測:%.2f\n", autoDifficultyPredictionResult);
-			printfDx(L"想定難易度:%d%%\n", Cdiff.level);
-			printfDx(L"想定局所難易度:%d%%\n", Cdiff.level_local);
+			printfDx(L"AI 難易度予測:%.2f%%\n", autoDifficultyPredictionResult);
+			printfDx(L"旧難易度予測:%d%%\n", Cdiff.level);
+			printfDx(L"旧局所難易度予測:%d%%\n", Cdiff.level_local);
 
 			printfDx(L"行:%d,%d,%d,%d%\n", note[0][j_n_n[0]].textLine
 				, note[1][j_n_n[1]].textLine

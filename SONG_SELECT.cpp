@@ -122,8 +122,7 @@ void SONG_SELECT(int *l_n,
 	int H_BUTTON_G;
 	int H_BUTTON_B;
 	int H_BUTTON_PRESS;
-	int	H_R_IN;
-	int H_R_OUT;
+	int	H_R;
 	int H_JACKET;
 	int H_JACKET_GAUSS;
 	int H_CLOUD;
@@ -535,8 +534,7 @@ void SONG_SELECT(int *l_n,
 	H_BUTTON_B = LoadGraph(L"img/button_B.png");
 	H_BUTTON_PRESS = LoadGraph(L"img/button_press.png");
 
-	H_R_IN = LoadGraph(L"img/R_inside.png");
-	H_R_OUT = LoadGraph(L"img/R_outside.png");
+	H_R = LoadGraph(L"img/R.png");
 
 
 	H_BPM_MINMAX_STR = LoadGraph(L"img/BPM_minmax_str.png");
@@ -3318,8 +3316,7 @@ void SONG_SELECT(int *l_n,
 		
 		//R表示
 		if (R_ShowFlag) {//曲選択
-			DrawGraph(0, 97, H_R_OUT, TRUE);
-			DrawGraph(0, 97, H_R_IN, TRUE);
+			DrawGraph(0, 97, H_R, TRUE);
 		}
 
 		int boxAlpha = viewAlphaRatio * 80;

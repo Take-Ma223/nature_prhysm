@@ -90,7 +90,7 @@ void GAME_LOAD(int song_number,
 	double time_counter = 0;//単位はミリ秒
 	double time_counter_real = 0;//実際の(GAME_time_passed)経過時間
 
-
+	int offsetMargin = 50;//音声、動画の先頭を合わせるためのオフセットマージン
 
 	int DN = 0;//Division Number一小節の分割数
 
@@ -506,18 +506,18 @@ void GAME_LOAD(int song_number,
 
 		}
 		if (wcscmp(L"#SONGOFFSET", sharp1) == 0) {
-			Music[song_number].songoffset[difficulty] = int((double)_wtoi(sharp2)/pitch) + 17;
+			Music[song_number].songoffset[difficulty] = int((double)_wtoi(sharp2)/pitch) + offsetMargin;
 			//printfDx(L"%f\n", Music[song_number].songoffset[difficulty]);
 
 		}
 		if (wcscmp(L"#NOTEOFFSET", sharp1) == 0) {
-			Music[song_number].noteoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + 17 + Option->noteOffsetVal[Option->op.noteOffset];
+			Music[song_number].noteoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + offsetMargin + Option->noteOffsetVal[Option->op.noteOffset];
 			note_offset_scroll = Music[song_number].noteoffset[difficulty] * scroll;//表示用オフセット
 			//printfDx(L"%f\n", Music[song_number].noteoffset[difficulty]);
 
 		}
 		if (wcscmp(L"#MOVIEOFFSET", sharp1) == 0) {
-			Music[song_number].movieoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + 17;
+			Music[song_number].movieoffset[difficulty] = int((double)_wtoi(sharp2) / pitch) + offsetMargin;
 			//printfDx(L"%f\n", Music[song_number].songoffset[difficulty]);
 
 		}

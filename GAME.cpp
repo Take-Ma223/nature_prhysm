@@ -117,8 +117,7 @@ void GAME(int song_number, int difficulty,
 	int H_PFC;//
 	int H_COVER_STR;//右側の文字画像
 	int H_DIFFICULTY = 0;//難易度画像
-	int H_R_IN;
-	int H_R_OUT;
+	int H_R;
 
 	int H_BUTTON_R;
 	int H_BUTTON_G;
@@ -623,9 +622,7 @@ void GAME(int song_number, int difficulty,
 	if (option->op.gauge == (OptionItem::Gauge::PFC_ATTACK))H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_pfc.png");//(左上95,105)大きさ130*510
 	if (option->op.gauge == (OptionItem::Gauge::SKILL_TEST))H_GAUGE_BAR = LoadGraph(L"img/gauge_bar_skill_test.png");//(左上95,105)大きさ130*510
 
-
-	H_R_IN = LoadGraph(L"img/R_inside.png");
-	H_R_OUT = LoadGraph(L"img/R_outside.png");
+	H_R = LoadGraph(L"img/R.png");
 
 	LoadDivGraph(L"img/hit.png", 16, 4, 4, 256, 256, H_HIT);
 	LoadDivGraph(L"img/hit_large.png", 20, 4, 5, 300, 300, H_HIT_LARGE);
@@ -835,7 +832,18 @@ void GAME(int song_number, int difficulty,
 	if (option->op.movie == OptionItem::Movie::OFF)isPlayMovie = false;
 
 	int MovieGraphHandle = 0;
-	if(isPlayMovie)MovieGraphHandle = LoadGraph(Music[song_number].moviePath[difficulty]);
+	LONGLONG movieFrameTime = 0;//動画ファイルの1フレームの時間(us)
+
+	auto updateSeekTime = [&](int seekTime) {
+		SeekMovieToGraph(MovieGraphHandle, seekTime);
+	};
+
+	if (isPlayMovie) {
+		MovieGraphHandle = LoadGraph(Music[song_number].moviePath[difficulty]);
+		movieFrameTime = GetOneFrameTimeMovieToGraph(MovieGraphHandle);
+		updateSeekTime(0);
+	}
+
 	BOOL isOverMoviePlayTiming = false;
 
 	int movieHeight;
@@ -1273,8 +1281,7 @@ void GAME(int song_number, int difficulty,
 		//スコア描画
 		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションのときR表示
 								 //SetDrawBright(190, 190, 190);
-			DrawGraph(960, -3, H_R_OUT, TRUE);
-			DrawGraph(960, -3, H_R_IN, TRUE);
+			DrawGraph(960, -3, H_R, TRUE);
 			//SetDrawBright(255, 255, 255);
 		}
 
@@ -1611,6 +1618,7 @@ void GAME(int song_number, int difficulty,
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time / ROOT12_2;//再生位置のずれを補正 GAME_passed_time-GAME_passed_time/ROOT12_2が差 
 					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+					autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 					Music[song_number].hash[difficulty] = hash;
 					res->hash = hash;//ハッシュ値を格納
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1643,6 +1651,7 @@ void GAME(int song_number, int difficulty,
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time * ROOT12_2;//再生位置のずれを補正 GAME_passed_time - GAME_passed_time * ROOT12_2が差 
 					GAME_LOAD(song_number, difficulty, note, barline, lane, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
+					autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 					Music[song_number].hash[difficulty] = hash;
 					res->hash = hash;//ハッシュ値を格納
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -2853,7 +2862,7 @@ void GAME(int song_number, int difficulty,
 
 		bool isShowingFinishStrTimeOver = (GAME_passed_time - cleared_time) >= TimeFromEndOfGameToResult;
 		bool retryRequest = false;
-		if (isGameFinishStrShowComplete && ClearFlag == 2 && !retryRequest) {
+		if (isGameFinishStrShowComplete && ClearFlag == 2 && !retryRequest && secret == 0) {
 			retryRequest = (Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
 				&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1);
 		}
@@ -3383,8 +3392,7 @@ void GAME(int song_number, int difficulty,
 		int rAlphaGeneral = getAlpha(255, 128, 0);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * rAlphaGeneral);
 		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションのときR表示
-			DrawGraph(960, -3, H_R_OUT, TRUE);
-			DrawGraph(960, -3, H_R_IN, TRUE);
+			DrawGraph(960, -3, H_R, TRUE);
 		}
 
 		//スコア描画
@@ -3726,7 +3734,6 @@ void GAME(int song_number, int difficulty,
 			printfDx(L"Streak:%d\n", Cdiff.longNote);
 			printfDx(L"Color:%d\n", Cdiff.color);
 
-
 			printfDx(L"F11:EDIT\n");
 
 			//printfDx("insert:%x\n", insert);
@@ -3782,25 +3789,23 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
-		isOverMoviePlayTiming = (GAME_passed_time + LOOP_passed_time > Music[song_number].movieoffset[difficulty]);
+		isOverMoviePlayTiming = (GAME_passed_time + LOOP_passed_time + 0.001*movieFrameTime > Music[song_number].movieoffset[difficulty]);
 		if (isOverMoviePlayTiming
 			&& (debug_stop == 0)
 			&& (ClearFlag == 0)
 			&& (isMoviePlaying == 0)) {
-			// 1/60sの後ろずれを防ぐためフレーム時間分前倒しで再生
+			// 後ろずれを防ぐためフレーム時間 + 動画ファイルの1フレーム時間 分前倒しで再生
 			if (FirstMoviePlay == 0) {//最初のBGM再生でないときのみ再生位置変更処理を行う(先頭が削れて再生されるのを防ぐため)
-				SeekMovieToGraph(MovieGraphHandle, int((double)pitch * ((GAME_passed_time + TimePerFrame) - Music[song_number].movieoffset[difficulty])));
+				updateSeekTime(int((double)pitch * ((GAME_passed_time + TimePerFrame) - Music[song_number].movieoffset[difficulty])));
 			}
-
 			PlayMovieToGraph(MovieGraphHandle);//動画の再生開始
-
 			isMoviePlaying = 1;
 			FirstMoviePlay = 0;
 		}
 		if (!isOverMoviePlayTiming) {
 			if (FirstMoviePlay == 0) {
 				FirstMoviePlay = 1;
-				SeekMovieToGraph(MovieGraphHandle, 0);
+				if (*debug == 1)updateSeekTime(0);
 			}
 		}
 

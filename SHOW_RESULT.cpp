@@ -69,8 +69,7 @@ void SHOW_RESULT(RESULT res,
 	int H_FULL_COMBO[6];//フルコンボ
 	int H_PFC;//PERFECTフルコンボ
 	int H_FX[25];//エフェクト
-	int H_R_IN;//虹オプション(内側)
-	int H_R_OUT;//虹オプション(外側)
+	int H_R;//虹オプション
 	int H_JACKET = 0;
 	int H_JACKET_GAUSS = 0;
 
@@ -738,8 +737,7 @@ void SHOW_RESULT(RESULT res,
 	if (res.rank == 6)H_RANK = LoadGraph(L"img/A.png");
 	if (res.rank == 7)H_RANK = LoadGraph(L"img/S.png");
 
-	H_R_IN = LoadGraph(L"img/R_inside.png");
-	H_R_OUT = LoadGraph(L"img/R_outside.png");
+	H_R = LoadGraph(L"img/R.png");
 
 	H_WHITE_WALL = LoadGraph(L"img/WhiteWall.png");
 
@@ -1069,9 +1067,7 @@ void SHOW_RESULT(RESULT res,
 
 		if (option->op.color == OptionItem::Color::RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 			//SetDrawBright(brightness2, brightness2, brightness2);
-			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R_OUT, TRUE);//R_out
-			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R_IN, TRUE);//R_in
-																		   //SetDrawBright(255, 255, 255);
+			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R, TRUE);//R_out
 		}
 
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く

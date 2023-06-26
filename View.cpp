@@ -39,8 +39,10 @@ void View::draw(int drawScreen)
 	beforeDrawProcess(handle.getHandle());
 
 	//このViewの抱えるDrawableを全て描画(stackに積まれた順に描画する)
-	for (auto content = drawables.begin(); content != drawables.end(); ++content) {
-		(*content)->draw(handle.getHandle());
+	if (!drawables.empty()) {
+		for (auto content = drawables.begin(); content != drawables.end(); ++content) {
+			(*content)->draw(handle.getHandle());
+		}
 	}
 
 	//View全体を指定されたスクリーンへ描画

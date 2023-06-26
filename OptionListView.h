@@ -171,7 +171,7 @@ private:
 
 
 	static const int rowDuration = 90;
-	static const int rowCount = 19;//必ず奇数にする
+	static const int rowCount = 13;//必ず奇数にする
 	static const int rowCenterIndex = rowCount / 2;
 	int selectingOption = 0;//ビューで選択しているオプションの番号
 

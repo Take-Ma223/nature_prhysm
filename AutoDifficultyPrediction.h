@@ -61,8 +61,11 @@ public:
 		//}
 
 		//getline(ifs, str);
-		if (difficulty < 0) {
-			difficulty = 0;
+		if (difficultyValue < 1) {
+			difficultyValue = 1;
+		}
+		if (difficultyValue > 999) {
+			difficultyValue = 999;
 		}
 
 		return difficultyValue;
@@ -74,6 +77,7 @@ public:
 
 	/// <summary>
 	/// AI難易度算出用サーバーを起動する
+	/// throw std::runtime_error
 	/// </summary>
 	void bootServer() {
 		wchar_t command[] = L"./programs/application/auto_difficulty_prediction/NPADP_pred.exe";
@@ -95,6 +99,10 @@ public:
 		//TerminateProcess(pi.hProcess, exitCode);		
 	}
 
+	/// <summary>
+	/// サーバーへの接続
+	/// throw std::runtime_error
+	/// </summary>
 	void connectToServer() {
 		/* IP アドレス、ポート番号、ソケット */
 		char* destination = "127.0.0.1";//localhost
@@ -125,9 +133,19 @@ public:
 		/* ソケット生成 */
 		dstSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-		/* 接続 */
-		//printf("Trying to connect to %s: \n", destination);
-		connect(dstSocket, (struct sockaddr*)&dstAddr, sizeof(dstAddr));
+		/* サーバーに接続できるまで待つ */
+		int err = 0;
+		int tryCount = 0;
+		do {
+			tryCount++;
+			if (tryCount >= 4) {
+				throw std::runtime_error("tcp socket connection timeout");
+			}
+			connect(dstSocket, (struct sockaddr*)&dstAddr, sizeof(dstAddr));
+			err = WSAGetLastError();
+			if (err != 0)Sleep(1);
+		} while (err != 0);
+
 	}
 
 	double getDifficultyFromServer(string str) {
@@ -138,16 +156,15 @@ public:
 
 		char buffer[BUFFER_SIZE];
 		int err = 0;
-
+		int status = 0;
 		//受信
 		numrcv = recv(dstSocket, buffer, BUFFER_SIZE, 0);
 		err = WSAGetLastError();
 		if (numrcv == 0 || numrcv == -1) {
-			int status = closesocket(dstSocket);
+			status = closesocket(dstSocket);
 			return 0;
 		}
 		//printf("received: %s\n", buffer);
-
 		return atof(buffer);
 	}
 

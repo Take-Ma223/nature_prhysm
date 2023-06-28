@@ -42,9 +42,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	_wchdir(L"../../");//作業ディレクトリをapplicationから親の親ディレクトリに移す
 
-	AutoDifficultyPrediction adp;
-	adp.bootServer();//難易度算出用サーバーを立てる
-
 	wchar_t DX_PASSWORD[] = L"ntps";
 	SetDXArchiveKeyString(DX_PASSWORD);
 
@@ -103,6 +100,18 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	EffekseerInitProcess();//Effekseer用初期化処理
 
 	SetCreateGraphColorBitDepth(32);//作成するグラフィックのビット数設定
+
+	AutoDifficultyPrediction adp;
+	try {
+		adp.bootServer();//難易度算出用サーバーを立てる
+	}
+	catch (exception e) {
+		printfDx(L"AI難易度予測サーバーの起動に失敗したため、AI難易度予測が使えません。\n");
+		printfDx(L"ゲームが動かない時.txtを参照してください。\n");
+
+		ScreenFlip();
+		Sleep(3000);
+	}
 
 	///////////////////////////////////難易度
 	int C = 2, H = 3, SH = 4, F = 5, PF = 6;

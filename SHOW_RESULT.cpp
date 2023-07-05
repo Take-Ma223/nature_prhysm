@@ -132,7 +132,7 @@ void SHOW_RESULT(RESULT res,
 	int bestscore = 0;//ハイスコア更新したか(0:してない 1:した)
 	int firstplay = 0;//最初のプレイかどうか(1:最初のプレイ)
 	double fx_draw_counter = 0;//エフェクト描画カウンタ
-	int rank_appear_time = 3500;//ランクが出現する時間
+	int rank_appear_time = 3800;//ランクが出現する時間
 	double c_m_draw_counter = 0;
 	int rank_flag = 0;
 

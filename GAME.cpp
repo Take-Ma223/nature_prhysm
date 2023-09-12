@@ -38,6 +38,7 @@
 #include "AutoDifficultyPrediction.h"
 #include "DxLibUtil.h"
 #include "NPLoadSoundMem.h"
+#include "NoteJudgeProcessor.h"
 
 using namespace std;
 
@@ -415,6 +416,8 @@ void GAME(int song_number, int difficulty,
 
 	NOTE hit_n[4];//最後に叩いたノートの情報
 
+	NoteJudgeProcessor noteJudgeProcessor;
+
 
 	double fall_y = 0;
 	//叩くと後ろに落ちるもの関連
@@ -597,10 +600,6 @@ void GAME(int song_number, int difficulty,
 	int Keylist[3][4] = { { Button[0][0],Button[0][1],Button[0][2],Button[0][3] },
 	{ Button[1][0],Button[1][1],Button[1][2],Button[1][3] },
 	{ Button[2][0],Button[2][1],Button[2][2],Button[2][3] } };//キーのリスト
-	int Colorlist[3][7] = { { 3, 5, 2, 6, 1, 7, 4 },
-	{ 2, 4, 1, 5, 3, 7, 6 },
-	{ 1, 4, 2, 6, 3, 7, 5 } };
-
 
 	XY pos_cloud;//雲の座標
 	if (secret == 0) {//隠し曲演出中ではない
@@ -1934,7 +1933,9 @@ void GAME(int song_number, int difficulty,
 				for (j = 0; j <= 2; j++) {//色
 					if (Key[Keylist[j][i]] == 1) {	
 						int judge_dark = 0;
-						GAME_judge_note(j_n_n[i], note, i, int(GAME_passed_time), int(judge_time_bad), Colorlist[j][0], Colorlist[j][1], Colorlist[j][2], Colorlist[j][3], Colorlist[j][4], Colorlist[j][5], Colorlist[j][6], 9, &timingDifference, LN_flag, &searching);//LN始点叩くとLN_flag変化
+						NoteJudgeButtonColor buttonColor = (NoteJudgeButtonColor)(2 - j);
+
+						noteJudgeProcessor.GAME_judge_note(j_n_n[i], note, i, int(GAME_passed_time), int(judge_time_bad), buttonColor, &timingDifference, LN_flag, &searching);//LN始点叩くとLN_flag変化
 						
 						if (abs(timingDifference) <= judge_time_good)AllowSound[j][i] = 0;//j行i列のスイッチからの音を出さない
 
@@ -2112,7 +2113,7 @@ void GAME(int song_number, int difficulty,
 						}
 
 						if (debug_warp != 1 && judge_dark == 1) {//ワープ時には黒の判定やらず、このフレームで普通の音符が反応していない(judge_dark==1)とき黒音符の叩き判定をする
-							GAME_judge_dark_note(j_dn_n[i], note, i, int(GAME_passed_time), int(judge_time_dark), 8, &dark_hit, &searching);
+							noteJudgeProcessor.GAME_judge_dark_note(j_dn_n[i], note, i, int(GAME_passed_time), int(judge_time_dark), 8, &dark_hit, &searching);
 							if (dark_hit == 1) {//黒を叩いた
 								dnote_hit_flash[i] = 11;
 								volume = 0;
@@ -2341,7 +2342,7 @@ void GAME(int song_number, int difficulty,
 			if (debug_warp != 1) {//ワープ時には黒の判定やらない
 				for (i = 0; i <= 3; i++) {
 					if (Key[Button[2][i]] > 1 || Key[Button[1][i]] >= 1 || Key[Button[0][i]] >= 1) {
-						GAME_judge_dark_note(j_dn_push_n[i], note, i, int(GAME_passed_time), int(con_jd), 8, &dark_hit, &searching);
+						noteJudgeProcessor.GAME_judge_dark_note(j_dn_push_n[i], note, i, int(GAME_passed_time), int(con_jd), 8, &dark_hit, &searching);
 						if (dark_hit == 1) {//黒が判定された
 							dnote_hit_flash[i] = 11;
 							volume = 0;
@@ -3827,152 +3828,6 @@ void GAME(int song_number, int difficulty,
 
 	return;
 }
-
-//黒以外のノートのヒット判定
-void GAME_judge_note(int note_search_init, NOTE **note, int lane, int GAME_passed_time, int judge_time_bad, int H_TG, int H_1B, int H_1A, int H_2B, int H_2A, int H_3B, int H_3A, int H_F, int *score, int *LN_flag, int *searching) {
-	int cash = 0;
-	int note_search = note_search_init;
-
-	while (note[lane][note_search].hit == 1 || note[lane][note_search].color_init == 8) {
-		note_search++;
-	}
-	*searching = note_search;
-	while (1) {
-
-		if (note[lane][note_search].timing_real - GAME_passed_time > judge_time_bad) {//判定対象のノートがまだ判定時間に達していない
-			*score = -10000;
-			break;//while(1)を抜ける
-		}
-
-		cash = note[lane][note_search].color == H_TG || note[lane][note_search].color == H_1B || note[lane][note_search].color == H_2B || note[lane][note_search].color == H_3B || note[lane][note_search].color == H_F;
-		//通常ノート判定
-		if (cash == 1 && note[lane][note_search].group != 1 && note[lane][note_search].group != 2) {//判定対象のノートにH_TG(またはH_F)が含まれていてLNの始点、終点ではないとき
-
-			if (note[lane][note_search].color == H_F) {//H_Fならhit=1で叩いたことにする
-				note[lane][note_search].hit = 1;
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_TG) {//H_TGならhit=1で叩いたことにする
-				note[lane][note_search].hit = 1;
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_1B) {//H_1Bなら
-				note[lane][note_search].color = H_1A;//H_1Aに変える
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_2B) {//H_2Bなら
-				note[lane][note_search].color = H_2A;//H_2Aに変える
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_3B) {//H_3Bなら
-				note[lane][note_search].color = H_3A;//H_3Aに変える
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-		}
-
-		//LN始点判定(LNは餡蜜ができないようにする)
-		if ((cash == 1 && note[lane][note_search].group == 1)//判定対象のノートにH_TG(またはH_F)が含まれていてLNの始点のとき
-			&& ((note_search == note_search_init) || (note[lane][note_search_init].group == 2 && note_search == note_search_init + 1))) {
-			//でまだ叩いてないノートがLNの前に無いとき、またはLN終点から探し始めてる時で次のノーツ(LN始点)があるとき
-
-			if (note[lane][note_search].color == H_F) {//H_FならLN_flag[lane] = 2でLN開始
-				LN_flag[lane] = 2;
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_TG) {//H_TGならLN_flag[lane] = 2でLN開始
-				LN_flag[lane] = 2;
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_1B) {//H_1Bなら
-				note[lane][note_search].color = H_1A;//H_1Aに変える
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_2B) {//H_2Bなら
-				note[lane][note_search].color = H_2A;//H_2Aに変える
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-			if (note[lane][note_search].color == H_3B) {//H_3Bなら
-				note[lane][note_search].color = H_3A;//H_3Aに変える
-				*score = GAME_passed_time - note[lane][note_search].timing_real;
-				break;
-			}
-
-		}
-
-
-		if (note[lane][note_search].color == 0) {//最後以降のノーツに来たら
-			*score = -10000;
-			break;
-		}
-		else {//note_searchのノートがH_TG,H_Fを含んでいない
-			do {
-				note_search++;//一つ上のノートを探す
-				*searching = note_search;
-			} while (note[lane][note_search].hit == 1 || note[lane][note_search].color_init == 8);//もう叩かれてるノートの番号ならもう一回note_searchをインクリメント
-		}
-	}
-
-	return;
-}
-
-//黒ノートのヒット判定
-void GAME_judge_dark_note(int note_search, NOTE **note, int lane, int GAME_passed_time, int judge_time_dark, int H_K, int *dark_hit, int *searching) {
-	int cash = 0;
-	while (note[lane][note_search].hit == 1) {//判定枠をまだ通っていない音符までカウンタを進める
-		note_search++;
-	}
-	*searching = note_search;
-	while (1) {
-
-		if (note[lane][note_search].timing_real - GAME_passed_time >= judge_time_dark) {//判定対象のノートがまだ判定時間に達していない
-			*dark_hit = 0;
-			break;//while(1)を抜ける
-		}
-
-		cash = note[lane][note_search].color == H_K;
-		if (cash == 1) {//判定対象のノートにH_Kが含まれている
-
-			if (note[lane][note_search].color == H_K && note[lane][note_search].hit == 0) {//H_Kならhit=1で叩いたことにする
-				note[lane][note_search].hit = 1;
-				*dark_hit = 1;
-				break;
-			}
-
-		}
-
-		if (note[lane][note_search].color == 0) {//最後以降のノーツに来たら
-			*dark_hit = 0;
-			break;
-		}
-		else {//note_searchのノートがH_Kを含んでいない
-			do {
-				note_search++;//一つ上のノートを探す
-				*searching = note_search;
-			} while (note[lane][note_search].hit == 1);//もう叩かれてるノートの番号ならもう一回note_searchをインクリメント
-		}
-	}
-
-	return;
-}
-
 
 void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effectResourceHandle, int *playingEffectHandle, int PFC) {//フルコンボエフェクト
 	

@@ -405,6 +405,9 @@
     <ClCompile Include="NPLoadSoundMem.cpp">
       <Filter>ソース ファイル\NPUtil</Filter>
     </ClCompile>
+    <ClCompile Include="NoteJudgeProcessor.cpp">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -711,6 +714,9 @@
     </ClInclude>
     <ClInclude Include="NPLoadSoundMem.h">
       <Filter>ソース ファイル\NPUtil</Filter>
+    </ClInclude>
+    <ClInclude Include="NoteJudgeProcessor.h">
+      <Filter>ソース ファイル\GAME</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

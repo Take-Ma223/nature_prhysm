@@ -6,6 +6,25 @@
 
 const int TIMING_SHOW_RATIO = 1000;//表示用タイミングをミリ秒から何倍の精度で扱うか
 
+enum NoteColor
+{
+	R = 1,
+	G,
+	B,
+	Y,
+	C,
+	M,
+	W,
+	K,
+	F
+};
+
+enum NoteGroup {
+	Single,
+	LongNoteStart,
+	LongNoteEnd,
+};
+
 typedef struct NOTE {
 	short x = 0;//ノートのx座標
 	short y = -128;//ノートのy座標

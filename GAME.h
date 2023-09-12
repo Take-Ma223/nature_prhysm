@@ -32,12 +32,7 @@ extern void GAME(int song_number,
 	int AllowExit = 1
 	);
 
-extern void GAME_judge_note(int, NOTE**, int, int, int, int, int, int, int, int, int, int, int, int *, int *, int *);
-extern void GAME_judge_dark_note(int, NOTE**, int, int, int, int, int*, int *);
-
-
 extern void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effectResourceHandle, int *playingEffectHandle, int PFC);//フルコンボエフェクト
-
 
 class SpeedBuffer {
 	NOTE** note;

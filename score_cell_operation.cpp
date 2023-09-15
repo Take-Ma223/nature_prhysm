@@ -15,11 +15,11 @@ void score_insert_cell(SCORE_CELL *p,int step){//pポインタの後にタイミ
 	//score_cell = new_cell;//挿入位置を進める
 }
 
-void score_cell_write_note(SCORE_CELL* p, int column, char color, char group, BOOL bright, BOOL LN_k = 0) {//pポインタにcolumn列目の音符情報を格納 LN黒終点は省略可
+void score_cell_write_note(SCORE_CELL* p, int column, NoteColor color, NoteGroup group, BOOL bright, BOOL LN_k = 0) {//pポインタにcolumn列目の音符情報を格納 LN黒終点は省略可
 	p->content = 1;
 	p->data.note.color[column] = color;
 	p->data.note.group[column] = group;
-	p->data.note.bright[column] = bright;
+	p->data.note.isBright[column] = bright;
 	p->data.note.LN_k[column] = LN_k;
 	return;
 }
@@ -60,7 +60,7 @@ SCORE_CELL* score_cell_find_before_note(SCORE_CELL *p,int column) {//pポイン�
 		p = p->before;
 	
 		if (p == NULL)break;
-		if (p->content == 1 && p->data.note.color[column] != 0)break;//なんかの音符がある行が見つかった
+		if (p->content == 1 && p->data.note.color[column] != NoteColor::NONE)break;//なんかの音符がある行が見つかった
 
 	};
 	return p;//見つからなければNULL
@@ -71,7 +71,7 @@ SCORE_CELL* score_cell_find_next_note(SCORE_CELL *p, int column) {//pポイン�
 		p = p->next;
 
 		if (p == NULL)break;
-		if (p->content == 1 && p->data.note.color[column] != 0)break;//なんかの音符がある行が見つかった
+		if (p->content == 1 && p->data.note.color[column] != NoteColor::NONE)break;//なんかの音符がある行が見つかった
 
 	};
 	return p;//見つからなければNULL
@@ -123,10 +123,10 @@ SCORE_CELL* score_cell_find_command_next(SCORE_CELL* p, int kind) {//pポイン�
 void score_cell_delete_if_no_note(SCORE_CELL **p) {//何もない行なら消す ポインタの値を変更するのでポインタのポインタを引数にする
 	SCORE_CELL *delete_cell = (*p)->before;//消す用
 	
-	if ((*p)->data.note.color[0] == 0
-		&& (*p)->data.note.color[1] == 0
-		&& (*p)->data.note.color[2] == 0
-		&& (*p)->data.note.color[3] == 0) {//何もない行なら
+	if ((*p)->data.note.color[0] == NoteColor::NONE
+		&& (*p)->data.note.color[1] == NoteColor::NONE
+		&& (*p)->data.note.color[2] == NoteColor::NONE
+		&& (*p)->data.note.color[3] == NoteColor::NONE) {//何もない行なら
 
 		*p = (*p)->before;//beforeに移動
 		score_delete_cell(delete_cell);//pの行を消す

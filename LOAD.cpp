@@ -47,7 +47,6 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	STOP_SE stopSequence[NOTE_MAX_NUMBER];
 	SongSub MusicSub;//ダミー
 
-	int hash = 0;
 	int TimeToEndScrollDummy=0;
 	int playing_time_dummy = 0;
 
@@ -276,7 +275,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 							}
 						}
 
-						GAME_LOAD(i, j, note, barline, lane_dummy, readHeaderOnly, &Cdiff_dummy, &opt_dummy, bpmchange, scrollchange, stopSequence, &hash, Music, &MusicSub, &TimeToEndScrollDummy, &playing_time_dummy, config);
+						GAME_LOAD(i, j, note, barline, lane_dummy, readHeaderOnly, &Cdiff_dummy, &opt_dummy, bpmchange, scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScrollDummy, &playing_time_dummy, config);
 						if (readHeaderOnly == 0) {
 							Cache.writeTime = file_lp.ftLastWriteTime;
 							writeMusicToCache(&Cache, Music, i, j);
@@ -290,8 +289,6 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 
 						folder_insert(song_folder, i, j, Music);
 						folder_insert_radar(song_folder, i, j, Music);
-
-						Music[i].hash[j] = hash;
 					} while (FindNextFile(hFind_nps, &file_lp));
 
 					//隠し曲設定があるか確認

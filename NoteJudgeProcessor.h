@@ -8,9 +8,9 @@
 using namespace std;
 
 enum NoteJudgeButtonColor {
-	Red,
-	Green,
-	Blue
+	Red = 0,
+	Green = 1,
+	Blue = 2
 };
 
 class NoteJudgeProcessor {
@@ -21,7 +21,7 @@ class NoteJudgeProcessor {
 	/// <param name="noteColor">音符の色</param>
 	/// <returns>true:有効 false:有効ではない</returns>
 	bool isValidColor(NoteJudgeButtonColor buttonColor, NoteColor noteColor) {
-		vector<vector<int>> validColorlist = { { NoteColor::R, NoteColor::Y, NoteColor::M, NoteColor::W, NoteColor::F},
+		vector<vector<NoteColor>> validColorlist = { { NoteColor::R, NoteColor::Y, NoteColor::M, NoteColor::W, NoteColor::F},
 		 { NoteColor::G, NoteColor::Y, NoteColor::C, NoteColor::W, NoteColor::F},
 		 { NoteColor::B, NoteColor::C, NoteColor::M, NoteColor::W, NoteColor::F} };
 
@@ -80,7 +80,7 @@ public:
 
 		int note_search = note_search_init;
 
-		while (note[lane][note_search].hit == 1 || note[lane][note_search].color_init == 8) {
+		while (note[lane][note_search].hit == 1 || note[lane][note_search].color_init == NoteColor::K) {
 			note_search++;
 		}
 		*searching = note_search;
@@ -125,7 +125,7 @@ public:
 			}
 
 
-			if (note[lane][note_search].color == 0) {//最後以降のノーツに来たら
+			if (note[lane][note_search].color == NoteColor::NONE) {//最後以降のノーツに来たら
 				*timingDifference = -10000;
 				break;
 			}
@@ -133,7 +133,7 @@ public:
 				do {
 					note_search++;//一つ上のノートを探す
 					*searching = note_search;
-				} while (note[lane][note_search].hit == 1 || note[lane][note_search].color_init == 8);//もう叩かれてるノートの番号ならもう一回note_searchをインクリメント
+				} while (note[lane][note_search].hit == 1 || note[lane][note_search].color_init == NoteColor::K);//もう叩かれてるノートの番号ならもう一回note_searchをインクリメント
 			}
 		}
 
@@ -141,7 +141,7 @@ public:
 	}
 
 	//黒ノートのヒット判定
-	void NoteJudgeProcessor::GAME_judge_dark_note(int note_search, NOTE** note, int lane, int GAME_passed_time, int judge_time_dark, int H_K, int* dark_hit, int* searching) {
+	void NoteJudgeProcessor::GAME_judge_dark_note(int note_search, NOTE** note, int lane, int GAME_passed_time, int judge_time_dark, int* dark_hit, int* searching) {
 		int cash = 0;
 		while (note[lane][note_search].hit == 1) {//判定枠をまだ通っていない音符までカウンタを進める
 			note_search++;
@@ -154,10 +154,10 @@ public:
 				break;//while(1)を抜ける
 			}
 
-			cash = note[lane][note_search].color == H_K;
+			cash = note[lane][note_search].color == NoteColor::K;
 			if (cash == 1) {//判定対象のノートにH_Kが含まれている
 
-				if (note[lane][note_search].color == H_K && note[lane][note_search].hit == 0) {//H_Kならhit=1で叩いたことにする
+				if (note[lane][note_search].color == NoteColor::K && note[lane][note_search].hit == 0) {//H_Kならhit=1で叩いたことにする
 					note[lane][note_search].hit = 1;
 					*dark_hit = 1;
 					break;
@@ -165,7 +165,7 @@ public:
 
 			}
 
-			if (note[lane][note_search].color == 0) {//最後以降のノーツに来たら
+			if (note[lane][note_search].color == NoteColor::NONE) {//最後以降のノーツに来たら
 				*dark_hit = 0;
 				break;
 			}

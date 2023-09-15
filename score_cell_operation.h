@@ -4,7 +4,7 @@
 
 void score_insert_cell(SCORE_CELL *score_cell,int);//score_cellポインタの後に音符を挿入
 
-void score_cell_write_note(SCORE_CELL* p, int column, char color, char group, BOOL bright, BOOL LN_k = 0);//pポインタにcolumn列目の音符情報を格納 LN黒終点は省略可
+void score_cell_write_note(SCORE_CELL* p, int column, NoteColor color, NoteGroup group, BOOL bright, BOOL LN_k = 0);//pポインタにcolumn列目の音符情報を格納 LN黒終点は省略可
 
 void score_cell_write_command(SCORE_CELL *p, char kind, double val1 = 0, double val2 = 0, double val3 = 0, double val4 = 0);//pポインタにcolumn列目の音符情報を格納
 

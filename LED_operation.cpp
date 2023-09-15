@@ -14,13 +14,13 @@ void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int i, DWORD *dwWritte
 	//_itoa(i, num, 10);
 	sprintf_s(num, "%d", i);
 
-	if (note.color_init == 1) {//R
+	if (note.color_init == NoteColor::R) {//R
 		LED_state->R[i] = 10;
 	}
-	if (note.color_init == 1) {//G
+	if (note.color_init == NoteColor::R) {//G
 		LED_state->G[i] = 10;
 	}
-	if (note.color_init == 1) {//B
+	if (note.color_init == NoteColor::R) {//B
 		LED_state->B[i] = 10;
 	}
 
@@ -28,31 +28,31 @@ void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int i, DWORD *dwWritte
 
 
 
-	if (note.color_init == 1) {
+	if (note.color_init == NoteColor::R) {
 		strcat_s(str, "R");
 	}
-	if (note.color_init == 2) {
+	if (note.color_init == NoteColor::G) {
 		strcat_s(str, "G");
 	}
-	if (note.color_init == 3) {
+	if (note.color_init == NoteColor::B) {
 		strcat_s(str, "B");
 	}
-	if (note.color_init == 4) {
+	if (note.color_init == NoteColor::Y) {
 		strcat_s(str, "Y");
 	}
-	if (note.color_init == 5) {
+	if (note.color_init == NoteColor::C) {
 		strcat_s(str, "C");
 	}
-	if (note.color_init == 6) {
+	if (note.color_init == NoteColor::M) {
 		strcat_s(str, "M");
 	}
-	if (note.color_init == 7) {
+	if (note.color_init == NoteColor::W) {
 		strcat_s(str, "W");
 	}
-	if (note.color_init == 8) {
+	if (note.color_init == NoteColor::K) {
 		strcat_s(str, "K");
 	}
-	if (note.color_init == 9) {
+	if (note.color_init == NoteColor::F) {
 		strcat_s(str, "F");
 	}
 

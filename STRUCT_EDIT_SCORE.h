@@ -1,5 +1,5 @@
 ﻿#include"DxLib.h"
-#include"CONST_NOTE.h"
+#include "STRUCT_NOTE.h"
 #ifndef _STRUCT_EDIT_SCORE
 #define _STRUCT_EDIT_SCORE
 
@@ -7,9 +7,9 @@
 #define EDITSTEP_SCALE_RATIO 5//768に対する倍率
 
 typedef struct note_data {
-	char color[4];//音符の種類を数値で格納
-	BOOL bright[4];//点滅する音符かどうか(0:しない 1:する)
-	char group[4];//ノートの種類(0:単ノート 1:ロングノート始点(使わない) 2:ロングノート終点) 譜面データを保存するときは終点かだけ分かればいい
+	NoteColor color[4];//音符の種類
+	BOOL isBright[4];//点滅する音符かどうか(0:しない 1:する)
+	NoteGroup group[4];//ノートの種類(0:単ノート 1:ロングノート始点(使わない) 2:ロングノート終点) 譜面データを保存するときは終点かだけ分かればいい
 	BOOL LN_k[4];//LNが黒終点か
 }note_data;
 
@@ -39,7 +39,7 @@ typedef union ROW_DATA {//データ行の音符、命令どっちかを格納す
 typedef struct SCORE_CELL {//譜面データを格納する双方向連結リスト構造の要素になる構造体
 	int step = 0;//1小節をEDITSTEP分割した単位を使ったこの行の位置
 	char content = 0;// 音符、命令どっちが入っているか(1, 音符 2:命令 3:#END)
-	ROW_DATA data = { 0 };
+	ROW_DATA data = { NoteColor::NONE };
 	SCORE_CELL *next=NULL;//次のセルへのポインタ
 	SCORE_CELL *before=NULL;//前のセルへのポインタ
 }SCORE_CELL;

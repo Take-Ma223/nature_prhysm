@@ -449,8 +449,6 @@ void SHOW_RESULT(RESULT res,
 		res.play_count = PlayCountBuf;
 		save.play_count = PlayCountBuf;//プレイ回数を足す
 														//printfDx(L"保存しました\n");
-		save.hash_result = make_result_hash(save);
-
 		fwrite(&save, sizeof(save), 1, fp);
 		fclose(fp);
 

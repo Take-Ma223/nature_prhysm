@@ -264,7 +264,6 @@
     <ClCompile Include="GetValueFromController.cpp" />
     <ClCompile Include="Processable.cpp" />
     <ClCompile Include="SaveDataSaveLoad.cpp" />
-    <ClCompile Include="ScoreData_Authentication.cpp" />
     <ClCompile Include="score_cell_operation.cpp" />
     <ClCompile Include="ScreenShot.cpp" />
     <ClCompile Include="secret_LOAD.cpp" />
@@ -350,7 +349,6 @@
     <ClInclude Include="STRUCT_ANDROID_CONTROLLER.h" />
     <ClInclude Include="cell_operation.h" />
     <ClInclude Include="CONSTANT_VALUE.h" />
-    <ClInclude Include="CONST_NOTE.h" />
     <ClInclude Include="EDIT_SCORE.h" />
     <ClInclude Include="folder_insert.h" />
     <ClInclude Include="GAME.h" />
@@ -364,7 +362,6 @@
     <ClInclude Include="number_digit.h" />
     <ClInclude Include="number_ring.h" />
     <ClInclude Include="PlayHitSound.h" />
-    <ClInclude Include="ScoreData_Authentication.h" />
     <ClInclude Include="score_cell_operation.h" />
     <ClInclude Include="secret_LOAD.h" />
     <ClInclude Include="setupSerial.h" />

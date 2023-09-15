@@ -547,7 +547,7 @@ void SONG_SELECT(int *l_n,
 	H_CURSOR = LoadGraph(L"img/cursor.png");
 
 	//NOTEプレビュー画像読み込み
-	wchar_t* ReadNameRGB[11] = { L"r",L"g",L"b",L"y",L"c",L"m",L"w",L"d",L"f",L"bright",L"note_Long_hit_b" };
+	wchar_t* ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",L"bright",L"note_Long_hit_b" };
 	wchar_t strcash[128];
 	sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
 	H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);

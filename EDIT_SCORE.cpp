@@ -146,7 +146,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	BOOL isInstructionAppear = 1;//操作説明表示フラグ
 
 	//画像音ハンドル値代入
-	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"y",L"c",L"m",L"w",L"d",L"f",
+	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",
 		L"bright",L"note_Long_hit_b" };
 
 
@@ -774,10 +774,10 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 								insert = insert->next;
 
-								score_cell_write_note(insert, 0, 0, 0, 0);//color0で初期化
-								score_cell_write_note(insert, 1, 0, 0, 0);
-								score_cell_write_note(insert, 2, 0, 0, 0);
-								score_cell_write_note(insert, 3, 0, 0, 0);
+								score_cell_write_note(insert, 0, NoteColor::NONE, NoteGroup::Single, 0);//color0で初期化
+								score_cell_write_note(insert, 1, NoteColor::NONE, NoteGroup::Single, 0);
+								score_cell_write_note(insert, 2, NoteColor::NONE, NoteGroup::Single, 0);
+								score_cell_write_note(insert, 3, NoteColor::NONE, NoteGroup::Single, 0);
 							}
 							/*
 							if (insert->next->content == 3) {//一番最後の音符、命令だったら
@@ -805,46 +805,46 @@ void EDIT_SCORE(SCORE_CELL* head,
 							int putflag = -1;//-1:黒、LN終点を置いた 0:消した 1:置いた
 							if (note_kind == 0) {
 								if (i == 0) {//Red
-									if (insert->data.note.color[j] == 0) {//何もない
-										score_cell_write_note(insert, j, NOTE_COLOR_RED, 0, 0);
+									if (insert->data.note.color[j] == NoteColor::NONE) {//何もない
+										score_cell_write_note(insert, j, NoteColor::R, NoteGroup::Single, 0);
 										putflag = 1;
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_RED) {
-										score_cell_write_note(insert, j, 0, 0, 0);//消す
+									else if (insert->data.note.color[j] == NoteColor::R) {
+										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 										putflag = 0;
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_GREEN) {
-										score_cell_write_note(insert, j, NOTE_COLOR_YELLOW, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::G) {
+										score_cell_write_note(insert, j, NoteColor::Y, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_BLUE) {
-										score_cell_write_note(insert, j, NOTE_COLOR_MAGENTA, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::B) {
+										score_cell_write_note(insert, j, NoteColor::M, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_YELLOW) {
-										score_cell_write_note(insert, j, NOTE_COLOR_GREEN, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::Y) {
+										score_cell_write_note(insert, j, NoteColor::G, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_CYAN) {
-										score_cell_write_note(insert, j, NOTE_COLOR_WHITE, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::C) {
+										score_cell_write_note(insert, j, NoteColor::W, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_MAGENTA) {
-										score_cell_write_note(insert, j, NOTE_COLOR_BLUE, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::M) {
+										score_cell_write_note(insert, j, NoteColor::B, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_WHITE) {
-										score_cell_write_note(insert, j, NOTE_COLOR_CYAN, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::W) {
+										score_cell_write_note(insert, j, NoteColor::C, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_RAINBOW) {
-										score_cell_write_note(insert, j, NOTE_COLOR_RED, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::F) {
+										score_cell_write_note(insert, j, NoteColor::R, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_BLACK) {
-										score_cell_write_note(insert, j, NOTE_COLOR_RED, insert->data.note.group[j], 0);
+									else if (insert->data.note.color[j] == NoteColor::K) {
+										score_cell_write_note(insert, j, NoteColor::R, insert->data.note.group[j], 0);
 									}
 									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == 1) {//LN終点の色を変えたら
+										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
 											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
 										}
 									}
 									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == 2) {//LN始点の色を変えたら
+										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
 											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
 										}
 									}
@@ -857,46 +857,46 @@ void EDIT_SCORE(SCORE_CELL* head,
 								}
 
 								if (i == 1) {//Green
-									if (insert->data.note.color[j] == 0) {//何もない
-										score_cell_write_note(insert, j, NOTE_COLOR_GREEN, 0, 0);
+									if (insert->data.note.color[j] == NoteColor::NONE) {//何もない
+										score_cell_write_note(insert, j, NoteColor::G, NoteGroup::Single, 0);
 										putflag = 1;
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_RED) {
-										score_cell_write_note(insert, j, NOTE_COLOR_YELLOW, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::R) {
+										score_cell_write_note(insert, j, NoteColor::Y, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_GREEN) {
-										score_cell_write_note(insert, j, 0, 0, 0);//消す
+									else if (insert->data.note.color[j] == NoteColor::G) {
+										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 										putflag = 0;
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_BLUE) {
-										score_cell_write_note(insert, j, NOTE_COLOR_CYAN, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::B) {
+										score_cell_write_note(insert, j, NoteColor::C, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_YELLOW) {
-										score_cell_write_note(insert, j, NOTE_COLOR_RED, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::Y) {
+										score_cell_write_note(insert, j, NoteColor::R, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_CYAN) {
-										score_cell_write_note(insert, j, NOTE_COLOR_BLUE, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::C) {
+										score_cell_write_note(insert, j, NoteColor::B, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_MAGENTA) {
-										score_cell_write_note(insert, j, NOTE_COLOR_WHITE, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::M) {
+										score_cell_write_note(insert, j, NoteColor::W, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_WHITE) {
-										score_cell_write_note(insert, j, NOTE_COLOR_MAGENTA, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::W) {
+										score_cell_write_note(insert, j, NoteColor::M, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_RAINBOW) {
-										score_cell_write_note(insert, j, NOTE_COLOR_GREEN, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::F) {
+										score_cell_write_note(insert, j, NoteColor::G, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_BLACK) {
-										score_cell_write_note(insert, j, NOTE_COLOR_GREEN, insert->data.note.group[j], 0);
+									else if (insert->data.note.color[j] == NoteColor::K) {
+										score_cell_write_note(insert, j, NoteColor::G, insert->data.note.group[j], 0);
 									}
 									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == 1) {//LN終点の色を変えたら
+										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
 											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
 										}
 									}
 									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == 2) {//LN始点の色を変えたら
+										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
 											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
 										}
 									}
@@ -909,46 +909,46 @@ void EDIT_SCORE(SCORE_CELL* head,
 								}
 
 								if (i == 2) {//Blue
-									if (insert->data.note.color[j] == 0) {//何もない
-										score_cell_write_note(insert, j, NOTE_COLOR_BLUE, 0, 0);
+									if (insert->data.note.color[j] == NoteColor::NONE) {//何もない
+										score_cell_write_note(insert, j, NoteColor::B, NoteGroup::Single, 0);
 										putflag = 1;
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_RED) {
-										score_cell_write_note(insert, j, NOTE_COLOR_MAGENTA, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::R) {
+										score_cell_write_note(insert, j, NoteColor::M, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_GREEN) {
-										score_cell_write_note(insert, j, NOTE_COLOR_CYAN, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::G) {
+										score_cell_write_note(insert, j, NoteColor::C, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_BLUE) {
-										score_cell_write_note(insert, j, 0, 0, 0);//消す
+									else if (insert->data.note.color[j] == NoteColor::B) {
+										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 										putflag = 0;
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_YELLOW) {
-										score_cell_write_note(insert, j, NOTE_COLOR_WHITE, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::Y) {
+										score_cell_write_note(insert, j, NoteColor::W, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_CYAN) {
-										score_cell_write_note(insert, j, NOTE_COLOR_GREEN, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::C) {
+										score_cell_write_note(insert, j, NoteColor::G, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_MAGENTA) {
-										score_cell_write_note(insert, j, NOTE_COLOR_RED, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::M) {
+										score_cell_write_note(insert, j, NoteColor::R, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_WHITE) {
-										score_cell_write_note(insert, j, NOTE_COLOR_YELLOW, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::W) {
+										score_cell_write_note(insert, j, NoteColor::Y, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_RAINBOW) {
-										score_cell_write_note(insert, j, NOTE_COLOR_BLUE, insert->data.note.group[j], insert->data.note.bright[j]);
+									else if (insert->data.note.color[j] == NoteColor::F) {
+										score_cell_write_note(insert, j, NoteColor::B, insert->data.note.group[j], insert->data.note.isBright[j]);
 									}
-									else if (insert->data.note.color[j] == NOTE_COLOR_BLACK) {
-										score_cell_write_note(insert, j, NOTE_COLOR_BLUE, 0, 0);
+									else if (insert->data.note.color[j] == NoteColor::K) {
+										score_cell_write_note(insert, j, NoteColor::B, NoteGroup::Single, 0);
 									}
 									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == 1) {//LN終点の色を変えたら
+										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
 											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
 										}
 									}
 									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == 2) {//LN始点の色を変えたら
+										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
 											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
 										}
 									}
@@ -962,50 +962,50 @@ void EDIT_SCORE(SCORE_CELL* head,
 							}
 							else if (note_kind == 1) {//配置音符の種類変更をしている
 								if (i == 0) {//Black
-									if (insert->data.note.color[j] == NOTE_COLOR_BLACK) {
-										score_cell_write_note(insert, j, 0, 0, 0);//消す
+									if (insert->data.note.color[j] == NoteColor::K) {
+										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 									}
 									else {//黒音符を書き込む
 
-										if (insert->data.note.group[j] == 1) {//始点を黒で上書きしたとき
-											score_cell_write_note(find_next, j, 0, 0, 0);//終点を消す
+										if (insert->data.note.group[j] == NoteGroup::LongNoteStart) {//始点を黒で上書きしたとき
+											score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//終点を消す
 											score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
 										}
-										else if (insert->data.note.group[j] == 2) {//終点を黒で上書きしたとき
-											find_before->data.note.group[j] = 0;//始点を単ノートにする
+										else if (insert->data.note.group[j] == NoteGroup::LongNoteEnd) {//終点を黒で上書きしたとき
+											find_before->data.note.group[j] = NoteGroup::Single;//始点を単ノートにする
 										}
 										else if (find_next != NULL && find_before != NULL) {
-											if (find_before->data.note.group[j] == 1) {//LNの中に黒を置いた時
-												find_next->data.note.group[j] = 0;//始点を単ノートにする
-												find_before->data.note.group[j] = 0;//終点を単ノートにする
+											if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LNの中に黒を置いた時
+												find_next->data.note.group[j] = NoteGroup::Single;//始点を単ノートにする
+												find_before->data.note.group[j] = NoteGroup::Single;//終点を単ノートにする
 											}
 										}
 
-										score_cell_write_note(insert, j, NOTE_COLOR_BLACK, 0, 0);//黒音符書き込み
+										score_cell_write_note(insert, j, NoteColor::K, NoteGroup::Single, 0);//黒音符書き込み
 
 									}
 									PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
 								}
 								if (i == 1) {//Rainbow
-									if (insert->data.note.color[j] == NOTE_COLOR_RAINBOW) {//既に虹がある
-										score_cell_write_note(insert, j, 0, 0, 0);//消す
+									if (insert->data.note.color[j] == NoteColor::F) {//既に虹がある
+										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 										putflag = 0;
 									}
 									else {//虹ではない
-										if (insert->data.note.color[j] == 0)putflag = 1;//何もないときは置いたフラグ立てる
+										if (insert->data.note.color[j] == NoteColor::NONE)putflag = 1;//何もないときは置いたフラグ立てる
 
-										score_cell_write_note(insert, j, NOTE_COLOR_RAINBOW, insert->data.note.group[j], insert->data.note.bright[j]);
+										score_cell_write_note(insert, j, NoteColor::F, insert->data.note.group[j], insert->data.note.isBright[j]);
 
 									}
 									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == 1) {//LN終点の色を変えたら
+										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
 											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
 										}
 									}
 									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == 2) {//LN始点の色を変えたら
+										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
 											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
 										}
 									}
@@ -1017,46 +1017,46 @@ void EDIT_SCORE(SCORE_CELL* head,
 									}
 								}
 								if (i == 2) {//LN
-									if (insert->data.note.group[j] == 2) {//既にLN終点があったら
-										score_cell_write_note(insert, j, 0, 0, 0);//消す
+									if (insert->data.note.group[j] == NoteGroup::LongNoteEnd) {//既にLN終点があったら
+										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 
-										score_cell_write_note(find_before, j, find_before->data.note.color[j], 0, find_before->data.note.bright[j]);//下にある音符を単ノートにする
+										score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::Single, find_before->data.note.isBright[j]);//下にある音符を単ノートにする
 									}
 									else {//今のstep_countの行にLN終点が配置されてない
 										if (find_before != NULL) {//この行の下に音符があって
-											if (find_before->data.note.color[j] != NOTE_COLOR_BLACK && find_before->data.note.group[j] != 2) {//それが黒じゃなくLN終点でもないならLN終端を置ける
+											if (find_before->data.note.color[j] != NoteColor::K && find_before->data.note.group[j] != NoteGroup::LongNoteEnd) {//それが黒じゃなくLN終点でもないならLN終端を置ける
 
 												if (find_next != NULL) {//上に音符がある
-													if (find_next->data.note.group[j] == 2) {//それがLN終点なら消す
-														score_cell_write_note(find_next, j, 0, 0, 0);//消す
+													if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//それがLN終点なら消す
+														score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 														score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
 													}
 												}
-												score_cell_write_note(find_before, j, find_before->data.note.color[j], 1, find_before->data.note.bright[j]);//下にある音符をLN始点にする
+												score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::LongNoteStart, find_before->data.note.isBright[j]);//下にある音符をLN始点にする
 
 												if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//SHIFT押しながらだと黒終点にする
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], 2, score_cell_find_before_note(insert, j)->data.note.bright[j], 1);//LN情報を書き込む(黒終点)
+													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
 												}
 												else {
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], 2, score_cell_find_before_note(insert, j)->data.note.bright[j], 0);//LN情報を書き込む(通常終点)
+													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
 												}
 											}
-											else if (find_before->data.note.group[j] == 2) {//下がLN終点のときは今の位置にずらす
+											else if (find_before->data.note.group[j] == NoteGroup::LongNoteEnd) {//下がLN終点のときは今の位置にずらす
 
-												score_cell_write_note(find_before, j, 0, 0, 0);//下にある音符を消す
+												score_cell_write_note(find_before, j, NoteColor::NONE, NoteGroup::Single, 0);//下にある音符を消す
 												score_cell_delete_if_no_note(&find_before);//その結果何もない行になったら行を消す
 
 												if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//SHIFT押しながらだと黒終点にする
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], 2, score_cell_find_before_note(insert, j)->data.note.bright[j], 1);//LN情報を書き込む(黒終点)
+													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
 												}
 												else {
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], 2, score_cell_find_before_note(insert, j)->data.note.bright[j], 0);//LN情報を書き込む(通常終点)
+													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
 												}
 
 												if (find_next != NULL) {//上に音符がある
-													if (find_next->data.note.group[j] == 2) {//それがLN終点なら消す
-														score_cell_write_note(find_next, j, 0, 0, 0);//消す
+													if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//それがLN終点なら消す
+														score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 														score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
 													}
 												}
@@ -1069,14 +1069,14 @@ void EDIT_SCORE(SCORE_CELL* head,
 							}
 
 							if (putflag == 1 && (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1)) {//音符を置いたときSHIFT押してたら光らせる
-								if (insert->data.note.color[j] != NOTE_COLOR_BLACK && insert->data.note.color[j] != 0) {
-									insert->data.note.bright[j] = 1;//光らせる
-									if (insert->data.note.group[j] == 2) {//LN終点なら始点も光らせる
-										find_before->data.note.bright[j] = 1;
+								if (insert->data.note.color[j] != NoteColor::K && insert->data.note.color[j] != NoteColor::NONE) {
+									insert->data.note.isBright[j] = 1;//光らせる
+									if (insert->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN終点なら始点も光らせる
+										find_before->data.note.isBright[j] = true;
 
 									}
-									if (insert->data.note.group[j] == 1) {//LN始点なら終点も光らせる
-										find_next->data.note.bright[j] = 1;
+									if (insert->data.note.group[j] == NoteGroup::LongNoteStart) {//LN始点なら終点も光らせる
+										find_next->data.note.isBright[j] = true;
 									}
 								}
 							}
@@ -1084,22 +1084,22 @@ void EDIT_SCORE(SCORE_CELL* head,
 							if (putflag != -1) {
 								if (putflag == 0) {//RGB虹音符を消していたとき 黒を置いたとき
 									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == 2) {//LN始点を消していたとき
-											score_cell_write_note(find_next, j, 0, 0, 0);//LN終点も消す
+										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点を消していたとき
+											score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//LN終点も消す
 											score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
 										}
 									}
 									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == 1) {//LN終点を消していたとき
-											find_before->data.note.group[j] = 0;//LN始点を単ノートにする
+										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点を消していたとき
+											find_before->data.note.group[j] = NoteGroup::Single;//LN始点を単ノートにする
 										}
 									}
 								}
 								if (putflag == 1) {//音符を置いていたとき
 									if (find_next != NULL && find_before != NULL) {
-										if (find_next->data.note.group[j] == 2) {//LNの中に音符を置いていたとき
-											score_cell_write_note(insert, j, insert->data.note.color[j], 1, insert->data.note.bright[j]);//この音符をLN始点にする
-											score_cell_write_note(find_before, j, find_before->data.note.color[j], 0, find_before->data.note.bright[j]);//下の音符は単ノートにする
+										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LNの中に音符を置いていたとき
+											score_cell_write_note(insert, j, insert->data.note.color[j], NoteGroup::LongNoteStart, insert->data.note.isBright[j]);//この音符をLN始点にする
+											score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::Single, find_before->data.note.isBright[j]);//下の音符は単ノートにする
 										}
 									}
 								}
@@ -1125,19 +1125,19 @@ void EDIT_SCORE(SCORE_CELL* head,
 								SCORE_CELL* find_before = score_cell_find_before_note(insert, j);
 								SCORE_CELL* find_next = score_cell_find_next_note(insert, j);
 
-								score_cell_write_note(insert, j, 0, 0, 0);//消す
+								score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 								score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 
 
 								if (find_next != NULL) {
-									if (find_next->data.note.group[j] == 2) {//LN始点を消していたとき
-										score_cell_write_note(find_next, j, 0, 0, 0);//LN終点も消す
+									if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点を消していたとき
+										score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//LN終点も消す
 										score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
 									}
 								}
 								if (find_before != NULL) {
-									if (find_before->data.note.group[j] == 1) {//LN終点を消していたとき
-										find_before->data.note.group[j] = 0;//LN始点を単ノートにする
+									if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点を消していたとき
+										find_before->data.note.group[j] = NoteGroup::Single;//LN始点を単ノートにする
 									}
 								}
 
@@ -1322,10 +1322,10 @@ void EDIT_SCORE(SCORE_CELL* head,
 						insert_command = insert;
 						insert_command = score_cell_find_command_before(insert_command, command_put);//目的の命令がstep_countにあるか
 						if (insert_command != NULL) {//目的の命令が存在する
-							score_cell_write_note(insert_command, 0, 0, 0, 0);//音符セルということにして消す
-							score_cell_write_note(insert_command, 1, 0, 0, 0);//音符セルということにして消す
-							score_cell_write_note(insert_command, 2, 0, 0, 0);//音符セルということにして消す
-							score_cell_write_note(insert_command, 3, 0, 0, 0);//音符セルということにして消す
+							score_cell_write_note(insert_command, 0, NoteColor::NONE, NoteGroup::Single, 0);//音符セルということにして消す
+							score_cell_write_note(insert_command, 1, NoteColor::NONE, NoteGroup::Single, 0);//音符セルということにして消す
+							score_cell_write_note(insert_command, 2, NoteColor::NONE, NoteGroup::Single, 0);//音符セルということにして消す
+							score_cell_write_note(insert_command, 3, NoteColor::NONE, NoteGroup::Single, 0);//音符セルということにして消す
 
 							if (insert_command == insert) {//音符が付いてない所の命令を消すとき
 								score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
@@ -1550,20 +1550,20 @@ void EDIT_SCORE(SCORE_CELL* head,
 		while (show->step != -1) {//endからheadまで描画
 			if (show->content == CONTENTS_NOTE) {
 				for (i = 0; i <= 3; i++) {
-					if (show->data.note.color[i] != 0) {//音符があったら
-						if (show->data.note.group[i] == 0) {//単ノート
-							if (show->data.note.bright[i] == NOTE_NOT_BRIGHT) {
-								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[show->data.note.color[i]], TRUE);
+					if (show->data.note.color[i] != NoteColor::NONE) {//音符があったら
+						if (show->data.note.group[i] == NoteGroup::Single) {//単ノート
+							if (show->data.note.isBright[i] == false) {
+								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[(int)show->data.note.color[i]], TRUE);
 							}
-							if (show->data.note.bright[i] == NOTE_BRIGHT) {
-								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[show->data.note.color[i]], TRUE);
+							if (show->data.note.isBright[i] == true) {
+								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[(int)show->data.note.color[i]], TRUE);
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
 								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[10], TRUE);
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 							}
 						}
-						if (show->data.note.group[i] == 1) {//LN始点
-							if (show->data.note.bright[i] == NOTE_NOT_BRIGHT) {
+						if (show->data.note.group[i] == NoteGroup::LongNoteStart) {//LN始点
+							if (show->data.note.isBright[i] == false) {
 								/*
 								DrawExtendGraph(lane[i] - 64 ,
 									judge_area - (show->step - step_count)*scale - 64,
@@ -1575,11 +1575,11 @@ void EDIT_SCORE(SCORE_CELL* head,
 								DrawRectExtendGraph(
 									lane[i] - 64, judge_area - int((show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64),
 									0, 128, 256, 128,
-									H_NOTE[show->data.note.color[i]], TRUE
+									H_NOTE[(int)show->data.note.color[i]], TRUE
 								);
 
 							}
-							if (show->data.note.bright[i] == NOTE_BRIGHT) {
+							if (show->data.note.isBright[i] == true) {
 								/*
 								DrawExtendGraph(lane[i] - 64 - 32, judge_area - (show->step - step_count)*scale - 64, lane[i] + 64, judge_area - (show->step - step_count)*scale + 64, H_NOTE[show->data.note.color[i]], TRUE);
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
@@ -1590,7 +1590,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 								DrawRectExtendGraph(
 									lane[i] - 64, judge_area - int((show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5),
 									0, 128, 256, 128,
-									H_NOTE[show->data.note.color[i]], TRUE
+									H_NOTE[(int)show->data.note.color[i]], TRUE
 								);
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
 								DrawRectExtendGraph(
@@ -1602,24 +1602,24 @@ void EDIT_SCORE(SCORE_CELL* head,
 							}
 
 						}
-						if (show->data.note.group[i] == 2) {//LN終点
+						if (show->data.note.group[i] == NoteGroup::LongNoteEnd) {//LN終点
 
 							//DrawExtendGraph(lane[i] - 64 + 32, judge_area - (show->step - step_count)*scale - 64, lane[i] + 64, judge_area - (show->step - step_count)*scale + 64, H_NOTE[show->data.note.color[i]], TRUE);
 
 							DrawRectExtendGraph(
 								lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
 								0, 0, 256, 128,
-								show->data.note.LN_k[i] == 0 ? H_NOTE[show->data.note.color[i]] : H_NOTE[8],//黒終点なら上半分は黒音符表示
+								show->data.note.LN_k[i] == 0 ? H_NOTE[(int)show->data.note.color[i]] : H_NOTE[8],//黒終点なら上半分は黒音符表示
 								TRUE
 							);
 
 							DrawRectExtendGraph(//LN中間表示
 								lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (score_cell_find_before_note(show, i)->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
 								0, 0, 256, 256,
-								H_LNOTE[show->data.note.color[i]], TRUE
+								H_LNOTE[(int)show->data.note.color[i]], TRUE
 							);
 
-							if (show->data.note.bright[i] == NOTE_BRIGHT) {//光る音符の場合
+							if (show->data.note.isBright[i] == true) {//光る音符の場合
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
 								DrawRectExtendGraph(
 									lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
@@ -2208,10 +2208,10 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 
 				if (measure_p->content == CONTENTS_NOTE && int(step) >= measure_p->step) {//音符
 					fwprintf_s(fp, L"%c%c%c%c",
-						note_to_char(measure_p->data.note.color[0], measure_p->data.note.group[0], measure_p->data.note.bright[0], measure_p->data.note.LN_k[0]),
-						note_to_char(measure_p->data.note.color[1], measure_p->data.note.group[1], measure_p->data.note.bright[1], measure_p->data.note.LN_k[1]),
-						note_to_char(measure_p->data.note.color[2], measure_p->data.note.group[2], measure_p->data.note.bright[2], measure_p->data.note.LN_k[2]),
-						note_to_char(measure_p->data.note.color[3], measure_p->data.note.group[3], measure_p->data.note.bright[3], measure_p->data.note.LN_k[3])
+						note_to_char(measure_p->data.note.color[0], measure_p->data.note.group[0], measure_p->data.note.isBright[0], measure_p->data.note.LN_k[0]),
+						note_to_char(measure_p->data.note.color[1], measure_p->data.note.group[1], measure_p->data.note.isBright[1], measure_p->data.note.LN_k[1]),
+						note_to_char(measure_p->data.note.color[2], measure_p->data.note.group[2], measure_p->data.note.isBright[2], measure_p->data.note.LN_k[2]),
+						note_to_char(measure_p->data.note.color[3], measure_p->data.note.group[3], measure_p->data.note.isBright[3], measure_p->data.note.LN_k[3])
 					);
 					if (measure_p->next != NULL) {//次がNULLじゃない
 						measure_p = measure_p->next;
@@ -2273,18 +2273,18 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 	return 0;
 }
 
-wchar_t note_to_char(char color,char group,BOOL bright,BOOL LN_k) {//音符の数値情報を譜面データ文字に変換
-	wchar_t color_list[11] = { L'0',L'r',L'g',L'b',L'y',L'c',L'm',L'w',L'k',L'f',L'e' };
-	wchar_t color_list_CAP[11] = { NULL,L'R',L'G',L'B',L'Y',L'C',L'M',L'W',NULL,L'F',L'E' };
-	if (group == NOTE_GROUP_LN_END) {
+wchar_t note_to_char(NoteColor color,NoteGroup group,BOOL bright,BOOL LN_k) {//音符の数値情報を譜面データ文字に変換
+	wchar_t color_list[11] = { L'0',L'r',L'g',L'b',L'c',L'm',L'y',L'w',L'k',L'f',L'e' };
+	wchar_t color_list_CAP[11] = { NULL,L'R',L'G',L'B',L'C',L'M',L'Y',L'W',NULL,L'F',L'E' };
+	if (group == NoteGroup::LongNoteEnd) {
 		return LN_k==0? color_list[10] : color_list_CAP[10];
 	}
 
-	if (bright == NOTE_NOT_BRIGHT) {
-		return color_list[color];
+	if (bright == false) {
+		return color_list[(int)color];
 	}
-	else if (bright == NOTE_BRIGHT) {
-		return color_list_CAP[color];
+	else if (bright == true) {
+		return color_list_CAP[(int)color];
 	}
 
 	return L'0';
@@ -2410,7 +2410,7 @@ void MirrorSelectArea(AreaSelect area) {//選択範囲をミラー配置にす�
 		if (search->content == CONTENTS_NOTE) {
 			buf = search->data.note;
 			for (i = 0; i < 4; i++) {
-				buf2.bright[i] = buf.bright[3 - i];
+				buf2.isBright[i] = buf.isBright[3 - i];
 				buf2.color[i] = buf.color[3 - i];
 				buf2.group[i] = buf.group[3 - i];
 				buf2.LN_k[i] = buf.LN_k[3 - i];
@@ -2424,31 +2424,31 @@ void MirrorSelectArea(AreaSelect area) {//選択範囲をミラー配置にす�
 	return;
 }
 
-void SolveLN(SCORE_CELL* end) {//LNの不整合を良い感じにする
+void SolveLN(SCORE_CELL* end) {//LNの不整合を単ノートに置き換える
 	SCORE_CELL* search = end;
 	int column = 0;
 
 	while (1) {
 		if (search->content == CONTENTS_NOTE) {
 			for (column = 0; column < 4; column++) {
-				if (search->data.note.group[column] == 2) {//LN終点
+				if (search->data.note.group[column] == NoteGroup::LongNoteEnd) {//LN終点
 					if (score_cell_find_before_note(search, column) != NULL) {
-						if (score_cell_find_before_note(search, column)->data.note.group[column] != 1) {
-							search->data.note.group[column] = 0;
+						if (score_cell_find_before_note(search, column)->data.note.group[column] != NoteGroup::LongNoteStart) {
+							search->data.note.group[column] = NoteGroup::Single;
 						}
 					}
 					else {
-						search->data.note.group[column] = 0;
+						search->data.note.group[column] = NoteGroup::Single;
 					}
 				}
-				if (search->data.note.group[column] == 1) {//LN始点
+				if (search->data.note.group[column] == NoteGroup::LongNoteStart) {//LN始点
 					if (score_cell_find_next_note(search, column) != NULL) {
-						if (score_cell_find_next_note(search, column)->data.note.group[column] != 2) {
-							search->data.note.group[column] = 0;
+						if (score_cell_find_next_note(search, column)->data.note.group[column] != NoteGroup::LongNoteEnd) {
+							search->data.note.group[column] = NoteGroup::Single;
 						}
 					}
 					else {
-						search->data.note.group[column] = 0;
+						search->data.note.group[column] = NoteGroup::Single;
 					}
 				}
 
@@ -2484,7 +2484,7 @@ void CopySelectArea(int step_count, AreaSelect area, SCORE_CELL *CopyHead) {//Co
 			    score_cell_write_note(copy, column, 
 					search->data.note.color[column], 
 					search->data.note.group[column],
-					search->data.note.bright[column],
+					search->data.note.isBright[column],
 					search->data.note.LN_k[column]);
 			}
 		}
@@ -2531,7 +2531,7 @@ void DeleteSelectArea(SCORE_CELL** insert, AreaSelect area) {//選択範囲の�
 		while (1) {
 			if (search->content == 1) {
 				for (column = 0; column < 4; column++) {
-					score_cell_write_note(search, column, 0, 0, 0);//消す
+					score_cell_write_note(search, column, NoteColor::NONE, NoteGroup::Single, 0);//消す
 				}
 				score_cell_delete_if_no_note(&search);//その結果何もない行になったら行を消す
 			}
@@ -2573,7 +2573,7 @@ void PasteSelectArea(int step_count, SCORE_CELL** insert, int PasteRange, SCORE_
 		while (1) {
 			if (search->content == 1) {
 				for (column = 0; column < 4; column++) {
-					score_cell_write_note(search, column, 0, 0, 0);//消す
+					score_cell_write_note(search, column, NoteColor::NONE, NoteGroup::Single, 0);//消す
 				}
 				score_cell_delete_if_no_note(&search);//その結果何もない行になったら行を消す
 			}
@@ -2619,7 +2619,7 @@ void PasteSelectArea(int step_count, SCORE_CELL** insert, int PasteRange, SCORE_
 				score_cell_write_note(search, column,
 					copy->data.note.color[column],
 					copy->data.note.group[column],
-					copy->data.note.bright[column],
+					copy->data.note.isBright[column],
 					copy->data.note.LN_k[column]);
 			}
 

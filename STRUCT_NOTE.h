@@ -34,7 +34,8 @@ enum NoteGroup {
 };
 
 
-typedef struct NOTE {
+class NOTE {
+public:
 	short x = 0;//ノートのx座標
 	short y = -128;//ノートのy座標
 	int timing = 0;//表示用タイミング(マイクロ秒)
@@ -53,15 +54,16 @@ typedef struct NOTE {
 	BOOL isBright = 0;//鳴らす音を大きくするかどうか(0:通常 1で長くする) 長く鳴る音符は点滅する
 	BOOL ignore = 0;//ワープ区間のため無視される音符なら1 それ以外0
 	//std::vector<NOTE*> j;
-}NOTE;
+};
 
-typedef struct GlnNode {
+class GradationLongNoteNode {
 
 
 };
 
 
-typedef struct BARLINE {//演奏画面で表示する小節線の構造体
+class BARLINE {//演奏画面で表示する小節線の構造体
+public:
 	short x = 0;//ノートのx座標
 	short y = -128;//ノートのy座標
 	int timing = 0;//表示用タイミング(ミリ秒)
@@ -71,6 +73,6 @@ typedef struct BARLINE {//演奏画面で表示する小節線の構造体
 	char fall = 0;//0なら落ちてない,1なら落下中,2なら落ち切った
 	float bpm = 1;//このノート時点のBPM
 	BOOL use = 0;//使用フラグ
-}BARLINE;
+};
 
 #endif

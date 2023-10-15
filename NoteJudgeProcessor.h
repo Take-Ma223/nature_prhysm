@@ -94,7 +94,7 @@ public:
 			}
 			bool isValid = isValidColor(buttonColor, noteColor);
 			//通常ノート判定
-			if (isValid && note[lane][note_search].group != 1 && note[lane][note_search].group != 2) {//判定対象のノートが有効色でLNの始点、終点ではないとき
+			if (isValid && note[lane][note_search].group == NoteGroup::Single) {//判定対象のノートが有効色で単ノートのとき
 
 				if (isRemovableColor(buttonColor, noteColor)) {//消せる音符のとき
 					note[lane][note_search].hit = 1;
@@ -108,8 +108,8 @@ public:
 			}
 
 			//LN始点判定(LNは餡蜜ができないようにする)
-			if ((isValid && note[lane][note_search].group == 1)//判定対象のノートにH_TG(またはH_F)が含まれていてLNの始点のとき
-				&& ((note_search == note_search_init) || (note[lane][note_search_init].group == 2 && note_search == note_search_init + 1))) {
+			if ((isValid && note[lane][note_search].group == NoteGroup::LongNoteStart)//判定対象のノートにH_TG(またはH_F)が含まれていてLNの始点のとき
+				&& ((note_search == note_search_init) || (note[lane][note_search_init].group == NoteGroup::LongNoteEnd && note_search == note_search_init + 1))) {
 				//でまだ叩いてないノートがLNの前に無いとき、またはLN終点から探し始めてる時で次のノーツ(LN始点)があるとき
 
 				if (isRemovableColor(buttonColor, noteColor)) {//消せる音符のとき

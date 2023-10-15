@@ -56,13 +56,13 @@ void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int i, DWORD *dwWritte
 		strcat_s(str, "F");
 	}
 
-	if (note.group == 0) {//単ノート
+	if (note.group == NoteGroup::Single) {//単ノート
 		strcat_s(str, "0");
 	}
-	if (note.group == 1) {//LN始点
+	if (note.group == NoteGroup::LongNoteStart) {//LN始点
 		strcat_s(str, "1");
 	}
-	if (note.group == 2) {//LN終点
+	if (note.group == NoteGroup::LongNoteEnd) {//LN終点
 		strcat_s(str, "2");
 	}
 

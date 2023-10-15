@@ -1,5 +1,6 @@
 ﻿#include"DxLib.h"
 #include<vector>
+#include <stdexcept>
 
 #ifndef _STRUCT_NOTE
 #define _STRUCT_NOTE
@@ -29,7 +30,7 @@ enum class NoteColor : char
 enum NoteGroup {
 	Single = 0,//NoteGroup::Single
 	LongNoteStart = 1,//NoteGroup::LongNoteStart
-	LongNoteMiddle,//NoteGroup::LongNoteMiddle
+	LongNoteMiddle = 3,//NoteGroup::LongNoteMiddle
 	LongNoteEnd = 2,//NoteGroup::LongNoteEnd
 };
 
@@ -49,16 +50,82 @@ public:
 	float bpm_real = 1;//SCROLLの影響を考慮したこのノートの実際の速さ(BPM基準)
 	BOOL hit = 0;//1:叩いた 0:叩いてない
 	NoteGroup group = NoteGroup::Single;//ノートの種類(0:単ノート 1:ロングノート始点 2:ロングノート終点)
+	NoteGroup group_init = NoteGroup::Single;//ノートの元の種類(0:単ノート 1:ロングノート始点 2:ロングノート終点)
 	BOOL LN_k = 0;//LNの終端で離すべきか(0:離さなくても良い 1:離さないといけない黒終点)
 	short textLine = 0;//譜面データ上の行(見つけやすくする)
 	BOOL isBright = 0;//鳴らす音を大きくするかどうか(0:通常 1で長くする) 長く鳴る音符は点滅する
 	BOOL ignore = 0;//ワープ区間のため無視される音符なら1 それ以外0
-	//std::vector<NOTE*> j;
+	//std::vector<GradationLongNoteNode*> j;
 };
 
-class GradationLongNoteNode {
 
+class NoteSearcher {
+	NOTE** note;
 
+public:
+	NoteSearcher(NOTE** n) {
+		note = n;
+
+	}
+
+	/// <summary>
+	/// laneとindexの位置から一番最近のSingleノートのindexを返す
+	/// </summary>
+	int getLatestSingle(int lane, int ind) {
+		int index = ind;
+
+		while (true) {
+			if (note[lane][index].group == NoteGroup::Single) {
+				return index;
+			}
+			index--;
+			if (index < 0) {
+				throw std::runtime_error("単ノートが見つかりませんでした。");
+			}
+		}
+	}
+
+	/// <summary>
+	/// laneとindexの位置(ロング中間、終点のみ)からロングノート始点のindexを返す
+	/// </summary>
+	int getLnStart(int lane, int ind) {
+		int index = ind;
+
+		if (!(note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteEnd)) {
+			throw std::runtime_error("ロング中間またはロング終点が指定されませんでした。");
+		}
+
+		while (true) {
+			if (note[lane][index].group == NoteGroup::LongNoteStart) {
+				return index;
+			}
+			index--;
+			if (index < 0) {
+				throw std::runtime_error("ロングノート始点が見つかりませんでした。");
+			}
+		}
+	}
+
+	/// <summary>
+	/// laneとindexの位置(ロング中間、始点のみ)からロングノート終点のindexを返す
+	/// </summary>
+	int getLnEnd(int lane, int ind) {
+		int index = ind;
+
+		if (!(note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteStart)) {
+			throw std::runtime_error("ロング中間またはロング始点が指定されませんでした。");
+		}
+
+		while (true) {
+			if (note[lane][index].group == NoteGroup::LongNoteEnd) {
+				return index;
+			}
+			index++;
+			if (index < 0) {
+				throw std::runtime_error("ロングノート終点が見つかりませんでした。");
+			}
+		}
+	}
 };
 
 

@@ -23,7 +23,7 @@ void GAME_LOAD(int song_number,
 	int difficulty,
 	NOTE **note,
 	BARLINE *barline,
-	int *lane,
+	int *laneCordinateX,
 	int readflag,
 	CALCDIFF *Cdiff,
 	Option  *Option,
@@ -55,7 +55,7 @@ void GAME_LOAD(int song_number,
 
 	int hash_M = 99999999;//譜面ハッシュ値の最大値
 
-	int i = 0, j = 0, k = 0, n = 0, dataArrayLength = 0;
+	int i = 0, j = 0, lane = 0, n = 0, dataArrayLength = 0;
 	int fp = 0;
 	errno_t error = 0;
 	//NOTE copy[4][NOTE_MAX_NUMBER];
@@ -297,6 +297,8 @@ void GAME_LOAD(int song_number,
 	//デフォルト色
 	Music[song_number].StrColor[difficulty] = colorRatio(255, 255, 255);
 	Music[song_number].StrShadowColor[difficulty] = colorRatio(0, 0, 0);
+
+	NoteSearcher noteSercher = NoteSearcher(note);
 
 	fp = FileRead_open(filename);
 	if (fp == 0) {//無かったら戻る
@@ -655,6 +657,9 @@ void GAME_LOAD(int song_number,
 				do {//空行は無視
 					FileRead_gets(str, 256, fp);//一行取得(\nは入らない)
 				} while (wcscmp(str, L"") == 0);
+
+				//1行を:で分割して格納
+				sharp2[0] = '\0'; sharp2[1] = '\0'; sharp2[2] = '\0'; sharp2[3] = '\0';
 				swscanf_s(str, L"%[^:\n]:%[^:\n]", sharp1, _countof(sharp1), sharp2, _countof(sharp2));
 
 				if (wcscmp(L"#BPM", sharp1) == 0) {//BPM変更点を見つけた
@@ -773,8 +778,8 @@ void GAME_LOAD(int song_number,
 					stopSequence[stop_se_c].stop_time = _wtof(sharp2) / pitch;//停止時間(s)
 					stopSequence[stop_se_c].use = 1;
 
-					//note[k][nc[k]].timing = int((time_counter + note_offset_scroll));
-					//note[k][nc[k]].timing_init = int((time_counter + note_offset_scroll));
+					//note[lane][nc[lane]].timing = int((time_counter + note_offset_scroll));
+					//note[lane][nc[lane]].timing_init = int((time_counter + note_offset_scroll));
 
 					ignoreFlag = 1;//次のノートにはタイミングずらしを適用しない
 
@@ -801,8 +806,8 @@ void GAME_LOAD(int song_number,
 
 					stopSequence[stop_se_c].use = 1;
 
-					//note[k][nc[k]].timing = int((time_counter + note_offset_scroll));
-					//note[k][nc[k]].timing_init = int((time_counter + note_offset_scroll));
+					//note[lane][nc[lane]].timing = int((time_counter + note_offset_scroll));
+					//note[lane][nc[lane]].timing_init = int((time_counter + note_offset_scroll));
 
 					ignoreFlag = 1;//次のノートにはタイミングずらしを適用しない
 
@@ -888,10 +893,10 @@ void GAME_LOAD(int song_number,
 					int length = wcslen(sharp1);//左端から何列探索するか
 					if (length > 4)length = 4;
 
-					for (k = 0; k < length; k++) {//レーン
+					for (lane = 0; lane < length; lane++) {//レーン
 						for (j = 1; j <= 10; j++) {//rからdまでの色を探す(ロングノート終端も探す)
-							if (color_list[j] == sharp1[k] || color_list_CAP[j] == sharp1[k]) {//キャッシュの[i]行[k-1]列目の色が何色か(大文字だと音は長く鳴る)
-								//printfDx(L"レーン番号:%d\n", k);
+							if (color_list[j] == sharp1[lane] || color_list_CAP[j] == sharp1[lane]) {//キャッシュの[i]行[lane-1]列目の色が何色か(大文字だと音は長く鳴る)
+								//printfDx(L"レーン番号:%d\n", lane);
 								//printfDx(L"time:%f\n", time_counter);
 								//printfDx(L"DN:%d\n", DN);
 
@@ -908,34 +913,43 @@ void GAME_LOAD(int song_number,
 									}
 								}
 
-								note[k][nc[k]].timing = int((time_counter + note_offset_scroll) * TIMING_SHOW_RATIO + 0.5);//表示用タイミング
-								note[k][nc[k]].timing_init = note[k][nc[k]].timing;//表示用タイミング(保存用)
-								note[k][nc[k]].timing_real = int(time_counter_real + Music[song_number].noteoffset[difficulty]
+								note[lane][nc[lane]].timing = int((time_counter + note_offset_scroll) * TIMING_SHOW_RATIO + 0.5);//表示用タイミング
+								note[lane][nc[lane]].timing_init = note[lane][nc[lane]].timing;//表示用タイミング(保存用)
+								note[lane][nc[lane]].timing_real = int(time_counter_real + Music[song_number].noteoffset[difficulty]
 									+ stopTimeSum * 1000 + 0.5 + config.VsyncOffsetCompensation);//実際に叩くタイミング
-								note[k][nc[k]].timing_init_real = note[k][nc[k]].timing_real;//実際に叩くタイミング(保存用)
+								note[lane][nc[lane]].timing_init_real = note[lane][nc[lane]].timing_real;//実際に叩くタイミング(保存用)
 
-								note[k][nc[k]].color = (NoteColor)j;
-								note[k][nc[k]].color_init = (NoteColor)j;
+								note[lane][nc[lane]].color = (NoteColor)j;
+								note[lane][nc[lane]].color_init = (NoteColor)j;
 
-								note[k][nc[k]].x = lane[k];
-								note[k][nc[k]].bpm = float(high_speed[k] * bpm );
-								note[k][nc[k]].bpm_real = float(high_speed[k] * bpm * scroll);
-								if (color_list_CAP[j] == sharp1[k] && color_list_CAP[10] != sharp1[k]) {//LN終端以外で大文字で書かれていたら
+								note[lane][nc[lane]].x = laneCordinateX[lane];
+								note[lane][nc[lane]].bpm = float(high_speed[lane] * bpm );
+								note[lane][nc[lane]].bpm_real = float(high_speed[lane] * bpm * scroll);
+								if (color_list_CAP[j] == sharp1[lane] && color_list_CAP[10] != sharp1[lane]) {//LN終端以外で大文字で書かれていたら
 
-									note[k][nc[k]].isBright = 1;//長く音を鳴らすようにする
+									note[lane][nc[lane]].isBright = 1;//長く音を鳴らすようにする
 									cp_CAP = 1.333;//難易度ポイントを1.333倍にする
 								}
 								else {
 									cp_CAP = 1;//難易度ポイントは等倍
 								}
 
+								if (!sharp2[0] == '\0') {
+									//グラデーションロングノートの中間かどうか
+									if (sharp2[lane] == 'e') {
+										note[lane][nc[lane]].group = NoteGroup::LongNoteMiddle;//中間点
+										note[lane][nc[lane]].group_init = NoteGroup::LongNoteMiddle;
+									}
+
+								}
+
 								if (j != 8 && j != 10) {//黒とLN終点以外なら
-									bpmList[Music[song_number].total_note[difficulty]] = (short)(note[k][nc[k]].bpm * scroll);//BPM情報格納
+									bpmList[Music[song_number].total_note[difficulty]] = (short)(note[lane][nc[lane]].bpm * scroll);//BPM情報格納
 									Music[song_number].total_note[difficulty]++;//総ノート数+1する
 								}
 
 								if (IgnoreArea == 1) {//無視するべき音符ならignoreを1にする
-									note[k][nc[k]].ignore = 1;
+									note[lane][nc[lane]].ignore = 1;
 								}
 
 								//難易度自動算出処理
@@ -943,7 +957,7 @@ void GAME_LOAD(int song_number,
 								int la = 0;
 								for (la = 0; la <= 3; la++) {
 									if (j == BeforeColorBuf[la]) {//この前の音符の色と同じだった
-										if (la == k) {//レーンも同じ
+										if (la == lane) {//レーンも同じ
 											BeforeSamePoint *= 0.800;
 										}
 										else {//レーンは違うけど前の色と同じ
@@ -955,21 +969,21 @@ void GAME_LOAD(int song_number,
 										BeforeSamePoint = 1;
 									}
 								}
-								if (k >= 1) {//2列目以降について
-									if (note[k][nc[k]].color == NearColorBuf) {//左にある音符と同じ色だったらポイント下げる
+								if (lane >= 1) {//2列目以降について
+									if (note[lane][nc[lane]].color == NearColorBuf) {//左にある音符と同じ色だったらポイント下げる
 										diff_point += BeforeSamePoint * 0.900 * color_point[j] * cp_CAP;//難易度ポイント算出
 																						   //1/3として加算
 
 																						   //難易度ポイントバッファに格納していく
 										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = BeforeSamePoint * color_point[j] * cp_CAP;
-										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
+										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[lane][nc[lane]].timing_real;
 									}
 									else {//違う色だった
 										diff_point += BeforeSamePoint * color_point[j] * cp_CAP;//難易度ポイント普通に加算
 
 																					 //難易度ポイントバッファに格納していく
 										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = BeforeSamePoint * color_point[j] * cp_CAP;
-										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
+										diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[lane][nc[lane]].timing_real;
 									}
 								}
 								else {//1列目について
@@ -977,67 +991,76 @@ void GAME_LOAD(int song_number,
 
 																				 //難易度ポイントバッファに格納していく
 									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = BeforeSamePoint * color_point[j] * cp_CAP;
-									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
+									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[lane][nc[lane]].timing_real;
 								}
 								NearColorBuf = (NoteColor)j;//この音符の色を保存(後に左の音符扱い)
-								if (j != 10)BeforeColorBuf[k] = j;//このレーンの今回の音符の色を保存(eは除く)
+								if (j != 10)BeforeColorBuf[lane] = j;//このレーンの今回の音符の色を保存(eは除く)
 
 
 
-								note[k][nc[k]].textLine = textLine + 1;
-								if (color_list[0] != sharp1[k]) {//0以外の時
+								note[lane][nc[lane]].textLine = textLine + 1;
+								if (color_list[0] != sharp1[lane]) {//0以外の時
 									if (timing_same[tc] == -1) {//音符のタイミング格納
-										timing_same[tc] = note[k][nc[k]].timing;
+										timing_same[tc] = note[lane][nc[lane]].timing;
 
 										//sprintf_s(Cdiff_buf[Cdiff_count],"%s",sharp1);//難易度算出用バッファに格納
 										//Cdiff_count++;
 									}
 
 									if (start_time_flag == 0) {
-										start_time = note[k][nc[k]].timing_real;
+										start_time = note[lane][nc[lane]].timing_real;
 										start_time_flag = 1;
 									}
-									end_time = note[k][nc[k]].timing_real;
+									end_time = note[lane][nc[lane]].timing_real;
 								}
-								//printfDx(L"レーン:%d 色:%d\n", k, j);
-								if (color_list[10] == sharp1[k] || color_list_CAP[10] == sharp1[k]) {//'e'または'E'だったら前のノートをLN始点にしてここでLN終点にする
-									note[k][nc[k] - 1].group = NoteGroup::LongNoteStart;//始点
-									note[k][nc[k]].group = NoteGroup::LongNoteEnd;//終点
+								//printfDx(L"レーン:%d 色:%d\n", lane, j);
 
-									if (color_list[10] == sharp1[k]) {//eなら
-										note[k][nc[k]].LN_k = 0;//通常終点
+								if (color_list[10] == sharp1[lane] || color_list_CAP[10] == sharp1[lane]) 
+								{//'e'または'E'だったら前のノートをLN始点にしてここでLN終点にする
+									//TODO:LN始点にするノートは一番近い直前のSingleノート
+
+									const int startInd = noteSercher.getLatestSingle(lane, nc[lane] - 1);
+
+									note[lane][startInd].group = NoteGroup::LongNoteStart;//始点
+									note[lane][startInd].group_init = NoteGroup::LongNoteStart;//始点
+
+									note[lane][nc[lane]].group = NoteGroup::LongNoteEnd;//終点
+									note[lane][nc[lane]].group_init = NoteGroup::LongNoteEnd;//終点
+
+									if (color_list[10] == sharp1[lane]) {//eなら
+										note[lane][nc[lane]].LN_k = 0;//通常終点
 									}
-									else if (color_list_CAP[10] == sharp1[k]) {//Eなら
-										note[k][nc[k]].LN_k = 1;//黒終点
+									else if (color_list_CAP[10] == sharp1[lane]) {//Eなら
+										note[lane][nc[lane]].LN_k = 1;//黒終点
 									}
 
-									note[k][nc[k]].color = note[k][nc[k] - 1].color;
-									note[k][nc[k]].color_init = note[k][nc[k] - 1].color;
+									note[lane][nc[lane]].color = note[lane][nc[lane] - 1].color;
+									note[lane][nc[lane]].color_init = note[lane][nc[lane] - 1].color;
 
-									diff_point += (double)cp_CAP * ((double)note[k][nc[k]].timing_real - note[k][nc[k] - 1].timing_real) / (LN_point);
+									diff_point += (double)cp_CAP * ((double)note[lane][nc[lane]].timing_real - note[lane][nc[lane] - 1].timing_real) / (LN_point);
 
 									//難易度ポイントバッファに格納していく
-									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = (double)cp_CAP * ((double)note[k][nc[k]].timing_real - note[k][nc[k] - 1].timing_real) / (LN_point);
-									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[k][nc[k]].timing_real;
+									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].Point = (double)cp_CAP * ((double)note[lane][nc[lane]].timing_real - note[lane][nc[lane] - 1].timing_real) / (LN_point);
+									diff_buf[number_ring(total_diff_point_notes, LOCAL_DIFF_AMOUNT - 1)].timing = note[lane][nc[lane]].timing_real;
 
 
 									//エディタ用処理
 									if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
-										score_cell_find_before_note(score_cell_insert, k)->data.note.group[k] = NoteGroup::LongNoteStart;//k列目のこのLN終端のbeforeにあるノートのグループをLN始点にする
+										score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] = NoteGroup::LongNoteStart;//k列目のこのLN終端のbeforeにあるノートのグループをLN始点にする
 									}
 								}
 
 								//エディタ用処理
 								if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
-									score_cell_write_note(score_cell_insert, k, note[k][nc[k]].color, note[k][nc[k]].group, note[k][nc[k]].isBright, note[k][nc[k]].LN_k);//k列目の音符情報を格納
-									if (score_cell_find_before_note(score_cell_insert, k) != NULL) {
-										if (score_cell_find_before_note(score_cell_insert, k)->data.note.group[k] == 1 && score_cell_find_before_note(score_cell_insert, k)->data.note.isBright[k] == 1) {//beforeがLN始点で光っていたら
-											score_cell_insert->data.note.isBright[k] = 1;//このLN終点も光らせる(エディタ用)
+									score_cell_write_note(score_cell_insert, lane, note[lane][nc[lane]].color, note[lane][nc[lane]].group, note[lane][nc[lane]].isBright, note[lane][nc[lane]].LN_k);//k列目の音符情報を格納
+									if (score_cell_find_before_note(score_cell_insert, lane) != NULL) {
+										if (score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] == NoteGroup::LongNoteStart && score_cell_find_before_note(score_cell_insert, lane)->data.note.isBright[lane] == true) {//beforeがLN始点で光っていたら
+											score_cell_insert->data.note.isBright[lane] = true;//このLN終点も光らせる(エディタ用)
 										}
 									}
 								}
 
-								nc[k]++;
+								nc[lane]++;
 
 								if (j != 8) {//黒以外なら
 									total_diff_point_notes++;//難易度加算数インクリメント
@@ -1178,7 +1201,7 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i < 4; i++) {
 			if (note[i][ncChords[i]].timing == timing_same[timingSameIndex]) {
-				MaxChords.setChords(i, note[i][ncChords[i]].color, note[i][ncChords[i]].group == 1);
+				MaxChords.setChords(i, note[i][ncChords[i]].color, note[i][ncChords[i]].group == NoteGroup::LongNoteStart);
 				ncChords[i]++;
 			}
 		}
@@ -1287,11 +1310,11 @@ void GAME_LOAD(int song_number,
 			for (i = 0; i <= 3; i++) {//元の譜面のiレーン
 				if (timing_same[tc] == note[i][nc_s[i]].timing) {//縦に見てtc行目で音符を見つけた
 					if (op_lane[i] != -1) {//-1になるのは元の譜面のLN終点のとき
-						if (note[i][nc_s[i]].group != 2) {//LN終点以外
+						if (note[i][nc_s[i]].group != NoteGroup::LongNoteEnd) {//LN終点以外
 							copy[op_lane[i]][nc_c[op_lane[i]]] = note[i][nc_s[i]];
 							//コピー元のi行nc_s[i]列目のノートをop_lane[i]行nc_c[op_lane[i]]列目のコピー先に格納
 						}
-						if (note[i][nc_s[i]].group == 1) {//LN始点 を見つけると終点もすぐにコピーする
+						if (note[i][nc_s[i]].group == NoteGroup::LongNoteStart) {//LN始点 を見つけると終点もすぐにコピーする
 							ln_use_s[i] = 1;//元の譜面のiレーンはLN中
 							ln_use_c[op_lane[i]] = 1;//コピー先のop_lane[i]レーンはLN中なので音符を置けない
 							lanestolanec[i] = op_lane[i];//元の譜面のiレーンのLNはコピー先のop_lane[i]レーンと対応している
@@ -1302,7 +1325,7 @@ void GAME_LOAD(int song_number,
 						nc_c[op_lane[i]]++;//コピー先の音符番号++
 					}
 					
-					if (note[i][nc_s[i]].group == 2) {//LN終点
+					if (note[i][nc_s[i]].group == NoteGroup::LongNoteEnd) {//LN終点
 						ln_use_s[i] = 0;//iレーンはLN終了
 						ln_use_c[lanestolanec[i]] = 0;
 						lanestolanec[i] = 0;
@@ -1347,10 +1370,10 @@ void GAME_LOAD(int song_number,
 
 
 	if (Option->op.color == OptionItem::Color::RGB_CHANGE) {//RGB CHANGE
-		k = rand() % 5;//0~4
+		lane = rand() % 5;//0~4
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				note[i][j].color = rgb_change[k][(int)note[i][j].color];
+				note[i][j].color = rgb_change[lane][(int)note[i][j].color];
 				note[i][j].color_init = note[i][j].color;
 			}
 		}
@@ -1360,12 +1383,12 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				k = rand() % 6;//0~5
-				note[i][j].color = rgb_change[k][(int)note[i][j].color];
+				lane = rand() % 6;//0~5
+				note[i][j].color = rgb_change[lane][(int)note[i][j].color];
 				note[i][j].color_init = note[i][j].color;
-				if (note[i][j].group == 1) {
+				if (note[i][j].group == NoteGroup::LongNoteStart) {
 					j++;
-					note[i][j].color = rgb_change[k][(int)note[i][j].color];
+					note[i][j].color = rgb_change[lane][(int)note[i][j].color];
 					note[i][j].color_init = note[i][j].color;
 				}
 
@@ -1378,13 +1401,13 @@ void GAME_LOAD(int song_number,
 
 	for (i = 1; i <= 4; i++) {
 	for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-	k = rand() % 3 + 1;//1~3
+	lane = rand() % 3 + 1;//1~3
 	if (note[i][j].color >= 1 && note[i][j].color <= 3) {
-	note[i][j].color = k;
+	note[i][j].color = lane;
 	note[i][j].color_init = note[i][j].color;
 	if (note[i][j].group == 1) {
 	j++;
-	note[i][j].color = k;
+	note[i][j].color = lane;
 	note[i][j].color_init = note[i][j].color;
 	}
 	}
@@ -1398,13 +1421,13 @@ void GAME_LOAD(int song_number,
 
 	for (i = 1; i <= 4; i++) {
 	for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-	k = rand() % 6 + 1;//1~6
+	lane = rand() % 6 + 1;//1~6
 	if (note[i][j].color >= 1 && note[i][j].color <= 6) {
-	note[i][j].color = k;
+	note[i][j].color = lane;
 	note[i][j].color_init = note[i][j].color;
 	if (note[i][j].group == 1) {
 	j++;
-	note[i][j].color = k;
+	note[i][j].color = lane;
 	note[i][j].color_init = note[i][j].color;
 	}
 	}
@@ -1417,13 +1440,13 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				k = rand() % 7 + 1;//1~7
+				lane = rand() % 7 + 1;//1~7
 				if (note[i][j].color >= NoteColor::R && note[i][j].color <= NoteColor::W) {
-					note[i][j].color = (NoteColor)k;
+					note[i][j].color = (NoteColor)lane;
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
@@ -1440,39 +1463,39 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 
-				if (note[i][j].color == NoteColor::Y && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = rand() % 2 + (int)NoteColor::R);//Yは12どっちか
+				if (note[i][j].color == NoteColor::Y && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::R);//Yは12どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				if (note[i][j].color == NoteColor::C && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = rand() % 2 + (int)NoteColor::G);//Cは23どっちか
+				if (note[i][j].color == NoteColor::C && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::G);//Cは23どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				if (note[i][j].color == NoteColor::M && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = (rand() % 2) * 2 + (int)NoteColor::R);//Mは13どっちか
+				if (note[i][j].color == NoteColor::M && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::R);//Mは13どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				if (note[i][j].color == NoteColor::W && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = rand() % 3 + (int)NoteColor::R);//Wは123どっちか
+				if (note[i][j].color == NoteColor::W && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::R);//Wは123どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
@@ -1487,39 +1510,39 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 
-				if (note[i][j].color == NoteColor::R && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = (rand() % 2) + (int)NoteColor::M);//Rは46どっちか
+				if (note[i][j].color == NoteColor::R && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::M);//Rは46どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				if (note[i][j].color == NoteColor::G && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = (rand() % 2)*2 + (int)NoteColor::C);//Gは45どっちか
+				if (note[i][j].color == NoteColor::G && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = (rand() % 2)*2 + (int)NoteColor::C);//Gは45どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				if (note[i][j].color == NoteColor::B && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = (rand() % 2) + (int)NoteColor::C);//Bは56どっちか
+				if (note[i][j].color == NoteColor::B && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::C);//Bは56どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				if (note[i][j].color == NoteColor::W && note[i][j].group != 2) {
-					note[i][j].color = (NoteColor)(k = rand() % 3 + (int)NoteColor::C);//Wは456どっちか
+				if (note[i][j].color == NoteColor::W && note[i][j].group != NoteGroup::LongNoteEnd) {
+					note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::C);//Wは456どっちか
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == 1) {
+					if (note[i][j].group == NoteGroup::LongNoteStart) {
 						j++;
-						note[i][j].color = (NoteColor)k;
+						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
@@ -1570,7 +1593,7 @@ void GAME_LOAD(int song_number,
 	for (i = 1; i <= 4; i++) {
 	note[i][0].timing = 0;
 	note[i][0].color = 1;
-	note[i][0].x = lane[i];
+	note[i][0].x = laneCordinateX[i];
 	note[i][0].bpm = 120;
 	}
 	*/

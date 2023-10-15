@@ -49,7 +49,7 @@ DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE*
 				TotalNotesK++;
 				NotesAmount[NumberTranslation(note[lane][NoteCounter].color)]++;//ŠeF‚ª‚¢‚­‚Â‚ ‚é‚©‰ÁŽZ
 			}
-			if (note[lane][NoteCounter].group == 2 && note[lane][NoteCounter].LN_k == 1) {//LNI’[‚Ì•
+			if (note[lane][NoteCounter].group == NoteGroup::LongNoteEnd && note[lane][NoteCounter].LN_k == 1) {//LNI’[‚Ì•
 				NotesAmount[NumberTranslation(NoteColor::K)]++;//ŠeF‚ª‚¢‚­‚Â‚ ‚é‚©‰ÁŽZ
 			}
 		}
@@ -101,7 +101,7 @@ void DifficultyRadar::GetLocalNotesGraph(short* LocalNotesGraph) {
 					break;
 				}
 
-				if ((note[ind][nc_last[ind]].group == 0 || note[ind][nc_last[ind]].group == 1)
+				if ((note[ind][nc_last[ind]].group == NoteGroup::Single || note[ind][nc_last[ind]].group == NoteGroup::LongNoteStart)
 					&& note[ind][nc_last[ind]].color != NoteColor::K) {//˜gI‚í‚è‚©‚çŒ©‚Äˆê”Ô‰º‚É‚ ‚é’P,LNŽn“_ƒm[ƒg‚ÅK‚¶‚á‚È‚¢
 
 					if (note[ind][nc_last[ind]].color == NoteColor::R ||
@@ -131,7 +131,7 @@ void DifficultyRadar::GetLocalNotesGraph(short* LocalNotesGraph) {
 					break;
 				}
 
-				if ((note[ind][nc_start[ind]].group == 0 || note[ind][nc_start[ind]].group == 1)//˜g“à‚©‚ço‚Ä‚¢‚Á‚½‰¹•„”‚ðˆø‚­
+				if ((note[ind][nc_start[ind]].group == NoteGroup::Single || note[ind][nc_start[ind]].group == NoteGroup::LongNoteStart)//˜g“à‚©‚ço‚Ä‚¢‚Á‚½‰¹•„”‚ðˆø‚­
 					&& note[ind][nc_start[ind]].color != NoteColor::K) {//˜gŽn‚Ü‚è‚©‚çŒ©‚Äˆê”Ô‰º‚É‚ ‚é’P,LNŽn“_ƒm[ƒg‚ÅK‚¶‚á‚È‚¢
 
 					if (note[ind][nc_start[ind]].color == NoteColor::R ||
@@ -261,7 +261,7 @@ int DifficultyRadar::CalcLocal(int Rainbow) {
 					break;
 				}
 
-				if ((note[ind][nc_last[ind]].group == 0 || note[ind][nc_last[ind]].group == 1)
+				if ((note[ind][nc_last[ind]].group == NoteGroup::Single || note[ind][nc_last[ind]].group == NoteGroup::LongNoteStart)
 					&& note[ind][nc_last[ind]].color != NoteColor::K) {//˜gI‚í‚è‚©‚çŒ©‚Äˆê”Ô‰º‚É‚ ‚é’P,LNŽn“_ƒm[ƒg‚ÅK‚¶‚á‚È‚¢
 
 					if (note[ind][nc_last[ind]].color == NoteColor::R ||
@@ -291,7 +291,7 @@ int DifficultyRadar::CalcLocal(int Rainbow) {
 					break;
 				}
 
-				if ((note[ind][nc_start[ind]].group == 0 || note[ind][nc_start[ind]].group == 1)//˜g“à‚©‚ço‚Ä‚¢‚Á‚½‰¹•„”‚ðˆø‚­
+				if ((note[ind][nc_start[ind]].group == NoteGroup::Single || note[ind][nc_start[ind]].group == NoteGroup::LongNoteStart)//˜g“à‚©‚ço‚Ä‚¢‚Á‚½‰¹•„”‚ðˆø‚­
 					&& note[ind][nc_start[ind]].color != NoteColor::K) {//˜gŽn‚Ü‚è‚©‚çŒ©‚Äˆê”Ô‰º‚É‚ ‚é’P,LNŽn“_ƒm[ƒg‚ÅK‚¶‚á‚È‚¢
 
 					if (note[ind][nc_start[ind]].color == NoteColor::R ||
@@ -541,7 +541,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 	int k_flag = 0;//‘O‚Ì‰¹•„‚ª•‚¾‚Á‚½
 
 	serachNotesBFS([&](int lane, int index) {
-		if ((note[lane][index].group == 0 || note[lane][index].group == 1)) {//’Pƒm[ƒg‚©LNŽn“_
+		if ((note[lane][index].group == NoteGroup::Single || note[lane][index].group == NoteGroup::LongNoteStart)) {//’Pƒm[ƒg‚©LNŽn“_
 			NoteColor = note[lane][index].color;
 			if (Rainbow == 1) {
 				if (NoteColor >= NoteColor::R && NoteColor <= NoteColor::W) {//“øƒ‚[ƒh‚Í•“øˆÈŠO‚Ì‰¹•„‚Í“ø‚Æ‚µ‚Äˆµ‚¤
@@ -583,7 +583,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 				}
 			}
 		}
-		else if (note[lane][index].group == 2 && note[lane][index].LN_k == 1) {//•I“_‚ÌŽž
+		else if (note[lane][index].group == NoteGroup::LongNoteEnd && note[lane][index].LN_k == 1) {//•I“_‚ÌŽž
 			ColorChangeCount += 0.5;
 			k_flag = 1;
 		}
@@ -711,7 +711,7 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 		int lnFindCount = 0;//¡‰ñ‰ÁŽZ‚µ‚½•ª
 		for (lane = 0; lane < 4; lane++) {
 			if (existNote[lane]) {
-				if (note[lane][noteIndex[lane]].group == 1) {
+				if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart) {
 					NoteColor color = note[lane][noteIndex[lane]].color;
 					lnFindCount += color2weight(color);
 					lnCount.setLnCount(lane, color2weight(color));
@@ -730,7 +730,7 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 				if (note[lane][noteIndex[lane]].LN_k) {//•I’[‚È‚ç1 (Ôˆµ‚¢)
 					color = NoteColor::R;
 				}
-				else if (note[lane][noteIndex[lane]].group != 2) {
+				else if (note[lane][noteIndex[lane]].group != NoteGroup::LongNoteEnd) {
 					color = note[lane][noteIndex[lane]].color;
 				}
 				else {//’Êí‚ÌI“_‚ÍœŠO
@@ -744,7 +744,7 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 		//ƒŒ[ƒ“–ˆ‚ÌLN”(Fd‚Ý•t‚«)‚ðˆø‚­
 		for (lane = 0; lane < 4; lane++) {
 			if (existNote[lane]) {
-				if (note[lane][noteIndex[lane]].group == 2) {
+				if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteEnd) {
 					lnCount.deleteLnCount(lane);
 				}
 			}
@@ -894,7 +894,7 @@ int DifficultyRadar::CalcChain() {
 	for (lane = 0; lane <= 3; lane++) {
 		firstFlag = 0;
 		for (NoteCounter = 0; NoteCounter <= nc[lane] - 1; NoteCounter++) {
-			if ((note[lane][NoteCounter].group == 0 || note[lane][NoteCounter].group == 1) && note[lane][NoteCounter].color != NoteColor::K) {
+			if ((note[lane][NoteCounter].group == NoteGroup::Single || note[lane][NoteCounter].group == NoteGroup::LongNoteStart) && note[lane][NoteCounter].color != NoteColor::K) {
 				if (firstFlag == 0) {
 					TimingBuf = note[lane][NoteCounter].timing_real;
 					firstFlag = 1;

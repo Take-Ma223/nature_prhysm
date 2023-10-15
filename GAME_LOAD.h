@@ -9,7 +9,7 @@
 #ifndef _GAME_LOAD
 #define _GAME_LOAD
 
-extern void GAME_LOAD(int song_number, int difficulty, NOTE **note, BARLINE *barline, int *lane, int readflag, CALCDIFF *Cdiff, Option *Option, BPMC *bpmchange, SC *scrollchange, STOP_SE *stopSequence, Song *Music, SongSub* MusicSub, int *TimetoEndScroll, int *playing_time, Config config,
+extern void GAME_LOAD(int song_number, int difficulty, NOTE **note, BARLINE *barline, int *laneCordinateX, int readflag, CALCDIFF *Cdiff, Option *Option, BPMC *bpmchange, SC *scrollchange, STOP_SE *stopSequence, Song *Music, SongSub* MusicSub, int *TimetoEndScroll, int *playing_time, Config config,
 	double pitch = 1, 
 	SCORE_CELL *score_cell_head = NULL,
 	int SkillTestFlag = 0

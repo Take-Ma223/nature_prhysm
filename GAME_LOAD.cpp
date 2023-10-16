@@ -587,6 +587,8 @@ void GAME_LOAD(int song_number,
 			if (i != 0)note[i][j].color = NoteColor::NONE;//ノートの色(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
 			note[i][j].hit = 0;//1:叩いた 0:叩いてない
 			note[i][j].group = NoteGroup::Single;
+			note[i][j].group_init = NoteGroup::Single;
+
 			note[i][j].textLine = 0;
 			note[i][j].isBright = 0;
 		}
@@ -599,8 +601,9 @@ void GAME_LOAD(int song_number,
 			if (i != 0)copy[i][j].color = NoteColor::NONE;//ノートの色(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
 			copy[i][j].hit = 0;//1:叩いた 0:叩いてない
 			copy[i][j].group = NoteGroup::Single;
-			note[i][j].textLine = 0;
-			note[i][j].isBright = 0;
+			copy[i][j].group_init = NoteGroup::Single;
+			copy[i][j].textLine = 0;
+			copy[i][j].isBright = 0;
 		}
 
 	}

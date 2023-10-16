@@ -121,7 +121,7 @@ public:
 				return index;
 			}
 			index++;
-			if (index < 0) {
+			if (note[lane][index].group == NoteGroup::Single) {
 				throw std::runtime_error("ロングノート終点が見つかりませんでした。");
 			}
 		}

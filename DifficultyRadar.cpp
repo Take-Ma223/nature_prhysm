@@ -22,31 +22,33 @@ DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE*
 	//‰¹•„‚Ì‡Œv‚ğæ“¾
 	for (lane = 0; lane <= 3; lane++) {
 		for (NoteCounter = 0; NoteCounter <= nc[lane] - 1; NoteCounter++) {
-			if (note[lane][NoteCounter].group == NoteGroup::Single || note[lane][NoteCounter].group == NoteGroup::LongNoteStart) {
-				if (note[lane][NoteCounter].color != NoteColor::K) {
+			if (note[lane][NoteCounter].group == NoteGroup::Single || note[lane][NoteCounter].group == NoteGroup::LongNoteStart || note[lane][NoteCounter].group == NoteGroup::LongNoteMiddle) {
+				if (note[lane][NoteCounter].group == NoteGroup::Single || note[lane][NoteCounter].group == NoteGroup::LongNoteStart) {
+					if (note[lane][NoteCounter].color != NoteColor::K) {
 
-					if (note[lane][NoteCounter].color == NoteColor::R ||
-						note[lane][NoteCounter].color == NoteColor::G ||
-						note[lane][NoteCounter].color == NoteColor::B) {//RGB
-						TotalNotes += 1;
-						TotalNotesRainbow += 1;
+						if (note[lane][NoteCounter].color == NoteColor::R ||
+							note[lane][NoteCounter].color == NoteColor::G ||
+							note[lane][NoteCounter].color == NoteColor::B) {//RGB
+							TotalNotes += 1;
+							TotalNotesRainbow += 1;
+						}
+						else if (note[lane][NoteCounter].color == NoteColor::Y ||
+							note[lane][NoteCounter].color == NoteColor::C ||
+							note[lane][NoteCounter].color == NoteColor::M) {//CMY
+							TotalNotes += 2;
+							TotalNotesRainbow += 1;
+						}
+						else if (note[lane][NoteCounter].color == NoteColor::W) {//W
+							TotalNotes += 3;
+							TotalNotesRainbow += 1;
+						}
+						else if (note[lane][NoteCounter].color == NoteColor::F) {//F
+							TotalNotes += 1;
+							TotalNotesRainbow += 1;
+						}
 					}
-					else if (note[lane][NoteCounter].color == NoteColor::Y ||
-						note[lane][NoteCounter].color == NoteColor::C ||
-						note[lane][NoteCounter].color == NoteColor::M) {//CMY
-						TotalNotes += 2;
-						TotalNotesRainbow += 1;
-					}
-					else if (note[lane][NoteCounter].color == NoteColor::W) {//W
-						TotalNotes += 3;
-						TotalNotesRainbow += 1;
-					}
-					else if (note[lane][NoteCounter].color == NoteColor::F) {//F
-						TotalNotes += 1;
-						TotalNotesRainbow += 1;
-					}
+					TotalNotesK++;
 				}
-				TotalNotesK++;
 				NotesAmount[NumberTranslation(note[lane][NoteCounter].color)]++;//ŠeF‚ª‚¢‚­‚Â‚ ‚é‚©‰ÁZ
 			}
 			if (note[lane][NoteCounter].group == NoteGroup::LongNoteEnd && note[lane][NoteCounter].LN_k == 1) {//LNI’[‚Ì•
@@ -541,7 +543,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 	int k_flag = 0;//‘O‚Ì‰¹•„‚ª•‚¾‚Á‚½
 
 	serachNotesBFS([&](int lane, int index) {
-		if ((note[lane][index].group == NoteGroup::Single || note[lane][index].group == NoteGroup::LongNoteStart)) {//’Pƒm[ƒg‚©LNn“_
+		if ((note[lane][index].group == NoteGroup::Single || note[lane][index].group == NoteGroup::LongNoteStart || note[lane][index].group == NoteGroup::LongNoteMiddle)) {//’Pƒm[ƒg‚©LNn“_‚©’†ŠÔƒm[ƒg
 			NoteColor = note[lane][index].color;
 			if (Rainbow == 1) {
 				if (NoteColor >= NoteColor::R && NoteColor <= NoteColor::W) {//“øƒ‚[ƒh‚Í•“øˆÈŠO‚Ì‰¹•„‚Í“ø‚Æ‚µ‚Äˆµ‚¤
@@ -711,7 +713,7 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 		int lnFindCount = 0;//¡‰ñ‰ÁZ‚µ‚½•ª
 		for (lane = 0; lane < 4; lane++) {
 			if (existNote[lane]) {
-				if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart) {
+				if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart || note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle) {
 					NoteColor color = note[lane][noteIndex[lane]].color;
 					lnFindCount += color2weight(color);
 					lnCount.setLnCount(lane, color2weight(color));

@@ -205,7 +205,7 @@ void GAME_LOAD(int song_number,
 			case NoteColor::W:
 				return 3;
 				break;
-			case NoteColor::K:
+			case NoteColor::F:
 				return 1;
 				break;
 			default:
@@ -947,8 +947,10 @@ void GAME_LOAD(int song_number,
 								}
 
 								if (j != 8 && j != 10) {//黒とLN終点以外なら
-									bpmList[Music[song_number].total_note[difficulty]] = (short)(note[lane][nc[lane]].bpm * scroll);//BPM情報格納
-									Music[song_number].total_note[difficulty]++;//総ノート数+1する
+									if (note[lane][nc[lane]].group != NoteGroup::LongNoteMiddle) {//中間ノーツはコンボ・風速計算対象外
+										bpmList[Music[song_number].total_note[difficulty]] = (short)(note[lane][nc[lane]].bpm * scroll);//BPM情報格納
+										Music[song_number].total_note[difficulty]++;//総ノート数+1する
+									}
 								}
 
 								if (IgnoreArea == 1) {//無視するべき音符ならignoreを1にする
@@ -1204,7 +1206,7 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i < 4; i++) {
 			if (note[i][ncChords[i]].timing == timing_same[timingSameIndex]) {
-				MaxChords.setChords(i, note[i][ncChords[i]].color, note[i][ncChords[i]].group == NoteGroup::LongNoteStart);
+				MaxChords.setChords(i, note[i][ncChords[i]].color, note[i][ncChords[i]].group == NoteGroup::LongNoteStart || note[i][ncChords[i]].group == NoteGroup::LongNoteMiddle);
 				ncChords[i]++;
 			}
 		}
@@ -1313,19 +1315,30 @@ void GAME_LOAD(int song_number,
 			for (i = 0; i <= 3; i++) {//元の譜面のiレーン
 				if (timing_same[tc] == note[i][nc_s[i]].timing) {//縦に見てtc行目で音符を見つけた
 					if (op_lane[i] != -1) {//-1になるのは元の譜面のLN終点のとき
-						if (note[i][nc_s[i]].group != NoteGroup::LongNoteEnd) {//LN終点以外
+						if (note[i][nc_s[i]].group == NoteGroup::Single) {//LN終点以外
 							copy[op_lane[i]][nc_c[op_lane[i]]] = note[i][nc_s[i]];
 							//コピー元のi行nc_s[i]列目のノートをop_lane[i]行nc_c[op_lane[i]]列目のコピー先に格納
+							nc_c[op_lane[i]]++;//コピー先の音符番号++
 						}
-						if (note[i][nc_s[i]].group == NoteGroup::LongNoteStart) {//LN始点 を見つけると終点もすぐにコピーする
+						if (note[i][nc_s[i]].group == NoteGroup::LongNoteStart) {//LN始点 を見つけるとLN終点までコピーする
 							ln_use_s[i] = 1;//元の譜面のiレーンはLN中
 							ln_use_c[op_lane[i]] = 1;//コピー先のop_lane[i]レーンはLN中なので音符を置けない
 							lanestolanec[i] = op_lane[i];//元の譜面のiレーンのLNはコピー先のop_lane[i]レーンと対応している
-							copy[op_lane[i]][nc_c[op_lane[i]] + 1] = note[i][nc_s[i] + 1];//終点を同じ場所に移す
-							nc_c[op_lane[i]]++;//終点の分インクリメント
+
+							//終点まですべての音符を移す
+							int ind = 0;
+							while(1){
+								copy[op_lane[i]][nc_c[op_lane[i]]] = note[i][nc_s[i] + ind];
+								nc_c[op_lane[i]]++;//終点の分インクリメント
+
+								
+								if (note[i][nc_s[i] + ind].group == NoteGroup::LongNoteEnd)break;
+								ind++;
+							};
+							
 						}
 
-						nc_c[op_lane[i]]++;//コピー先の音符番号++
+						
 					}
 					
 					if (note[i][nc_s[i]].group == NoteGroup::LongNoteEnd) {//LN終点

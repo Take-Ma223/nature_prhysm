@@ -405,6 +405,9 @@
     <ClCompile Include="NoteJudgeProcessor.cpp">
       <Filter>ソース ファイル\GAME</Filter>
     </ClCompile>
+    <ClCompile Include="GradationNoteImage.cpp">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -707,6 +710,9 @@
       <Filter>ソース ファイル\NPUtil</Filter>
     </ClInclude>
     <ClInclude Include="NoteJudgeProcessor.h">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="GradationNoteImage.h">
       <Filter>ソース ファイル\GAME</Filter>
     </ClInclude>
   </ItemGroup>

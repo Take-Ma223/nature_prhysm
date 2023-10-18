@@ -1400,14 +1400,13 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 				lane = rand() % 6;//0~5
-				note[i][j].color = rgb_change[lane][(int)note[i][j].color];
-				note[i][j].color_init = note[i][j].color;
-				if (note[i][j].group == NoteGroup::LongNoteStart) {
-					j++;
+				if (note[i][j].group == NoteGroup::LongNoteEnd) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color;
+				}else {
 					note[i][j].color = rgb_change[lane][(int)note[i][j].color];
 					note[i][j].color_init = note[i][j].color;
 				}
-
 			}
 		}
 	}
@@ -1457,14 +1456,13 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 				lane = rand() % 7 + 1;//1~7
-				if (note[i][j].color >= NoteColor::R && note[i][j].color <= NoteColor::W) {
+				if (note[i][j].group == NoteGroup::LongNoteEnd) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color;
+				}else if (note[i][j].color >= NoteColor::R && note[i][j].color <= NoteColor::W) {
 					note[i][j].color = (NoteColor)lane;
 					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
+					
 				}
 			}
 		}
@@ -1478,45 +1476,28 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-
-				if (note[i][j].color == NoteColor::Y && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::R);//Yは12どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
+				if (note[i][j].group == NoteGroup::LongNoteEnd) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color;
+				}
+				else {
+					if (note[i][j].color == NoteColor::Y) {
+						note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::R);//Yは12どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::C) {
+						note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::G);//Cは23どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::M) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::R);//Mは13どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::W) {
+						note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::R);//Wは123どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				if (note[i][j].color == NoteColor::C && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::G);//Cは23どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
-				}
-				if (note[i][j].color == NoteColor::M && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::R);//Mは13どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
-				}
-				if (note[i][j].color == NoteColor::W && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::R);//Wは123どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
-				}
-
-
 			}
 		}
 	}
@@ -1525,43 +1506,29 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				if (note[i][j].group == NoteGroup::LongNoteEnd) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color;
+				}
+				else {
+					if (note[i][j].color == NoteColor::R) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::M);//Rは46どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::G) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::C);//Gは45どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::B) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::C);//Bは56どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::W) {
+						note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::C);//Wは456どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+				}
 
-				if (note[i][j].color == NoteColor::R && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::M);//Rは46どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
-				}
-				if (note[i][j].color == NoteColor::G && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2)*2 + (int)NoteColor::C);//Gは45どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
-				}
-				if (note[i][j].color == NoteColor::B && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::C);//Bは56どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
-				}
-				if (note[i][j].color == NoteColor::W && note[i][j].group != NoteGroup::LongNoteEnd) {
-					note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::C);//Wは456どっちか
-					note[i][j].color_init = note[i][j].color;
-					if (note[i][j].group == NoteGroup::LongNoteStart) {
-						j++;
-						note[i][j].color = (NoteColor)lane;
-						note[i][j].color_init = note[i][j].color;
-					}
-				}
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 ﻿#include"DxLib.h"
 #include<vector>
 #include <stdexcept>
+#include <functional>
 
 #ifndef _STRUCT_NOTE
 #define _STRUCT_NOTE
@@ -88,7 +89,7 @@ public:
 	/// <summary>
 	/// laneとindexの位置(ロング中間、終点のみ)からロングノート始点のindexを返す
 	/// </summary>
-	int getLnStart(int lane, int ind) {
+	int searchLnStart(int lane, int ind, std::function<void(NOTE&)> handler = nullptr) {
 		int index = ind;
 
 		if (!(note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteEnd)) {
@@ -96,6 +97,8 @@ public:
 		}
 
 		while (true) {
+			if(handler)handler(note[lane][index]);
+
 			if (note[lane][index].group == NoteGroup::LongNoteStart) {
 				return index;
 			}
@@ -109,7 +112,7 @@ public:
 	/// <summary>
 	/// laneとindexの位置(ロング中間、始点のみ)からロングノート終点のindexを返す
 	/// </summary>
-	int getLnEnd(int lane, int ind) {
+	int searchLnEnd(int lane, int ind, std::function<void(NOTE&)> handler = nullptr) {
 		int index = ind;
 
 		if (!(note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteStart)) {
@@ -117,6 +120,8 @@ public:
 		}
 
 		while (true) {
+			if (handler)handler(note[lane][index]);
+
 			if (note[lane][index].group == NoteGroup::LongNoteEnd) {
 				return index;
 			}

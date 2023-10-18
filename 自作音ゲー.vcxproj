@@ -210,6 +210,7 @@
     <ClCompile Include="DetailView.cpp" />
     <ClCompile Include="DifficultyRadar.cpp" />
     <ClCompile Include="DxLibUtil.cpp" />
+    <ClCompile Include="GradationNoteImage.cpp" />
     <ClCompile Include="LearningDataGenarator.cpp" />
     <ClCompile Include="NoteJudgeProcessor.cpp" />
     <ClCompile Include="NPGradTextView.cpp" />
@@ -297,6 +298,7 @@
     <ClInclude Include="DetailView.h" />
     <ClInclude Include="DifficultyRadar.h" />
     <ClInclude Include="DxLibUtil.h" />
+    <ClInclude Include="GradationNoteImage.h" />
     <ClInclude Include="LearningDataGenarator.h" />
     <ClInclude Include="NoteJudgeProcessor.h" />
     <ClInclude Include="NPGradTextView.h" />

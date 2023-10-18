@@ -551,6 +551,9 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//êFìÔà
 				}
 			}
 
+			double weight = note[lane][index].group == NoteGroup::LongNoteMiddle ? 0.1 : 1;
+
+
 			if (ColorBuf[lane] != NoteColor) {//ëOÇÃâπïÑÇ∆êFÇ™à·Ç§
 				if (NoteColor != NoteColor::K) {//kà»äOÇ≈ÉoÉbÉtÉ@Ç…êFï€ë∂
 					colorRingBuf.setThisLaneColor(lane, NoteColor);
@@ -558,12 +561,12 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//êFìÔà
 				if (NoteColor == NoteColor::Y ||
 					NoteColor == NoteColor::C ||
 					NoteColor == NoteColor::M) {//cmyÇ»ÇÁ4î{ÇÃèdÇ›
-					ColorChangeCount += 4 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor);
+					ColorChangeCount += 4 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
 					k_flag = 0;
 				}
 				else if (NoteColor == NoteColor::W) {//wÇ»ÇÁ2î{ÇÃèdÇ›
-					ColorChangeCount += 2 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor);;
+					ColorChangeCount += 2 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
 					k_flag = 0;
 				}
@@ -572,7 +575,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//êFìÔà
 					k_flag = 1;
 				}
 				else if (NoteColor == NoteColor::F) {//fÇ»ÇÁ1î{ÇÃèdÇ›
-					ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor);;
+					ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
 					k_flag = 0;
 				}
@@ -580,7 +583,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//êFìÔà
 					NoteColor == NoteColor::G ||
 					NoteColor == NoteColor::B) {//RGBÇÃèÍçáÇÕ1î{ÇÃèdÇ›
 					ColorBuf[lane] = NoteColor;
-					ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor);;
+					ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					k_flag = 0;
 				}
 			}
@@ -715,7 +718,10 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 			if (existNote[lane]) {
 				if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart || note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle) {
 					NoteColor color = note[lane][noteIndex[lane]].color;
-					lnFindCount += color2weight(color);
+
+					double weight = note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle ? 0.1 : 1;
+
+					lnFindCount += color2weight(color) * weight;
 					lnCount.setLnCount(lane, color2weight(color));
 				}
 			}
@@ -739,7 +745,8 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 					continue;
 				}
 
-				lnDegrees += sqrt(color2weight(color) * lnCount.getLnCountWithoutThisLane(lane));
+				double weight = note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle ? 0.1 : 1;
+				lnDegrees += sqrt(color2weight(color) * lnCount.getLnCountWithoutThisLane(lane) * weight);
 			}
 		}
 

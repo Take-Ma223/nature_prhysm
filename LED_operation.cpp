@@ -8,20 +8,20 @@
 #include"STRUCT_NOTE.h"
 
 
-void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int i, DWORD *dwWritten, OVERLAPPED *ovl) {//コントローラのLEDを光らせる
+void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int lane, DWORD *dwWritten, OVERLAPPED *ovl) {//コントローラのLEDを光らせる
 	char str[5];
 	char num[2];
-	//_itoa(i, num, 10);
-	sprintf_s(num, "%d", i);
+	//_itoa(lane, num, 10);
+	sprintf_s(num, "%d", lane);
 
 	if (note.color_init == NoteColor::R) {//R
-		LED_state->R[i] = 10;
+		LED_state->R[lane] = 10;
 	}
 	if (note.color_init == NoteColor::R) {//G
-		LED_state->G[i] = 10;
+		LED_state->G[lane] = 10;
 	}
 	if (note.color_init == NoteColor::R) {//B
-		LED_state->B[i] = 10;
+		LED_state->B[lane] = 10;
 	}
 
 	strcpy_s(str, num);
@@ -62,6 +62,9 @@ void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int i, DWORD *dwWritte
 	if (note.group == NoteGroup::LongNoteStart) {//LN始点
 		strcat_s(str, "1");
 	}
+	if (note.group == NoteGroup::LongNoteMiddle) {//LN中間
+		strcat_s(str, "1");
+	}
 	if (note.group == NoteGroup::LongNoteEnd) {//LN終点
 		strcat_s(str, "2");
 	}
@@ -73,6 +76,16 @@ void flash_LED(HANDLE hComm, NOTE note, STATE *LED_state, int i, DWORD *dwWritte
 
 	WriteFile(hComm, str, (DWORD)strlen(str), dwWritten, NULL);
 }
+
+void  flash_LED_all(HANDLE hComm, STATE* LED_state, DWORD* dwWritten, OVERLAPPED* ovl) {//コントローラのLEDを光らせる
+	char str[5];
+
+
+	strcpy_s(str, "B");
+
+	WriteFile(hComm, str, (DWORD)strlen(str), dwWritten, NULL);
+}
+
 
 void turn_off_LED(HANDLE hComm, STATE *LED_state, DWORD *dwWritten, OVERLAPPED *ovl) {//コントローラのLEDを消す
 	char str[5];

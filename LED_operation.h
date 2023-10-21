@@ -10,6 +10,7 @@ typedef struct STATE {//LEDの状態
 }STATE;
 
 extern void flash_LED(HANDLE, NOTE, STATE *, int, DWORD *, OVERLAPPED *);
+extern void flash_LED_all(HANDLE hComm, STATE* LED_state, DWORD* dwWritten, OVERLAPPED* ovl);
 extern void turn_off_LED(HANDLE, STATE *, DWORD *, OVERLAPPED *);
 
 #endif

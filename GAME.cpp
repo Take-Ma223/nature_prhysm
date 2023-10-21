@@ -1919,7 +1919,9 @@ void GAME(int song_number, int difficulty,
 
 			for (i = 0; i <= 3; i++) {//レーン
 				for (j = 0; j <= 2; j++) {//色
-					if (Key[Keylist[j][i]] == 1) {	
+					bool isLnNothing = (LN_flag[i] == LnFlag::Nothing) || (LN_flag[i] == LnFlag::Completed);
+
+					if (Key[Keylist[j][i]] == 1 && isLnNothing) {
 						int judge_dark = 0;
 						NoteJudgeButtonColor buttonColor = (NoteJudgeButtonColor)(2 - j);
 
@@ -2122,17 +2124,24 @@ void GAME(int song_number, int difficulty,
 				}
 
 				if (LN_flag[i] != LnFlag::Nothing && (note[i][j_n_n[i] - 1].group == NoteGroup::LongNoteStart || note[i][j_n_n[i] - 1].group == NoteGroup::LongNoteMiddle)) {//iレーンのLNが判定枠に重なっているとき(かつjnnがLNをしっかり指している)
-							
+					bool isNextLnNodeOver = GAME_passed_time - note[i][j_n_n[i]].timing_real > 0 - TimePerFrame;//LN終点または中間点が判定枠を超えているかどうか
+					
+					auto isPushColor = [&](NoteColor inputColor, int lane){
+						return(
+							 (inputColor == NoteColor::R && Key[Keylist[2][lane]] >= 1)//R
+							|| (inputColor == NoteColor::G && Key[Keylist[1][lane]] >= 1)//G
+							|| (inputColor == NoteColor::B && Key[Keylist[0][lane]] >= 1)//B
+							|| (inputColor == NoteColor::Y && Key[Keylist[2][lane]] >= 1 && Key[Keylist[1][lane]] >= 1)//Y
+							|| (inputColor == NoteColor::C && Key[Keylist[1][lane]] >= 1 && Key[Keylist[0][lane]] >= 1)//C
+							|| (inputColor == NoteColor::M && Key[Keylist[0][lane]] >= 1 && Key[Keylist[2][lane]] >= 1)//M
+							|| (inputColor == NoteColor::W && Key[Keylist[2][lane]] >= 1 && Key[Keylist[1][lane]] >= 1 && Key[Keylist[0][lane]] >= 1)//W
+							|| (inputColor == NoteColor::F && (Key[Keylist[2][lane]] >= 1 || Key[Keylist[1][lane]] >= 1 || Key[Keylist[0][lane]] >= 1)));//F
+
+					};
+
+
 					//LN_pushフラグの計算 対応する色を押しているときは1,離したフレームは-1,それ以外の離しているとき0
-					if (((note[i][j_n_n[i] - 1].color_init == NoteColor::R && Key[Keylist[2][i]] >= 1)//R
-						|| (note[i][j_n_n[i] - 1].color_init == NoteColor::G && Key[Keylist[1][i]] >= 1)//G
-						|| (note[i][j_n_n[i] - 1].color_init == NoteColor::B && Key[Keylist[0][i]] >= 1)//B
-						|| (note[i][j_n_n[i] - 1].color_init == NoteColor::Y && Key[Keylist[2][i]] >= 1 && Key[Keylist[1][i]] >= 1)//Y
-						|| (note[i][j_n_n[i] - 1].color_init == NoteColor::C && Key[Keylist[1][i]] >= 1 && Key[Keylist[0][i]] >= 1)//C
-						|| (note[i][j_n_n[i] - 1].color_init == NoteColor::M && Key[Keylist[0][i]] >= 1 && Key[Keylist[2][i]] >= 1)//M
-						|| (note[i][j_n_n[i] - 1].color_init == NoteColor::W && Key[Keylist[2][i]] >= 1 && Key[Keylist[1][i]] >= 1 && Key[Keylist[0][i]] >= 1)//W
-						|| (note[i][j_n_n[i] - 1].color_init == NoteColor::F && (Key[Keylist[2][i]] >= 1 || Key[Keylist[1][i]] >= 1 || Key[Keylist[0][i]] >= 1)))//F
-						) {
+					if (isPushColor(note[i][j_n_n[i] - 1].color_init, i) || isPushColor(note[i][j_n_n[i]].color_init, i)) {
 						LN_push[i] = 1;
 					}
 					else if (LN_push[i] == 1) {
@@ -2142,9 +2151,18 @@ void GAME(int song_number, int difficulty,
 						LN_push[i] = 0;
 					}
 
-					if (note[i][j_n_n[i]].timing_real - GAME_passed_time <= judge_time_good && note[i][j_n_n[i]].LN_k == 1 && LN_push[i] == -1) {//黒終端が猶予時間判定内に来ているときに離したとき
+
+					int endIndex = noteSearcher.searchLnEnd(i, j_n_n[i]);
+					if (note[i][endIndex].timing_real - GAME_passed_time <= judge_time_good && note[i][endIndex].LN_k == 1 && LN_push[i] == -1) {//黒終端が猶予時間判定内に来ているときに離したとき
 						LN_flag[i] = LnFlag::Completed;//LN中だけどもう離していいことにする(押し切ったことにする)
 						PlaySoundMem(SH.SH_RELEASE, DX_PLAYTYPE_BACK, TRUE);//黒終端リリース音
+					}
+
+
+					if (note[i][endIndex].timing_real - GAME_passed_time <= judge_time_delay && note[i][endIndex].LN_k == 0 && note[i][endIndex].group == NoteGroup::LongNoteEnd) {//通常のLN終点が猶予時間判定内に来たとき
+						if (isPushColor(note[i][endIndex].color, i)) {//終端の色を押していたら
+							LN_flag[i] = LnFlag::Completed;//LN中だけどもう離していいことにする(押し切ったことにする)
+						}
 					}
 
 					if (LN_push[i] == 1
@@ -2162,14 +2180,12 @@ void GAME(int song_number, int difficulty,
 							} while (note[i][ind].group != NoteGroup::LongNoteStart);
 						}
 
-
-						note[i][j_n_n[i] - 1].timing = int(GAME_passed_time_scroll * TIMING_SHOW_RATIO);//始点を判定枠に表示し続けるために現在の経過時間をtimingに入れる
-						note[i][j_n_n[i] - 1].timing_real = int(GAME_passed_time);//ちょっと離しても大丈夫にするため現在の経過時間(本当)をtiming_realに入れる
-
-
-						if (note[i][j_n_n[i]].timing_real - GAME_passed_time <= judge_time_delay && note[i][j_n_n[i]].LN_k == 0 && note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd) {//通常のLN終点が猶予時間判定内に来たとき
-							LN_flag[i] = LnFlag::Completed;//LN中だけどもう離していいことにする(押し切ったことにする)
+						if (note[i][j_n_n[i]].LN_k == true || !isNextLnNodeOver) {
+							note[i][j_n_n[i] - 1].timing = int(GAME_passed_time_scroll * TIMING_SHOW_RATIO);//始点を判定枠に表示し続けるために現在の経過時間をtimingに入れる
+							note[i][j_n_n[i] - 1].timing_real = int(GAME_passed_time);//ちょっと離しても大丈夫にするため現在の経過時間(本当)をtiming_realに入れる
 						}
+
+
 
 						LN_flash[i] = 1;//LNを光らせる
 					}
@@ -2209,7 +2225,7 @@ void GAME(int song_number, int difficulty,
 						}
 					}
 
-					if (GAME_passed_time - note[i][j_n_n[i]].timing_real > 0 - TimePerFrame) {//LN終点または中間点が判定枠を超えて来たとき
+					if (isNextLnNodeOver) {//LN終点または中間点が判定枠を超えて来たとき
 						if (note[i][j_n_n[i]].LN_k == 0 || 
 							(note[i][j_n_n[i]].LN_k == 1 && (LN_flag[i] == LnFlag::Missed ||LN_flag[i] == LnFlag::Completed) && LN_push[i] <= 0)) {
 							//終端が通常終端 または黒終端で既に消していい状態になっていて(LN_flag[i] == 1か-1)対応する色を押していないとき
@@ -2236,52 +2252,58 @@ void GAME(int song_number, int difficulty,
 							};
 
 							if (note[i][j_n_n[i]].group == NoteGroup::LongNoteMiddle) {
-								if (LN_push[i] == 1 || LN_flag[i] == LnFlag::Completed) {
+								if (LN_push[i] == 1) {
 									note[i][j_n_n[i]].group = NoteGroup::LongNoteStart;
 									note[i][j_n_n[i] - 1].hit = true;
 								}
-							}
-							else if ((LN_judge[i] == 2 || LN_judge[i] == 3) && debug_auto != 1) {//PERFECT以上
-								TimePerfect++;
-
-								if (note[i][j_n_n[i] - 1].isBright != 0) {
-									note_hit_large_flash[note_hit_large_flash_rounder][i] = 19;//光るノーツ用のフラッシュ
-									note_hit_large_flash_rounder = (note_hit_large_flash_rounder + 1) % NOTE_HIT_LARGE_FLASH_NUMBER;//0~3で回す
+								if (debug_auto) {
+									flash_LED(hComm, note[i][j_n_n[i]], &LED_state, i, &dwWritten, &ovl);//コントローラのLEDを光らせる
+									//if (note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init)PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
 								}
+							}
+							else if (LN_flag[i] == LnFlag::Completed) {
+								if ((LN_judge[i] == 2 || LN_judge[i] == 3) && debug_auto != 1) {//PERFECT以上
+									TimePerfect++;
 
-								gauge += total / Music[song_number].total_note[difficulty];
-								if (note[i][noteSearcher.searchLnStart(i, j_n_n[i])].isBright != 0) {//光るノートなら2倍
+									if (note[i][j_n_n[i] - 1].isBright != 0) {
+										note_hit_large_flash[note_hit_large_flash_rounder][i] = 19;//光るノーツ用のフラッシュ
+										note_hit_large_flash_rounder = (note_hit_large_flash_rounder + 1) % NOTE_HIT_LARGE_FLASH_NUMBER;//0~3で回す
+									}
+
 									gauge += total / Music[song_number].total_note[difficulty];
-								}
+									if (note[i][noteSearcher.searchLnStart(i, j_n_n[i])].isBright != 0) {//光るノートなら2倍
+										gauge += total / Music[song_number].total_note[difficulty];
+									}
 
-								if (LN_judge[i] == 3) {//SKY_PERFECT
-									SKY_PERFECT++;
-									score += score_note + 1;
-									hit_sky_perfect[i] = 1;
-									gauge += 0.1;
-								}
-								else {//PERFECT
-									PERFECT++;
-									score += score_note - 1;
-									hit_perfect[i] = 1;
-								}
+									if (LN_judge[i] == 3) {//SKY_PERFECT
+										SKY_PERFECT++;
+										score += score_note + 1;
+										hit_sky_perfect[i] = 1;
+										gauge += 0.1;
+									}
+									else {//PERFECT
+										PERFECT++;
+										score += score_note - 1;
+										hit_perfect[i] = 1;
+									}
 
-								commonProcess();
-							}
-							else if (LN_judge[i] == 1 && debug_auto != 1) {//GOOD
-								GOOD++;
-								TimeGood++;
-								hit_good[i] = 1;
-								gauge += (double)total / Music[song_number].total_note[difficulty] / 2;
-								if (note[i][j_n_n[i] - 1].isBright != 0) {//光るノートなら2倍
+									commonProcess();
+								}
+								else if (LN_judge[i] == 1 && debug_auto != 1) {//GOOD
+									GOOD++;
+									TimeGood++;
+									hit_good[i] = 1;
 									gauge += (double)total / Music[song_number].total_note[difficulty] / 2;
+									if (note[i][j_n_n[i] - 1].isBright != 0) {//光るノートなら2倍
+										gauge += (double)total / Music[song_number].total_note[difficulty] / 2;
+									}
+									score += (double)0.5 * score_note;
+
+									commonProcess();
 								}
-								score += (double)0.5 * score_note;
-								
-								commonProcess();
 							}
 
-							if (LN_flag[i] == LnFlag::Completed) {//押し切っているとき始点までのノートを消す(hit=1にする)
+							if (note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd && LN_flag[i] == LnFlag::Completed) {//押し切っているとき始点までのノートを消す(hit=1にする)
 								noteSearcher.searchLnStart(i, j_n_n[i], 
 									[](NOTE& note) {
 										note.hit = true;
@@ -2294,7 +2316,7 @@ void GAME(int song_number, int difficulty,
 
 							}
 
-							if (note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd) {
+							if (LN_flag[i] == LnFlag::Completed && note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd) {
 								LN_flag[i] = LnFlag::Nothing;
 								LN_flash[i] = 0;
 								LN_judge[i] = 0;
@@ -2467,7 +2489,10 @@ void GAME(int song_number, int difficulty,
 				//printfDx("%d\n", beat);
 				beat_time_cash = beat_time;
 				beat_time = (((double)60000 / cbpm) + beat_time_cash);
-				if (stopFlag != 1)flash = 1;//フラッシュ表示フラグ(停止中は表示しない)
+				if (stopFlag != 1) {
+					flash = 1;//フラッシュ表示フラグ(停止中は表示しない)
+					//flash_LED_all(hComm, &LED_state, &dwWritten, &ovl);//コントローラのLEDを光らせる
+				}
 			}
 		}
 		
@@ -2680,9 +2705,14 @@ void GAME(int song_number, int difficulty,
 									//音の処理
 									//if (note[i][j_n_n[i]].group == 0)PlaySoundMem(SH_HIT, DX_PLAYTYPE_BACK, TRUE);
 									//if (note[i][j_n_n[i]].group == 1)PlaySoundMem(SH_HIT_LONG, DX_PLAYTYPE_BACK, TRUE);
-
-									if (note[i][j_n_n[i]].group == NoteGroup::Single || note[i][j_n_n[i]].group == NoteGroup::LongNoteStart) {
-										if (debug_sound == 1)PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);
+									if (debug_sound == 1) {
+										if (note[i][j_n_n[i]].group == NoteGroup::LongNoteMiddle || note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd) {
+											bool isColorDifferent = note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init;
+											if(isColorDifferent)PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);
+										}
+										else {
+											PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);
+										}
 									}
 
 									//後ろに落ちるものの処理
@@ -2718,12 +2748,19 @@ void GAME(int song_number, int difficulty,
 				}
 			}
 
-			for (i = 0; i <= 3; i++) {//通常時
+			for (i = 0; i <= 3; i++) {//音符見逃し処理
 				if (debug_warp == 0) {
 					if (j_n_n[i] <= MusicSub.objOfLane[difficulty][i] - 1) {
 						if ((GAME_passed_time - note[i][j_n_n[i]].timing_real > judge_time_through) && (note[i][j_n_n[i]].color != NoteColor::NONE)//through時間を過ぎていった、または
 							|| ((GAME_passed_time - note[i][j_n_n[i]].timing_real > judge_time_good) && (fabs(note[i][j_n_n[i] + 1].timing_real - GAME_passed_time) < judge_time_good))) {//(good判定を通り過ぎて次のノートがgood判定内にいるとき)ノートの見逃し(コンボが途切れる MISS)
-							if (NoteColor::K != note[i][j_n_n[i]].color && note[i][j_n_n[i]].group != NoteGroup::LongNoteEnd) {//黒とLN終点以外のときミスにする
+							
+							bool isSingleOrStart = (NoteColor::K != note[i][j_n_n[i]].color) && (note[i][j_n_n[i]].group != NoteGroup::LongNoteEnd);
+
+							bool isLnEnd = (note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd);
+							bool isMustPushEnd = isLnEnd && (LN_flag[i] == LnFlag::MustPush);
+							bool isMiss = isSingleOrStart || isMustPushEnd;//ミスにするべき音符かどうか
+							
+							if (isMiss) {
 								if (note[i][j_n_n[i]].group == NoteGroup::LongNoteStart) {//LN始点のとき
 									LN_flag[i] = LnFlag::Missed;//LN中(すでに先頭見逃し)にする
 								}
@@ -2744,6 +2781,9 @@ void GAME(int song_number, int difficulty,
 								MISS++;
 								TimeMiss++;
 							}
+
+							if (isLnEnd)LN_flag[i] = LnFlag::Nothing;
+
 							j_n_n[i]++;
 							speedBuffer.updateAverage();//NOWSPEED算出
 						}
@@ -3180,31 +3220,16 @@ void GAME(int song_number, int difficulty,
 
 						}
 
-
+						//各LNノードは自身と上のノーツまでの中間部分を描画
 						if (note[j][i].y >= note[j][endInd].y) {//始点が終点より下にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//LN始点の場合(始点下半分と中間を表示)
-							if (LN_flash[j] == 1 && j_n_n[j] - 1 == i && note[j][i].group == NoteGroup::LongNoteStart) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//LN始点の場合(始点下半分を表示)
-							}
-
-							if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE));
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//白く光らせる
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS));
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//常に白くする
-
-							}
-
 							//LN中間表示
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i + 1].group == NoteGroup::LongNoteMiddle && option->op.blackGradation == OptionItem::BlackGradation::ON) {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
+							if (note[j][i + 1].LN_k == 1 && option->op.blackGradation == OptionItem::BlackGradation::ON) {
+								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
 								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 							}
-							else if (note[j][i + 1].LN_k == 1 && option->op.blackGradation == OptionItem::BlackGradation::ON) {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
+							else if (option->op.blackGradation == OptionItem::BlackGradation::ON) {
+								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
 								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 							}
 							else {
@@ -3224,12 +3249,25 @@ void GAME(int song_number, int difficulty,
 								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
 							}
 
-							
+							SetDrawBlendMode(BlendMode, BlendVal);
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//LN始点の場合(始点下半分と中間を表示)
+							if (LN_flash[j] == 1 && j_n_n[j] - 1 == i && note[j][i].group == NoteGroup::LongNoteStart) {//LNを叩いているとき
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
+								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//LN始点の場合(始点下半分を表示)
+							}
+
+							if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE));
+								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//白く光らせる
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS));
+								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//常に白くする
+
+							}
 						}
 						else {////始点が終点より上にある場合
 							SetDrawBlendMode(BlendMode, BlendVal);
 
-							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color], TRUE, FALSE);//通常終端
+							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//通常終端
 
 							if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE));
@@ -3305,7 +3343,7 @@ void GAME(int song_number, int difficulty,
 							SetDrawBlendMode(BlendMode, BlendVal);
 
 							if (note[j][i].LN_k == 0) {
-								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color], TRUE, FALSE);//上半分表示
+								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//上半分表示
 							}
 							else if (note[j][i].LN_k == 1) {
 								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[8], TRUE, FALSE);//上半分黒音符表示
@@ -3329,7 +3367,7 @@ void GAME(int song_number, int difficulty,
 							SetDrawBlendMode(BlendMode, BlendVal);
 
 							if (note[j][i].LN_k == 0) {
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color], TRUE, FALSE);//下半分表示
+								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//下半分表示
 
 							}
 							else if (note[j][i].LN_k == 1) {
@@ -3348,6 +3386,10 @@ void GAME(int song_number, int difficulty,
 							SetDrawBlendMode(BlendMode, BlendVal);
 							if (option->op.blackGradation == OptionItem::BlackGradation::ON && note[j][i].LN_k == 1) {
 								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)NoteColor::K], TRUE);
+								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
+							}
+							else if (option->op.blackGradation == OptionItem::BlackGradation::ON) {
+								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
 							}
 							else {

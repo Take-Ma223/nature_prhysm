@@ -87,13 +87,13 @@ public:
 	}
 
 	/// <summary>
-	/// laneとindexの位置(ロング中間、終点のみ)からロングノート始点のindexを返す
+	/// laneとindexの位置(ロング中のみ)からロングノート始点のindexを返す
 	/// </summary>
 	int searchLnStart(int lane, int ind, std::function<void(NOTE&)> handler = nullptr) {
 		int index = ind;
 
-		if (!(note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteEnd)) {
-			throw std::runtime_error("ロング中間またはロング終点が指定されませんでした。");
+		if (note[lane][index].group == NoteGroup::Single) {
+			throw std::runtime_error("ロング中のノートが指定されませんでした。");
 		}
 
 		while (true) {
@@ -110,13 +110,13 @@ public:
 	}
 
 	/// <summary>
-	/// laneとindexの位置(ロング中間、始点のみ)からロングノート終点のindexを返す
+	/// laneとindexの位置(ロング中のみ)からロングノート終点のindexを返す
 	/// </summary>
 	int searchLnEnd(int lane, int ind, std::function<void(NOTE&)> handler = nullptr) {
 		int index = ind;
 
-		if (!(note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteStart)) {
-			throw std::runtime_error("ロング中間またはロング始点が指定されませんでした。");
+		if (note[lane][index].group == NoteGroup::Single) {
+			throw std::runtime_error("ロング中のノートが指定されませんでした。");
 		}
 
 		while (true) {

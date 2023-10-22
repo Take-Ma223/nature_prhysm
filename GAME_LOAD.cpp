@@ -1236,7 +1236,35 @@ void GAME_LOAD(int song_number,
 	
 
 
+	//DIFFICULTY_RADAR,NotesAmount算出
+	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, Music[song_number].ColorNotesAmount[difficulty], BPM_suggest);
+	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[difficulty]);//音符密度グラフを得る
 
+	Cdiff->global = DR.CalcGlobal(CALC_MODE_NORMAL);
+	Cdiff->local = DR.CalcLocal(CALC_MODE_NORMAL);
+	Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_NORMAL);
+	Cdiff->longNote = DR.CalcLongNote(CALC_MODE_NORMAL);
+	Cdiff->unstability = DR.CalcUnstability();
+	Cdiff->chain = DR.CalcChain();
+
+	Music[song_number].global[CALC_MODE_NORMAL][difficulty] = Cdiff->global;
+	Music[song_number].local[CALC_MODE_NORMAL][difficulty] = Cdiff->local;
+	Music[song_number].color[CALC_MODE_NORMAL][difficulty] = Cdiff->color;
+	Music[song_number].longNote[CALC_MODE_NORMAL][difficulty] = Cdiff->longNote;
+	Music[song_number].unstability[CALC_MODE_NORMAL][difficulty] = Cdiff->unstability;
+	Music[song_number].chain[CALC_MODE_NORMAL][difficulty] = Cdiff->chain;
+
+	//Cdiff->global = DR.CalcGlobal(CALC_MODE_RAINBOW);
+	//Cdiff->local = DR.CalcLocal(CALC_MODE_RAINBOW);
+	//Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_RAINBOW);
+	//Cdiff->longNote = DR.CalcLongNote(CALC_MODE_RAINBOW);
+
+	Music[song_number].global[CALC_MODE_RAINBOW][difficulty] = Cdiff->global;
+	Music[song_number].local[CALC_MODE_RAINBOW][difficulty] = Cdiff->local;
+	Music[song_number].color[CALC_MODE_RAINBOW][difficulty] = Cdiff->color;
+	Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
+	Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
+	Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
 
 
 
@@ -1388,8 +1416,14 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 				lane = rand() % 6;//0~5
-				note[i][j].color = rgb_change[lane][(int)note[i][j].color];
-				note[i][j].color_init = note[i][j].color;
+				if (note[i][j].LN_k == true) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color_init;
+				}
+				else {
+					note[i][j].color = rgb_change[lane][(int)note[i][j].color];
+					note[i][j].color_init = note[i][j].color;
+				}
 			}
 		}
 	}
@@ -1440,9 +1474,14 @@ void GAME_LOAD(int song_number,
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 				lane = rand() % 7 + 1;//1~7
 				if (note[i][j].color >= NoteColor::R && note[i][j].color <= NoteColor::W) {
-					note[i][j].color = (NoteColor)lane;
-					note[i][j].color_init = note[i][j].color;
-					
+					if (note[i][j].LN_k == true) {
+						note[i][j].color = note[i][j - 1].color;
+						note[i][j].color_init = note[i][j - 1].color_init;
+					}
+					else {
+						note[i][j].color = (NoteColor)lane;
+						note[i][j].color_init = note[i][j].color;
+					}
 				}
 			}
 		}
@@ -1456,21 +1495,27 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				if (note[i][j].color == NoteColor::Y) {
-					note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::R);//Yは12どっちか
-					note[i][j].color_init = note[i][j].color;
+				if (note[i][j].LN_k == true) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color_init;
 				}
-				if (note[i][j].color == NoteColor::C) {
-					note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::G);//Cは23どっちか
-					note[i][j].color_init = note[i][j].color;
-				}
-				if (note[i][j].color == NoteColor::M) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::R);//Mは13どっちか
-					note[i][j].color_init = note[i][j].color;
-				}
-				if (note[i][j].color == NoteColor::W) {
-					note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::R);//Wは123どっちか
-					note[i][j].color_init = note[i][j].color;
+				else {
+					if (note[i][j].color == NoteColor::Y) {
+						note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::R);//Yは12どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::C) {
+						note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::G);//Cは23どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::M) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::R);//Mは13どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::W) {
+						note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::R);//Wは123どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
 				}
 			}
 		}
@@ -1480,21 +1525,27 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				if (note[i][j].color == NoteColor::R) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::M);//Rは46どっちか
-					note[i][j].color_init = note[i][j].color;
+				if (note[i][j].LN_k == true) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color_init;
 				}
-				if (note[i][j].color == NoteColor::G) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::C);//Gは45どっちか
-					note[i][j].color_init = note[i][j].color;
-				}
-				if (note[i][j].color == NoteColor::B) {
-					note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::C);//Bは56どっちか
-					note[i][j].color_init = note[i][j].color;
-				}
-				if (note[i][j].color == NoteColor::W) {
-					note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::C);//Wは456どっちか
-					note[i][j].color_init = note[i][j].color;
+				else {
+					if (note[i][j].color == NoteColor::R) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::M);//Rは46どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::G) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::C);//Gは45どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::B) {
+						note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::C);//Bは56どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
+					if (note[i][j].color == NoteColor::W) {
+						note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::C);//Wは456どっちか
+						note[i][j].color_init = note[i][j].color;
+					}
 				}
 			}
 		}
@@ -1521,36 +1572,6 @@ void GAME_LOAD(int song_number,
 			}
 		}
 	}
-
-		//DIFFICULTY_RADAR,NotesAmount算出
-	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, Music[song_number].ColorNotesAmount[difficulty], BPM_suggest);
-	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[difficulty]);//音符密度グラフを得る
-
-	Cdiff->global = DR.CalcGlobal(CALC_MODE_NORMAL);
-	Cdiff->local = DR.CalcLocal(CALC_MODE_NORMAL);
-	Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_NORMAL);
-	Cdiff->longNote = DR.CalcLongNote(CALC_MODE_NORMAL);
-	Cdiff->unstability = DR.CalcUnstability();
-	Cdiff->chain = DR.CalcChain();
-
-	Music[song_number].global[CALC_MODE_NORMAL][difficulty] = Cdiff->global;
-	Music[song_number].local[CALC_MODE_NORMAL][difficulty] = Cdiff->local;
-	Music[song_number].color[CALC_MODE_NORMAL][difficulty] = Cdiff->color;
-	Music[song_number].longNote[CALC_MODE_NORMAL][difficulty] = Cdiff->longNote;
-	Music[song_number].unstability[CALC_MODE_NORMAL][difficulty] = Cdiff->unstability;
-	Music[song_number].chain[CALC_MODE_NORMAL][difficulty] = Cdiff->chain;
-
-	//Cdiff->global = DR.CalcGlobal(CALC_MODE_RAINBOW);
-	//Cdiff->local = DR.CalcLocal(CALC_MODE_RAINBOW);
-	//Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_RAINBOW);
-	//Cdiff->longNote = DR.CalcLongNote(CALC_MODE_RAINBOW);
-
-	Music[song_number].global[CALC_MODE_RAINBOW][difficulty] = Cdiff->global;
-	Music[song_number].local[CALC_MODE_RAINBOW][difficulty] = Cdiff->local;
-	Music[song_number].color[CALC_MODE_RAINBOW][difficulty] = Cdiff->color;
-	Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
-	Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
-	Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
 
 	printfDx(L"diff_point:%f\n", diff_point);
 	printfDx(L"level_s:%d\n", Cdiff->level);

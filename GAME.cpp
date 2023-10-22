@@ -2141,7 +2141,7 @@ void GAME(int song_number, int difficulty,
 
 
 					//LN_pushフラグの計算 対応する色を押しているときは1,離したフレームは-1,それ以外の離しているとき0
-					if (isPushColor(note[i][j_n_n[i] - 1].color_init, i) || isPushColor(note[i][j_n_n[i]].color_init, i)) {
+					if (isPushColor(note[i][j_n_n[i] - 1].color_init, i)) {
 						LN_push[i] = 1;
 					}
 					else if (LN_push[i] == 1) {
@@ -2258,7 +2258,7 @@ void GAME(int song_number, int difficulty,
 								}
 								if (debug_auto) {
 									flash_LED(hComm, note[i][j_n_n[i]], &LED_state, i, &dwWritten, &ovl);//コントローラのLEDを光らせる
-									//if (note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init)PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
+									if (note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init)PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
 								}
 							}
 							else if (LN_flag[i] == LnFlag::Completed) {
@@ -2634,10 +2634,10 @@ void GAME(int song_number, int difficulty,
 
 			}
 			note[3][1];
-			printfDx(L"j_n_n[3]:%d\n", j_n_n[3]);
+			//printfDx(L"j_n_n[3]:%d\n", j_n_n[3]);
 
-			printfDx(L"LN_flag[3]:%d\n", LN_flag[3]);
-			printfDx(L"LN_push[3]:%d\n", LN_push[3]);
+			//printfDx(L"LN_flag[3]:%d\n", LN_flag[3]);
+			//printfDx(L"LN_push[3]:%d\n", LN_push[3]);
 
 			if (debug_auto == 1) {//オートプレイ中
 				for (i = 0; i <= 3; i++) {
@@ -2708,7 +2708,7 @@ void GAME(int song_number, int difficulty,
 									if (debug_sound == 1) {
 										if (note[i][j_n_n[i]].group == NoteGroup::LongNoteMiddle || note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd) {
 											bool isColorDifferent = note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init;
-											if(isColorDifferent)PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);
+											if(isColorDifferent && note[i][j_n_n[i]].LN_k == false)PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);
 										}
 										else {
 											PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);

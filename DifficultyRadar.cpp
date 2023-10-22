@@ -744,20 +744,20 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 			if (existNote[lane]) {
 				NoteColor color;
 
-				bool isColorDifferent = note[lane][noteIndex[lane]].color != note[lane][noteIndex[lane] - 1].color;
 				if (note[lane][noteIndex[lane]].LN_k) {//黒終端なら1 (赤扱い)
 					color = NoteColor::R;
 				}
 				else if (note[lane][noteIndex[lane]].group != NoteGroup::LongNoteEnd) {
-					if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle && !isColorDifferent) {
-						continue;
+					if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle) {
+						bool isColorDifferent = note[lane][noteIndex[lane]].color != note[lane][noteIndex[lane] - 1].color;
+						if (isColorDifferent)continue;
 					}
-					else {
-						//中間ノートは色が変わっている場合のみ対象
-						color = note[lane][noteIndex[lane]].color;
-					}
+
+					//中間ノートは色が変わっている場合のみ対象
+					color = note[lane][noteIndex[lane]].color;
 				}
 				else {
+					bool isColorDifferent = note[lane][noteIndex[lane]].color != note[lane][noteIndex[lane] - 1].color;
 					if (isColorDifferent) {
 						//終点は色が変わっている場合のみ対象
 						color = note[lane][noteIndex[lane]].color;

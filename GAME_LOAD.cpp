@@ -641,14 +641,14 @@ void GAME_LOAD(int song_number,
 			//textLine++;
 		}
 
-		if ((wcslen(sharp1) >= 1) && wcsrchr(sharp1, L',') == NULL) {//最後にカンマがない1文字以上の行(#命令も含めて複数行になる所)を見つけた
+		if ((wcslen(sharp1) >= 1) && wstring(str).back() != L',') {//最後にカンマがない1文字以上の行(#命令も含めて複数行になる所)を見つけた
 			if (sharp1[0] != L'#') {//先頭が#じゃないなら分割数を数える
 				i++;//一小節の分割数を数える
 			}
 		}
 
 
-		if (wcsrchr(sharp1, L',') != NULL) {//「,」がある行を見つけた → 1小節分読み込んだので分割数を決めnoteにデータを入れる
+		if (wstring(str).back() == L',') {//「,」がある行を見つけた → 1小節分読み込んだので分割数を決めnoteにデータを入れる
 			i++;//「,」行分の分割数を足す
 			DN = i;//DN分音符単位になる
 			i = 0;
@@ -1067,7 +1067,14 @@ void GAME_LOAD(int song_number,
 
 									//エディタ用処理
 									if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
-										score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] = NoteGroup::LongNoteStart;//k列目のこのLN終端のbeforeにあるノートのグループをLN始点にする
+										if (score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] == NoteGroup::Single) {
+											score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] = NoteGroup::LongNoteStart;//k列目のこのLN終端のbeforeにあるノートのグループをLN始点にする
+										}
+										else {
+											score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] = NoteGroup::LongNoteMiddle;//k列目のこのLN終端のbeforeにあるノートのグループをLN始点にする
+										}
+
+
 									}
 								}
 
@@ -1075,7 +1082,8 @@ void GAME_LOAD(int song_number,
 								if (score_cell_head != NULL) {//エディタ用譜面形式での読み込みも行うとき
 									score_cell_write_note(score_cell_insert, lane, note[lane][nc[lane]].color, note[lane][nc[lane]].group, note[lane][nc[lane]].isBright, note[lane][nc[lane]].LN_k);//k列目の音符情報を格納
 									if (score_cell_find_before_note(score_cell_insert, lane) != NULL) {
-										if (score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] == NoteGroup::LongNoteStart && score_cell_find_before_note(score_cell_insert, lane)->data.note.isBright[lane] == true) {//beforeがLN始点で光っていたら
+										if (score_cell_find_before_note(score_cell_insert, lane)->data.note.group[lane] == NoteGroup::LongNoteStart 
+											&& score_cell_find_before_note(score_cell_insert, lane)->data.note.isBright[lane] == true) {//beforeがLN始点で光っていたら
 											score_cell_insert->data.note.isBright[lane] = true;//このLN終点も光らせる(エディタ用)
 										}
 									}
@@ -1147,7 +1155,10 @@ void GAME_LOAD(int song_number,
 				}
 				textLine++;//テキスト行数を数える
 
-				if (wcsrchr(sharp1, L',') != NULL) {//「,」がある行を見つけた → 1小節分読み込んだので次の小節の読み込みに移る
+				
+				
+
+				if (wstring(str).back() == L',') {//最後に「,」がある行を見つけた → 1小節分読み込んだので次の小節の読み込みに移る
 					file_p_first = FileRead_tell(fp);//次に読み込む小節の先頭を指す
 					break;
 				}

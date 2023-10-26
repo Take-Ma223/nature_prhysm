@@ -2207,12 +2207,7 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 				}
 
 				if (measure_p->content == CONTENTS_NOTE && int(step) >= measure_p->step) {//音符
-					fwprintf_s(fp, L"%c%c%c%c",
-						note_to_char(measure_p->data.note.color[0], measure_p->data.note.group[0], measure_p->data.note.isBright[0], measure_p->data.note.LN_k[0]),
-						note_to_char(measure_p->data.note.color[1], measure_p->data.note.group[1], measure_p->data.note.isBright[1], measure_p->data.note.LN_k[1]),
-						note_to_char(measure_p->data.note.color[2], measure_p->data.note.group[2], measure_p->data.note.isBright[2], measure_p->data.note.LN_k[2]),
-						note_to_char(measure_p->data.note.color[3], measure_p->data.note.group[3], measure_p->data.note.isBright[3], measure_p->data.note.LN_k[3])
-					);
+					fwprintf_s(fp, L"%s", generateRow(measure_p->data.note));
 					if (measure_p->next != NULL) {//次がNULLじゃない
 						measure_p = measure_p->next;
 					}
@@ -2273,10 +2268,46 @@ int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficul
 	return 0;
 }
 
+wchar_t* generateRow(note_data& note) {
+	wchar_t noteText[5] = L"";
+	wchar_t colon = L'\0';
+	wchar_t glnText[5] = L"";
+	sprintfDx(noteText, L"%c%c%c%c",
+		note_to_char(note.color[0], note.group[0], note.isBright[0], note.LN_k[0]),
+		note_to_char(note.color[1], note.group[1], note.isBright[1], note.LN_k[1]),
+		note_to_char(note.color[2], note.group[2], note.isBright[2], note.LN_k[2]),
+		note_to_char(note.color[3], note.group[3], note.isBright[3], note.LN_k[3])
+	);
+
+	bool isLnNode[4] = { false, false, false, false };
+	for (int i = 0; i < 4; i++) {
+		isLnNode[i] = note.group[i] == NoteGroup::LongNoteMiddle || note.group[i] == NoteGroup::LongNoteEnd;
+	}
+
+	bool isExistLnNode = isLnNode[0] || isLnNode[1] || isLnNode[2] || isLnNode[3];
+
+	if (isExistLnNode) {
+		colon = L':';
+
+		sprintfDx(glnText, L"%c%c%c%c",
+			note_to_char(note.color[0], NoteGroup::Single, false, false),
+			note_to_char(note.color[1], NoteGroup::Single, false, false),
+			note_to_char(note.color[2], NoteGroup::Single, false, false),
+			note_to_char(note.color[3], NoteGroup::Single, false, false)
+		);
+	}
+	wchar_t resultText[12] = L"";
+	sprintfDx(resultText, L"%s%c%s",noteText,colon,glnText);
+	return resultText;
+}
+
 wchar_t note_to_char(NoteColor color,NoteGroup group,BOOL bright,BOOL LN_k) {//音符の数値情報を譜面データ文字に変換
 	wchar_t color_list[11] = { L'0',L'r',L'g',L'b',L'c',L'm',L'y',L'w',L'k',L'f',L'e' };
 	wchar_t color_list_CAP[11] = { NULL,L'R',L'G',L'B',L'C',L'M',L'Y',L'W',NULL,L'F',L'E' };
-	if (group == NoteGroup::LongNoteEnd) {
+	if (group == NoteGroup::LongNoteMiddle) {
+		return color_list[10];
+	}
+	else if (group == NoteGroup::LongNoteEnd) {
 		return LN_k==0? color_list[10] : color_list_CAP[10];
 	}
 
@@ -2289,6 +2320,9 @@ wchar_t note_to_char(NoteColor color,NoteGroup group,BOOL bright,BOOL LN_k) {//�
 
 	return L'0';
 }
+
+
+
 
 int gcd(int n, int m) {//最大公約数
 	int i, r;

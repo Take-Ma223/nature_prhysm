@@ -18,6 +18,7 @@ void EDIT_SCORE(SCORE_CELL *head, Song *Music, SongSub* MusicSub, Option *Option
 	double* scale_score, int* step_array_number, int* measure_start_step, int* SwingBackBeatTime, ANDROID_CONTROLLER *AC, Config config, int SH_SONG);
 
 int SAVE_EDIT_SCORE(SCORE_CELL *head, Song *Music, int song_number, int difficulty, double scroll);
+wchar_t* generateRow(note_data& note);
 wchar_t note_to_char(NoteColor color, NoteGroup group, BOOL bright, BOOL LN_k);
 int gcd(int n, int m);
 double calc_insert_passed_time(double init_bpm, double init_scroll, SCORE_CELL *p, SCORE_CELL *insert);//headからinsertまでの実時間をmsで計測し返す関数

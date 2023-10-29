@@ -17,6 +17,7 @@
 #include "AppContext.h"
 #include "DxLibUtil.h"
 #include "NPLoadSoundMem.h"
+#include "GradationNoteImage.h"
 
 using namespace std;
 
@@ -149,6 +150,9 @@ void EDIT_SCORE(SCORE_CELL* head,
 	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",
 		L"bright",L"note_Long_hit_b" };
 
+	GradationNoteImage gradationLongNote(wstring(L"img/notes/") + wstring(option->note[option->op.note]));
+
+
 
 	for (i = 0; i <= 10; i++) {
 		wchar_t strcash[128];
@@ -163,19 +167,6 @@ void EDIT_SCORE(SCORE_CELL* head,
 	sprintfDx(strcash, L"img/notes/%s/JudgeArea.png", option->note[option->op.note]);
 	H_JUDGE_AREA = LoadGraph(strcash);
 
-	DeleteGraph(H_LNOTE[8]);//黒ロング画像を削除し、透過加工黒ロング画像を作成
-	sprintfDx(strcash, L"img/notes/%s/dl.png", option->note[option->op.note]);
-	int SOFTH_LNOTE_B = LoadSoftImage(strcash);
-	for (int y = 0; y < 256; y++) {//透過グラデーション加工
-		for (int x = 0; x < 256; x++) {
-			int r = 0, g = 0, b = 0, a = 0;
-			GetPixelSoftImage(SOFTH_LNOTE_B, x, y, &r, &g, &b, &a);
-			if (a != 0)DrawPixelSoftImage(SOFTH_LNOTE_B, x, y, r, g, b, 255 - y);
-
-		}
-	}
-	H_LNOTE[8] = CreateGraphFromSoftImage(SOFTH_LNOTE_B);
-	DeleteSoftImage(SOFTH_LNOTE_B);
 
 	DrawableInitParam notesModeViewParam;
 	notesModeViewParam.cordinate = Cordinate(439, 532);
@@ -548,7 +539,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 			Key[KEY_INPUT_M] == 1 &&
 			area.StartCell != NULL && area.EndCell != NULL) {//ミラー配置にする
 			MirrorSelectArea(area);
-			SolveLN(end);
+			SolveLN(head, end);
 
 			//選択範囲の処理領域の再算出
 			area.end += 1;//選択範囲endが事前に1減っているのであらかじめ1足しておく
@@ -585,7 +576,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 			}
 
 			PasteSelectArea(step_count, &insert, PasteRange, &CopyHead, scale_m);
-			SolveLN(end);
+			SolveLN(head, end);
 
 			area.end += 1;//選択範囲endが事前に1減っているのであらかじめ1足しておく
 			DecideProcessArea(&area, end);//areaの指すセルが消えている場合があるので処理領域を再算出
@@ -764,6 +755,47 @@ void EDIT_SCORE(SCORE_CELL* head,
 		
 		//音符、命令配置
 		if (Key[KEY_INPUT_LCONTROL] == 0 && Key[KEY_INPUT_RCONTROL] == 0) {//CTRLを押していない
+			auto deleteSolve = [](SCORE_CELL* before, SCORE_CELL* next, int lane) {
+				NoteGroup beforeGroup = before == NULL ? NoteGroup::None : before->data.note.group[lane];
+				NoteGroup nextGroup = next == NULL ? NoteGroup::None : next->data.note.group[lane];
+
+				if (beforeGroup == NoteGroup::None && nextGroup == NoteGroup::LongNoteMiddle) {
+					next->data.note.group[lane] = NoteGroup::LongNoteStart;
+				}
+				else if (beforeGroup == NoteGroup::None && nextGroup == NoteGroup::LongNoteEnd) {
+					next->data.note.group[lane] = NoteGroup::Single;
+				}
+				else if (beforeGroup == NoteGroup::Single && nextGroup == NoteGroup::LongNoteMiddle) {
+					next->data.note.group[lane] = NoteGroup::LongNoteStart;
+				}
+				else if (beforeGroup == NoteGroup::Single && nextGroup == NoteGroup::LongNoteEnd) {
+					next->data.note.group[lane] = NoteGroup::Single;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteStart && nextGroup == NoteGroup::None) {
+					before->data.note.group[lane] = NoteGroup::Single;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteStart && nextGroup == NoteGroup::Single) {
+					before->data.note.group[lane] = NoteGroup::Single;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteStart && nextGroup == NoteGroup::LongNoteStart) {
+					before->data.note.group[lane] = NoteGroup::Single;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteMiddle && nextGroup == NoteGroup::None) {
+					before->data.note.group[lane] = NoteGroup::LongNoteEnd;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteMiddle && nextGroup == NoteGroup::Single) {
+					before->data.note.group[lane] = NoteGroup::LongNoteEnd;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteMiddle && nextGroup == NoteGroup::LongNoteStart) {
+					before->data.note.group[lane] = NoteGroup::LongNoteEnd;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteEnd && nextGroup == NoteGroup::LongNoteMiddle) {
+					next->data.note.group[lane] = NoteGroup::LongNoteStart;
+				}
+				else if (beforeGroup == NoteGroup::LongNoteEnd && nextGroup == NoteGroup::LongNoteEnd) {
+					next->data.note.group[lane] = NoteGroup::Single;
+				}
+			};
 
 			if (command_put == 0) {//音符配置モードのとき
 				for (i = 0; i <= 2; i++) {//縦 RGB 012
@@ -838,16 +870,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 									else if (insert->data.note.color[j] == NoteColor::K) {
 										score_cell_write_note(insert, j, NoteColor::R, insert->data.note.group[j], 0);
 									}
-									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
-											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
-										}
-									}
-									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
-											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
-										}
-									}
+
 									if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//音を鳴らす
 										PlaySoundMem(SH.SH_HIT_R_L, DX_PLAYTYPE_BACK, TRUE);
 									}
@@ -890,16 +913,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 									else if (insert->data.note.color[j] == NoteColor::K) {
 										score_cell_write_note(insert, j, NoteColor::G, insert->data.note.group[j], 0);
 									}
-									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
-											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
-										}
-									}
-									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
-											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
-										}
-									}
+
 									if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//音を鳴らす
 										PlaySoundMem(SH.SH_HIT_G_L, DX_PLAYTYPE_BACK, TRUE);
 									}
@@ -942,16 +956,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 									else if (insert->data.note.color[j] == NoteColor::K) {
 										score_cell_write_note(insert, j, NoteColor::B, NoteGroup::Single, 0);
 									}
-									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
-											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
-										}
-									}
-									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
-											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
-										}
-									}
+
 									if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//音を鳴らす
 										PlaySoundMem(SH.SH_HIT_B_L, DX_PLAYTYPE_BACK, TRUE);
 									}
@@ -965,27 +970,40 @@ void EDIT_SCORE(SCORE_CELL* head,
 									if (insert->data.note.color[j] == NoteColor::K) {
 										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
+										PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
 									}
 									else {//黒音符を書き込む
-
-										if (insert->data.note.group[j] == NoteGroup::LongNoteStart) {//始点を黒で上書きしたとき
-											score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//終点を消す
-											score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
+										if (insert->data.note.group[j] == NoteGroup::LongNoteEnd) {//終点を黒で上書きしたとき
+											insert->data.note.LN_k[j] = !insert->data.note.LN_k[j];//黒終端を切り替える
+											PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
 										}
-										else if (insert->data.note.group[j] == NoteGroup::LongNoteEnd) {//終点を黒で上書きしたとき
-											find_before->data.note.group[j] = NoteGroup::Single;//始点を単ノートにする
-										}
-										else if (find_next != NULL && find_before != NULL) {
-											if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LNの中に黒を置いた時
-												find_next->data.note.group[j] = NoteGroup::Single;//始点を単ノートにする
-												find_before->data.note.group[j] = NoteGroup::Single;//終点を単ノートにする
+										else {
+											if (insert->data.note.group[j] == NoteGroup::LongNoteStart) {//始点を黒で上書きしたとき
+												if (find_next->data.note.group[j] == NoteGroup::LongNoteMiddle) {
+													find_next->data.note.group[j] = NoteGroup::LongNoteStart;
+												}
+												else if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {
+													score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//終点を消す
+													score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
+												}
+												score_cell_write_note(insert, j, NoteColor::K, NoteGroup::Single, 0);//黒音符書き込み
+												PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
 											}
+											else if (find_next != NULL && find_before != NULL) {
+												//LN中に黒は置けない
+												bool isInLn = 
+													(find_before->data.note.group[j] == NoteGroup::LongNoteStart || find_before->data.note.group[j] == NoteGroup::LongNoteMiddle)
+													|| (find_next->data.note.group[j] == NoteGroup::LongNoteMiddle || find_next->data.note.group[j] == NoteGroup::LongNoteEnd);
+
+												if (!isInLn) {
+													score_cell_write_note(insert, j, NoteColor::K, NoteGroup::Single, 0);//黒音符書き込み
+													PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
+												}
+											}
+											
 										}
-
-										score_cell_write_note(insert, j, NoteColor::K, NoteGroup::Single, 0);//黒音符書き込み
-
 									}
-									PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
+									
 								}
 								if (i == 1) {//Rainbow
 									if (insert->data.note.color[j] == NoteColor::F) {//既に虹がある
@@ -999,16 +1017,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 										score_cell_write_note(insert, j, NoteColor::F, insert->data.note.group[j], insert->data.note.isBright[j]);
 
 									}
-									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点の色を変えたら
-											find_before->data.note.color[j] = insert->data.note.color[j];//始点の色も変える
-										}
-									}
-									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点の色を変えたら
-											find_next->data.note.color[j] = insert->data.note.color[j];//終点の色も変える
-										}
-									}
+
 									if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//音を鳴らす
 										PlaySoundMem(SH.SH_HIT_L, DX_PLAYTYPE_BACK, TRUE);
 									}
@@ -1021,7 +1030,13 @@ void EDIT_SCORE(SCORE_CELL* head,
 										score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 										score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 
-										score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::Single, find_before->data.note.isBright[j]);//下にある音符を単ノートにする
+										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {
+											score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::Single, find_before->data.note.isBright[j]);
+										}
+										else if (find_before->data.note.group[j] == NoteGroup::LongNoteMiddle) {
+											score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::LongNoteEnd, find_before->data.note.isBright[j]);
+
+										}
 									}
 									else {//今のstep_countの行にLN終点が配置されてない
 										if (find_before != NULL) {//この行の下に音符があって
@@ -1031,9 +1046,13 @@ void EDIT_SCORE(SCORE_CELL* head,
 													if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//それがLN終点なら消す
 														score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 														score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
+													}else if (find_next->data.note.group[j] == NoteGroup::LongNoteMiddle) {//それがLN中間なら始点にする
+														find_next->data.note.group[j] = NoteGroup::LongNoteStart;
 													}
 												}
-												score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::LongNoteStart, find_before->data.note.isBright[j]);//下にある音符をLN始点にする
+												if (find_before->data.note.group[j] == NoteGroup::Single) {
+													score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::LongNoteStart, find_before->data.note.isBright[j]);//下にある音符をLN始点にする
+												}
 
 												if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//SHIFT押しながらだと黒終点にする
 													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
@@ -1043,21 +1062,23 @@ void EDIT_SCORE(SCORE_CELL* head,
 												}
 											}
 											else if (find_before->data.note.group[j] == NoteGroup::LongNoteEnd) {//下がLN終点のときは今の位置にずらす
+												if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//SHIFT押しながらだと黒終点にする
+													score_cell_write_note(insert, j, find_before->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
+												}
+												else {
+													score_cell_write_note(insert, j, find_before->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
+												}
 
 												score_cell_write_note(find_before, j, NoteColor::NONE, NoteGroup::Single, 0);//下にある音符を消す
 												score_cell_delete_if_no_note(&find_before);//その結果何もない行になったら行を消す
-
-												if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//SHIFT押しながらだと黒終点にする
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
-												}
-												else {
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
-												}
 
 												if (find_next != NULL) {//上に音符がある
 													if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//それがLN終点なら消す
 														score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 														score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
+													}
+													else if (find_next->data.note.group[j] == NoteGroup::LongNoteMiddle) {//それがLN中間なら始点にする
+														find_next->data.note.group[j] = NoteGroup::LongNoteStart;
 													}
 												}
 											}
@@ -1083,23 +1104,12 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 							if (putflag != -1) {
 								if (putflag == 0) {//RGB虹音符を消していたとき 黒を置いたとき
-									if (find_next != NULL) {
-										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点を消していたとき
-											score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//LN終点も消す
-											score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
-										}
-									}
-									if (find_before != NULL) {
-										if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点を消していたとき
-											find_before->data.note.group[j] = NoteGroup::Single;//LN始点を単ノートにする
-										}
-									}
+									deleteSolve(find_before, find_next, j);
 								}
 								if (putflag == 1) {//音符を置いていたとき
 									if (find_next != NULL && find_before != NULL) {
-										if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LNの中に音符を置いていたとき
-											score_cell_write_note(insert, j, insert->data.note.color[j], NoteGroup::LongNoteStart, insert->data.note.isBright[j]);//この音符をLN始点にする
-											score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::Single, find_before->data.note.isBright[j]);//下の音符は単ノートにする
+										if (find_next->data.note.group[j] == NoteGroup::LongNoteMiddle || find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LNの中に音符を置いていたとき
+											score_cell_write_note(insert, j, insert->data.note.color[j], NoteGroup::LongNoteMiddle, insert->data.note.isBright[j]);//この音符をLN始点にする
 										}
 									}
 								}
@@ -1115,7 +1125,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 				if (Key[KEY_INPUT_BACK] == 1) {//BackSpace押されてたら音符行を削除
 					if (area.StartCell != NULL && area.EndCell != NULL) {//選択範囲があればそこを削除する
 						DeleteSelectArea(&insert, area);
-						SolveLN(end);
+						SolveLN(head, end);
 					}
 					else {//範囲選択していない
 						for (j = 0; j <= 3; j++) {
@@ -1128,18 +1138,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 								score_cell_write_note(insert, j, NoteColor::NONE, NoteGroup::Single, 0);//消す
 								score_cell_delete_if_no_note(&insert);//その結果何もない行になったら行を消す
 
-
-								if (find_next != NULL) {
-									if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LN始点を消していたとき
-										score_cell_write_note(find_next, j, NoteColor::NONE, NoteGroup::Single, 0);//LN終点も消す
-										score_cell_delete_if_no_note(&find_next);//その結果何もない行になったら行を消す
-									}
-								}
-								if (find_before != NULL) {
-									if (find_before->data.note.group[j] == NoteGroup::LongNoteStart) {//LN終点を消していたとき
-										find_before->data.note.group[j] = NoteGroup::Single;//LN始点を単ノートにする
-									}
-								}
+								deleteSolve(find_before, find_next, j);
 
 							}
 						}
@@ -1552,6 +1551,8 @@ void EDIT_SCORE(SCORE_CELL* head,
 				for (i = 0; i <= 3; i++) {
 					if (show->data.note.color[i] != NoteColor::NONE) {//音符があったら
 						if (show->data.note.group[i] == NoteGroup::Single) {//単ノート
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
 							if (show->data.note.isBright[i] == false) {
 								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[(int)show->data.note.color[i]], TRUE);
 							}
@@ -1562,84 +1563,123 @@ void EDIT_SCORE(SCORE_CELL* head,
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 							}
 						}
-						if (show->data.note.group[i] == NoteGroup::LongNoteStart) {//LN始点
-							if (show->data.note.isBright[i] == false) {
-								/*
-								DrawExtendGraph(lane[i] - 64 ,
-									judge_area - (show->step - step_count)*scale - 64,
-									lane[i] + 64,
-									judge_area - (show->step - step_count)*scale + 64,
-									H_NOTE[show->data.note.color[i]], TRUE);
-									*/
+						else if (show->data.note.group[i] == NoteGroup::LongNoteStart) {//LN始点
+							//下半分と中間描画
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
+							DrawRectExtendGraph(
+								lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 64 + 0.5),
+								0, 128, 256, 128,
+								H_NOTE[(int)show->data.note.color[i]], TRUE
+							);
+
+							//LN中間表示
+
+							DrawRectExtendGraph(
+								lane[i] - 64, int(judge_area - (score_cell_find_next_note(show, i)->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5),
+								lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+								0, 0, 256, 256,
+								H_LNOTE[(int)show->data.note.color[i]], TRUE
+							);
+						
+
+
+
+							if (score_cell_find_next_note(show, i)->data.note.LN_k[i] == true && option->op.blackGradation == OptionItem::BlackGradation::ON) {
+								//黒終端ロングの中間
 								DrawRectExtendGraph(
-									lane[i] - 64, judge_area - int((show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64),
-									0, 128, 256, 128,
-									H_NOTE[(int)show->data.note.color[i]], TRUE
+									lane[i] - 64, int(judge_area - (score_cell_find_next_note(show, i)->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5),
+									lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+									0, 0, 256, 256,
+									gradationLongNote.H_LNOTE_GRAD_FADE_IN[8], TRUE
 								);
-
 							}
-							if (show->data.note.isBright[i] == true) {
-								/*
-								DrawExtendGraph(lane[i] - 64 - 32, judge_area - (show->step - step_count)*scale - 64, lane[i] + 64, judge_area - (show->step - step_count)*scale + 64, H_NOTE[show->data.note.color[i]], TRUE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
-								DrawExtendGraph(lane[i] - 64 - 32, judge_area - (show->step - step_count)*scale - 64, lane[i] + 64, judge_area - (show->step - step_count)*scale + 64, H_NOTE[10], TRUE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-								*/
 
-								DrawRectExtendGraph(
-									lane[i] - 64, judge_area - int((show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5),
-									0, 128, 256, 128,
-									H_NOTE[(int)show->data.note.color[i]], TRUE
-								);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+
+						
+							//光るノーツ
+							if (show->data.note.isBright[i] == true) {
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 105);
 								DrawRectExtendGraph(
 									lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5),
 									0, 128, 256, 128,
 									H_NOTE[10], TRUE
 								);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
-							}
 
-						}
-						if (show->data.note.group[i] == NoteGroup::LongNoteEnd) {//LN終点
-
-							//DrawExtendGraph(lane[i] - 64 + 32, judge_area - (show->step - step_count)*scale - 64, lane[i] + 64, judge_area - (show->step - step_count)*scale + 64, H_NOTE[show->data.note.color[i]], TRUE);
-
-							DrawRectExtendGraph(
-								lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
-								0, 0, 256, 128,
-								show->data.note.LN_k[i] == 0 ? H_NOTE[(int)show->data.note.color[i]] : H_NOTE[8],//黒終点なら上半分は黒音符表示
-								TRUE
-							);
-
-							DrawRectExtendGraph(//LN中間表示
-								lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (score_cell_find_before_note(show, i)->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
-								0, 0, 256, 256,
-								H_LNOTE[(int)show->data.note.color[i]], TRUE
-							);
-
-							if (show->data.note.isBright[i] == true) {//光る音符の場合
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
-								DrawRectExtendGraph(
-									lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
-									0, 0, 256, 128,
-									H_NOTE[10], TRUE
-								);
 								DrawRectExtendGraph(//LN中間表示
-									lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (score_cell_find_before_note(show, i)->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+									lane[i] - 64, int(judge_area - (score_cell_find_next_note(show, i)->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5),
+									lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
 									0, 0, 256, 256,
 									H_LNOTE[10], TRUE
 								);
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 							}
 
-							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);//黒終端ロングノートのグラデーション表示
-							if (show->data.note.LN_k[i] == 1 && option->op.blackGradation == OptionItem::BlackGradation::ON) {
-								DrawRectExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (score_cell_find_before_note(show, i)->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
-									0, 0, 256, 256, H_LNOTE[8], TRUE);
+						}
+						else if (show->data.note.group[i] == NoteGroup::LongNoteMiddle) {//LN中間
+							//中間描画
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+							//LN中間表示
+
+							DrawRectExtendGraph(
+								lane[i] - 64, int(judge_area - (score_cell_find_next_note(show, i)->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5),
+								lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+								0, 0, 256, 256,
+								H_LNOTE[(int)show->data.note.color[i]], TRUE
+							);
+						
+
+
+
+							if (score_cell_find_next_note(show, i)->data.note.LN_k[i] == true && option->op.blackGradation == OptionItem::BlackGradation::ON) {
+								//黒終端ロングの中間
+								DrawRectExtendGraph(
+									lane[i] - 64, int(judge_area - (score_cell_find_next_note(show, i)->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5),
+									lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+									0, 0, 256, 256,
+									gradationLongNote.H_LNOTE_GRAD_FADE_IN[8], TRUE
+								);
 							}
 
+
+
+							//光るノーツ
+							if (show->data.note.isBright[i] == true) {
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 105);
+
+								DrawRectExtendGraph(//LN中間表示
+									lane[i] - 64, int(judge_area - (score_cell_find_next_note(show, i)->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5),
+									lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+									0, 0, 256, 256,
+									H_LNOTE[10], TRUE
+								);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+							}
+
+						}
+						else if (show->data.note.group[i] == NoteGroup::LongNoteEnd) {//LN終点
+							//上半分描画
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+							//DrawExtendGraph(lane[i] - 64 + 32, judge_area - (show->step - step_count)*scale - 64, lane[i] + 64, judge_area - (show->step - step_count)*scale + 64, H_NOTE[show->data.note.color[i]], TRUE);
+
+							DrawRectExtendGraph(
+								lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+								0, 0, 256, 128,
+								show->data.note.LN_k[i] == false ? H_NOTE[(int)show->data.note.color[i]] : H_NOTE[8],//黒終点なら上半分は黒音符表示
+								TRUE
+							);
+
+
+							if (show->data.note.LN_k[i] == false && show->data.note.isBright[i] == true) {//光る音符の場合
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+								DrawRectExtendGraph(
+									lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
+									0, 0, 256, 128,
+									H_NOTE[10], TRUE
+								);
+							}
 						}
 					}
 				}
@@ -2290,10 +2330,10 @@ wchar_t* generateRow(note_data& note) {
 		colon = L':';
 
 		sprintfDx(glnText, L"%c%c%c%c",
-			note_to_char(note.color[0], NoteGroup::Single, false, false),
-			note_to_char(note.color[1], NoteGroup::Single, false, false),
-			note_to_char(note.color[2], NoteGroup::Single, false, false),
-			note_to_char(note.color[3], NoteGroup::Single, false, false)
+			isLnNode[0] ? note_to_char(note.color[0], NoteGroup::Single, false, false): L'0',
+			isLnNode[1] ? note_to_char(note.color[1], NoteGroup::Single, false, false): L'0',
+			isLnNode[2] ? note_to_char(note.color[2], NoteGroup::Single, false, false): L'0',
+			isLnNode[3] ? note_to_char(note.color[3], NoteGroup::Single, false, false): L'0'
 		);
 	}
 	wchar_t resultText[12] = L"";
@@ -2458,40 +2498,91 @@ void MirrorSelectArea(AreaSelect area) {//選択範囲をミラー配置にす�
 	return;
 }
 
-void SolveLN(SCORE_CELL* end) {//LNの不整合を単ノートに置き換える
+
+
+void SolveLN(SCORE_CELL* start, SCORE_CELL* end) {//LNの不整合を単ノートに置き換える
 	SCORE_CELL* search = end;
 	int column = 0;
+
+	auto solveEnd = [](SCORE_CELL* search, int column) {
+		if (search->data.note.group[column] == NoteGroup::LongNoteEnd) {//LN終点
+			if (score_cell_find_before_note(search, column) != NULL) {
+				if ((score_cell_find_before_note(search, column)->data.note.group[column] != NoteGroup::LongNoteStart)
+					&& (score_cell_find_before_note(search, column)->data.note.group[column] != NoteGroup::LongNoteMiddle)) {
+					//LN終点の下が始点でも中間でもないので不整合
+					search->data.note.group[column] = NoteGroup::Single;
+				}
+			}
+			else {
+				search->data.note.group[column] = NoteGroup::Single;
+			}
+		}
+	};
+
+	auto solveMiddle = [](SCORE_CELL* search, int column) {
+		if (search->data.note.group[column] == NoteGroup::LongNoteMiddle) {//LN中間
+			if (score_cell_find_before_note(search, column) != NULL) {
+				if ((score_cell_find_before_note(search, column)->data.note.group[column] != NoteGroup::LongNoteStart)
+					&& (score_cell_find_before_note(search, column)->data.note.group[column] != NoteGroup::LongNoteMiddle)) {
+					//LN中間の下が始点でも中間でもないので不整合
+					search->data.note.group[column] = NoteGroup::Single;
+				}
+			}
+			if (score_cell_find_next_note(search, column) != NULL) {
+				if ((score_cell_find_next_note(search, column)->data.note.group[column] != NoteGroup::LongNoteEnd)
+					&& (score_cell_find_next_note(search, column)->data.note.group[column] != NoteGroup::LongNoteMiddle)) {
+					//LN中間の上が終点でも中間でもないので不整合
+					search->data.note.group[column] = NoteGroup::Single;
+				}
+			}
+			if (score_cell_find_before_note(search, column) == NULL || score_cell_find_next_note(search, column) == NULL) {
+				search->data.note.group[column] = NoteGroup::Single;
+			}
+		}
+	};
+
+	auto solveStart = [](SCORE_CELL* search, int column) {
+		if (search->data.note.group[column] == NoteGroup::LongNoteStart) {//LN始点
+			if (score_cell_find_next_note(search, column) != NULL) {
+				if ((score_cell_find_next_note(search, column)->data.note.group[column] != NoteGroup::LongNoteEnd)
+					&& (score_cell_find_next_note(search, column)->data.note.group[column] != NoteGroup::LongNoteMiddle)) {
+					//LN始点の上が終点でも中間でもないので不整合
+					search->data.note.group[column] = NoteGroup::Single;
+				}
+			}
+			else {
+				search->data.note.group[column] = NoteGroup::Single;
+			}
+		}
+	};
+
 
 	while (1) {
 		if (search->content == CONTENTS_NOTE) {
 			for (column = 0; column < 4; column++) {
-				if (search->data.note.group[column] == NoteGroup::LongNoteEnd) {//LN終点
-					if (score_cell_find_before_note(search, column) != NULL) {
-						if (score_cell_find_before_note(search, column)->data.note.group[column] != NoteGroup::LongNoteStart) {
-							search->data.note.group[column] = NoteGroup::Single;
-						}
-					}
-					else {
-						search->data.note.group[column] = NoteGroup::Single;
-					}
-				}
-				if (search->data.note.group[column] == NoteGroup::LongNoteStart) {//LN始点
-					if (score_cell_find_next_note(search, column) != NULL) {
-						if (score_cell_find_next_note(search, column)->data.note.group[column] != NoteGroup::LongNoteEnd) {
-							search->data.note.group[column] = NoteGroup::Single;
-						}
-					}
-					else {
-						search->data.note.group[column] = NoteGroup::Single;
-					}
-				}
-
-
+				solveEnd(search, column);
+				solveMiddle(search, column);
+				solveStart(search, column);
 			}
 		}
 
 		search = search->before;
 		if (search->step == -1)break;
+	}
+
+	search = start;
+
+	while (1) {
+		if (search->content == CONTENTS_NOTE) {
+			for (column = 0; column < 4; column++) {
+				solveEnd(search, column);
+				solveMiddle(search, column);
+				solveStart(search, column);
+			}
+		}
+
+		search = search->next;
+		if (search->content == CONTENTS_END)break;
 	}
 
 	return;

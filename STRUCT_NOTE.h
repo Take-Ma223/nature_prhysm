@@ -29,6 +29,7 @@ enum class NoteColor : char
 };
 
 enum NoteGroup {
+	None = -1,//譜面エディタでのみ使用
 	Single = 0,//NoteGroup::Single
 	LongNoteStart = 1,//NoteGroup::LongNoteStart
 	LongNoteMiddle = 3,//NoteGroup::LongNoteMiddle

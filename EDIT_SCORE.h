@@ -34,7 +34,7 @@ void DecideProcessArea(AreaSelect* area, SCORE_CELL* end);
 
 void MirrorSelectArea(AreaSelect area);
 
-void SolveLN(SCORE_CELL* end);//LNの不整合を良い感じにする
+void SolveLN(SCORE_CELL* start, SCORE_CELL* end);//LNの不整合を良い感じにする
 
 void DeleteSelectArea(SCORE_CELL** insert, AreaSelect area);
 

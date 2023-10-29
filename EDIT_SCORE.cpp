@@ -2336,7 +2336,7 @@ wchar_t* generateRow(note_data& note) {
 			isLnNode[3] ? note_to_char(note.color[3], NoteGroup::Single, false, false): L'0'
 		);
 	}
-	wchar_t resultText[12] = L"";
+	static wchar_t resultText[12] = L"";//Releaseビルドで参照できなくなるのでstaticで宣言
 	sprintfDx(resultText, L"%s%c%s",noteText,colon,glnText);
 	return resultText;
 }

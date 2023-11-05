@@ -136,6 +136,20 @@ void SONG_SELECT(int *l_n,
 
 	int H_OPTION_NOTE_PREVIEW[2];
 
+	TransValue coverAlpha = TransValue(&context);
+	auto coverAlphaOpen = [&coverAlpha] {
+		coverAlpha.clearEvent();
+		coverAlpha.value = 255;
+		coverAlpha.eChange(255, 128, Converter(ConvertMode::Linear), 0, 500);
+		coverAlpha.play();
+	};
+	auto coverAlphaClose = [&coverAlpha] {
+		coverAlpha.clearEvent();
+		coverAlpha.value = 128;
+		coverAlpha.eChange(128, 255, Converter(ConvertMode::Linear), 0, 500);
+		coverAlpha.play();
+	};
+
 	TransValue viewAlpha = TransValue(&context);
 	viewAlpha.value = 0;
 	bool isViewAlphaAnimationRun = false;
@@ -145,6 +159,8 @@ void SONG_SELECT(int *l_n,
 		viewAlpha.clearEvent();
 		viewAlpha.eChange(Point(0), Point(255), Converter(ConvertMode::Linear), 0, 500);
 		viewAlpha.play();
+
+		coverAlphaOpen();
 	};
 
 	int SH_CLOSE;
@@ -178,9 +194,6 @@ void SONG_SELECT(int *l_n,
 	const int FLAG_CLOSING_STATE = 2;
 	const int FLAG_END_FUNCTION_STATE = 3;
 	int flag = FLAG_OPENING_STATE;
-
-
-
 
 	int Column = config.SongSelectRowNumber - 1;//バナーの縦の列数(RowNumber) -1(実際に並ぶのはColumn+1個) 偶数にする
 	wchar_t *title_buf[20 + 1] = {NULL,NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -1387,6 +1400,7 @@ void SONG_SELECT(int *l_n,
 	
 	while (1) {
 		appContext.updateTime();
+		coverAlpha.process();
 
 		if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE && flag != FLAG_END_FUNCTION_STATE) {//ESCでゲーム終了
 			dxLibFinishProcess();
@@ -1728,6 +1742,7 @@ void SONG_SELECT(int *l_n,
 									) {
 									flag = FLAG_CLOSING_STATE;
 									PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+									coverAlphaClose();
 								}
 								else {
 									PlaySoundMem(SH_NO, DX_PLAYTYPE_BACK, TRUE);//選曲不可
@@ -1819,6 +1834,7 @@ void SONG_SELECT(int *l_n,
 							if (STList->Kind[list_number] != 2) {//内容が「フォルダ選択に戻る」じゃなくて「コース」のとき
 								flag = FLAG_CLOSING_STATE;
 								PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+								coverAlphaClose();
 							}
 							else {//「フォルダ選択に戻る」を決定したとき
 								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
@@ -2254,7 +2270,10 @@ void SONG_SELECT(int *l_n,
 				jacket_alpha = 1;
 			}
 			if (jacket_alpha < 1 && CheckHandleASyncLoad(H_JACKET) == FALSE && jacket_show_counter == -2) {
-				jacket_alpha += 0.003;
+				if (Music[song_number].secret != 1 || secret->song_appear_number == song_number) {
+					//隠し曲ではないまたは隠し曲の出現中の時のみジャケットを表示する
+					jacket_alpha += 0.003;
+				}
 			}
 
 			if (SelectingTarget == SELECTING_FOLDER || SelectingTarget == SELECTING_COURSE) {//フォルダ,コースセレクト時
@@ -2907,7 +2926,7 @@ void SONG_SELECT(int *l_n,
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * jacket_alpha));
 
 			//ぼかしたジャケットで隙間を埋める
-
+			SetDrawArea(320, 96, 960, 624);//描画可能エリアを指定
 			if (Music[song_number].secret == 1 && secret->song_appear_number != song_number) {//隠し曲なら表示しない
 			  //表示しない
 			}
@@ -2920,6 +2939,7 @@ void SONG_SELECT(int *l_n,
 				//元のジャケット
 				DrawExtendGraph(int(center.x - jacketScale*(jacketSize.x / 2)), int(center.y - jacketScale*(jacketSize.y / 2)), int(center.x + jacketScale*(jacketSize.x / 2)), int(center.y + jacketScale*(jacketSize.y / 2)), H_JACKET, FALSE);
 			}
+			SetDrawArea(0, 0, 1280, 720);//描画可能エリアを元に戻す
 		}
 		SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
 
@@ -2928,8 +2948,7 @@ void SONG_SELECT(int *l_n,
 
 
 		for (i = 0; i <= Column; i++) {//画面真ん中領域の「フォルダ名、曲名」の後ろに置くバナーの表示
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-			if (i != Column / 2)SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(50 * jacket_alpha));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(100 * jacket_alpha));
 			//SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(155 * jacket_alpha));
 			int list_number_base_buf = number_ring(list_number_base + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1);
 
@@ -2955,17 +2974,14 @@ void SONG_SELECT(int *l_n,
 			if (SelectingTarget == SELECTING_SONG) {
 				if (season_banner_buf[i] != 0) {
 					//無季節じゃないなら
-
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-					if (i != Column / 2)SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150 - int(75 * jacket_alpha));
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150 - int(150 * jacket_alpha));
 					DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_SEASON[season_banner_buf[i] - 1], TRUE);
 					//バナー(季節の模様)に飾りを付ける
-
 					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-					if (i != Column / 2)SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(50 * jacket_alpha));
+					if (i != Column / 2)SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(100 * jacket_alpha));
 				}
 			}
-
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(100 * jacket_alpha));
 			DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_FLAME, TRUE);//バナーフレーム
 
 		}
@@ -2988,6 +3004,22 @@ void SONG_SELECT(int *l_n,
 		//printfDx(L"LOOP5.1:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
 
 
+		//キー操作指示表示
+		for (i = 1; i <= 2; i++) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+			DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(0 + 90 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_B, TRUE);//Bボタン
+			if (Key[Button[0][i]] >= 1) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+				DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(0 + 90 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_PRESS, TRUE);//Bボタン
+			}
+
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+			DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(688 - 90 - 7 + ((double)button_draw_counter - 1) * 32), H_BUTTON_R, TRUE);//Rボタン
+			if (Key[Button[2][i]] >= 1) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+				DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(688 - 90 - 7 + ((double)button_draw_counter - 1) * 32), H_BUTTON_PRESS, TRUE);//Rボタン
+			}
+		}
 
 		//SetFontSize(28);
 
@@ -3000,36 +3032,40 @@ void SONG_SELECT(int *l_n,
 				int sn_buf = folder->folder[folder->selected_folder]
 					[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
 
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(255 * jacket_alpha));//選択してる曲名以外非表示アニメーション
 
-				if (i != Column / 2) {
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(220 * jacket_alpha));//選択してる曲名以外薄く表示
-				}
-				else {
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-				}
 				//文字列を求める処理が重い
 				//title_buf[i];曲名の先頭ポインタが配列に格納されている
 				int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
 				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
-				/*
-				ShowExtendedStrFitToHandle(640, int(7 + 336 + (bn_draw_counter + i - Column / 2) * 48), 
-					title_buf[i] ,
-					title_width[i],
-					620,
-					FontHandle,
-					title_color[i], 
-					title_shadow_color[i]);//曲名描画
-				*/
+
 
 				if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == 1)) {//隠し曲が出現対象になっている
-					//Attack a Secret Song!の表示
-					SetDrawBright(brightness, brightness, brightness);//選択枠点滅
-					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(20 * jacket_alpha));
-					DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_FLAME_SECRET, TRUE);//選択枠
+					//Attack the Secret Song!の表示
+					SetDrawBright(brightness, brightness, brightness);//点滅
+					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(255 * jacket_alpha));
+					DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_FLAME_SECRET, TRUE);
 					SetDrawBright(255, 255, 255);
 					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 				}
+			}
 
+			//下部に選択中の曲名を表示
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255.0 * jacket_alpha));//ジャケット表示と同時に表示
+			int index = cycleIndex(Column / 2 + titleCycleIndex.index, config.SongSelectRowNumber);
+			DrawGraph(320, int(336 + (12 - Column / 2) * 48) - 48 + 48.0 * jacket_alpha, H_TITLE_STR[index], TRUE);
+
+			int list_number_base_buf = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+			int list_number_buf = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base_buf].index;
+			int sn_buf = folder->folder[folder->selected_folder]
+				[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
+
+			if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == 1)) {//隠し曲が出現対象になっている
+				//Attack the Secret Song!の表示
+				SetDrawBright(brightness, brightness, brightness);//点滅
+				DrawGraph(320, int(336 + (12 - Column / 2) * 48) - 48 + 48.0 * jacket_alpha, H_BANNER_FLAME_SECRET, TRUE);
+				SetDrawBright(255, 255, 255);
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 			}
 		}
 
@@ -3109,6 +3145,7 @@ void SONG_SELECT(int *l_n,
 
 		//アナウンス表示
 		if (SelectingTarget == SELECTING_FOLDER) {
+			SetDrawArea(328, 8, 953, 88);//描画可能エリアを指定
 			if (secret->song_appear_number != -1) {//隠し曲出現演出中
 				show_str(GetNowCount(), Announse_show_time_base, H_ANNOUNSE, 960, 32, secret->Announce_width);
 
@@ -3119,6 +3156,7 @@ void SONG_SELECT(int *l_n,
 
 				//show_str(GetNowCount(), Announse_show_time_base, StrAnnounce,      330 * 3, 32, AnnounceWidth, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 			}
+			SetDrawArea(0, 0, 1280, 720);//描画可能エリアを元に戻す
 		}
 
 		//実際のハイスピを決める
@@ -3187,7 +3225,7 @@ void SONG_SELECT(int *l_n,
 
 		SetDrawBright(brightness, brightness, brightness);//選択枠点滅
 		if (OptionOpen == 0) {//選曲のモードのとき
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(200 * jacket_alpha));
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(255 * jacket_alpha));
 			DrawGraph(320, 336, H_BANNER_SELECT, TRUE);//選択枠
 		}
 		SetDrawBright(255, 255, 255);
@@ -3208,6 +3246,7 @@ void SONG_SELECT(int *l_n,
 
 
 		if (SelectingTarget != SELECTING_COURSE) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, coverAlpha.value);
 			DrawGraph(0, 0, H_COVER[difficulty], TRUE);//カバー表示
 			DrawGraph(960, 0, H_COVER[difficulty], TRUE);//右側
 
@@ -3246,8 +3285,10 @@ void SONG_SELECT(int *l_n,
 			
 		}
 		else {//段位認定カバー
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, coverAlpha.value);
 			DrawGraph(0, 0, H_COVER_SKILL_TEST, TRUE);//カバー表示
 			DrawGraph(960, 0, H_COVER_SKILL_TEST, TRUE);//右側
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 			DrawGraph(960, 0, H_COVER_SKILL_TEST_POP, TRUE);//右側の文字
 		}
 
@@ -3694,22 +3735,6 @@ void SONG_SELECT(int *l_n,
 
 
 		//キー操作指示表示
-		for (i = 1; i <= 2; i++) {
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-			DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(0 + 90 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_B, TRUE);//Bボタン
-			if (Key[Button[0][i]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-				DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(0 + 90 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_PRESS, TRUE);//Bボタン
-			}
-
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-			DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(688 - 90 - 7 + ((double)button_draw_counter - 1) * 32), H_BUTTON_R, TRUE);//Rボタン
-			if (Key[Button[2][i]] >= 1) {
-				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
-				DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(688 - 90 - 7 + ((double)button_draw_counter - 1) * 32), H_BUTTON_PRESS, TRUE);//Rボタン
-			}
-		}
-
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415*button_draw_counter)  * c_m_draw_counter));
 		DrawGraph(int(320 - 16 - (button_draw_counter) * 320), 7 + 1, H_BUTTON_B, TRUE);//左Bボタン
 		if (Key[Button[0][0]] >= 1) {

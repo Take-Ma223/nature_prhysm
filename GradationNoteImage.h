@@ -53,6 +53,23 @@ public:
 
 	}
 
+	void createFadeInImage(NoteColor noteColor) {
+		int softImage = LoadSoftImage((rootPath + L"/" + fileName[(int)noteColor]).c_str());
+
+		for (int y = 0; y < 256; y++) {//透過グラデーション加工
+			for (int x = 0; x < 256; x++) {
+				int r = 0, g = 0, b = 0, a = 0;
+				GetPixelSoftImage(softImage, x, y, &r, &g, &b, &a);
+
+				double alphaRatio = ratioFunc(255 - y);
+				if (a != 0)DrawPixelSoftImage(softImage, x, y, r, g, b, alphaRatio * a);
+
+			}
+		}
+
+		H_LNOTE_GRAD_FADE_IN[(int)noteColor] = CreateGraphFromSoftImage(softImage);
+		DeleteSoftImage(softImage);
+	}
 
 	void createFadeOutImage(NoteColor noteColor) {
 		int softImage = LoadSoftImage((rootPath + L"/" + fileName[(int)noteColor]).c_str());
@@ -62,8 +79,8 @@ public:
 				int r = 0, g = 0, b = 0, a = 0;
 				GetPixelSoftImage(softImage, x, y, &r, &g, &b, &a);
 
-				double alphaRatio = (double)y / 255;
-				if (a != 0)DrawPixelSoftImage(softImage, x, y, r, g, b, alphaRatio*a);
+				double alphaRatio = 1 - ratioFunc(255 - y);
+				if (a != 0)DrawPixelSoftImage(softImage, x, y, r, g, b, alphaRatio * a);
 
 			}
 		}
@@ -72,22 +89,14 @@ public:
 		DeleteSoftImage(softImage);
 	}
 
-	void createFadeInImage(NoteColor noteColor) {
-		int softImage = LoadSoftImage((rootPath + L"/" + fileName[(int)noteColor]).c_str());
-
-		for (int y = 0; y < 256; y++) {//透過グラデーション加工
-			for (int x = 0; x < 256; x++) {
-				int r = 0, g = 0, b = 0, a = 0;
-				GetPixelSoftImage(softImage, x, y, &r, &g, &b, &a);
-
-				double alphaRatio = 1.0 - (double)y / 255;
-				if (a != 0)DrawPixelSoftImage(softImage, x, y, r, g, b, alphaRatio * a);
-
-			}
-		}
-
-		H_LNOTE_GRAD_FADE_IN[(int)noteColor] = CreateGraphFromSoftImage(softImage);
-		DeleteSoftImage(softImage);
+	/// <summary>
+	/// 0~1を返す
+	/// </summary>
+	/// <param name="input"></param>
+	/// <returns></returns>
+	double ratioFunc(double input) {
+		double pi = 3.14159265;
+		return pow(1.0 - (double)cos((pi / 2) * (input / 255)), 1.5);
 	}
 
 };

@@ -2258,8 +2258,9 @@ void GAME(int song_number, int difficulty,
 									note[i][j_n_n[i] - 1].hit = true;
 								}
 								if (debug_auto) {
+
 									flash_LED(hComm, note[i][j_n_n[i]], &LED_state, i, &dwWritten, &ovl);//コントローラのLEDを光らせる
-									if (note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init)PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
+									if (note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init && debug_sound)PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
 								}
 							}
 							else if (LN_flag[i] == LnFlag::Completed) {

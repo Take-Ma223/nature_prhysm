@@ -267,8 +267,9 @@ void GAME(int song_number, int difficulty,
 	int note_hit_large_flash_rounder = 0;//4個以内で順々にフラッシュを表示するためのカウンタ(0~3で回る)
 	double dnote_hit_flash[4] = { 0,0,0,0 };//黒ノートを叩いた時のフラッシュを表示するためのカウンタ
 	const int FLASH_VALUE = 100;//長音ノートの点滅輝度
-	const int FLASH_VALUE_ALWAYS = 70;//長音ノートの常時点滅輝度
+	const int FLASH_VALUE_ALWAYS = 40;//長音ノートの常時点滅輝度
 	const int FLASH_COVER_VALUE = 15;//カバーの点滅輝度
+	const int FLASH_VALUE_LN_PUSH = 50;
 
 	double hit_sky_perfect[4] = { 0,0,0,0 };//判定画像のSKY_PERFECTを表示するカウンタ
 	double hit_perfect[4] = { 0,0,0,0 };//判定画像のPERFECTを表示するカウンタ
@@ -3237,7 +3238,7 @@ void GAME(int song_number, int difficulty,
 							}
 
 							if (LN_flash[j] == 1 && j_n_n[j] - 1 == i) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
 
 								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);//白く光らせる
 							}
@@ -3252,7 +3253,7 @@ void GAME(int song_number, int difficulty,
 							SetDrawBlendMode(BlendMode, BlendVal);
 							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//LN始点の場合(始点下半分と中間を表示)
 							if (LN_flash[j] == 1 && j_n_n[j] - 1 == i && note[j][i].group == NoteGroup::LongNoteStart) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
 								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//LN始点の場合(始点下半分を表示)
 							}
 
@@ -3299,7 +3300,7 @@ void GAME(int song_number, int difficulty,
 
 
 							if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
 								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);//白く光らせる
 							}
 
@@ -3323,7 +3324,7 @@ void GAME(int song_number, int difficulty,
 
 
 							if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
 								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
 							}
 
@@ -3351,7 +3352,7 @@ void GAME(int song_number, int difficulty,
 
 							if (note[j][i].LN_k == 0) {//黒終端は光らせない
 								if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
-									SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
+									SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
 									DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
 								}
 
@@ -3399,7 +3400,7 @@ void GAME(int song_number, int difficulty,
 							//DrawRectExtendGraph
 							//DrawRect
 							if (LN_flash[j] == 1 && j_n_n[j] == i && note[j][i].group == NoteGroup::LongNoteEnd) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 60);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
 								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
 							}
 

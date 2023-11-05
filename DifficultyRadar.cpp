@@ -767,8 +767,10 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 					}
 				}
 
+				//中間、終端がGLNの場合は重みを変更
 				double weight = 
-					note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle || note[lane][noteIndex[lane]].group == NoteGroup::LongNoteEnd 
+					note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle ||
+					(note[lane][noteIndex[lane]].group == NoteGroup::LongNoteEnd && !note[lane][noteIndex[lane]].LN_k)
 					? 5 : 1;
 				lnDegrees += weight * sqrt(color2weight(color) * lnCount.getLnCountWithoutThisLane(lane));
 			}

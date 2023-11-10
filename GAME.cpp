@@ -2252,18 +2252,29 @@ void GAME(int song_number, int difficulty,
 								HitingNoteCount++; 
 							};
 
+							auto playHitSound = [&]() {
+								bool isColorDifferent = note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init;
+								if (isColorDifferent && note[i][j_n_n[i]].LN_k == false) {
+									//前と色が違う時のみ音を鳴らす(光る音符の音は使わない)
+									PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
+								}
+							};
+
 							if (note[i][j_n_n[i]].group == NoteGroup::LongNoteMiddle) {
 								if (LN_push[i] == 1) {
 									note[i][j_n_n[i]].group = NoteGroup::LongNoteStart;
 									note[i][j_n_n[i] - 1].hit = true;
+
+									if(isPushColor(note[i][j_n_n[i]].color_init, i))playHitSound();//既に中間ノートの色で押していたら音を鳴らす
 								}
 								if (debug_auto) {
-
 									flash_LED(hComm, note[i][j_n_n[i]], &LED_state, i, &dwWritten, &ovl);//コントローラのLEDを光らせる
 									if (note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init && debug_sound)PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
 								}
 							}
 							else if (LN_flag[i] == LnFlag::Completed) {
+								playHitSound();
+
 								if ((LN_judge[i] == 2 || LN_judge[i] == 3) && debug_auto != 1) {//PERFECT以上
 									TimePerfect++;
 
@@ -2710,7 +2721,7 @@ void GAME(int song_number, int difficulty,
 									if (debug_sound == 1) {
 										if (note[i][j_n_n[i]].group == NoteGroup::LongNoteMiddle || note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd) {
 											bool isColorDifferent = note[i][j_n_n[i]].color_init != note[i][j_n_n[i] - 1].color_init;
-											if(isColorDifferent && note[i][j_n_n[i]].LN_k == false)PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);
+											if(isColorDifferent && note[i][j_n_n[i]].LN_k == false)PlayHitSound(2, note[i][j_n_n[i]].color_init, false, SH);
 										}
 										else {
 											PlayHitSound(2, note[i][j_n_n[i]].color_init, note[i][j_n_n[i]].isBright, SH);

@@ -47,7 +47,9 @@ namespace OptionItem {
 		NONE,
 		RGB_CHANGE,
 		RGB_RAND,
+		RGB_RAND_PLUS,
 		SUPER_RAND,
+		SUPER_RAND_PLUS,
 		RGB_ONLY,
 		CMY_ONLY,
 		W_ONLY,
@@ -274,7 +276,7 @@ typedef struct Option {//オプション構造体(全体)
 	static const int SPEED_NUM = 78;//ハイスピの数
 	static const int GAUGE_NUM = 6;//ゲージ種類の数
 	static const int LANE_NUM = 4;//レーンオプションの数
-	static const int COLOR_NUM = 8;//色オプションの数
+	static const int COLOR_NUM = 10;//色オプションの数
 	static const int WINDBREAK_NUM = 11;//カバー位置オプションの数
 
 	static const int FAST_SLOW_NUM = 3;//FAST/SLOWオプションの数
@@ -463,7 +465,7 @@ typedef struct Option {//オプション構造体(全体)
 	
 	wchar_t* gauge[GAUGE_NUM + 1] = { L"NORMAL",L"HARD",L"SUPER HARD",L"FC ATTACK",L"PFC ATTACK",L"NO FAIL", L"SKILL TEST"};
 	wchar_t* lane[LANE_NUM] = { L"NONE",L"MIRROR",L"RANDOM",L"SUPER RAND" };
-	wchar_t* color[COLOR_NUM] = { L"NONE",L"RGB CHANGE",L"RGB RAND",L"SUPER RAND",L"RGB ONLY",L"CMY ONLY",L"W ONLY",L"RAINBOW" };
+	wchar_t* color[COLOR_NUM] = { L"NONE",L"RGB CHANGE",L"RGB RAND",L"RGB RAND+",L"SUPER RAND",L"SUPER RAND+",L"RGB ONLY",L"CMY ONLY",L"W ONLY",L"RAINBOW" };
 	wchar_t* windbreak[WINDBREAK_NUM] = { L"OFF",L"10%",L"20%",L"30%",L"40%",L"50%",L"60%",L"70%",L"80%",L"90%",L"100%" };
 
 	int windbreakVal[WINDBREAK_NUM] = {
@@ -687,7 +689,9 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t *sent_color[COLOR_NUM] = { L"オプションを付けません"
 		,L"音符全体のRGB値がランダムに入れ替わります"
 		,L"音符それぞれのRGB値がランダムに入れ替わります"
+		,L"音符それぞれのRGB値がランダムに入れ替わります(ロングノート終点も変化)"
 		,L"音符の色がランダムに変わります"
+		,L"音符の色がランダムに変わります(ロングノート終点も変化)"
 		,L"音符の色が赤,緑,青のみになります(スコアは保存されません)"
 		,L"音符の色が水色,紫,黄色のみになります(スコアは保存されません)"
 		,L"音符の色が白のみになります(スコアは保存されません)"

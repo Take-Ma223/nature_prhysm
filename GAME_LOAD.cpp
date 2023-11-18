@@ -1425,6 +1425,35 @@ void GAME_LOAD(int song_number,
 	if (Option->op.color == OptionItem::Color::RGB_RAND) {//RGB RAND
 
 		for (i = 0; i <= 3; i++) {
+			NoteColor latestColor = NoteColor::NONE;
+			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				lane = rand() % 6;//0~5
+				if (note[i][j].LN_k == true) {
+					note[i][j].color = note[i][j - 1].color;
+					note[i][j].color_init = note[i][j - 1].color_init;
+				}
+				else {
+					bool isLnMiddleOrEnd = (note[i][j].group_init == NoteGroup::LongNoteMiddle || note[i][j].group_init == NoteGroup::LongNoteEnd);
+					bool isLnSameColor = isLnMiddleOrEnd && (note[i][j].color == latestColor);
+					if (isLnMiddleOrEnd) {
+						if (isLnSameColor) {
+							note[i][j].color = note[i][j - 1].color;
+							note[i][j].color_init = note[i][j].color;
+							continue;
+						}
+					}
+					latestColor = note[i][j].color;
+					note[i][j].color = rgb_change[lane][(int)note[i][j].color];
+					note[i][j].color_init = note[i][j].color;
+				}
+			}
+		}
+	}
+
+	if (Option->op.color == OptionItem::Color::RGB_RAND_PLUS) {//RGB RAND+
+
+		for (i = 0; i <= 3; i++) {
+			NoteColor latestColor = NoteColor::NONE;
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 				lane = rand() % 6;//0~5
 				if (note[i][j].LN_k == true) {
@@ -1438,48 +1467,37 @@ void GAME_LOAD(int song_number,
 			}
 		}
 	}
-
-	/*
-	if (Option->op.color == 2) {//RGB RAND
-
-	for (i = 1; i <= 4; i++) {
-	for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-	lane = rand() % 3 + 1;//1~3
-	if (note[i][j].color >= 1 && note[i][j].color <= 3) {
-	note[i][j].color = lane;
-	note[i][j].color_init = note[i][j].color;
-	if (note[i][j].group == 1) {
-	j++;
-	note[i][j].color = lane;
-	note[i][j].color_init = note[i][j].color;
-	}
-	}
-	}
-	}
-	}
-	*/
-
-	/*
-	if (Option->op.color == 3) {//RGBCMY RAND
-
-	for (i = 1; i <= 4; i++) {
-	for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-	lane = rand() % 6 + 1;//1~6
-	if (note[i][j].color >= 1 && note[i][j].color <= 6) {
-	note[i][j].color = lane;
-	note[i][j].color_init = note[i][j].color;
-	if (note[i][j].group == 1) {
-	j++;
-	note[i][j].color = lane;
-	note[i][j].color_init = note[i][j].color;
-	}
-	}
-	}
-	}
-	}
-	*/
-
 	if (Option->op.color == OptionItem::Color::SUPER_RAND) {//SUPER RAND
+
+		for (i = 0; i <= 3; i++) {
+			NoteColor latestColor = NoteColor::NONE;
+			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
+				lane = rand() % 7 + 1;//1~7
+				if (note[i][j].color >= NoteColor::R && note[i][j].color <= NoteColor::W) {
+					if (note[i][j].LN_k == true) {
+						note[i][j].color = note[i][j - 1].color;
+						note[i][j].color_init = note[i][j - 1].color_init;
+					}
+					else {
+						bool isLnMiddleOrEnd = (note[i][j].group_init == NoteGroup::LongNoteMiddle || note[i][j].group_init == NoteGroup::LongNoteEnd);
+						bool isLnSameColor = isLnMiddleOrEnd && (note[i][j].color == latestColor);
+						if (isLnMiddleOrEnd) {
+							if (isLnSameColor) {
+								note[i][j].color = note[i][j - 1].color;
+								note[i][j].color_init = note[i][j].color;
+								continue;
+							}
+						}
+						latestColor = note[i][j].color;
+						note[i][j].color = (NoteColor)lane;
+						note[i][j].color_init = note[i][j].color;
+					}
+				}
+			}
+		}
+	}
+
+	if (Option->op.color == OptionItem::Color::SUPER_RAND_PLUS) {//SUPER RAND+
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {

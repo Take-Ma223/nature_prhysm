@@ -565,7 +565,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 			}
 
 			//’†ŠÔAI“_‚ÌF•Ï‰»‚Íd‚İ‚ğ•Ï‚¦‚é
-			double weight = (note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteEnd) ? 5 : 1;
+			double weight = (note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteEnd) ? 1 : 1;
 
 
 			if (ColorBuf[lane] != NoteColor) {//‘O‚Ì‰¹•„‚ÆF‚ªˆá‚¤
@@ -771,7 +771,7 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 				double weight = 
 					note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle ||
 					(note[lane][noteIndex[lane]].group == NoteGroup::LongNoteEnd && !note[lane][noteIndex[lane]].LN_k)
-					? 5 : 1;
+					? 1 : 1;
 				lnDegrees += weight * sqrt(color2weight(color) * lnCount.getLnCountWithoutThisLane(lane));
 			}
 		}

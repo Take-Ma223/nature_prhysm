@@ -332,9 +332,9 @@ void EDIT_SCORE(SCORE_CELL* head,
 	step_count_draw = step_count;
 
 	//フォント設定
-	ChangeFont(L"メイリオ");
+	ChangeFont(NATURE_PRHYSM_FONT);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(15);
+	SetFontSize(13);
 	SetFontThickness(9);
 
 	GAME_start_time = GetNowCount_d(config);//開始時のカウント

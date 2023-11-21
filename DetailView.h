@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "CONSTANT_VALUE.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ public:
 		alpha.value = 0;
 	}
 
-	FontInfo font = FontInfo(wstring(L"ÉÅÉCÉäÉI"), 17, 1, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo font = FontInfo(wstring(NATURE_PRHYSM_FONT), 15, 1, FontType::ANTIALIASING_EDGE_16X16);
 	//vector<TextView> detailText;
 
 	/// <summary>

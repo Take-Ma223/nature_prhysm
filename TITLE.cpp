@@ -22,6 +22,7 @@
 #include <EffekseerForDXLib.h>
 #include "DxLibUtil.h"
 #include "NPLoadSoundMem.h"
+#include "CONSTANT_VALUE.h"
 
 using namespace std;
 
@@ -123,10 +124,10 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	SH_TEST[2] = LoadSoundMem(L"sound/3.wav", 1);
 	*/
 
-	ChangeFont(L"メイリオ");
+	ChangeFont(NATURE_PRHYSM_FONT);
 	SetFontThickness(9);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(26);
+	SetFontSize(24);
 
 	GAME_start_time = GetNowCount_d(config);
 	Get_Key_State(Buf, Key, AC);

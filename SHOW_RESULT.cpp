@@ -796,9 +796,9 @@ void SHOW_RESULT(RESULT res,
 	int show_inst_flag = 1;//F11:左上の説明(DEBUG_MODE除く)を表示するフラグ(1:する 0:しない)
 
 	GAME_start_time = GetNowCount_d(config);
-	ChangeFont(L"メイリオ");
+	ChangeFont(NATURE_PRHYSM_FONT);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(35);
+	SetFontSize(31);
 	SetFontThickness(9);
 
 	int title_width = 1;

@@ -27,7 +27,7 @@ void TextView::setText(TextViewParam p) {
 		param.getString().length(),
 		fh.getHandle());
 
-	int height = fh.getSize() + 5;//小さいフォントサイズだと下が欠けるため縦サイズは1多めにとる
+	int height = fh.getSize() + 9;//小さいフォントサイズだと下が欠けるため縦サイズは多めにとる
 	//テキスト画像の用意
 	DeleteGraph(textImageHandle.getHandle());
 	int screenHandle = MakeScreen(width, height, TRUE);

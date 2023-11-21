@@ -996,8 +996,8 @@ void GAME(int song_number, int difficulty,
 
 	gauge_draw_counter = 0;
 
-	int FontHandleBpm = CreateFontToHandle(L"メイリオ", 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
-	int FontHandleCommon = CreateFontToHandle(L"メイリオ", 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
+	int FontHandleBpm = CreateFontToHandle(NATURE_PRHYSM_FONT, 24, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
+	int FontHandleCommon = CreateFontToHandle(NATURE_PRHYSM_FONT, 26, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
 
 	genre_width = GetDrawStringWidthToHandle(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]), FontHandleCommon);//ジャンル名の横の長さを入れる
 	title_width = GetDrawStringWidthToHandle(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]), FontHandleCommon);//曲名の横の長さを入れる

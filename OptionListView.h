@@ -8,6 +8,7 @@
 #include <memory>
 #include "NPTextView.h"
 #include "NPGradTextView.h"
+#include "CONSTANT_VALUE.h"
 
 using namespace std;
 
@@ -44,9 +45,11 @@ public:
 		
 
 
-			TextViewParam textViewParam = TextViewParam(option->OptionName[optionIndex], fontOptionName, optionNameColor);
+			NPTextViewParam textViewParam = NPTextViewParam(
+				option->OptionName[optionIndex], 
+				fontOptionName, optionNameColor, itemNameShadowColor);
 			drawableParam = DrawableInitParam(Cordinate(40, getYPos(i) + optionNameY), CenterRatio(0, 0.5));
-			listOptionName[i] = unique_ptr<TextView>(new TextView(this, c, textViewParam, drawableParam));
+			listOptionName[i] = unique_ptr<NPGradTextView>(new NPGradTextView(this, c, textViewParam, drawableParam));
 			if (i != rowCenterIndex)listOptionName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listOptionName[i].get());
 
@@ -190,14 +193,14 @@ private:
 
 	const int optionNameColor = GetColor(255, 255, 255);
 	const int itemNameColor = GetColor(160,160,160);
-	const int itemNameShadowColor = GetColor(0,0,0);
+	const int itemNameShadowColor = GetColor(32,32,32);
 
 	wstring themeStr1;
 	wstring themeStr2;
 
 	unique_ptr<Image> backGround;
 	vector<unique_ptr<Image>> listFrame = vector<unique_ptr<Image>>(rowCount);
-	vector<unique_ptr<TextView>> listOptionName = vector<unique_ptr<TextView>>(rowCount);
+	vector<unique_ptr<NPGradTextView>> listOptionName = vector<unique_ptr<NPGradTextView>>(rowCount);
 	vector<unique_ptr<NPGradTextView>> listItemName = vector<unique_ptr<NPGradTextView>>(rowCount);
 
 	unique_ptr<Image> title;
@@ -205,8 +208,8 @@ private:
 	unique_ptr<Image> arrowLeft;
 	unique_ptr<Image> arrowRight;
 
-	FontInfo fontOptionName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
-	FontInfo fontItemName = FontInfo(wstring(L"メイリオ"), 25, 9, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo fontOptionName = FontInfo(wstring(NATURE_PRHYSM_FONT), 21, 9, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo fontItemName = FontInfo(wstring(NATURE_PRHYSM_FONT), 20, 9, FontType::ANTIALIASING_EDGE_16X16);
 
 	Option* option;
 
@@ -268,9 +271,9 @@ private:
 	void updateOptionName(int listIndex, int optionIndex)
 	{
 		listOptionName[listIndex].get()->setText(
-			TextViewParam(
+			NPTextViewParam(
 				option->OptionName[optionIndex],
-				fontOptionName, optionNameColor)
+				fontOptionName, optionNameColor, itemNameShadowColor)
 		);
 	}
 

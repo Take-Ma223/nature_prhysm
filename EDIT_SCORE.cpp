@@ -1115,7 +1115,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 								if (putflag == 1) {//音符を置いていたとき
 									if (find_next != NULL && find_before != NULL) {
 										if (find_next->data.note.group[j] == NoteGroup::LongNoteMiddle || find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//LNの中に音符を置いていたとき
-											score_cell_write_note(insert, j, insert->data.note.color[j], NoteGroup::LongNoteMiddle, insert->data.note.isBright[j]);//この音符をLN始点にする
+											score_cell_write_note(insert, j, insert->data.note.color[j], NoteGroup::LongNoteMiddle, insert->before->data.note.isBright[j]);//この音符をLN中間点にする (光るかどうかは直前の音符と合わせる)
 										}
 									}
 								}

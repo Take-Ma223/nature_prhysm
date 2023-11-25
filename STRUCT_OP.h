@@ -18,6 +18,7 @@ namespace OptionItem {
 		TARGETSCORE2,
 		THEME,
 		NOTE,
+		NOTE_TEXT,
 		HITSOUND,
 		HITSOUNDVOL,
 		FXSOUNDVOL,
@@ -210,6 +211,8 @@ namespace OptionItem {
 }
 
 typedef struct OP {//オプション構造体(ロード時に渡す値)
+	//並び順を変えると以前のセーブデータが読み込めなくなります
+
 	int speed = 11;//ハイスピード番号
 	double speedVal = 1;//ハイスピ倍率
 	OptionItem::Gauge gauge = OptionItem::Gauge::NORMAL;//ゲージタイプ(0:ノーマルゲージ(青) 1:ハードゲージ(緑) 2:スーパーハードゲージ(赤) 3:FCゲージ(銀) 4:PFCゲージ(金))
@@ -232,18 +235,39 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItem::HitSoundVol hitSoundVol = OptionItem::HitSoundVol::Vol_100;//ヒット音音量
 	OptionItem::FxSoundVol fxSoundVol = OptionItem::FxSoundVol::Vol_100;//効果音音量
 	OptionItem::BgmSoundVol bgmSoundVol = OptionItem::BgmSoundVol::Vol_100;//曲の音量
-
-
 	OptionItem::Movie movie = OptionItem::Movie::ON_NORMAL;//ムービー再生方法
-
+	int noteText = 0;//音符テキストスキン
 }OP;
 
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 21;//オプションの数
+	static const int OPTION_NUM = 22;//オプションの数
 
-	wchar_t* OptionName[OPTION_NUM] = { L"SPEED",L"GAUGE",L"LANE",L"COLOR",L"WINDBREAK",L"FAST/SLOW",L"BARLINE",L"NIGHT",L"GRADATION",L"NOTE OFFSET",L"SCORE GRAPH",L"TARGET SCORE1",L"TARGET SCORE2",L"THEME",L"NOTE",L"HIT SOUND",L"HIT SOUND VOL",L"FX VOL",L"BGM VOL",L"MOVIE",L"SORT"};
+	wchar_t* OptionName[OPTION_NUM] = { 
+		L"SPEED",
+		L"GAUGE",
+		L"LANE",
+		L"COLOR",
+		L"WINDBREAK",
+		L"FAST/SLOW",
+		L"BARLINE",
+		L"NIGHT",
+		L"GRADATION",
+		L"NOTE OFFSET",
+		L"SCORE GRAPH",
+		L"TARGET SCORE1",
+		L"TARGET SCORE2",
+		L"THEME",
+		L"NOTE",
+		L"NOTE TEXT",
+		L"HIT SOUND",
+		L"HIT SOUND VOL",
+		L"FX VOL",
+		L"BGM VOL",
+		L"MOVIE",
+		L"SORT"
+	};
 
 	OptionItem::BannerColor bannerColor[OPTION_NUM] = {
 		OptionItem::BannerColor::GREEN,
@@ -262,6 +286,7 @@ typedef struct Option {//オプション構造体(全体)
 		OptionItem::BannerColor::RED,
 		OptionItem::BannerColor::RED,
 
+		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
@@ -289,6 +314,8 @@ typedef struct Option {//オプション構造体(全体)
 	static const int TARGET_SCORE1_NUM = 8;//スコアグラフターゲットオプションの数
 	static const int TARGET_SCORE2_NUM = 6;//スコアグラフターゲットオプションの数
 	int NOTE_NUM = 0;//ノートスキンオプションの数
+	int NOTE_TEXT_NUM = 0;//ノートテキストスキンオプションの数
+
 	int HITSOUND_NUM = 0;//ヒット音オプションの数
 	static const int SORT_NUM = 26;//曲ソート種類の数
 	int THEME_NUM = 0;//テーマオプションの数
@@ -483,6 +510,7 @@ typedef struct Option {//オプション構造体(全体)
 	};
 
 	wchar_t** note = 0;//名前はフォルダ名から取る パスの役割も果たす
+	wchar_t** noteText = 0;//名前はフォルダ名から取る パスの役割も果たす
 	wchar_t** hitSound = 0;//名前はフォルダ名から取る パスの役割も果たす
 	wchar_t* fastSlow[FAST_SLOW_NUM] = { L"OFF",L"ON:C/R",L"ON:R/C" };
 	wchar_t* barline[BARLINE_NUM] = { L"ON",L"OFF"};
@@ -711,6 +739,7 @@ typedef struct Option {//オプション構造体(全体)
 		,L"レーンカバーを100%下げて演奏開始します"};//説明文
 
 	wchar_t *sent_note = L"音符を変更します";
+	wchar_t *sent_note_text = L"音符に表示する文字を変更します";
 
 	wchar_t *sent_hitSound = L"音符を叩いた時の音を変更します";
 
@@ -898,6 +927,7 @@ typedef struct Option {//オプション構造体(全体)
 		&TARGET_SCORE2_NUM,
 		&THEME_NUM,
 		&NOTE_NUM,
+		&NOTE_TEXT_NUM,
 		&HITSOUND_NUM,
 		&HIT_SOUND_VOL_NUM,
 		&FX_SOUND_VOL_NUM,
@@ -921,6 +951,7 @@ typedef struct Option {//オプション構造体(全体)
 		sent_targetScore2,
 		&sent_theme,
 		&sent_note,
+		&sent_note_text,
 		&sent_hitSound,
 		sent_hit_sound_vol,
 		sent_fx_sound_vol,
@@ -944,6 +975,7 @@ typedef struct Option {//オプション構造体(全体)
 		targetScore2,
 		theme,
 		note,
+		noteText,
 		hitSound,
 		hitSoundVol,
 		fxSoundVol,
@@ -967,6 +999,7 @@ typedef struct Option {//オプション構造体(全体)
 		(int*)&(op.targetScore2),
 		&(op.theme),
 		&(op.note),
+		&(op.noteText),
 		&(op.hitSound),
 		(int*)&(op.hitSoundVol),
 		(int*)&(op.fxSoundVol),

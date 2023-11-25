@@ -213,6 +213,7 @@
     <ClCompile Include="GradationNoteImage.cpp" />
     <ClCompile Include="LearningDataGenarator.cpp" />
     <ClCompile Include="NoteJudgeProcessor.cpp" />
+    <ClCompile Include="NoteTextImage.cpp" />
     <ClCompile Include="NPGradTextView.cpp" />
     <ClCompile Include="NPLoadSoundMem.cpp" />
     <ClCompile Include="NPTextView.cpp" />
@@ -301,6 +302,7 @@
     <ClInclude Include="GradationNoteImage.h" />
     <ClInclude Include="LearningDataGenarator.h" />
     <ClInclude Include="NoteJudgeProcessor.h" />
+    <ClInclude Include="NoteTextImage.h" />
     <ClInclude Include="NPGradTextView.h" />
     <ClInclude Include="NPLoadSoundMem.h" />
     <ClInclude Include="NPTextView.h" />

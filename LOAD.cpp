@@ -470,7 +470,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 	SearchThemeSkin(op);
 	SearchNoteSkin(op);
 	SearchHitSoundSkin(op);
-
+	SearchNoteTextSkin(op);
 
 	//最後のプレーのオプション読み込み
 	LoadOptionState(op);
@@ -675,3 +675,52 @@ void SearchHitSoundSkin(Option *op) {//ヒット音スキン読み込み
 	}
 }
 
+
+void SearchNoteTextSkin(Option* op) {//ノートテキストスキン読み込み
+	vector<wstring> list = getSkinFolderList(wstring(L"img/note_text"));
+
+	op->NOTE_TEXT_NUM = list.size();
+	//メモリ確保(ノートスキンの種類分)
+	op->noteText = new wchar_t* [op->NOTE_TEXT_NUM];
+
+	op->ArrayOptionKindName[(int)OptionItem::Name::NOTE_TEXT] = op->noteText;
+
+	int i = 0;
+	for (const auto& e : list) {
+		//文字列分のメモリ確保
+		int len = wcslen(e.c_str());
+		op->noteText[i] = new wchar_t[len + 1];//終端文字分を考えて文字数+1のメモリを取る
+		//文字列格納
+		sprintfDx(op->noteText[i], L"%s", e.c_str());
+		i++;
+	}
+}
+
+
+/// <summary>
+/// Pathに含まれるフォルダリストを取得
+/// </summary>
+/// <param name="path"></param>
+/// <returns></returns>
+vector<wstring> getSkinFolderList(wstring path) {
+	vector<wstring> pathList;
+
+	HANDLE hFind_HitSounds = 0;//見つける用ハンドル
+	WIN32_FIND_DATA lp;
+
+	hFind_HitSounds = FindFirstFile((path + L"/*").c_str(), &lp);//フォルダの最初の探索
+	do {
+		if (ProcessMessage() != 0) {
+			dxLibFinishProcess();
+		}
+		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
+			pathList.push_back(lp.cFileName);
+		}
+	} while (FindNextFile(hFind_HitSounds, &lp));//何も見つからなかったら0になりループを抜ける
+	if (FindClose(hFind_HitSounds) == 0) {
+		ShowError(L"フォルダがありません。");
+		dxLibFinishProcess();
+	}
+
+	return pathList;
+}

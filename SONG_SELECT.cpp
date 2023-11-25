@@ -4095,6 +4095,9 @@ void DrawOptionSentence(Option* Option, OptionItem::Name option_select, Config c
 	else if (option_select == OptionItem::Name::THEME) {
 		StrAddress = Option->ArrayOptionSent[(int)OptionItem::Name::THEME][0];
 	}
+	else if (option_select == OptionItem::Name::NOTE_TEXT) {
+		StrAddress = Option->ArrayOptionSent[(int)OptionItem::Name::NOTE_TEXT][0];
+	}
 	else {
 		StrAddress = Option->ArrayOptionSent[(int)option_select][*(Option->ArrayValue[(int)option_select])];
 	}

@@ -40,6 +40,7 @@
 #include "NPLoadSoundMem.h"
 #include "NoteJudgeProcessor.h"
 #include "GradationNoteImage.h"
+#include "NoteTextImage.h"
 
 using namespace std;
 
@@ -592,6 +593,7 @@ void GAME(int song_number, int difficulty,
 	H_JUDGE_AREA_PAINT = LoadGraph(tmpPath);
 
 	GradationNoteImage gradationLongNote(wstring(L"img/notes/")+wstring(option->note[option->op.note]));
+	NoteTextImage noteText(wstring(L"img/note_text/") + wstring(option->noteText[option->op.noteText]));
 
 	int Keylist[3][4] = { { Button[0][0],Button[0][1],Button[0][2],Button[0][3] },
 	{ Button[1][0],Button[1][1],Button[1][2],Button[1][3] },
@@ -3431,6 +3433,64 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
+		for (j = 0; j <= 3; j++) {
+			for (i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツテキストの描画
+				if (note[j][i].fall == NoteFall::Faling) {
+					if (note[j][i].group == NoteGroup::Single) {
+						SetDrawBlendMode(BlendMode, BlendVal);
+
+						DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color], TRUE);//単ノートの場合
+
+					}
+
+					if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
+						int endInd = i;
+						try {
+							endInd = noteSearcher.searchLnEnd(j, i);
+						}
+						catch (exception) {
+
+						}
+
+						//各LNノードは自身と上のノーツまでの中間部分を描画
+						if (note[j][i].y >= note[j][endInd].y) {//始点が終点より下にある場合
+							//LN中間表示
+							SetDrawBlendMode(BlendMode, BlendVal);
+							DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						}
+						else {////始点が終点より上にある場合
+							SetDrawBlendMode(BlendMode, BlendVal);
+
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						}
+					}
+					if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
+						if (note[j][i].y >= note[j][i + 1].y) {//次が自身より上にある場合
+							//LN中間表示
+							SetDrawBlendMode(BlendMode, BlendVal);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						}
+						else {//次が自身より下にある場合
+							//LN中間表示
+							SetDrawBlendMode(BlendMode, BlendVal);
+							if (note[j][i].color_init != note[j][i + 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						}
+					}
+					if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
+						int startInd = noteSearcher.searchLnStart(j, i);
+						if (note[j][startInd].y >= note[j][i].y) {//始点が終点より下にある場合
+							SetDrawBlendMode(BlendMode, BlendVal);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						}
+						else {//始点が終点より上にある場合
+							SetDrawBlendMode(BlendMode, BlendVal);
+							DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						}
+					}
+
+				}
+			}
+		}
 
 
 		int sideCoverAlphaRatioGeneral = 195;

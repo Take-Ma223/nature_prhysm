@@ -90,17 +90,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		SetUseASIODriverIndex(config.AsioDriver);
 		SetEnableASIOFlag(TRUE, config.Buffer);
 	}
-	
-
-	// フォントのロード
-	LPCWSTR font_path = L"res/font/mgenplus-1c-bold.ttf"; // 読み込むフォントファイルのパス
-	if (AddFontResourceEx(font_path, FR_PRIVATE, NULL) > 0) {
-	}
-	else {
-		// フォント読込エラー処理
-		MessageBox(NULL, L"フォント読込失敗", L"", MB_OK);
-	}
-
 
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{

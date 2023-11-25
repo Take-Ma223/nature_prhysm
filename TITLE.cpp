@@ -127,7 +127,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	ChangeFont(NATURE_PRHYSM_FONT);
 	SetFontThickness(9);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(24);
+	SetFontSize(26);
 
 	GAME_start_time = GetNowCount_d(config);
 	Get_Key_State(Buf, Key, AC);

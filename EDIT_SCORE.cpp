@@ -64,6 +64,9 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 	int H_JUDGE_AREA, H_BG;//画像データのハンドル
 
+	int H_GLN;//画像データのハンドル
+
+
 	GAME_SH SH;
 	int SH_STEP_CHANGE;
 	int SH_STEP_INC_DEC;
@@ -180,6 +183,9 @@ void EDIT_SCORE(SCORE_CELL* head,
 	int H_STOP_NUMBER[10];
 	int H_MEASURE_NUMBER[10];
 	*/
+
+	H_GLN = LoadGraph(L"img/edit/gln.png");
+
 	int digit[5] = { 0,0,0,0,0 };
 
 	wchar_t command_show_str[100];
@@ -334,7 +340,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	//フォント設定
 	ChangeFont(NATURE_PRHYSM_FONT);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(13);
+	SetFontSize(15);
 	SetFontThickness(9);
 
 	GAME_start_time = GetNowCount_d(config);//開始時のカウント
@@ -1656,7 +1662,6 @@ void EDIT_SCORE(SCORE_CELL* head,
 								);
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 							}
-
 						}
 						else if (show->data.note.group[i] == NoteGroup::LongNoteEnd) {//LN終点
 							//上半分描画
@@ -1688,7 +1693,21 @@ void EDIT_SCORE(SCORE_CELL* head,
 			show = show->before;
 		}
 
+		//GLN文字描画
+		show = end;
+		while (show->step != -1) {//endからheadまで描画
+			if (show->content == CONTENTS_NOTE) {
+				for (i = 0; i <= 3; i++) {
+					if (show->data.note.color[i] != NoteColor::NONE) {//音符があったら
+						if (show->data.note.group[i] == NoteGroup::LongNoteMiddle) {//LN中間
+							DrawGraph(lane[i] - 14, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 7 + 0.5), H_GLN, TRUE);
+						}
+					}
+				}
+			}
 
+			show = show->before;
+		}
 
 
 		//命令描画
@@ -1717,12 +1736,52 @@ void EDIT_SCORE(SCORE_CELL* head,
 		sprintfDx(command_show_str, L"LETBPM");
 		DrawString(958, 700, command_show_str, GetColor(255, 255, 255));
 
-		sprintfDx(command_show_str, L"SC");
-		DrawString(1095, 700, command_show_str, GetColor(255, 255, 255));
+		sprintfDx(command_show_str, L"SCROLL");
+		DrawString(1072, 700, command_show_str, GetColor(255, 255, 255));
 
 		sprintfDx(command_show_str, L"SCBPM");
 		DrawString(1188, 700, command_show_str, GetColor(255, 255, 255));
 
+		if (command_put == COMMAND_KIND_MEASURE) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(0, 0, 229, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		}
+		else if (command_put == COMMAND_KIND_STOPSTEP) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(229, 0, 342, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		}
+		else if (command_put == COMMAND_KIND_STOP) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(342, 0, 455, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		}
+		else if (command_put == COMMAND_KIND_HS) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(455, 0, 824, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		}
+		else if (command_put == COMMAND_KIND_BPM) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(824, 0, 937, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		}
+		else if (command_put == COMMAND_KIND_LETBPM) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(937, 0, 1050, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		}
+		else if (command_put == COMMAND_KIND_SCROLL) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(1050, 0, 1163, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		}
+		else if (command_put == COMMAND_KIND_SCROLL_BPM) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+			DrawBox(1163, 0, 1280, 720, GetColor(255, 255, 255), true);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
+		};
 
 		show = end;
 		while (show->step != -1) {//endからheadまで描画

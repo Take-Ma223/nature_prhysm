@@ -57,7 +57,7 @@ public:
 			NPTextViewParam itemNameTextViewParam = NPTextViewParam(
 				option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
 				fontItemName, itemNameColor, itemNameShadowColor);
-			drawableParam = DrawableInitParam(Cordinate(162, getYPos(i)), CenterRatio(0.5, 0.5));
+			drawableParam = DrawableInitParam(Cordinate(162, getYPos(i) + selectingOptionY), CenterRatio(0.5, 0.5));
 			listItemName[i] = unique_ptr<NPGradTextView>(new NPGradTextView(this, context, itemNameTextViewParam, drawableParam));
 			if (i != rowCenterIndex)listItemName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listItemName[i].get());
@@ -186,6 +186,7 @@ private:
 
 
 	static const int optionNameY = -35;
+	static const int selectingOptionY = 4;
 
 	bool isSkillTestMode = false;
 	static const int defaultBrightness = 255;
@@ -209,7 +210,7 @@ private:
 	unique_ptr<Image> arrowRight;
 
 	FontInfo fontOptionName = FontInfo(wstring(NATURE_PRHYSM_FONT), 21, 9, FontType::ANTIALIASING_EDGE_16X16);
-	FontInfo fontItemName = FontInfo(wstring(NATURE_PRHYSM_FONT), 20, 9, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo fontItemName = FontInfo(wstring(NATURE_PRHYSM_FONT), 22, 9, FontType::ANTIALIASING_EDGE_16X16);
 
 	Option* option;
 
@@ -316,7 +317,7 @@ private:
 
 			listFrame[listIndex].get()->Y.value = getYPos(i) + moveRatio.value;
 			listOptionName[listIndex].get()->Y.value = getYPos(i) + moveRatio.value + optionNameY;
-			listItemName[listIndex].get()->Y.value = getYPos(i) + moveRatio.value;
+			listItemName[listIndex].get()->Y.value = getYPos(i) + moveRatio.value + selectingOptionY;
 		}
 	};
 

@@ -20,6 +20,6 @@ constexpr auto SONG_MAX_NUMBER = 9999;//最大曲数
 
 const wchar_t RUN_PASS[] = L"223210";
 
-#define NATURE_PRHYSM_FONT L"Mgen+ 1c bold"
+#define NATURE_PRHYSM_FONT L"メイリオ"
 
 #endif

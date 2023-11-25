@@ -798,7 +798,7 @@ void SHOW_RESULT(RESULT res,
 	GAME_start_time = GetNowCount_d(config);
 	ChangeFont(NATURE_PRHYSM_FONT);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(31);
+	SetFontSize(35);
 	SetFontThickness(9);
 
 	int title_width = 1;

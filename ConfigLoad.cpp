@@ -202,7 +202,15 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 	}
 
 	if (config->Vsync == TRUE) {
-		config->Fps = 60;
+		//ディスプレイのリフレッシュレートを設定する 通常は60 モニタによって120など
+		int RefreshRate;
+		HDC hdc;
+
+		hdc = GetDC(GetMainWindowHandle());	// デバイスコンテキストの取得
+		RefreshRate = GetDeviceCaps(hdc, VREFRESH);	// リフレッシュレートの取得
+		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
+
+		config->Fps = RefreshRate;
 	}
 
 	FileRead_close(fp);

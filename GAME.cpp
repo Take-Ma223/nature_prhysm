@@ -3478,7 +3478,10 @@ void GAME(int song_number, int difficulty,
 					}
 					if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
 						int startInd = noteSearcher.searchLnStart(j, i);
-						if (note[j][startInd].y >= note[j][i].y) {//始点が終点より下にある場合
+						if (note[j][i].LN_k = true) {
+							SetDrawBlendMode(BlendMode, BlendVal);
+							DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)NoteColor::K], TRUE);
+						}else if (note[j][startInd].y >= note[j][i].y) {//始点が終点より下にある場合
 							SetDrawBlendMode(BlendMode, BlendVal);
 							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}

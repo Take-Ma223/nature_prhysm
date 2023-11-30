@@ -12,7 +12,6 @@ extern void LOAD(LIST *, Song *, int *, SECRET *, SkillTestList *, Option *op, C
 extern void SearchThemeSkin(Option* op);
 extern void SearchNoteSkin(Option *op);
 extern void SearchHitSoundSkin(Option *op);
-extern void SearchNoteTextSkin(Option* op);
 
 vector<wstring> getSkinFolderList(wstring path);
 

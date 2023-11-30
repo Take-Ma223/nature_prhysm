@@ -18,7 +18,6 @@ namespace OptionItem {
 		TARGETSCORE2,
 		THEME,
 		NOTE,
-		NOTE_TEXT,
 		HITSOUND,
 		HITSOUNDVOL,
 		FXSOUNDVOL,
@@ -236,13 +235,12 @@ typedef struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItem::FxSoundVol fxSoundVol = OptionItem::FxSoundVol::Vol_100;//効果音音量
 	OptionItem::BgmSoundVol bgmSoundVol = OptionItem::BgmSoundVol::Vol_100;//曲の音量
 	OptionItem::Movie movie = OptionItem::Movie::ON_NORMAL;//ムービー再生方法
-	int noteText = 0;//音符テキストスキン
 }OP;
 
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 22;//オプションの数
+	static const int OPTION_NUM = 21;//オプションの数
 
 	wchar_t* OptionName[OPTION_NUM] = { 
 		L"SPEED",
@@ -260,7 +258,6 @@ typedef struct Option {//オプション構造体(全体)
 		L"TARGET SCORE2",
 		L"THEME",
 		L"NOTE",
-		L"NOTE TEXT",
 		L"HIT SOUND",
 		L"HIT SOUND VOL",
 		L"FX VOL",
@@ -293,7 +290,6 @@ typedef struct Option {//オプション構造体(全体)
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
-		OptionItem::BannerColor::YELLOW,
 
 		OptionItem::BannerColor::CYAN,
 	};
@@ -314,7 +310,6 @@ typedef struct Option {//オプション構造体(全体)
 	static const int TARGET_SCORE1_NUM = 8;//スコアグラフターゲットオプションの数
 	static const int TARGET_SCORE2_NUM = 6;//スコアグラフターゲットオプションの数
 	int NOTE_NUM = 0;//ノートスキンオプションの数
-	int NOTE_TEXT_NUM = 0;//ノートテキストスキンオプションの数
 
 	int HITSOUND_NUM = 0;//ヒット音オプションの数
 	static const int SORT_NUM = 26;//曲ソート種類の数
@@ -510,7 +505,6 @@ typedef struct Option {//オプション構造体(全体)
 	};
 
 	wchar_t** note = 0;//名前はフォルダ名から取る パスの役割も果たす
-	wchar_t** noteText = 0;//名前はフォルダ名から取る パスの役割も果たす
 	wchar_t** hitSound = 0;//名前はフォルダ名から取る パスの役割も果たす
 	wchar_t* fastSlow[FAST_SLOW_NUM] = { L"OFF",L"ON:C/R",L"ON:R/C" };
 	wchar_t* barline[BARLINE_NUM] = { L"ON",L"OFF"};
@@ -739,7 +733,6 @@ typedef struct Option {//オプション構造体(全体)
 		,L"レーンカバーを100%下げて演奏開始します"};//説明文
 
 	wchar_t *sent_note = L"音符を変更します";
-	wchar_t *sent_note_text = L"音符に表示する文字を変更します";
 
 	wchar_t *sent_hitSound = L"音符を叩いた時の音を変更します";
 
@@ -757,8 +750,8 @@ typedef struct Option {//オプション構造体(全体)
 	,L"演奏画面の背景を100%暗くします" };//説明文
 
 	wchar_t* sent_blackGradation[BLACK_GRADATION_NUM] =
-	{ L"黒終端ロングノートをグラデーション表示にします",
-	  L"黒終端ロングノートをグラデーション表示にしません"
+	{ L"ロングノートをグラデーション表示にします",
+	  L"ロングノートをグラデーション表示にしません"
 	};
 
 	wchar_t* sent_noteOffset[NOTE_OFFSET_NUM] =
@@ -927,7 +920,6 @@ typedef struct Option {//オプション構造体(全体)
 		&TARGET_SCORE2_NUM,
 		&THEME_NUM,
 		&NOTE_NUM,
-		&NOTE_TEXT_NUM,
 		&HITSOUND_NUM,
 		&HIT_SOUND_VOL_NUM,
 		&FX_SOUND_VOL_NUM,
@@ -951,7 +943,6 @@ typedef struct Option {//オプション構造体(全体)
 		sent_targetScore2,
 		&sent_theme,
 		&sent_note,
-		&sent_note_text,
 		&sent_hitSound,
 		sent_hit_sound_vol,
 		sent_fx_sound_vol,
@@ -975,7 +966,6 @@ typedef struct Option {//オプション構造体(全体)
 		targetScore2,
 		theme,
 		note,
-		noteText,
 		hitSound,
 		hitSoundVol,
 		fxSoundVol,
@@ -999,7 +989,6 @@ typedef struct Option {//オプション構造体(全体)
 		(int*)&(op.targetScore2),
 		&(op.theme),
 		&(op.note),
-		&(op.noteText),
 		&(op.hitSound),
 		(int*)&(op.hitSoundVol),
 		(int*)&(op.fxSoundVol),

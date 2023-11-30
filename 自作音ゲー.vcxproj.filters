@@ -409,7 +409,7 @@
       <Filter>ソース ファイル\GAME</Filter>
     </ClCompile>
     <ClCompile Include="NoteTextImage.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\GAME</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -719,7 +719,7 @@
       <Filter>ソース ファイル\GAME</Filter>
     </ClInclude>
     <ClInclude Include="NoteTextImage.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\GAME</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

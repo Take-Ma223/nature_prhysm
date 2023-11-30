@@ -593,7 +593,7 @@ void GAME(int song_number, int difficulty,
 	H_JUDGE_AREA_PAINT = LoadGraph(tmpPath);
 
 	GradationNoteImage gradationLongNote(wstring(L"img/notes/")+wstring(option->note[option->op.note]));
-	NoteTextImage noteText(wstring(L"img/note_text/") + wstring(option->noteText[option->op.noteText]));
+	NoteTextImage noteText(config);
 
 	int Keylist[3][4] = { { Button[0][0],Button[0][1],Button[0][2],Button[0][3] },
 	{ Button[1][0],Button[1][1],Button[1][2],Button[1][3] },

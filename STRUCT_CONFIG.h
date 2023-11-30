@@ -33,6 +33,9 @@ typedef struct Config {//コンフィグデータ
 	int ComPort = 0;
 	int Editable = 0;
 	int UseAiPredictedDifficulty = 0;
+
+	int NoteText[9] = {0,0,0,0,0,0,0,0,0};
+
 } Config;
 
 #endif

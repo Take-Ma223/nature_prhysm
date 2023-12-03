@@ -159,5 +159,8 @@ def main():
 
 if __name__ == "__main__":
     if args.run == "223210":
-        main()
+        try:
+            main()
+        except ConnectionRefusedError as e:
+            print(e)
         get_player_name()

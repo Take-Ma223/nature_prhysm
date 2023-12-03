@@ -66,7 +66,9 @@ DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE*
 		}
 	}
 
-	for (i = 0; i < 9; i++) {//ŠeF‰¹•„”‚ð•½‹Ï–§“x‚É‚·‚é
+	rainbowDensity = (double)NotesAmount[NumberTranslation(NoteColor::F)] / (DifficultyRadar::time);
+
+	for (i = 0; i < 9; i++) {//ŠeF‰¹•„”‚ð•½‹Ï–§“x‚É‚µ‚Ä‘Î”‚ðŽæ‚é
 		NotesAmount[i] = int(200 * log10((double)NotesAmount[i] * 30000 / (DifficultyRadar::time)+1));
 	}
 
@@ -180,34 +182,19 @@ void DifficultyRadar::GetLocalNotesGraph(short* LocalNotesGraph) {
 int DifficultyRadar::NumberTranslation(NoteColor color) {
 	int val = (int)color;
 
-	switch (val)
-	{
-	default:
-		break;
-	case (int)NoteColor::Y:
-		val = 6;//y
-		break;
-	case (int)NoteColor::C:
-		val = 4;//y
-		break;
-	case (int)NoteColor::M:
-		val = 5;//y
-		break;
-	}
-
 	val--;//0~8‚É‚·‚é
 
 	return val;
 }
 
 
-int DifficultyRadar::CalcGlobal(int Rainbow) {
+int DifficultyRadar::CalcGlobal(bool isRainbow) {
 	double GlobalScore = 0;
 
-	if (Rainbow == 0) {
+	if (!isRainbow) {
 		GlobalScore = TotalNotes;
 	}
-	else if (Rainbow == 1) {
+	else{
 		GlobalScore = TotalNotesRainbow;
 	}
 
@@ -226,7 +213,7 @@ int DifficultyRadar::CalcGlobal(int Rainbow) {
 	return (int)(GlobalScore * 100 / globalMax);
 }
 
-int DifficultyRadar::CalcLocal(int Rainbow) {
+int DifficultyRadar::CalcLocal(bool isRainbow) {
 	double LocalScore = 0;
 	double LocalScoreBuf = 0;
 	double NoteCount = 0;
@@ -257,7 +244,7 @@ int DifficultyRadar::CalcLocal(int Rainbow) {
 	const int F = 3;
 
 	int NoteCountVal[4] = { 1,2,3,1 };
-	if (Rainbow == 1) {
+	if (isRainbow) {
 		NoteCountVal[RGB] = 1;
 		NoteCountVal[CMY] = 1;
 		NoteCountVal[W] = 1;
@@ -438,8 +425,9 @@ int DifficultyRadar::index(NOTE** note, int* nc, int* ncMax) {//’Tõ‚ðI‚¦‚Ä‚¢‚é
 	return index;
 }
 
-int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆÕ“x
+int DifficultyRadar::CalcColor(int StartTime, int EndTime, bool isRainbow) {//F“ïˆÕ“x
 	double ColorChangeCount = 0;
+	double blackDifficulty = 0;
 	int lane = 0, NoteCounter = 0;
 	NoteColor ColorBuf[4] = { NoteColor::NONE,NoteColor::NONE,NoteColor::NONE,NoteColor::NONE };
 	int LocalTime = EndTime - StartTime;
@@ -539,7 +527,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 	ColorBuf[1] = note[1][0].color;
 	ColorBuf[2] = note[2][0].color;
 	ColorBuf[3] = note[3][0].color;
-	if (Rainbow == 1) {
+	if (isRainbow) {
 		for (int i = 0; i <= 3; i++) {
 			if (ColorBuf[i] >= NoteColor::R && ColorBuf[i] <= NoteColor::W) {//•“øˆÈŠO‚Ì‰¹•„‚Í“ø‚Æ‚µ‚Äˆµ‚¤
 				ColorBuf[i] = NoteColor::F;
@@ -549,16 +537,16 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 	for (int i = 0; i <= 3; i++) {colorRingBuf.setThisLaneColor(i, ColorBuf[i]);}
 
 	NoteColor NoteColor = NoteColor::NONE;//¡Œ©‚Ä‚¢‚é‰¹•„‚ÌF
-	int k_flag = 0;//‘O‚Ì‰¹•„‚ª•‚¾‚Á‚½
+	int k_flag[4] = { 0,0,0,0 };//‘O‚Ì‰¹•„‚ª•‚¾‚Á‚½
 
 	serachNotesBFS([&](int lane, int index) {
 		if (note[lane][index].group == NoteGroup::LongNoteEnd && note[lane][index].LN_k == 1) {//•I“_‚ÌŽž
-			ColorChangeCount += 0.5;
-			k_flag = 1;
+			blackDifficulty += 0.5;
+			k_flag[lane] = 1;
 		}
 		else {//’Pƒm[ƒg‚©LNŽn“_‚©’†ŠÔƒm[ƒg
 			NoteColor = note[lane][index].color;
-			if (Rainbow == 1) {
+			if (isRainbow) {
 				if (NoteColor >= NoteColor::R && NoteColor <= NoteColor::W) {//“øƒ‚[ƒh‚Í•“øˆÈŠO‚Ì‰¹•„‚Í“ø‚Æ‚µ‚Äˆµ‚¤
 					NoteColor = NoteColor::F;
 				}
@@ -567,7 +555,9 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 			//’†ŠÔAI“_‚ÌF•Ï‰»‚Íd‚Ý‚ð•Ï‚¦‚é
 			double weight = (note[lane][index].group == NoteGroup::LongNoteMiddle || note[lane][index].group == NoteGroup::LongNoteEnd) ? 1 : 1;
 
-
+			if (NoteColor != NoteColor::K) {//kˆÈŠO
+				k_flag[lane] = 0;
+			}
 			if (ColorBuf[lane] != NoteColor) {//‘O‚Ì‰¹•„‚ÆF‚ªˆá‚¤
 				if (NoteColor != NoteColor::K) {//kˆÈŠO‚Åƒoƒbƒtƒ@‚ÉF•Û‘¶
 					colorRingBuf.setThisLaneColor(lane, NoteColor);
@@ -577,42 +567,53 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, int Rainbow) {//F“ïˆ
 					NoteColor == NoteColor::M) {//cmy‚È‚ç4”{‚Ìd‚Ý
 					ColorChangeCount += 4 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
-					k_flag = 0;
 				}
 				else if (NoteColor == NoteColor::W) {//w‚È‚ç2”{‚Ìd‚Ý
 					ColorChangeCount += 2 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
-					k_flag = 0;
 				}
-				else if (NoteColor == NoteColor::K && k_flag == 0) {//‘O‚ªkˆÈŠO‚Å¡‰ñk‚È‚ç0.5”{‚Ìd‚Ý
-					ColorChangeCount += 0.5;
-					k_flag = 1;
+				else if (NoteColor == NoteColor::K && k_flag[lane] == 0) {//‘O‚ªkˆÈŠO‚Å¡‰ñk‚È‚ç0.5”{‚Ìd‚Ý
+					double distance = note[lane][index].timing_real - note[lane][index - 1].timing_real + 1;
+					
+					blackDifficulty += 4 / (pow(distance * 0.01, 2) + 1);//‘O‚Ì‰¹•„‚É‹ß‚¢ˆÊ’u‚É‚ ‚é•ƒm[ƒc’öd‚Ý‚ð‘å‚«‚­‚·‚é(Å‘å4)
+					k_flag[lane] = 1;
 				}
 				else if (NoteColor == NoteColor::F) {//f‚È‚ç1”{‚Ìd‚Ý
 					ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
-					k_flag = 0;
 				}
 				else if (NoteColor == NoteColor::R ||
 					NoteColor == NoteColor::G ||
 					NoteColor == NoteColor::B) {//RGB‚Ìê‡‚Í1”{‚Ìd‚Ý
 					ColorBuf[lane] = NoteColor;
 					ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
-					k_flag = 0;
 				}
 			}
 		}
 
 
-	});
+	}); 
 
 	ColorChangeCount = (ColorChangeCount / ((double)LocalTime / 1000)) * 60;
 	ColorChangeCount *= 1.725;//‘å‚«‚³’²®
 	//ColorChangeCount = ColorChangeCount / TotalNotesK;//•ˆ–Ê’PˆÊ‚Å‚Ç‚ê‚¾‚¯F‚ª•¡ŽG‚©
+	
+	//•‰¹•„‚Ì“ï‚µ‚³‚Ìd‚Ý‚ª–Ú—§‚Â‚æ‚¤‚É‚·‚é
+	blackDifficulty = (log(blackDifficulty * 0.2 + 1) / log(2)) * 97;
+	
+	if (isRainbow) {
+		//‰½‚à‚µ‚È‚¢
+	}
+	else {
+		//•‰¹•„‚Ì“ï‚µ‚³‚Ì‰e‹¿“x‚ð1/9‚É‚·‚é
+		blackDifficulty = blackDifficulty*0.111;
+	}
 
-	return (int)(ColorChangeCount * 100 / colorMax);
+	double result = ColorChangeCount + blackDifficulty;
+
+	return (int)(result * 100 / colorMax);
 }
-int DifficultyRadar::CalcLongNote(int Rainbow) {
+int DifficultyRadar::CalcLongNote(bool isRainbow) {
 	int lane = 0;
 	double LN[4] = { 0,0,0,0 };//ŠeƒŒ[ƒ“‚ÌLN“x
 	int NoteCounter = 0;
@@ -623,10 +624,11 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 
 	int weight = 1;//‰¹•„‚ÌF‚Åd‚Ý•t‚¯ (RGB:1 CMY:2 W:3)
 	int WeightOfColor[3] = { 1,2,3 };//‚»‚ê‚¼‚ê‚Ì‰¹•„ƒOƒ‹[ƒv‚Ìd‚Ý
+
 	const int RGBF = 0;
 	const int CMY = 1;
 	const int W = 2;
-	if (Rainbow == 1) {
+	if (isRainbow) {
 		WeightOfColor[RGBF] = 1;
 		WeightOfColor[CMY] = 1;
 		WeightOfColor[W] = 1;
@@ -661,37 +663,37 @@ int DifficultyRadar::CalcLongNote(int Rainbow) {
 		}
 	}lnCount;
 
-	auto color2weight = [](NoteColor colorNumber) {
+	auto color2weight = [&WeightOfColor, &RGBF, &CMY, &W](NoteColor colorNumber) {
 		switch (colorNumber)
 		{
 		case NoteColor::NONE:
 			return 0;
 		case NoteColor::R:
-			return 1;
+			return WeightOfColor[RGBF];
 			break;
 		case NoteColor::G:
-			return 1;
+			return WeightOfColor[RGBF];
 			break;
 		case NoteColor::B:
-			return 1;
+			return WeightOfColor[RGBF];
 			break;
 		case NoteColor::Y:
-			return 2;
+			return WeightOfColor[CMY];
 			break;
 		case NoteColor::C:
-			return 2;
+			return WeightOfColor[CMY];
 			break;
 		case NoteColor::M:
-			return 2;
+			return WeightOfColor[CMY];
 			break;
 		case NoteColor::W:
-			return 3;
+			return WeightOfColor[W];
 			break;
 		case NoteColor::K:
 			return 0;
 			break;
 		case NoteColor::F:
-			return 1;
+			return WeightOfColor[RGBF];
 			break;
 		}
 	};

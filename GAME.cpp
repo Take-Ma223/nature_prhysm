@@ -3973,12 +3973,12 @@ void GAME(int song_number, int difficulty,
 
 			printfDx(L"\n");
 
-			printfDx(L"Global:%d\n", Cdiff.global);
-			printfDx(L"Local:%d\n", Cdiff.local);
-			printfDx(L"Chain:%d\n", Cdiff.chain);
-			printfDx(L"Unstability:%d\n", Cdiff.unstability);
-			printfDx(L"Streak:%d\n", Cdiff.longNote);
-			printfDx(L"Color:%d\n", Cdiff.color);
+			printfDx(L"Global:%d\n", Music[song_number].global[option->op.color == OptionItem::Color::RAINBOW][difficulty]);
+			printfDx(L"Local:%d\n", Music[song_number].local[option->op.color == OptionItem::Color::RAINBOW][difficulty]);
+			printfDx(L"Chain:%d\n", Music[song_number].chain[option->op.color == OptionItem::Color::RAINBOW][difficulty]);
+			printfDx(L"Unstability:%d\n", Music[song_number].unstability[option->op.color == OptionItem::Color::RAINBOW][difficulty]);
+			printfDx(L"Streak:%d\n", Music[song_number].longNote[option->op.color == OptionItem::Color::RAINBOW][difficulty]);
+			printfDx(L"Color:%d\n", Music[song_number].color[option->op.color == OptionItem::Color::RAINBOW][difficulty]);
 
 			printfDx(L"F11:EDIT\n");
 

@@ -11,14 +11,14 @@ public:
 	int NumberTranslation(NoteColor color);//rgbycmwdfの番号をrgbcmywdfに変換
 	void GetLocalNotesGraph(short* LocalNotesGraph);//局所降水量の9分割グラフを求める
 
-	int CalcGlobal(int Rainbow);//降水量(平均)
-	int CalcLocal(int Rainbow);//最大局所降水量
+	int CalcGlobal(bool isRainbow);//降水量(平均)
+	int CalcLocal(bool isRainbow);//最大局所降水量
 	int index(NOTE**, int*, int*);//CalcLocal用の現在のncから最も最初にある音符のindexを返す関数
 
-	int CalcColor(int StartTime, int EndTime, int Rainbow);//色変化度 (算出開始時間~算出終了時間)
+	int CalcColor(int StartTime, int EndTime, bool isRainbow);//色変化度 (算出開始時間~算出終了時間)
 
 	//int CalcRange(int Rainbow);//同時押し度
-	int CalcLongNote(int Rainbow);//LN率
+	int CalcLongNote(bool isRainbow);//LN率
 	int CalcUnstability();//大気安定度(ソフラン度)
 	int CalcChain();//縦連度
 
@@ -44,6 +44,8 @@ public:
 	int unstabilityMax = 259;
 	int chainMax = 120;
 	double BPM_suggest = 0;
+
+	double rainbowDensity = 0;//虹音符の密度
 
 private:
 

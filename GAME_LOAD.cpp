@@ -18,6 +18,7 @@
 #include "DxLibUtil.h"
 #include "show_something.h"
 #include "AutoDifficultyPrediction.h"
+#include "DifficultyRadar.h"
 
 void GAME_LOAD(int song_number,
 	int difficulty,
@@ -1270,16 +1271,16 @@ void GAME_LOAD(int song_number,
 	//Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_RAINBOW);
 	//Cdiff->longNote = DR.CalcLongNote(CALC_MODE_RAINBOW);
 
-	Music[song_number].global[CALC_MODE_RAINBOW][difficulty] = Cdiff->global;
-	Music[song_number].local[CALC_MODE_RAINBOW][difficulty] = Cdiff->local;
-	Music[song_number].color[CALC_MODE_RAINBOW][difficulty] = Cdiff->color;
-	Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
-	Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
-	Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
+	//Music[song_number].global[CALC_MODE_RAINBOW][difficulty] = Cdiff->global;
+	//Music[song_number].local[CALC_MODE_RAINBOW][difficulty] = Cdiff->local;
+	//Music[song_number].color[CALC_MODE_RAINBOW][difficulty] = Cdiff->color;
+	//Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
+	//Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
+	//Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
 
 
 
-	/*
+	
 	Cdiff->global = DR.CalcGlobal(CALC_MODE_RAINBOW);
 	Cdiff->local = DR.CalcLocal(CALC_MODE_RAINBOW);
 	Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_RAINBOW);
@@ -1293,7 +1294,7 @@ void GAME_LOAD(int song_number,
 	Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
 	Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
 	Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
-	*/
+	
 
 
 	//オプションで加工された譜面をcopyに格納、その後noteに戻す

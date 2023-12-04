@@ -12,8 +12,10 @@ void writeCacheToMusic(SongCache* Cache, Song* Music, int song_number, int diffi
 	Music[song_number].total_note[difficulty] = Cache->total_note;
 
 	for (i = 0; i < 9; i++) {
-		Music[song_number].LocalNotesAmount[difficulty][i] = Cache->LocalNotesAmount[i];
-		Music[song_number].ColorNotesAmount[difficulty][i] = Cache->ColorNotesAmount[i];
+		Music[song_number].LocalNotesAmount[RainbowMode::General][difficulty][i] = Cache->LocalNotesAmount[RainbowMode::General][i];
+		Music[song_number].ColorNotesAmount[RainbowMode::General][difficulty][i] = Cache->ColorNotesAmount[RainbowMode::General][i];
+		Music[song_number].LocalNotesAmount[RainbowMode::Rainbow][difficulty][i] = Cache->LocalNotesAmount[RainbowMode::Rainbow][i];
+		Music[song_number].ColorNotesAmount[RainbowMode::Rainbow][difficulty][i] = Cache->ColorNotesAmount[RainbowMode::Rainbow][i];
 	}
 	for (i = 0; i < 2; i++) {
 		Music[song_number].global[i][difficulty] = Cache->global[i];//ç~êÖó (ïΩãœ)
@@ -37,8 +39,10 @@ void writeMusicToCache(SongCache *Cache, Song* Music, int song_number, int diffi
 	Cache->total_note = Music[song_number].total_note[difficulty];
 
 	for (i = 0; i < 9; i++) {
-		Cache->LocalNotesAmount[i] = Music[song_number].LocalNotesAmount[difficulty][i];
-		Cache->ColorNotesAmount[i] = Music[song_number].ColorNotesAmount[difficulty][i];
+		Cache->LocalNotesAmount[RainbowMode::General][i] = Music[song_number].LocalNotesAmount[RainbowMode::General][difficulty][i];
+		Cache->ColorNotesAmount[RainbowMode::General][i] = Music[song_number].ColorNotesAmount[RainbowMode::General][difficulty][i];
+		Cache->LocalNotesAmount[RainbowMode::Rainbow][i] = Music[song_number].LocalNotesAmount[RainbowMode::Rainbow][difficulty][i];
+		Cache->ColorNotesAmount[RainbowMode::Rainbow][i] = Music[song_number].ColorNotesAmount[RainbowMode::Rainbow][difficulty][i];
 	}
 	for (i = 0; i < 2; i++) {
 		Cache->global[i] = Music[song_number].global[i][difficulty];//ç~êÖó (ïΩãœ)
@@ -91,8 +95,10 @@ int LoadSongCache(SongCache* Cache, Song* Music, int song_number, int difficulty
 	Cache->total_note = 0;
 
 	for (i = 0; i < 9; i++) {
-		Cache->LocalNotesAmount[i] = 0;
-		Cache->ColorNotesAmount[i] = 0;
+		Cache->LocalNotesAmount[RainbowMode::General][i] = 0;
+		Cache->ColorNotesAmount[RainbowMode::General][i] = 0;
+		Cache->LocalNotesAmount[RainbowMode::Rainbow][i] = 0;
+		Cache->ColorNotesAmount[RainbowMode::Rainbow][i] = 0;
 	}
 	for (i = 0; i < 2; i++) {
 		Cache->global[i] = 0;//ç~êÖó (ïΩãœ)

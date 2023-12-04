@@ -7,9 +7,10 @@ using namespace std;
 
 class DifficultyRadar {
 public:
-	DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, SC* scrollchange, int time, int StartTime, int EndTime, int* TimingSame, short* NotesAmount, double BPM_suggest);//イニシャライザ,各色の個数も算出
+	DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, SC* scrollchange, int time, int StartTime, int EndTime, int* TimingSame, double BPM_suggest);//イニシャライザ,各色の個数も算出
 	int NumberTranslation(NoteColor color);//rgbycmwdfの番号をrgbcmywdfに変換
-	void GetLocalNotesGraph(short* LocalNotesGraph);//局所降水量の9分割グラフを求める
+	void GetLocalNotesGraph(short* LocalNotesGraph, bool isRainbow);//局所降水量の9分割グラフを求める
+	void GetColorNotesGraph(short* ColorNotesGraph, short* ColorNotesGraphR);//色グラフを求める
 
 	int CalcGlobal(bool isRainbow);//降水量(平均)
 	int CalcLocal(bool isRainbow);//最大局所降水量
@@ -44,9 +45,6 @@ public:
 	int unstabilityMax = 259;
 	int chainMax = 120;
 	double BPM_suggest = 0;
-
-	double rainbowDensity = 0;//虹音符の密度
-
 private:
 
 };

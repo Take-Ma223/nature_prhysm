@@ -1249,8 +1249,12 @@ void GAME_LOAD(int song_number,
 
 
 	//DIFFICULTY_RADAR,NotesAmount算出
-	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, Music[song_number].ColorNotesAmount[difficulty], BPM_suggest);
-	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[difficulty]);//音符密度グラフを得る
+	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, BPM_suggest);
+	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[RainbowMode::General][difficulty], false);//音符密度グラフを得る
+	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[RainbowMode::Rainbow][difficulty], true);//音符密度グラフを得る
+
+	DR.GetColorNotesGraph(Music[song_number].ColorNotesAmount[RainbowMode::General][difficulty], Music[song_number].ColorNotesAmount[RainbowMode::Rainbow][difficulty]);
+
 
 	Cdiff->global = DR.CalcGlobal(CALC_MODE_NORMAL);
 	Cdiff->local = DR.CalcLocal(CALC_MODE_NORMAL);

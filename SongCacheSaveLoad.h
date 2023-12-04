@@ -14,8 +14,8 @@ typedef struct SongCache {//譜面キャッシュ構造体
 	short bpm_suggested;//提案されるハイスピ設定に一番良いBPM
 	unsigned short total_note;//総ノート数
 
-	short LocalNotesAmount[9] = { 0,0,0,0,0,0,0,0,0 };//密度変化グラフ
-	short ColorNotesAmount[9] = { 0,0,0,0,0,0,0,0,0 };//RGBCMYWBFそれぞれの数
+	short LocalNotesAmount[2][9] = { { 0,0,0,0,0,0,0,0,0 },{ 0,0,0,0,0,0,0,0,0 } };//密度変化グラフ
+	short ColorNotesAmount[2][9] = { { 0,0,0,0,0,0,0,0,0 },{ 0,0,0,0,0,0,0,0,0 } };//RGBCMYWBFそれぞれの数
 
 	short global[2];//降水量(平均)
 	short local[2];//局所降水量(0~1に正規化された色重みづけ配置タイミングの標準偏差 小さいほど局所難)

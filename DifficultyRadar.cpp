@@ -1,7 +1,7 @@
 #include "DifficultyRadar.h"
 #include<math.h>
 
-DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, SC* scrollchange, int time, int StartTime, int EndTime, int* TimingSame, short* NotesAmount, double BPM_suggest) {
+DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, SC* scrollchange, int time, int StartTime, int EndTime, int* TimingSame, double BPM_suggest) {
 	DifficultyRadar::note = note;
 	DifficultyRadar::nc = nc;
 	DifficultyRadar::bpmchange = bpmchange;
@@ -13,68 +13,9 @@ DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE*
 	DifficultyRadar::TimingSame = TimingSame;
 	DifficultyRadar::BPM_suggest = BPM_suggest;
 
-	int i = 0;
-	for (i = 0; i < 9; i++) {//各色音符数の初期化
-		NotesAmount[i] = 0;
-	}
-
-	int lane = 0, NoteCounter = 0;
-	//音符の合計を取得
-	for (lane = 0; lane <= 3; lane++) {
-		for (NoteCounter = 0; NoteCounter <= nc[lane] - 1; NoteCounter++) {
-			if (note[lane][NoteCounter].group == NoteGroup::Single || note[lane][NoteCounter].group == NoteGroup::LongNoteStart) {
-				if (note[lane][NoteCounter].color != NoteColor::K) {
-
-					if (note[lane][NoteCounter].color == NoteColor::R ||
-						note[lane][NoteCounter].color == NoteColor::G ||
-						note[lane][NoteCounter].color == NoteColor::B) {//RGB
-						TotalNotes += 1;
-						TotalNotesRainbow += 1;
-					}
-					else if (note[lane][NoteCounter].color == NoteColor::Y ||
-						note[lane][NoteCounter].color == NoteColor::C ||
-						note[lane][NoteCounter].color == NoteColor::M) {//CMY
-						TotalNotes += 2;
-						TotalNotesRainbow += 1;
-					}
-					else if (note[lane][NoteCounter].color == NoteColor::W) {//W
-						TotalNotes += 3;
-						TotalNotesRainbow += 1;
-					}
-					else if (note[lane][NoteCounter].color == NoteColor::F) {//F
-						TotalNotes += 1;
-						TotalNotesRainbow += 1;
-					}
-				}
-				TotalNotesK++;
-			}
-
-			//各色がいくつあるか加算
-			if (note[lane][NoteCounter].group == NoteGroup::LongNoteMiddle || note[lane][NoteCounter].group == NoteGroup::LongNoteEnd) {
-				if (note[lane][NoteCounter].color != note[lane][NoteCounter - 1].color) {
-					//LN中間、LN終点は色が変わっている場合のみ加算
-					NotesAmount[NumberTranslation(note[lane][NoteCounter].color)]++;
-				}
-			}
-			else {
-				NotesAmount[NumberTranslation(note[lane][NoteCounter].color)]++;
-			}
-		
-			if (note[lane][NoteCounter].group == NoteGroup::LongNoteEnd && note[lane][NoteCounter].LN_k == 1) {//LN終端の黒
-				NotesAmount[NumberTranslation(NoteColor::K)]++;//各色がいくつあるか加算
-			}
-		}
-	}
-
-	rainbowDensity = (double)NotesAmount[NumberTranslation(NoteColor::F)] / (DifficultyRadar::time);
-
-	for (i = 0; i < 9; i++) {//各色音符数を平均密度にして対数を取る
-		NotesAmount[i] = int(200 * log10((double)NotesAmount[i] * 30000 / (DifficultyRadar::time)+1));
-	}
-
 }
 
-void DifficultyRadar::GetLocalNotesGraph(short* LocalNotesGraph) {
+void DifficultyRadar::GetLocalNotesGraph(short* LocalNotesGraph, bool isRainbow) {
 	double LocalScore = 0;
 	double LocalScoreBuf = 0;
 	double NoteCount = 0;
@@ -105,6 +46,13 @@ void DifficultyRadar::GetLocalNotesGraph(short* LocalNotesGraph) {
 	const int F = 3;
 
 	int NoteCountVal[4] = { 1,2,3,1 };
+
+	if (isRainbow) {
+		NoteCountVal[0] = 1;
+		NoteCountVal[1] = 1;
+		NoteCountVal[2] = 1;
+		NoteCountVal[3] = 1;
+	}
 
 	do {
 		//4レーンそれぞれの枠内音符数を計算
@@ -177,6 +125,80 @@ void DifficultyRadar::GetLocalNotesGraph(short* LocalNotesGraph) {
 	} while (SlideCount < CountToSlide);
 
 	return;
+}
+
+void DifficultyRadar::GetColorNotesGraph(short* colorNotesGraph, short* colorNotesGraphR)
+{
+
+	int i = 0;
+	for (i = 0; i < 9; i++) {//各色音符数の初期化
+		colorNotesGraph[i] = 0;
+		colorNotesGraphR[i] = 0;
+	}
+
+	int lane = 0, NoteCounter = 0;
+	//音符の合計を取得
+	for (lane = 0; lane <= 3; lane++) {
+		for (NoteCounter = 0; NoteCounter <= nc[lane] - 1; NoteCounter++) {
+			if (note[lane][NoteCounter].group == NoteGroup::Single || note[lane][NoteCounter].group == NoteGroup::LongNoteStart) {
+				if (note[lane][NoteCounter].color != NoteColor::K) {
+
+					if (note[lane][NoteCounter].color == NoteColor::R ||
+						note[lane][NoteCounter].color == NoteColor::G ||
+						note[lane][NoteCounter].color == NoteColor::B) {//RGB
+						TotalNotes += 1;
+						TotalNotesRainbow += 1;
+					}
+					else if (note[lane][NoteCounter].color == NoteColor::Y ||
+						note[lane][NoteCounter].color == NoteColor::C ||
+						note[lane][NoteCounter].color == NoteColor::M) {//CMY
+						TotalNotes += 2;
+						TotalNotesRainbow += 1;
+					}
+					else if (note[lane][NoteCounter].color == NoteColor::W) {//W
+						TotalNotes += 3;
+						TotalNotesRainbow += 1;
+					}
+					else if (note[lane][NoteCounter].color == NoteColor::F) {//F
+						TotalNotes += 1;
+						TotalNotesRainbow += 1;
+					}
+				}
+				TotalNotesK++;
+			}
+
+			//各色がいくつあるか加算
+			if (note[lane][NoteCounter].group == NoteGroup::LongNoteMiddle || note[lane][NoteCounter].group == NoteGroup::LongNoteEnd) {
+				if (note[lane][NoteCounter].color != note[lane][NoteCounter - 1].color) {
+					//LN中間、LN終点は色が変わっている場合のみ加算
+					colorNotesGraph[NumberTranslation(note[lane][NoteCounter].color)]++;
+				}
+			}
+			else {
+				colorNotesGraph[NumberTranslation(note[lane][NoteCounter].color)]++;
+
+				//虹モード用
+				if (note[lane][NoteCounter].color == NoteColor::K) {
+					colorNotesGraphR[NumberTranslation(NoteColor::K)]++;
+				}
+				else {
+					colorNotesGraphR[NumberTranslation(NoteColor::F)]++;
+				}
+
+			}
+
+			if (note[lane][NoteCounter].group == NoteGroup::LongNoteEnd && note[lane][NoteCounter].LN_k == 1) {//LN終端の黒
+				colorNotesGraph[NumberTranslation(NoteColor::K)]++;
+				colorNotesGraphR[NumberTranslation(NoteColor::K)]++;
+			}
+		}
+	}
+
+	for (i = 0; i < 9; i++) {//各色音符数を平均密度にして対数を取る
+		colorNotesGraph[i] = int(200 * log10((double)colorNotesGraph[i] * 30000 / (DifficultyRadar::time)+1));
+		colorNotesGraphR[i] = int(200 * log10((double)colorNotesGraphR[i] * 30000 / (DifficultyRadar::time)+1));
+	}
+
 }
 
 int DifficultyRadar::NumberTranslation(NoteColor color) {

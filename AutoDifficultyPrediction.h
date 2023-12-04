@@ -24,24 +24,24 @@ public:
 			std::to_string(Music.unstability[0][difficulty]) + "," +
 			std::to_string(Music.longNote[0][difficulty]) + "," +
 			std::to_string(Music.color[0][difficulty]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][0]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][1]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][2]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][3]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][4]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][5]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][6]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][7]) + "," +
-			std::to_string(Music.ColorNotesAmount[difficulty][8]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][0]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][1]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][2]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][3]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][4]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][5]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][6]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][7]) + "," +
-			std::to_string(Music.LocalNotesAmount[difficulty][8]);
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][0]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][1]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][2]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][3]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][4]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][5]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][6]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][7]) + "," +
+			std::to_string(Music.ColorNotesAmount[RainbowMode::General][difficulty][8]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][0]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][1]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][2]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][3]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][4]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][5]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][6]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][7]) + "," +
+			std::to_string(Music.LocalNotesAmount[RainbowMode::General][difficulty][8]);
 
 		//STARTUPINFO si = { sizeof(STARTUPINFO) };
 		//PROCESS_INFORMATION pi;

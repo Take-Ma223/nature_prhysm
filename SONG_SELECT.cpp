@@ -2203,8 +2203,8 @@ void SONG_SELECT(int *l_n,
 
 
 				for (j = 0; j < 9; j++) {
-					ShowLocalNotesGraph[j] += 0.01 * (Music[song_number].LocalNotesAmount[difficulty][j] - ShowLocalNotesGraph[j]);
-					ShowColorNotesGraph[j] += 0.01 * (Music[song_number].ColorNotesAmount[difficulty][j] - ShowColorNotesGraph[j]);
+					ShowLocalNotesGraph[j] += 0.01 * (Music[song_number].LocalNotesAmount[R][difficulty][j] - ShowLocalNotesGraph[j]);
+					ShowColorNotesGraph[j] += 0.01 * (Music[song_number].ColorNotesAmount[R][difficulty][j] - ShowColorNotesGraph[j]);
 				}
 			}
 			if (DRShowGlobal < 0)DRShowGlobal = 0;

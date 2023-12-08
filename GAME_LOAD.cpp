@@ -1251,7 +1251,7 @@ void GAME_LOAD(int song_number,
 	//DIFFICULTY_RADAR,NotesAmount算出
 	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, BPM_suggest);
 	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[RainbowMode::General][difficulty], false);//音符密度グラフを得る
-	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[RainbowMode::Rainbow][difficulty], true);//音符密度グラフを得る
+	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[RainbowMode::Rainbow][difficulty], false);//音符密度グラフを得る
 
 	DR.GetColorNotesGraph(Music[song_number].ColorNotesAmount[RainbowMode::General][difficulty], Music[song_number].ColorNotesAmount[RainbowMode::Rainbow][difficulty]);
 
@@ -1275,29 +1275,29 @@ void GAME_LOAD(int song_number,
 	//Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_RAINBOW);
 	//Cdiff->longNote = DR.CalcLongNote(CALC_MODE_RAINBOW);
 
-	//Music[song_number].global[CALC_MODE_RAINBOW][difficulty] = Cdiff->global;
-	//Music[song_number].local[CALC_MODE_RAINBOW][difficulty] = Cdiff->local;
-	//Music[song_number].color[CALC_MODE_RAINBOW][difficulty] = Cdiff->color;
-	//Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
-	//Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
-	//Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
-
-
-
-	
-	Cdiff->global = DR.CalcGlobal(CALC_MODE_RAINBOW);
-	Cdiff->local = DR.CalcLocal(CALC_MODE_RAINBOW);
-	Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_RAINBOW);
-	Cdiff->longNote = DR.CalcLongNote(CALC_MODE_RAINBOW);
-	Cdiff->unstability = DR.CalcUnstability();
-	Cdiff->chain = DR.CalcChain();
-
 	Music[song_number].global[CALC_MODE_RAINBOW][difficulty] = Cdiff->global;
 	Music[song_number].local[CALC_MODE_RAINBOW][difficulty] = Cdiff->local;
 	Music[song_number].color[CALC_MODE_RAINBOW][difficulty] = Cdiff->color;
 	Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
 	Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
 	Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
+
+
+
+	
+	//Cdiff->global = DR.CalcGlobal(CALC_MODE_RAINBOW);
+	//Cdiff->local = DR.CalcLocal(CALC_MODE_RAINBOW);
+	//Cdiff->color = DR.CalcColor(start_time, end_time, CALC_MODE_RAINBOW);
+	//Cdiff->longNote = DR.CalcLongNote(CALC_MODE_RAINBOW);
+	//Cdiff->unstability = DR.CalcUnstability();
+	//Cdiff->chain = DR.CalcChain();
+
+	//Music[song_number].global[CALC_MODE_RAINBOW][difficulty] = Cdiff->global;
+	//Music[song_number].local[CALC_MODE_RAINBOW][difficulty] = Cdiff->local;
+	//Music[song_number].color[CALC_MODE_RAINBOW][difficulty] = Cdiff->color;
+	//Music[song_number].longNote[CALC_MODE_RAINBOW][difficulty] = Cdiff->longNote;
+	//Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
+	//Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
 	
 
 

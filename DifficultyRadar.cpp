@@ -172,18 +172,20 @@ void DifficultyRadar::GetColorNotesGraph(short* colorNotesGraph, short* colorNot
 				if (note[lane][NoteCounter].color != note[lane][NoteCounter - 1].color) {
 					//LN中間、LN終点は色が変わっている場合のみ加算
 					colorNotesGraph[NumberTranslation(note[lane][NoteCounter].color)]++;
+					colorNotesGraphR[NumberTranslation(note[lane][NoteCounter].color)]++;
 				}
 			}
 			else {
 				colorNotesGraph[NumberTranslation(note[lane][NoteCounter].color)]++;
+				colorNotesGraphR[NumberTranslation(note[lane][NoteCounter].color)]++;
 
-				//虹モード用
-				if (note[lane][NoteCounter].color == NoteColor::K) {
-					colorNotesGraphR[NumberTranslation(NoteColor::K)]++;
-				}
-				else {
-					colorNotesGraphR[NumberTranslation(NoteColor::F)]++;
-				}
+				////虹モード用
+				//if (note[lane][NoteCounter].color == NoteColor::K) {
+				//	colorNotesGraphR[NumberTranslation(NoteColor::K)]++;
+				//}
+				//else {
+				//	colorNotesGraphR[NumberTranslation(NoteColor::F)]++;
+				//}
 
 			}
 

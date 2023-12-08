@@ -649,7 +649,7 @@ void GAME_LOAD(int song_number,
 		}
 
 
-		if (wstring(str).back() == L',') {//「,」がある行を見つけた → 1小節分読み込んだので分割数を決めnoteにデータを入れる
+		if (wstring(str).front() != L'#' && wstring(str).back() == L',') {//命令行ではなく、「,」がある行を見つけた → 1小節分読み込んだので分割数を決めnoteにデータを入れる
 			i++;//「,」行分の分割数を足す
 			DN = i;//DN分音符単位になる
 			i = 0;
@@ -1159,7 +1159,7 @@ void GAME_LOAD(int song_number,
 				
 				
 
-				if (wstring(str).back() == L',') {//最後に「,」がある行を見つけた → 1小節分読み込んだので次の小節の読み込みに移る
+				if (wstring(str).front() != L'#' && wstring(str).back() == L',') {//最後に「,」がある行を見つけた → 1小節分読み込んだので次の小節の読み込みに移る
 					file_p_first = FileRead_tell(fp);//次に読み込む小節の先頭を指す
 					break;
 				}

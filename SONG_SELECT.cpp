@@ -2531,6 +2531,8 @@ void SONG_SELECT(int *l_n,
 				int CourseCombo = 0;
 				int CourseMaxCombo = 0;
 				int AllowExit = 1;
+
+				int playedSongIndex = 0;
 				//1~4曲目
 				for (i = 0; i <= 3; i++) {
 					int TryCount = 1;//トライ数
@@ -2567,6 +2569,7 @@ void SONG_SELECT(int *l_n,
 						secret_all_get(secret);//全解禁されているならall_getは1
 					}
 
+					playedSongIndex = i;
 					if (Result[i].clear == CLEARTYPE_FAILED) {//この曲で抜け出した時段位終了
 						STRes.clear = 0;
 						break;
@@ -2617,7 +2620,7 @@ void SONG_SELECT(int *l_n,
 					//段位のリザルト表示
 
 
-					SHOW_RESULT(STRes, option, SongNumberList[0], DifficultyList[0], debug, Music, Button, Button_Shutter, Key, Buf, AC, 0,
+					SHOW_RESULT(STRes, option, SongNumberList[playedSongIndex], DifficultyList[playedSongIndex], debug, Music, Button, Button_Shutter, Key, Buf, AC, 0,
 						STList,
 						list_number,
 						config,

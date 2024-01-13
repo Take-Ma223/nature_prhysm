@@ -580,31 +580,10 @@ void GAME_LOAD(int song_number,
 
 	for (i = 0; i <= 3; i++) {
 		for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {//noteの初期化(bpm以外)
-			note[i][j].x = 0;//ノートのx座標
-			note[i][j].y = -128;//ノートのy座標
-			note[i][j].timing = 0;//叩くタイミング(ミリ秒)
-			note[i][j].fall = NoteFall::NotFaling;//0なら落ちてない,1なら落下中
-			if (i != 0)note[i][j].color_init = NoteColor::NONE;//ノートの元の色
-			if (i != 0)note[i][j].color = NoteColor::NONE;//ノートの色(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
-			note[i][j].hit = 0;//1:叩いた 0:叩いてない
-			note[i][j].group = NoteGroup::Single;
-			note[i][j].group_init = NoteGroup::Single;
-
-			note[i][j].textLine = 0;
-			note[i][j].isBright = 0;
+			note[i][j] = NOTE();
 		}
 		for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {//copyの初期化(bpm以外)
-			copy[i][j].x = 0;//ノートのx座標
-			copy[i][j].y = -128;//ノートのy座標
-			copy[i][j].timing = 0;//叩くタイミング(ミリ秒)
-			copy[i][j].fall = NoteFall::NotFaling;//0なら落ちてない,1なら落下中
-			if (i != 0)copy[i][j].color_init = NoteColor::NONE;//ノートの元の色
-			if (i != 0)copy[i][j].color = NoteColor::NONE;//ノートの色(1:R 2:G 3:B 4:Y 5:C 6:M 7:W 8:K)0ならこのノートは使ってない
-			copy[i][j].hit = 0;//1:叩いた 0:叩いてない
-			copy[i][j].group = NoteGroup::Single;
-			copy[i][j].group_init = NoteGroup::Single;
-			copy[i][j].textLine = 0;
-			copy[i][j].isBright = 0;
+			copy[i][j] = NOTE();
 		}
 
 	}

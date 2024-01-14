@@ -1608,6 +1608,7 @@ void SONG_SELECT(int *l_n,
 							//DeleteSoundMem(SH_SONG);
 							int beforeSongNumber = song_number;
 							int beforeDifficulty = difficulty;
+							int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
 
 							list_number_base--;
 							list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
@@ -1619,7 +1620,8 @@ void SONG_SELECT(int *l_n,
 							titleStrUpdateFlag = TOP;
 							if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
 								difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
-								if (Music[beforeSongNumber].exist[beforeDifficulty] == 0) {
+								bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+								if (isNeedAllTitleStrUpdate) {
 									titleStrUpdateFlag = ALL;
 								}
 							}
@@ -1640,6 +1642,7 @@ void SONG_SELECT(int *l_n,
 									//DeleteSoundMem(SH_SONG);
 									int beforeSongNumber = song_number;
 									int beforeDifficulty = difficulty;
+									int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
 
 									list_number_base--;
 									list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
@@ -1650,7 +1653,8 @@ void SONG_SELECT(int *l_n,
 									titleStrUpdateFlag = TOP;
 									if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
 										difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
-										if (Music[beforeSongNumber].exist[beforeDifficulty] == 0) {
+										bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+										if (isNeedAllTitleStrUpdate) {
 											titleStrUpdateFlag = ALL;
 										}
 									}
@@ -1674,6 +1678,7 @@ void SONG_SELECT(int *l_n,
 							//DeleteSoundMem(SH_SONG);
 							int beforeSongNumber = song_number;
 							int beforeDifficulty = difficulty;
+							int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
 
 							list_number_base++;
 							list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
@@ -1684,7 +1689,8 @@ void SONG_SELECT(int *l_n,
 							titleStrUpdateFlag = BOTTOM;
 							if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
 								difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
-								if (Music[beforeSongNumber].exist[beforeDifficulty] == 0) {
+								bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+								if (isNeedAllTitleStrUpdate) {
 									titleStrUpdateFlag = ALL;
 								}
 							}
@@ -1706,6 +1712,7 @@ void SONG_SELECT(int *l_n,
 
 									int beforeSongNumber = song_number;
 									int beforeDifficulty = difficulty;
+									int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
 
 									list_number_base++;
 									list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
@@ -1716,7 +1723,8 @@ void SONG_SELECT(int *l_n,
 									titleStrUpdateFlag = BOTTOM;
 									if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
 										difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
-										if (Music[beforeSongNumber].exist[beforeDifficulty] == 0) {
+										bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+										if (isNeedAllTitleStrUpdate) {
 											titleStrUpdateFlag = ALL;
 										}
 									}

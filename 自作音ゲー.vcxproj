@@ -211,6 +211,8 @@
     <ClCompile Include="DifficultyRadar.cpp" />
     <ClCompile Include="DxLibUtil.cpp" />
     <ClCompile Include="GradationNoteImage.cpp" />
+    <ClCompile Include="KeyConfigValidator.cpp" />
+    <ClCompile Include="KEY_CONFIG.cpp" />
     <ClCompile Include="LearningDataGenarator.cpp" />
     <ClCompile Include="NoteJudgeProcessor.cpp" />
     <ClCompile Include="NoteTextImage.cpp" />
@@ -218,6 +220,7 @@
     <ClCompile Include="NPLoadSoundMem.cpp" />
     <ClCompile Include="NPTextView.cpp" />
     <ClCompile Include="NPTextViewParam.cpp" />
+    <ClCompile Include="NPVsync.cpp" />
     <ClCompile Include="NumberImageHandles.cpp" />
     <ClCompile Include="NumberViewFormat.cpp" />
     <ClCompile Include="ActionEvent.cpp" />
@@ -245,7 +248,7 @@
     <ClCompile Include="ImageSet.cpp" />
     <ClCompile Include="Intent.cpp" />
     <ClCompile Include="IR_process.cpp" />
-    <ClCompile Include="KeyConfig.cpp" />
+    <ClCompile Include="KeyConfigSaveLoad.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="LED_operation.cpp" />
     <ClCompile Include="LOAD.cpp" />
@@ -300,6 +303,8 @@
     <ClInclude Include="DifficultyRadar.h" />
     <ClInclude Include="DxLibUtil.h" />
     <ClInclude Include="GradationNoteImage.h" />
+    <ClInclude Include="KeyConfigValidator.h" />
+    <ClInclude Include="KEY_CONFIG.h" />
     <ClInclude Include="LearningDataGenarator.h" />
     <ClInclude Include="NoteJudgeProcessor.h" />
     <ClInclude Include="NoteTextImage.h" />
@@ -307,6 +312,7 @@
     <ClInclude Include="NPLoadSoundMem.h" />
     <ClInclude Include="NPTextView.h" />
     <ClInclude Include="NPTextViewParam.h" />
+    <ClInclude Include="NPVsync.h" />
     <ClInclude Include="NumberImageHandles.h" />
     <ClInclude Include="NumberViewFormat.h" />
     <ClInclude Include="ActionEvent.h" />
@@ -359,7 +365,7 @@
     <ClInclude Include="GAME_LOAD.h" />
     <ClInclude Include="Get_Key_State.h" />
     <ClInclude Include="Header.h" />
-    <ClInclude Include="KeyConfig.h" />
+    <ClInclude Include="KeyConfigSaveLoad.h" />
     <ClInclude Include="LED_operation.h" />
     <ClInclude Include="LOAD.h" />
     <ClInclude Include="make_result_hash.h" />

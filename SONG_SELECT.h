@@ -17,7 +17,7 @@ extern void SONG_SELECT(int *l_n,
 	int *debug, int *NumberOfSongs,
 	int *result_count, int *result_rank_buf, SECRET *secret,
 	ANDROID_CONTROLLER *AC, int *StageCount, SkillTestList *STList,
-	Config config, IR_SETTING* ir);
+	Config config, IR_SETTING* ir, bool* isBackToTitle);
 
 extern wchar_t *announce_str(int StageCount, int PlayCount);
 

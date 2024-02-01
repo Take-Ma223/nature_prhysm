@@ -118,9 +118,6 @@
     <Filter Include="ソース ファイル\Util\ActivityController">
       <UniqueIdentifier>{3276c52d-de2c-498f-a8c6-4527e87af4e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\TEST">
-      <UniqueIdentifier>{cdaa4b1c-3ab9-4247-97af-5fa8e8c80faf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Util\ActivityController\AppContext">
       <UniqueIdentifier>{724d3a64-bf59-481f-b295-69ef47d598bd}</UniqueIdentifier>
     </Filter>
@@ -156,6 +153,12 @@
     </Filter>
     <Filter Include="ソース ファイル\NPUtil\TextView\NPGradTextView">
       <UniqueIdentifier>{61b4485d-80da-43be-b7e4-2bddca334cf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\TEST">
+      <UniqueIdentifier>{cdaa4b1c-3ab9-4247-97af-5fa8e8c80faf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\KEY_CONFIG">
+      <UniqueIdentifier>{0b368497-c144-440e-86d4-1b7f7561b83d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -204,7 +207,7 @@
     <ClCompile Include="Get_Key_State.cpp">
       <Filter>ソース ファイル\Util\Key</Filter>
     </ClCompile>
-    <ClCompile Include="KeyConfig.cpp">
+    <ClCompile Include="KeyConfigSaveLoad.cpp">
       <Filter>ソース ファイル\Util\Key</Filter>
     </ClCompile>
     <ClCompile Include="ScreenShot.cpp">
@@ -411,6 +414,15 @@
     <ClCompile Include="NoteTextImage.cpp">
       <Filter>ソース ファイル\GAME</Filter>
     </ClCompile>
+    <ClCompile Include="NPVsync.cpp">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="KEY_CONFIG.cpp">
+      <Filter>ソース ファイル\KEY_CONFIG</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyConfigValidator.cpp">
+      <Filter>ソース ファイル\Util\Key</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -475,7 +487,7 @@
     <ClInclude Include="Get_Key_State.h">
       <Filter>ソース ファイル\Util\Key</Filter>
     </ClInclude>
-    <ClInclude Include="KeyConfig.h">
+    <ClInclude Include="KeyConfigSaveLoad.h">
       <Filter>ソース ファイル\Util\Key</Filter>
     </ClInclude>
     <ClInclude Include="ScreenShot.h">
@@ -720,6 +732,15 @@
     </ClInclude>
     <ClInclude Include="NoteTextImage.h">
       <Filter>ソース ファイル\GAME</Filter>
+    </ClInclude>
+    <ClInclude Include="NPVsync.h">
+      <Filter>ソース ファイル\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="KEY_CONFIG.h">
+      <Filter>ソース ファイル\KEY_CONFIG</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyConfigValidator.h">
+      <Filter>ソース ファイル\Util\Key</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,7 +2,7 @@
 #include<math.h>
 #include<sys/stat.h>
 #include<string.h>
-#include"KeyConfig.h"
+#include"KeyConfigSaveLoad.h"
 
 void KeyConfigLoad(int Button[3][4], int* Button_Shutter) {
 	int fp;

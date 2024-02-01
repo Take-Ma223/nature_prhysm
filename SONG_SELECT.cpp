@@ -32,6 +32,7 @@
 #include "DxLibUtil.h"
 #include "OptionListView.h"
 #include "NPLoadSoundMem.h"
+#include "KEY_CONFIG.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ void SONG_SELECT(int *l_n,
 	int Button[3][4], int Button_Shutter, int *Key, char *Buf, 
 	int *debug, int *NumberOfSongs,
 	int *result_count,int *result_rank_buf,SECRET *secret, ANDROID_CONTROLLER *AC,int *StageCount, SkillTestList *STList,
-	Config config, IR_SETTING* ir) {
+	Config config, IR_SETTING* ir, bool* isBackToTitle) {
 	Asset asset;//使う画像セット
 	//コンテキスト
 	AppContext appContext = AppContext(NULL, option, &config);
@@ -193,7 +194,7 @@ void SONG_SELECT(int *l_n,
 	const int FLAG_OPENING_STATE = 0;
 	const int FLAG_SELECT_STATE = 1;//自由に選択できる状態
 	const int FLAG_CLOSING_STATE = 2;
-	const int FLAG_END_FUNCTION_STATE = 3;
+	const int FLAG_END_FUNCTION_STATE = 3;//中央カバーが閉まった後の状態
 	int flag = FLAG_OPENING_STATE;
 
 	int Column = config.SongSelectRowNumber - 1;//バナーの縦の列数(RowNumber) -1(実際に並ぶのはColumn+1個) 偶数にする
@@ -1386,7 +1387,7 @@ void SONG_SELECT(int *l_n,
 
 		PlaySoundMem(SH_ALARM, DX_PLAYTYPE_BACK, TRUE);
 		while (CheckSoundMem(SH_ALARM) == 1) {//なり終わるまで待機
-			if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE) {//ESCでゲーム終了
+			if (ProcessMessage() != 0) {//×でゲーム終了
 				dxLibFinishProcess();
 				return;
 			}
@@ -1402,7 +1403,7 @@ void SONG_SELECT(int *l_n,
 		appContext.updateTime();
 		coverAlpha.process();
 
-		if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE && flag != FLAG_END_FUNCTION_STATE) {//ESCでゲーム終了
+		if (ProcessMessage() != 0) {//×で終了
 			dxLibFinishProcess();
 			return;
 		}
@@ -1437,6 +1438,13 @@ void SONG_SELECT(int *l_n,
 			if (PressFrame <= 0)PressFrame = 1;//0以下にはしない
 
 			//printfDx(L"%d\n", PressFrame);
+			if (Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE && flag != FLAG_END_FUNCTION_STATE) {//ESCで画面終了
+				flag = FLAG_CLOSING_STATE;
+				PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+				coverAlphaClose();
+				*isBackToTitle = true;
+				//dxLibFinishProcess();
+			}
 
 			if (Key[KEY_INPUT_F1] == 1) {//デバッグモードONOFF
 				if (*debug == 0) {
@@ -1465,7 +1473,11 @@ void SONG_SELECT(int *l_n,
 				//}
 			}
 
-			if (Key[KEY_INPUT_F3] == 1 && SEND_EXIST_SCORE_TO_IR) {//既存スコアを送信
+			if (Key[KEY_INPUT_F3] == 1) {//キーコンフィグ画面
+				KEY_CONFIG(Button, Button_Shutter, Key, Buf, AC, config, option, ir);
+			}
+
+			if (Key[KEY_INPUT_F9] == 1 && SEND_EXIST_SCORE_TO_IR) {//既存スコアを送信
 				RESULT IrScore;
 				IrScore.difficulty = difficulty;
 				IrScore.clear = Highscore[song_number].clear_state[difficulty + select_rainbow];
@@ -2381,8 +2393,8 @@ void SONG_SELECT(int *l_n,
 
 				ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_BGM);//BGM有り隠し曲出現時はBGMもフェードアウト
 			}
-			if (SelectingTarget == SELECTING_COURSE) {
-				ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_BGM);//段位コース選んだ時はBGMもフェードアウト
+			if (SelectingTarget == SELECTING_COURSE || SelectingTarget == SELECTING_FOLDER) {
+				ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_BGM);//段位コース、曲フォルダを選んでいる時はBGMもフェードアウト
 			}
 		}
 
@@ -2404,238 +2416,239 @@ void SONG_SELECT(int *l_n,
 			InitGraph();//グラフィックメモリ開放
 			
 
+			if (*isBackToTitle == false) {//タイトルに戻る場合演奏画面には遷移しない
+				if (SelectingTarget == SELECTING_SONG) {//曲選択の時
 
-			if (SelectingTarget == SELECTING_SONG) {//曲選択の時
+					int gauge_buf = (int)option->op.gauge;//今選んでいるゲージ種類を保存
+					int AllowExit = 1;//途中退出可能か
+					if (Music[song_number].secret == 1 && secret->song_appear_number == song_number) {//隠し曲出現中にその隠し曲を選択したので
+						//debug取り消し
+						*debug = 0;
+						//ゲージ種類決定
+						if (SECRET_GAUGE_CHANGE_OFF == 0) {
 
-				int gauge_buf = (int)option->op.gauge;//今選んでいるゲージ種類を保存
-				int AllowExit = 1;//途中退出可能か
-				if (Music[song_number].secret == 1 && secret->song_appear_number == song_number) {//隠し曲出現中にその隠し曲を選択したので
-					//debug取り消し
-					*debug = 0;
-					//ゲージ種類決定
-					if (SECRET_GAUGE_CHANGE_OFF == 0) {
-
-						int rank_point = result_rank_buf[0] + result_rank_buf[1] + result_rank_buf[2];
+							int rank_point = result_rank_buf[0] + result_rank_buf[1] + result_rank_buf[2];
 
 
-						if (rank_point == 5 * 3) {//全てBランク(rank_point==15)
-							option->op.gauge = OptionItem::Gauge::FC_ATTACK;//強制FC ATTACKゲージ
-						}
-						else if (rank_point < 6 * 3) {//平均がAランクより小さい値(rank_point==16~17)
-							option->op.gauge = OptionItem::Gauge::SUPER_HARD;//強制SUPER HARDゲージ
-						}
-						else if (rank_point < 7 * 3) {//平均がSランクより小さい値(rank_point==18~20)
-							option->op.gauge = OptionItem::Gauge::HARD;//強制HARDゲージ
-						}
-						else {//全てSランク(rank_point==21)
-							option->op.gauge = OptionItem::Gauge::NORMAL;//強制NORMALゲージ
-						}
-					}
-
-					AllowExit = 0;
-				}
-
-				int CourseCombo = 0;
-				int CourseMaxCombo = 0;
-
-				int TryCount = 0;//トライ数(クイックリトライするたびに加算)
-				do {
-					TryCount++;
-					escape = 0;
-
-					GAME(song_number, difficulty,
-						&res, &escape, option, &retryAble,
-						debug, Music, Button, Button_Shutter, Key, Buf, secret->song_appear_number != -1, AC,
-						config, ir,
-						0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ
-					Get_Key_State(Buf, Key, AC);
-				} while ((Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
-					&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1)
-					&& (retryAble == 1)
-					&& (secret->song_appear_number != song_number || Music[song_number].secret != 1)//リトライできるときの条件(隠し曲演出中の未解禁隠し曲プレイはリトライできない)
-					);
-
-				RESULT STResDummy;
-				//演奏終了後処理
-				if (escape == 0
-					|| (*debug == 0
-						&& escape == 1
-						&& secret->song_appear_number == song_number
-						&& secret->get_song_number[secret->secret_song_appear_number] == 0)) {
-					//途中で抜け出していない,または抜け出してても非デバッグモードでそれが隠し曲演出中の未解禁隠し曲ならクリア失敗扱いにする
-
-					if (escape == 1 && secret->song_appear_number == song_number) {//隠し曲プレイの抜け出しはランクをFに
-						res.rank = 1;
-					}
-
-					SHOW_RESULT(res, option, song_number, difficulty, debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
-						STList,
-						list_number, config, ir);//結果発表
-					if (*debug == 0) {
-						if (secret->secret_song_appear_number == -1) {//通常プレイで隠し曲演出になっていないとき
-							result_rank_buf[*result_count] = res.rank;//ランクを保存
-
-							(*result_count)++;
-							if (*result_count == SECRET_SONG_APPEAR_CYCLE) {
-								(*result_count) = 0;
+							if (rank_point == 5 * 3) {//全てBランク(rank_point==15)
+								option->op.gauge = OptionItem::Gauge::FC_ATTACK;//強制FC ATTACKゲージ
+							}
+							else if (rank_point < 6 * 3) {//平均がAランクより小さい値(rank_point==16~17)
+								option->op.gauge = OptionItem::Gauge::SUPER_HARD;//強制SUPER HARDゲージ
+							}
+							else if (rank_point < 7 * 3) {//平均がSランクより小さい値(rank_point==18~20)
+								option->op.gauge = OptionItem::Gauge::HARD;//強制HARDゲージ
+							}
+							else {//全てSランク(rank_point==21)
+								option->op.gauge = OptionItem::Gauge::NORMAL;//強制NORMALゲージ
 							}
 						}
-						if (secret->secret_song_appear_number != -1) {//隠し曲演出の後
-							*result_count = 0;
-							for (i = 0; i <= SECRET_SONG_APPEAR_CYCLE - 1; i++) {
-								result_rank_buf[i] = 0;//ランクバッファを初期化
-							}
 
-							if (res.clear >= CLEARTYPE_EASY_CLEARED && song_number == secret->song_appear_number) {//対象曲をクリアしていた
-								//解禁情報を更新
-								secret->get_song_number[secret->secret_song_appear_number] = 1;//解禁済みにする
-								Music[secret->song_appear_number].secret = 2;
-								//全解禁したか確認
-								secret_all_get(secret);//全解禁されているならall_getは1
+						AllowExit = 0;
+					}
+
+					int CourseCombo = 0;
+					int CourseMaxCombo = 0;
+
+					int TryCount = 0;//トライ数(クイックリトライするたびに加算)
+					do {
+						TryCount++;
+						escape = 0;
+
+						GAME(song_number, difficulty,
+							&res, &escape, option, &retryAble,
+							debug, Music, Button, Button_Shutter, Key, Buf, secret->song_appear_number != -1, AC,
+							config, ir,
+							0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ
+						Get_Key_State(Buf, Key, AC);
+					} while ((Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
+						&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1)
+						&& (retryAble == 1)
+						&& (secret->song_appear_number != song_number || Music[song_number].secret != 1)//リトライできるときの条件(隠し曲演出中の未解禁隠し曲プレイはリトライできない)
+						);
+
+					RESULT STResDummy;
+					//演奏終了後処理
+					if (escape == 0
+						|| (*debug == 0
+							&& escape == 1
+							&& secret->song_appear_number == song_number
+							&& secret->get_song_number[secret->secret_song_appear_number] == 0)) {
+						//途中で抜け出していない,または抜け出してても非デバッグモードでそれが隠し曲演出中の未解禁隠し曲ならクリア失敗扱いにする
+
+						if (escape == 1 && secret->song_appear_number == song_number) {//隠し曲プレイの抜け出しはランクをFに
+							res.rank = 1;
+						}
+
+						SHOW_RESULT(res, option, song_number, difficulty, debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
+							STList,
+							list_number, config, ir);//結果発表
+						if (*debug == 0) {
+							if (secret->secret_song_appear_number == -1) {//通常プレイで隠し曲演出になっていないとき
+								result_rank_buf[*result_count] = res.rank;//ランクを保存
+
+								(*result_count)++;
+								if (*result_count == SECRET_SONG_APPEAR_CYCLE) {
+									(*result_count) = 0;
+								}
 							}
-							//隠し曲演出終了
-							secret->secret_song_appear_number = -1;
-							secret->song_appear_number = -1;
+							if (secret->secret_song_appear_number != -1) {//隠し曲演出の後
+								*result_count = 0;
+								for (i = 0; i <= SECRET_SONG_APPEAR_CYCLE - 1; i++) {
+									result_rank_buf[i] = 0;//ランクバッファを初期化
+								}
+
+								if (res.clear >= CLEARTYPE_EASY_CLEARED && song_number == secret->song_appear_number) {//対象曲をクリアしていた
+									//解禁情報を更新
+									secret->get_song_number[secret->secret_song_appear_number] = 1;//解禁済みにする
+									Music[secret->song_appear_number].secret = 2;
+									//全解禁したか確認
+									secret_all_get(secret);//全解禁されているならall_getは1
+								}
+								//隠し曲演出終了
+								secret->secret_song_appear_number = -1;
+								secret->song_appear_number = -1;
+							}
+						}
+						option->op.gauge = (OptionItem::Gauge)gauge_buf;//ゲージをもとに戻す
+					}
+
+				}
+				else if (SelectingTarget == SELECTING_COURSE) {//段位認定コース選択の時
+					//*debug = 0;//debug取り消し
+					//対象曲パス読み込み
+
+					//オプションを直す
+					int gauge_buf = (int)option->op.gauge;//後で戻すためのバッファ
+
+					option->op.gauge = OptionItem::Gauge::SKILL_TEST;
+
+					if (option->op.lane != OptionItem::Lane::MIRROR) {//MIRROR以外を選んだときは正規にする
+						option->op.lane = OptionItem::Lane::NONE;
+					}
+
+
+					option->op.color = OptionItem::Color::NONE;
+
+
+
+					//基本なら虹オプションにする
+					if (STList->Kind[list_number] == 0) {
+						option->op.color = OptionItem::Color::RAINBOW;
+					}
+
+					int SongNumberList[4];//曲番号リスト
+					int DifficultyList[4];//難易度リスト
+
+					LoadSkillTestNpsPathList(SongNumberList, DifficultyList, STList->fliepath[list_number], Music, *NumberOfSongs);//npsファイルパス読み込み
+					RESULT STRes;//段位認定リザルト
+					STRes.clear = 1;//初期値は合格にしておく
+
+					RESULT Result[4];//各曲のリザルト
+
+					double GaugeVal = 100;
+
+					int CourseCombo = 0;
+					int CourseMaxCombo = 0;
+					int AllowExit = 1;
+
+					int playedSongIndex = 0;
+					//1~4曲目
+					for (i = 0; i <= 3; i++) {
+						int TryCount = 1;//トライ数
+						GAME(SongNumberList[i], DifficultyList[i],
+							&Result[i], &escape, option, &retryAble,
+							debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config, ir,
+							i + 1, &GaugeVal,
+							&CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ	
+						if (escape == 1) {//プレイの抜け出しはランクをF、FAILEDに
+							Result[i].rank = 1;
+							Result[i].clear = CLEARTYPE_FAILED;
+						}
+						if (escape == 0) {//抜けだしてない
+							SHOW_RESULT(Result[i], option, SongNumberList[i], DifficultyList[i], debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
+								STList,
+								list_number,
+								config,
+								ir,
+								i + 1);//結果発表
+						}
+
+						if (Result[i].clear >= CLEARTYPE_FULL_COMBO && Music[SongNumberList[i]].secret == 1) {//隠し曲をフルコンボ以上でクリアした
+							//解禁情報を更新
+							int secretSongNnumber = 0;
+							//隠し曲番号の確認
+							for (j = 0; j < secret->total; j++) {
+								if (secret->song_number[j] == SongNumberList[i]) {
+									secretSongNnumber = j;
+								}
+							}
+							secret->get_song_number[secretSongNnumber] = 1;//解禁済みにする
+							Music[SongNumberList[i]].secret = 2;
+							//全解禁したか確認
+							secret_all_get(secret);//全解禁されているならall_getは1
+						}
+
+						playedSongIndex = i;
+						if (Result[i].clear == CLEARTYPE_FAILED) {//この曲で抜け出した時段位終了
+							STRes.clear = 0;
+							break;
 						}
 					}
-					option->op.gauge = (OptionItem::Gauge)gauge_buf;//ゲージをもとに戻す
-				}
 
-			}
-			else if (SelectingTarget == SELECTING_COURSE) {//段位認定コース選択の時
-				//*debug = 0;//debug取り消し
-				//対象曲パス読み込み
-
-				//オプションを直す
-				int gauge_buf = (int)option->op.gauge;//後で戻すためのバッファ
-
-				option->op.gauge = OptionItem::Gauge::SKILL_TEST;
-
-				if (option->op.lane != OptionItem::Lane::MIRROR) {//MIRROR以外を選んだときは正規にする
-					option->op.lane = OptionItem::Lane::NONE;
-				}
-
-
-				option->op.color = OptionItem::Color::NONE;
-
-
-
-				//基本なら虹オプションにする
-				if (STList->Kind[list_number] == 0) {
-					option->op.color = OptionItem::Color::RAINBOW;
-				}
-
-				int SongNumberList[4];//曲番号リスト
-				int DifficultyList[4];//難易度リスト
-
-				LoadSkillTestNpsPathList(SongNumberList, DifficultyList, STList->fliepath[list_number], Music, *NumberOfSongs);//npsファイルパス読み込み
-				RESULT STRes;//段位認定リザルト
-				STRes.clear = 1;//初期値は合格にしておく
-
-				RESULT Result[4];//各曲のリザルト
-
-				double GaugeVal = 100;
-
-				int CourseCombo = 0;
-				int CourseMaxCombo = 0;
-				int AllowExit = 1;
-
-				int playedSongIndex = 0;
-				//1~4曲目
-				for (i = 0; i <= 3; i++) {
-					int TryCount = 1;//トライ数
-					GAME(SongNumberList[i], DifficultyList[i],
-						&Result[i], &escape, option, &retryAble,
-						debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config, ir,
-						i + 1, &GaugeVal,
-						&CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ	
-					if (escape == 1) {//プレイの抜け出しはランクをF、FAILEDに
-						Result[i].rank = 1;
-						Result[i].clear = CLEARTYPE_FAILED;
-					}
 					if (escape == 0) {//抜けだしてない
-						SHOW_RESULT(Result[i], option, SongNumberList[i], DifficultyList[i], debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
+						//段位認定リザルトの保存
+						STRes.save_data_version = RESULT_DATA_VERSION;
+						for (i = 0; i <= 3; i++) {
+							STRes.sky_perfect += Result[i].sky_perfect;
+							STRes.perfect += Result[i].perfect;
+							STRes.good += Result[i].good;
+							STRes.miss += Result[i].miss;
+							STRes.score += Result[i].score;
+							STRes.rank += Result[i].rank;
+						}
+
+						STRes.max_combo = CourseMaxCombo;
+
+						if (STRes.score >= 38000) {//S
+							STRes.rank = 7;
+						}
+						else if (STRes.score >= 36000) {//A
+							STRes.rank = 6;
+						}
+						else if (STRes.score >= 32000) {//B
+							STRes.rank = 5;
+						}
+						else if (STRes.score >= 32000) {//C
+							STRes.rank = 4;
+						}
+						else if (STRes.score >= 28000) {//D
+							STRes.rank = 3;
+						}
+						else if (STRes.score >= 24000) {//E
+							STRes.rank = 2;
+						}
+						else {//F
+							STRes.rank = 1;
+						}
+
+						if (STRes.rank <= 0)STRes.rank = 1;//F以下にはしない
+
+
+
+
+						//段位のリザルト表示
+
+
+						SHOW_RESULT(STRes, option, SongNumberList[playedSongIndex], DifficultyList[playedSongIndex], debug, Music, Button, Button_Shutter, Key, Buf, AC, 0,
 							STList,
 							list_number,
 							config,
 							ir,
-							i + 1);//結果発表
+							SHOW_SKILL_TEST_RESULT);//結果発表
 					}
-
-					if (Result[i].clear >= CLEARTYPE_FULL_COMBO && Music[SongNumberList[i]].secret == 1) {//隠し曲をフルコンボ以上でクリアした
-						//解禁情報を更新
-						int secretSongNnumber = 0;
-						//隠し曲番号の確認
-						for (j = 0; j < secret->total; j++) {
-							if (secret->song_number[j] == SongNumberList[i]) {
-								secretSongNnumber = j;
-							}
-						}
-						secret->get_song_number[secretSongNnumber] = 1;//解禁済みにする
-						Music[SongNumberList[i]].secret = 2;
-						//全解禁したか確認
-						secret_all_get(secret);//全解禁されているならall_getは1
-					}
-
-					playedSongIndex = i;
-					if (Result[i].clear == CLEARTYPE_FAILED) {//この曲で抜け出した時段位終了
-						STRes.clear = 0;
-						break;
-					}
+					option->op.gauge = (OptionItem::Gauge)gauge_buf;//ゲージを元に戻す
 				}
-				
-				if (escape == 0) {//抜けだしてない
-				//段位認定リザルトの保存
-					STRes.save_data_version = RESULT_DATA_VERSION;
-					for (i = 0; i <= 3; i++) {
-						STRes.sky_perfect += Result[i].sky_perfect;
-						STRes.perfect += Result[i].perfect;
-						STRes.good += Result[i].good;
-						STRes.miss += Result[i].miss;
-						STRes.score += Result[i].score;
-						STRes.rank += Result[i].rank;
-					}
-
-					STRes.max_combo = CourseMaxCombo;
-
-					if (STRes.score >= 38000) {//S
-						STRes.rank = 7;
-					}
-					else if (STRes.score >= 36000) {//A
-						STRes.rank = 6;
-					}
-					else if (STRes.score >= 32000) {//B
-						STRes.rank = 5;
-					}
-					else if (STRes.score >= 32000) {//C
-						STRes.rank = 4;
-					}
-					else if (STRes.score >= 28000) {//D
-						STRes.rank = 3;
-					}
-					else if (STRes.score >= 24000) {//E
-						STRes.rank = 2;
-					}
-					else {//F
-						STRes.rank = 1;
-					}
-
-					if (STRes.rank <= 0)STRes.rank = 1;//F以下にはしない
-
-
-
-
-					//段位のリザルト表示
-
-
-					SHOW_RESULT(STRes, option, SongNumberList[playedSongIndex], DifficultyList[playedSongIndex], debug, Music, Button, Button_Shutter, Key, Buf, AC, 0,
-						STList,
-						list_number,
-						config,
-						ir,
-						SHOW_SKILL_TEST_RESULT);//結果発表
-				}
-				option->op.gauge = (OptionItem::Gauge)gauge_buf;//ゲージを元に戻す
 			}
 
 			*l_n = list_number_base;//前選んだフォルダ中のリストを選んでいる状態にする

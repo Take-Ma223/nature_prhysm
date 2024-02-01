@@ -11,7 +11,7 @@
 #include"SONG_SELECT.h"
 #include"LOAD.h"
 #include"TITLE.h"
-#include"KeyConfig.h"
+#include"KeyConfigSaveLoad.h"
 #include"STRUCT_CONFIG.h"
 #include"ConfigLoad.h"
 
@@ -275,29 +275,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config, &ir);
 	if (ProcessMessage() != 0) {dxLibFinishProcess();return -1;}
-	TITLE(Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
-	if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
-	int StageCount = 0;
+
 	while (1) {
+		TITLE(Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
 		if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
-		SONG_SELECT(&list_number,
-			&song_number, &difficulty,
-			&option,
-			&folder,
-			Music,
-			Button, Button_Shutter, Key, Buf,
-			&debug,
-			&NumberOfSongs,
-			&result_count,
-			result_rank_buf,
-			&secret,
-			&AC,
-			&StageCount,
-			&STList,
-			config,
-			&ir);
-		StageCount++;
+		int StageCount = 0;
+		bool isBackToTitle = false;
+		while (1) {
+			if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
+			SONG_SELECT(&list_number,
+				&song_number, &difficulty,
+				&option,
+				&folder,
+				Music,
+				Button, Button_Shutter, Key, Buf,
+				&debug,
+				&NumberOfSongs,
+				&result_count,
+				result_rank_buf,
+				&secret,
+				&AC,
+				&StageCount,
+				&STList,
+				config,
+				&ir,
+				&isBackToTitle);
+			StageCount++;
+
+			if (isBackToTitle)break;
+		}
 	}
+
 	//GAME();
 	free(Music);
 

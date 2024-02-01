@@ -14,7 +14,7 @@ constexpr auto SONG_MAX_NUMBER = 9999;//最大曲数
 
 #define SHOW_DEBUG_MODE 1//DEBUG MODEのときにDEBUG MODEの表示をする
 
-#define SEND_EXIST_SCORE_TO_IR 0//F3で既存スコアをIRに送信
+#define SEND_EXIST_SCORE_TO_IR 0//F9で既存スコアをIRに送信
 
 #define ENABLE_GENERATING_LERNING_DATA 0//学習用データ生成
 

@@ -12,7 +12,7 @@
 #include"STRUCT_OP.h"
 #include<string>
 #include"IR_process.h"
-#include"KeyConfig.h"
+#include"KeyConfigSaveLoad.h"
 #include "Image.h"
 #include "Asset.h"
 #include "TextView.h"
@@ -23,6 +23,8 @@
 #include "DxLibUtil.h"
 #include "NPLoadSoundMem.h"
 #include "CONSTANT_VALUE.h"
+#include "NPVsync.h"
+#include "KeyConfigValidator.h"
 
 using namespace std;
 
@@ -132,7 +134,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	GAME_start_time = GetNowCount_d(config);
 	Get_Key_State(Buf, Key, AC);
 
-	int testNumberValue = 0;
+	NPVsync npVsync = NPVsync(config.Vsync, config.Fps);
 	while (1) {
 		appContext.updateTime();
 
@@ -348,7 +350,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 			else {
 				for (i = 0; i < 256; i++) {
 					if (Key[i] == 1) {
-						if (isValidKey(i)) {
+						if (KeyConfigValidator::isValidKey(i)) {
 							Button[settingKeyPosition.y][settingKeyPosition.x] = i;
 							settingKeyPosition.x++;
 							if (settingKeyPosition.x >= 4) {
@@ -614,13 +616,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		//buttonBB.draw();
 
 		SetDrawBright(brightness, brightness, brightness);
-		if (config.Vsync == 0) {
-			i = 0;
-			while (LOOP_passed_time + i < (double)1000/config.Fps) {//FPSを安定させるため待つ
-				WaitTimer(1);
-				i++;
-			}
-		}
+		npVsync.wait(LOOP_passed_time);
 
 		SetDrawBright(255, 255, 255);
 		ScreenFlip();
@@ -782,34 +778,4 @@ void CLOSE_COVER(int difficulty, Config config, Option* option) {
 		ScreenFlip();
 		clsDx();
 	}
-}
-
-int isValidKey(int key) {
-
-
-	if (key == KEY_INPUT_ESCAPE)return FALSE;
-	if (key == KEY_INPUT_LSHIFT)return FALSE;
-	if (key == KEY_INPUT_LCONTROL)return FALSE;
-	if (key == KEY_INPUT_RSHIFT)return FALSE;
-	if (key == KEY_INPUT_RCONTROL)return FALSE;
-	if (key == KEY_INPUT_F1)return FALSE;
-	if (key == KEY_INPUT_F2)return FALSE;
-	if (key == KEY_INPUT_F3)return FALSE;
-	if (key == KEY_INPUT_F4)return FALSE;
-	if (key == KEY_INPUT_F5)return FALSE;
-	if (key == KEY_INPUT_F6)return FALSE;
-	if (key == KEY_INPUT_F7)return FALSE;
-	if (key == KEY_INPUT_F8)return FALSE;
-	if (key == KEY_INPUT_F9)return FALSE;
-	if (key == KEY_INPUT_F10)return FALSE;
-	if (key == KEY_INPUT_F11)return FALSE;
-	if (key == KEY_INPUT_F12)return FALSE;
-	if (key == KEY_INPUT_RETURN)return FALSE;
-	if (key == KEY_INPUT_NUMPADENTER)return FALSE;
-	if (key == KEY_INPUT_UP)return FALSE;
-	if (key == KEY_INPUT_DOWN)return FALSE;
-	if (key == KEY_INPUT_LEFT)return FALSE;
-	if (key == KEY_INPUT_RIGHT)return FALSE;
-
-	return TRUE;
 }

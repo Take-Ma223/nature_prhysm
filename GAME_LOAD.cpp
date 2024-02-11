@@ -1384,20 +1384,8 @@ void GAME_LOAD(int song_number,
 
 
 
-
-	/*
-	for (i = 0; i <= 3; i++) {//ブレ
-		for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-			double r = 1 + (double)(rand() % 50) / 100;
-			note[i][j].bpm *= r;
-		}
-	}
-	*/
-
-
-
 	if (Option->op.color == OptionItem::Color::RGB_CHANGE) {//RGB CHANGE
-		lane = rand() % 5;//0~4
+		lane = GetRand(4);
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
 				note[i][j].color = rgb_change[lane][(int)note[i][j].color];
@@ -1411,7 +1399,7 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			NoteColor latestColor = NoteColor::NONE;
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				lane = rand() % 6;//0~5
+				lane = GetRand(5);
 				if (note[i][j].LN_k == true) {
 					note[i][j].color = note[i][j - 1].color;
 					note[i][j].color_init = note[i][j - 1].color_init;
@@ -1439,7 +1427,7 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			NoteColor latestColor = NoteColor::NONE;
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				lane = rand() % 6;//0~5
+				lane = GetRand(5);
 				if (note[i][j].LN_k == true) {
 					note[i][j].color = note[i][j - 1].color;
 					note[i][j].color_init = note[i][j - 1].color_init;
@@ -1456,7 +1444,7 @@ void GAME_LOAD(int song_number,
 		for (i = 0; i <= 3; i++) {
 			NoteColor latestColor = NoteColor::NONE;
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				lane = rand() % 7 + 1;//1~7
+				lane = GetRand(6) + 1;//1~7
 				if (note[i][j].color >= NoteColor::R && note[i][j].color <= NoteColor::W) {
 					if (note[i][j].LN_k == true) {
 						note[i][j].color = note[i][j - 1].color;
@@ -1485,7 +1473,7 @@ void GAME_LOAD(int song_number,
 
 		for (i = 0; i <= 3; i++) {
 			for (j = 0; j <= NOTE_MAX_NUMBER - 1; j++) {
-				lane = rand() % 7 + 1;//1~7
+				lane = GetRand(6) + 1;//1~7
 				if (note[i][j].color >= NoteColor::R && note[i][j].color <= NoteColor::W) {
 					if (note[i][j].LN_k == true) {
 						note[i][j].color = note[i][j - 1].color;
@@ -1514,19 +1502,19 @@ void GAME_LOAD(int song_number,
 				}
 				else {
 					if (note[i][j].color == NoteColor::Y) {
-						note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::R);//Yは12どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(1) + (int)NoteColor::R);//Yは12どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 					if (note[i][j].color == NoteColor::C) {
-						note[i][j].color = (NoteColor)(lane = rand() % 2 + (int)NoteColor::G);//Cは23どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(1) + (int)NoteColor::G);//Cは23どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 					if (note[i][j].color == NoteColor::M) {
-						note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::R);//Mは13どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(1) * 2 + (int)NoteColor::R);//Mは13どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 					if (note[i][j].color == NoteColor::W) {
-						note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::R);//Wは123どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(2) + (int)NoteColor::R);//Wは123どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
@@ -1544,19 +1532,19 @@ void GAME_LOAD(int song_number,
 				}
 				else {
 					if (note[i][j].color == NoteColor::R) {
-						note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::M);//Rは46どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(1) + (int)NoteColor::M);//Rは46どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 					if (note[i][j].color == NoteColor::G) {
-						note[i][j].color = (NoteColor)(lane = (rand() % 2) * 2 + (int)NoteColor::C);//Gは45どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(1) * 2 + (int)NoteColor::C);//Gは45どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 					if (note[i][j].color == NoteColor::B) {
-						note[i][j].color = (NoteColor)(lane = (rand() % 2) + (int)NoteColor::C);//Bは56どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(1) + (int)NoteColor::C);//Bは56どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 					if (note[i][j].color == NoteColor::W) {
-						note[i][j].color = (NoteColor)(lane = rand() % 3 + (int)NoteColor::C);//Wは456どっちか
+						note[i][j].color = (NoteColor)(lane = GetRand(2) + (int)NoteColor::C);//Wは456どっちか
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
@@ -1645,7 +1633,7 @@ void random_kaburanai(int *box, int nae, int min, int max, int *ln_use_s, int *l
 
 	do {//コピー元の1レーン目のコピー先レーンを決める
 		if (ln_use_s[0] == 0) {
-			box[0] = rand() % (max - min + 1) + min;//min~maxでランダムに
+			box[0] = GetRand(max - min) + min;//min~maxでランダムに
 
 		}
 		else {
@@ -1659,7 +1647,7 @@ void random_kaburanai(int *box, int nae, int min, int max, int *ln_use_s, int *l
 		do {
 			kaburi = 0;
 			if (ln_use_s[i] == 0) {
-				box[i] = rand() % (max - min + 1) + min;//min~maxでランダムに
+				box[i] = GetRand(max - min) + min;//min~maxでランダムに
 				for (j = 0; j <= i - 1; j++) {
 					kaburi = (kaburi || (box[j] == box[i]));
 				}

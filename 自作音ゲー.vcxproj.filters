@@ -160,6 +160,9 @@
     <Filter Include="ソース ファイル\KEY_CONFIG">
       <UniqueIdentifier>{0b368497-c144-440e-86d4-1b7f7561b83d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\WindowTitleSetter">
+      <UniqueIdentifier>{02cfc952-950f-407c-9a4e-9659632ba5aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -422,6 +425,9 @@
     </ClCompile>
     <ClCompile Include="KeyConfigValidator.cpp">
       <Filter>ソース ファイル\Util\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowTitleSetter.cpp">
+      <Filter>ソース ファイル\Util\WindowTitleSetter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -741,6 +747,9 @@
     </ClInclude>
     <ClInclude Include="KeyConfigValidator.h">
       <Filter>ソース ファイル\Util\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowTitleSetter.h">
+      <Filter>ソース ファイル\Util\WindowTitleSetter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

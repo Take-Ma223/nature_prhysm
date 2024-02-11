@@ -33,6 +33,7 @@
 #include "OptionListView.h"
 #include "NPLoadSoundMem.h"
 #include "KEY_CONFIG.h"
+#include "WindowTitleSetter.h"
 
 using namespace std;
 
@@ -195,7 +196,7 @@ void SONG_SELECT(int *l_n,
 	const int FLAG_SELECT_STATE = 1;//自由に選択できる状態
 	const int FLAG_CLOSING_STATE = 2;
 	const int FLAG_END_FUNCTION_STATE = 3;//中央カバーが閉まった後の状態
-	int flag = FLAG_OPENING_STATE;
+	int activityState = FLAG_OPENING_STATE;
 
 	int Column = config.SongSelectRowNumber - 1;//バナーの縦の列数(RowNumber) -1(実際に並ぶのはColumn+1個) 偶数にする
 	wchar_t *title_buf[20 + 1] = {NULL,NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
@@ -330,15 +331,13 @@ void SONG_SELECT(int *l_n,
 
 	int ScoreShowMode = 0;//プレーヤースコアを表示するかライバルスコアを表示するか(0:プレイヤー 1:ライバル)
 
-	const int OPERATION_INSTRUCTION_NUMBER = 7;
+	const int OPERATION_INSTRUCTION_NUMBER = 5;
 	wchar_t *ope_ins[OPERATION_INSTRUCTION_NUMBER] = {//operation instruct 操作説明 
 		L"決定"
 		,L"選択"
 		,L"難易度変更"
 		,L"リザルト表示"
 		,L"オプション変更"
-		,L"F1:DEBUG MODE"
-		,L"F2:ランキング表示"
 	};
 
 
@@ -352,7 +351,7 @@ void SONG_SELECT(int *l_n,
 	int *width_sent_color = new int[option->COLOR_NUM];
 	//int width_sent_note, width_sent_hitsound;
 
-	int width_ope_ins[7];
+	int width_ope_ins[OPERATION_INSTRUCTION_NUMBER];
 	int oi_counter = 0;
 	SetFontSize(28);
 
@@ -562,7 +561,7 @@ void SONG_SELECT(int *l_n,
 	H_CURSOR = LoadGraph(L"img/cursor.png");
 
 	//NOTEプレビュー画像読み込み
-	wchar_t* ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",L"bright",L"note_Long_hit_b" };
+	wchar_t* ReadNameRGB[10] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",L"bright"};
 	wchar_t strcash[128];
 	sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
 	H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
@@ -1398,7 +1397,10 @@ void SONG_SELECT(int *l_n,
 
 	GAME_start_time = GetNowCount_d(config);
 	int Announse_show_time_base = GetNowCount() + 1500;//アナウンス表示の基準時間
-	
+
+	auto flag = ShowFlag(); flag.version = true; flag.autoPlay = true; flag.scoreRanking = true; flag.keyConfig = true;
+	WindowTitleSetter::setText(flag);
+			
 	while (1) {
 		appContext.updateTime();
 		coverAlpha.process();
@@ -1413,7 +1415,7 @@ void SONG_SELECT(int *l_n,
 			PlaySoundMem(SH_BGM, DX_PLAYTYPE_LOOP, TRUE);
 			BGM_play = 1;
 		}
-		if (flag != FLAG_END_FUNCTION_STATE) {//シャッター閉まったらここではBGMの音量調整は行わない
+		if (activityState != FLAG_END_FUNCTION_STATE) {//シャッター閉まったらここではBGMの音量調整は行わない
 			int bgmVolume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
 			ChangeVolumeSoundMem(int(bgm_vol_ratio * bgmVolume), SH_BGM);
 		}
@@ -1433,13 +1435,13 @@ void SONG_SELECT(int *l_n,
 
 		alphaAnimationOnStart();
 
-		if (flag == FLAG_SELECT_STATE) {
+		if (activityState == FLAG_SELECT_STATE) {
 			int PressFrame = int(25.0 * (17.0 / LOOP_passed_time));//ボタン押し続けてカーソルが動き続けるようになるまでのフレーム
 			if (PressFrame <= 0)PressFrame = 1;//0以下にはしない
 
 			//printfDx(L"%d\n", PressFrame);
-			if (Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE && flag != FLAG_END_FUNCTION_STATE) {//ESCで画面終了
-				flag = FLAG_CLOSING_STATE;
+			if (Key[KEY_INPUT_ESCAPE] == 1 && activityState != FLAG_CLOSING_STATE && activityState != FLAG_END_FUNCTION_STATE) {//ESCで画面終了
+				activityState = FLAG_CLOSING_STATE;
 				PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 				coverAlphaClose();
 				*isBackToTitle = true;
@@ -1760,7 +1762,7 @@ void SONG_SELECT(int *l_n,
 								if ((Music[song_number].exist[difficulty] == 1 && Music[song_number].secret != 1)//その難易度が存在して隠し曲ではない
 									|| (Music[song_number].exist[difficulty] == 1 && Music[song_number].secret == 1 && secret->song_appear_number == song_number)//それか隠し曲で出現対象になっているとき
 									) {
-									flag = FLAG_CLOSING_STATE;
+									activityState = FLAG_CLOSING_STATE;
 									PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 									coverAlphaClose();
 								}
@@ -1852,7 +1854,7 @@ void SONG_SELECT(int *l_n,
 
 						if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//コース決定
 							if (STList->Kind[list_number] != 2) {//内容が「フォルダ選択に戻る」じゃなくて「コース」のとき
-								flag = FLAG_CLOSING_STATE;
+								activityState = FLAG_CLOSING_STATE;
 								PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
 								coverAlphaClose();
 							}
@@ -2378,7 +2380,7 @@ void SONG_SELECT(int *l_n,
 
 		brightness = int(155 + 100 * (1 + sin((double)GAME_passed_time / 300)) / 2);
 
-		if (flag == FLAG_END_FUNCTION_STATE) {
+		if (activityState == FLAG_END_FUNCTION_STATE) {
 			//デモのフェードアウト
 			if (demo_vol > 0) {
 				demo_vol = 1.0 - ((GAME_passed_time - CoverClosedTime) / 1200);
@@ -2398,11 +2400,11 @@ void SONG_SELECT(int *l_n,
 			}
 		}
 
-		if (flag == FLAG_END_FUNCTION_STATE && GAME_passed_time - CoverClosedTime >= 1200) {//曲選択
+		if (activityState == FLAG_END_FUNCTION_STATE && GAME_passed_time - CoverClosedTime >= 1200) {//曲選択
 			
 			for (i = 0; i <= 40; i++) {
                 /*
-				if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && flag != FLAG_CLOSING_STATE) {//ESCでゲーム終了
+				if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && activityState != FLAG_CLOSING_STATE) {//ESCでゲーム終了
 					dxLibFinishProcess();
 					return;
 				}
@@ -3519,7 +3521,7 @@ void SONG_SELECT(int *l_n,
 
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		if (flag == FLAG_OPENING_STATE) {//開ける
+		if (activityState == FLAG_OPENING_STATE) {//開ける
 			DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
 			if (c_m_draw_counter > 1) {
 				if (SelectingTarget == SELECTING_SONG) {
@@ -3534,7 +3536,7 @@ void SONG_SELECT(int *l_n,
 					}
 				}
 				c_m_draw_counter = 1;
-				flag = FLAG_SELECT_STATE;
+				activityState = FLAG_SELECT_STATE;
 			}
 			for (i = 0; i < CRTBuf; i++) {
 				if (c_m_draw_counter <= 1) {
@@ -3549,11 +3551,11 @@ void SONG_SELECT(int *l_n,
 
 
 
-		if (flag == FLAG_CLOSING_STATE) {//閉める
+		if (activityState == FLAG_CLOSING_STATE) {//閉める
 			DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
 			if (c_m_draw_counter < 0) {
 				PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
-				flag = FLAG_END_FUNCTION_STATE;
+				activityState = FLAG_END_FUNCTION_STATE;
 				CoverClosedTime = (int)GAME_passed_time;
 			}
 			for (i = 0; i < CRTBuf; i++) {
@@ -3564,7 +3566,7 @@ void SONG_SELECT(int *l_n,
 
 		}
 
-		if (flag == FLAG_END_FUNCTION_STATE) {//閉まった後
+		if (activityState == FLAG_END_FUNCTION_STATE) {//閉まった後
 			DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
 		}
 
@@ -3812,7 +3814,7 @@ void SONG_SELECT(int *l_n,
 		}
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		if (flag == FLAG_END_FUNCTION_STATE) {
+		if (activityState == FLAG_END_FUNCTION_STATE) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * (GAME_passed_time - CoverClosedTime) / 1200));
 			DrawGraph(0, 0, H_DARKNESS, TRUE);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
@@ -3830,7 +3832,7 @@ void SONG_SELECT(int *l_n,
 
 
 		if (*debug == 1 && config.ShowDebug == 1) {
-			printfDx(L"DEBUG MODE\n");
+			printfDx(L"AUTO PLAY\n");
 		}
 		if (ScoreShowMode == 1) {
 			printfDx(L"RIVAL SCORE表示\n");

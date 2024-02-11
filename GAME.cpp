@@ -41,6 +41,7 @@
 #include "NoteJudgeProcessor.h"
 #include "GradationNoteImage.h"
 #include "NoteTextImage.h"
+#include "WindowTitleSetter.h"
 
 using namespace std;
 
@@ -93,10 +94,10 @@ void GAME(int song_number, int difficulty,
 	double TimePerFrame = 1000.0 / config.Fps;//1フレームの時間
 
 
-	int H_NOTE[12];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
+	int H_NOTE[11];//音符画像(0は無しで1~9でRGBYCMWKF 10はLNを叩いた時に光らせるレイヤー用 光るノート用)
 	//int H_NOTE_OR_FRAME;//ORノートの枠
 
-	int H_LNOTE[12];//LNの中間用画像ハンドル(0は無しで1~9でRGBYCMWK(無し)F)
+	int H_LNOTE[11];//LNの中間用画像ハンドル(0は無しで1~9でRGBYCMWK(無し)F)
 	//int H_LNOTE_OR_FRAME;//LNでORノートの枠
 
 	int H_JUDGE_AREA, H_BG;//画像データのハンドル
@@ -571,10 +572,9 @@ void GAME(int song_number, int difficulty,
 
 
 	//画像音ハンドル値代入
-	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",
-	L"bright",L"note_Long_hit_b" };
+	wchar_t *ReadNameRGB[10] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",L"bright" };
 
-	for (i = 0; i <= 10; i++) {
+	for (i = 0; i <= 9; i++) {
 		wchar_t strcash[128];
 		sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[i]);
 
@@ -1062,6 +1062,9 @@ void GAME(int song_number, int difficulty,
 		getTargetScore(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == OptionItem::Color::RAINBOW, static_cast<int>(option->op.targetScore2), highScore.score, ir->rivalID, config);
 		targetScore2 = LoadTargetScore(Music[song_number].SaveFolder);
 	}
+
+	auto flag = ShowFlag(); flag.version = true;
+	WindowTitleSetter::setText(flag);
 
 	bool isSkip = false;
 	GAME_start_time = GetNowCount_d(config);
@@ -3921,8 +3924,6 @@ void GAME(int song_number, int difficulty,
 
 
 		if (*debug == 1 && SHOW_DEBUG_MODE == 1 && config.ShowDebug == 1) {
-			printfDx(L"DEBUG MODE\n");
-
 			if (debug_auto == 1) {
 				printfDx(L"F1:AUTO PLAY:ON\n");
 			}

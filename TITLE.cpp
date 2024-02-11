@@ -25,6 +25,7 @@
 #include "CONSTANT_VALUE.h"
 #include "NPVsync.h"
 #include "KeyConfigValidator.h"
+#include "WindowTitleSetter.h"
 
 using namespace std;
 
@@ -131,10 +132,12 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(26);
 
+	NPVsync npVsync = NPVsync(config.Vsync, config.Fps);
+	auto flag = ShowFlag(); flag.version = true;
+	WindowTitleSetter::setText(flag);
+
 	GAME_start_time = GetNowCount_d(config);
 	Get_Key_State(Buf, Key, AC);
-
-	NPVsync npVsync = NPVsync(config.Vsync, config.Fps);
 	while (1) {
 		appContext.updateTime();
 

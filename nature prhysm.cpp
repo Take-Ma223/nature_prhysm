@@ -26,6 +26,7 @@
 #include "ActivityController.h"
 #include "DxLibUtil.h"
 #include "AutoDifficultyPrediction.h"
+#include "WindowTitleSetter.h"
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
 void EffekseerInitProcess();
@@ -72,9 +73,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	SetWindowSizeChangeEnableFlag(TRUE);//サイズ変更許可
 
-	wchar_t WindowTitle[30];
-	swprintf_s(WindowTitle, L"nature prhysm ver %.2f", APPLICATION_VERSION);
-	SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
+	auto flag = ShowFlag(); flag.version = true;
+	WindowTitleSetter::setText(flag);
+
 	SetWindowIconID(333);//ウィンドウアイコンの設定
 #endif
 	//SetEnableXAudioFlag(TRUE);

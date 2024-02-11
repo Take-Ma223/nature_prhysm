@@ -292,6 +292,7 @@
     <ClCompile Include="TransValue.cpp" />
     <ClCompile Include="ValueEvent.cpp" />
     <ClCompile Include="View.cpp" />
+    <ClCompile Include="WindowTitleSetter.cpp" />
     <ClCompile Include="xtosinx.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -401,6 +402,7 @@
     <ClInclude Include="TransValue.h" />
     <ClInclude Include="ValueEvent.h" />
     <ClInclude Include="View.h" />
+    <ClInclude Include="WindowTitleSetter.h" />
     <ClInclude Include="xtosinx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

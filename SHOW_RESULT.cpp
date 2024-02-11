@@ -22,6 +22,7 @@
 #include "ActivityContext.h"
 #include "DxLibUtil.h"
 #include "NPLoadSoundMem.h"
+#include "WindowTitleSetter.h"
 
 using namespace std;
 
@@ -783,15 +784,21 @@ void SHOW_RESULT(RESULT res,
 
 	}
 
-
-	wchar_t WindowTitle[128];
 	if (*debug == 1) {
-		swprintf_s(WindowTitle, L"nature prhysm ver %.2f  PrtSc:スクリーンショット", APPLICATION_VERSION);
+		auto flag = ShowFlag();
+		flag.version = true;
+		flag.scoreRanking = SkillTestFlag != SHOW_SKILL_TEST_RESULT ? true : false;
+		flag.screenShot = true;
+		WindowTitleSetter::setText(flag);
 	}
 	else {
-		swprintf_s(WindowTitle, L"nature prhysm ver %.2f  F11:Twitterに投稿  PrtSc:スクリーンショット", APPLICATION_VERSION);
+		auto flag = ShowFlag();
+		flag.version = true;
+		flag.scoreRanking = SkillTestFlag != SHOW_SKILL_TEST_RESULT ? true : false;
+		flag.twitter = true;
+		flag.screenShot = true;
+		WindowTitleSetter::setText(flag);
 	}
-	SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
 
 	int show_inst_flag = 1;//F11:左上の説明(DEBUG_MODE除く)を表示するフラグ(1:する 0:しない)
 
@@ -1330,9 +1337,6 @@ void SHOW_RESULT(RESULT res,
 				InitGraph();//メモリ開放
 				InitSoundMem();//
 
-				wchar_t WindowTitle[30];
-				swprintf_s(WindowTitle, L"nature prhysm ver %.2f", APPLICATION_VERSION);
-				SetMainWindowText(WindowTitle);//ウィンドウタイトル変更
 				return;
 			}
 			for (i = 0; i < CRTBuf; i++) {
@@ -1357,7 +1361,7 @@ void SHOW_RESULT(RESULT res,
 		*/
 
 		if (*debug == 1 && config.ShowDebug == 1) {
-			printfDx(L"DEBUG MODE\n");
+			printfDx(L"AUTO PLAY\n");
 			if (show_inst_flag == 1 && flag == 1 && GAME_passed_time >= rank_appear_time + 300 && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 				printfDx(L"F2:スコアランキング表示\n");
 			}

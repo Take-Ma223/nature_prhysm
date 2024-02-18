@@ -1006,6 +1006,10 @@ void EDIT_SCORE(SCORE_CELL* head,
 													PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
 												}
 											}
+											else {
+												score_cell_write_note(insert, j, NoteColor::K, NoteGroup::Single, 0);//黒音符書き込み
+												PlaySoundMem(SH.SH_HIT_K, DX_PLAYTYPE_BACK, TRUE);
+											}
 											
 										}
 									}

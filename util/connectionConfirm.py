@@ -1,78 +1,50 @@
-import socket
 import argparse
-import pickle
-from ctypes import *
+import np_request_operator as operator
+from request_operator import RequestMethod
 import os
-
+from ctypes import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--local', action="store_true")
 parser.add_argument('--run')
 args = parser.parse_args()
 
-password = "natureprhysmserver1.00"
-
 CONNECTION_SUCCESS = 0  # 接続成功
 CONNECTION_SERVER_NOT_FOUND = 1  # サーバーが見つからない
 CONNECTION_VERSION_ERROR = 2  # サーバーには繋がったがバージョンが違う
 
 
+CONNECTION_RESULT_SAVE_PATH = os.path.join('save_data', 'tmp')
+CONNECTION_RESULT_SAVE_FILE_NAME = 'ConnectState'
 class DataStructure(Structure):
     _fields_ = (
         ('ConnectionState', c_int32),
     )
 
-
-def authorization_password():
-
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if args.local:  # ローカル
-            s.connect(('192.168.3.6', 50001))
-        else:  # グローバル
-            s.connect(('nature-prhysm.f5.si', 50001))
-    except socket.timeout:
-        print("socket.timeout")
-        write(CONNECTION_SERVER_NOT_FOUND)
-        return
-    except BaseException as baseException:
-        print(baseException)
-        write(CONNECTION_SERVER_NOT_FOUND)
-
-    print("socket connected")
-
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-    s.send(bytes(password, 'utf-8'))
-    try:
-        # 応答を受け取る
-        recv = s.recv(1024)
-        print(recv.decode("utf-8"))
-        if recv == b"ok":
-            print("connection success")
-            write(CONNECTION_SUCCESS)
-            return
-    except socket.timeout:
-        print("socket.timeout")
-        write(CONNECTION_VERSION_ERROR)
-        return
-    except BaseException as baseException:
-        print(baseException)
-        write(CONNECTION_SERVER_NOT_FOUND)
-
-def write(data):
-    # フォルダ作成
-    os.makedirs(os.path.join("save_data", "tmp"), exist_ok=True)
-    with open(os.path.join("save_data", "tmp", "ConnectState"), "wb") as f:
-        f.write(DataStructure(data))
-        print(DataStructure(data))
-
-
-def main():
-    socket.setdefaulttimeout(1)
-    authorization_password()
-
+class ConnectionResultWriter():
+    def write(data:int):
+        # フォルダ作成
+        os.makedirs(CONNECTION_RESULT_SAVE_PATH, exist_ok=True)
+        with open(os.path.join(CONNECTION_RESULT_SAVE_PATH, CONNECTION_RESULT_SAVE_FILE_NAME), "wb") as f:
+            f.write(DataStructure(data))
+            print(DataStructure(data))
 
 if __name__ == "__main__":
-    if args.run == "223210":
-        main()
+    # connection_confirm()
+    op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+    result = op.request(cgi='connection.php',method=RequestMethod.GET)
+    
+    writer = ConnectionResultWriter()
+
+    if result.isOK():
+        writer.write(CONNECTION_SUCCESS)
+    elif result.get_NG_reason() == operator.NPServerRequestNGReason.SERVER_VERSION_INVALID:
+        writer.write(CONNECTION_VERSION_ERROR)
+    else:
+        writer.write(CONNECTION_SERVER_NOT_FOUND)
+
+
+    print(result)
+    print('isOK:', result.isOK())
+    print('NG_reason:', result.get_NG_reason())
+    print('data:', result.get_data())

@@ -1,9 +1,10 @@
-import socket
 import argparse
-import pickle
 from ctypes import *
 import os
-import hashlib
+
+from np_hash import NPHash
+import np_request_operator as operator
+from request_operator import RequestMethod
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--local', action="store_true")
@@ -16,71 +17,10 @@ parser.add_argument('rivalID', type=int)  # Riavlに指定したプレイヤー�
 parser.add_argument('--run')
 args = parser.parse_args()
 
-password = "natureprhysmserver1.00"
-
-
 class DataStructure(Structure):
     _fields_ = (
         ('score', c_int32),
     )
-
-
-def get_hash():
-    # ファイル を バイナリーモード で開く
-    with open(args.nps_file_path, 'rb') as file:
-        # ファイルを読み取る
-        fileData = file.read()
-        # sha3_256
-        hash_sha3_256 = hashlib.sha3_256(fileData).hexdigest()
-        return hash_sha3_256
-
-
-def authorization_password(s):
-    s.send(bytes(password, 'utf-8'))
-    # 応答を受け取る
-    recv = s.recv(1024)
-    print(recv.decode("utf-8"))
-    if recv == b"ok":
-        return
-
-def recv_data():
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    if args.local:  # ローカル
-        s.connect(('192.168.3.6', 50001))
-    else:  # グローバル
-        s.connect(('nature-prhysm.f5.si', 50001))
-
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-
-    # パスワード送信
-    authorization_password(s)
-
-    # サーバに送信
-    s.send(bytes("getTargetScore", 'utf-8'))
-
-    # 応答を受け取る
-    recv = s.recv(1024)
-    print(recv.decode("utf-8"))
-    if recv == b"ok":
-        data = {"hash": get_hash(),
-                "rainbow": args.rainbow,
-                "mode": args.mode,
-                "score": args.score,
-                "rivalID": args.rivalID,
-                }
-        msg = pickle.dumps(data)
-        s.send(msg)
-        # サーバからスコアの値を受信
-        full_msg = b''
-        msg = s.recv(1024)
-        print(len(msg))
-        full_msg += msg
-        print(full_msg)
-        score = pickle.loads(full_msg)
-        return score["score"]
-    else:
-        return 0
-
 
 def write(data):
     # フォルダ作成
@@ -91,10 +31,38 @@ def write(data):
 
 
 def main():
-    socket.setdefaulttimeout(1)
-    data = recv_data()
-    print("data:", data)
-    write(int(data))
+    np_hash = NPHash()
+    hash_sha3_256 = np_hash.get_nps_hash(args.nps_file_path)
+    print('sha3_256 : ' + hash_sha3_256)
+    if args.rainbow:
+        rainbow = "1"
+    else:
+        rainbow = "0"
+
+    mode = args.mode
+    if mode == 0:
+        target_mode='Rival'
+    elif mode == 1:
+        target_mode='Average'
+    elif mode == 2:
+        target_mode='Median'
+    elif mode == 3:
+        target_mode='NextRank'
+    elif mode == 4:
+        target_mode='Top'
+
+    data = {'chart_id':hash_sha3_256, 'rainbow':rainbow, 'target_mode':target_mode, 'rival_id':args.rivalID, 'best_score':args.score}
+
+    op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+    result = op.request(cgi='get_target_score.php',method=RequestMethod.POST, post_data=data)
+
+
+    if result.isOK():
+        print(result.get_data())
+        print(type(result.get_data()['score']))
+        target_score = int(float(result.get_data()['score']))
+        print(target_score)
+        write(target_score)
 
 
 if __name__ == "__main__":

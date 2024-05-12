@@ -1,9 +1,6 @@
-import socket
 import argparse
-import pickle
-import hashlib
-import os
-import webbrowser
+from np_hash import NPHash
+import np_request_operator as operator
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--local', action="store_true")
@@ -13,29 +10,20 @@ parser.add_argument('--run')
 
 args = parser.parse_args()
 
-def get_hash():
-    # ファイル を バイナリーモード で開く
-    with open(args.nps_file_path, 'rb') as file:
-        # ファイルを読み取る
-        fileData = file.read()
-        # sha3_256
-        hash_sha3_256 = hashlib.sha3_256(fileData).hexdigest()
-        return hash_sha3_256
-
-
 def main():
-    hash_sha3_256 = get_hash()
+    np_hash = NPHash()
+    hash_sha3_256 = np_hash.get_nps_hash(args.nps_file_path)
     print('sha3_256 : ' + hash_sha3_256)
     if args.rainbow:
-        rainbow = "_rainbow"
+        rainbow = "1"
     else:
-        rainbow = ""
+        rainbow = "0"
+    
+    query_chart_id = "chart_id="+hash_sha3_256
+    query_rainbow = "rainbow="+rainbow 
 
-    if args.local:  # ローカル
-        webbrowser.open("http://192.168.3.6"  +"/ranking/"+str(hash_sha3_256)+"/score_ranking"+rainbow+".html",new=0)
-    else:  # グローバル
-        webbrowser.open("http://nature-prhysm.f5.si"+"/ranking/"+str(hash_sha3_256)+"/score_ranking"+rainbow+".html")
-
+    op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+    result = op.open_with_browser(cgi='view.php?'+query_chart_id+'&'+query_rainbow)
 
 if __name__ == "__main__":
     if args.run == "223210":

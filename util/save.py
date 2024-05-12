@@ -1,8 +1,7 @@
-import socket
 import argparse
 import pickle
-import hashlib
 import os
+from np_hash import NPHash
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--local', action="store_true")
@@ -46,17 +45,6 @@ def get_nps_information():
                 break
     return title, artist, genre
 
-
-def get_hash():
-    # ファイル を バイナリーモード で開く
-    with open(args.nps_file_path, 'rb') as file:
-        # ファイルを読み取る
-        fileData = file.read()
-        # sha3_256
-        hash_sha3_256 = hashlib.sha3_256(fileData).hexdigest()
-        return hash_sha3_256
-
-
 def getid():
     with open(os.path.join("save_data", "IR_id.dat"), "rb") as f:
         msg = f.read()
@@ -81,7 +69,9 @@ def load(path):
 
 
 def main():
-    hash_sha3_256 = get_hash()
+    np_hash = NPHash()
+    hash_sha3_256 = np_hash.get_nps_hash(args.nps_file_path)
+
     print('sha3_256 : ' + hash_sha3_256)
     title, artist, genre = get_nps_information()
     try:

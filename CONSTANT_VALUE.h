@@ -22,4 +22,6 @@ const wchar_t RUN_PASS[] = L"223210";
 
 #define NATURE_PRHYSM_FONT L"メイリオ"
 
+#define FIRST_ACTIVITY TestActivity(&context);
+
 #endif

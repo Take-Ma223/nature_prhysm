@@ -8,6 +8,7 @@
 #include"Log.h"
 #include "Intent.h"
 #include "DxLibUtil.h"
+#include "CONSTANT_VALUE.h"
 
 class ActivityController
 {
@@ -94,7 +95,7 @@ public:
 	};
 
 	Activity* firstActivity() {
-		return new TestActivity(&context);
+		return new FIRST_ACTIVITY;
 	}
 
 };

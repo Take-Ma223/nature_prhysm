@@ -457,7 +457,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		*/
 
-		brightness = int(255 * (1 + sin((double)GAME_passed_time / 600)) / 2);
+		brightness = 191 + int(64 * (1 + sin((double)GAME_passed_time / 600)) / 2);
 
 		if (start == 1 && LOGO_draw_alpha == 0) break;
 
@@ -468,12 +468,12 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		for (i = 0; i < CRTBuf; i++) {
 			if (BackDrawCounter < 255) {
-				BackDrawCounter += 0.05;
+				BackDrawCounter += 0.03;
 				if (BackDrawCounter >= 255)BackDrawCounter = 255;
 			}
 
 			if (OtherDrawCounter < 255) {
-				OtherDrawCounter += 0.05;
+				OtherDrawCounter += 0.03;
 				if (OtherDrawCounter >= 255)OtherDrawCounter = 255;
 			}
 
@@ -626,7 +626,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		clsDx();
 
 		//BGM再生
-		if (BGMPlay == 0 && GAME_passed_time >= 1500) {
+		if (BGMPlay == 0 && GAME_passed_time >= 500) {
 			PlaySoundMem(SH_BGM, DX_PLAYTYPE_BACK, TRUE);
 			BGMPlay = 1;
 		}

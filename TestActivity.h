@@ -102,12 +102,12 @@ public:
 	}
 
 	virtual void draw() override {
-		//backGround.draw();
-		//img.draw();
-		//testText1.draw();
-		//testNumber1.draw();
-		//buttonBB.draw();
-		detailView.draw();
+		backGround.draw();
+		img.draw();
+		testText1.draw();
+		testNumber1.draw();
+		buttonBB.draw();
+		//detailView.draw();
 	}
 
 private:

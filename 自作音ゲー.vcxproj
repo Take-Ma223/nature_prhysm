@@ -287,6 +287,7 @@
     <ClCompile Include="TextViewParam.cpp" />
     <ClCompile Include="TITLE.cpp" />
     <ClCompile Include="TestController.cpp" />
+    <ClCompile Include="TitleLogoView.cpp" />
     <ClCompile Include="TransAction.cpp" />
     <ClCompile Include="Transition.cpp" />
     <ClCompile Include="TransValue.cpp" />
@@ -397,6 +398,7 @@
     <ClInclude Include="TextViewParam.h" />
     <ClInclude Include="TITLE.h" />
     <ClInclude Include="TestController.h" />
+    <ClInclude Include="TitleLogoView.h" />
     <ClInclude Include="TransAction.h" />
     <ClInclude Include="Transition.h" />
     <ClInclude Include="TransValue.h" />

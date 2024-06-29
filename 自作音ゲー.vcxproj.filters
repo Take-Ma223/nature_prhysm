@@ -163,6 +163,9 @@
     <Filter Include="ソース ファイル\Util\WindowTitleSetter">
       <UniqueIdentifier>{02cfc952-950f-407c-9a4e-9659632ba5aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\TITLE\TitleLogoView">
+      <UniqueIdentifier>{97345e8e-bca4-4f7f-ac25-80d6c339d98a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -428,6 +431,9 @@
     </ClCompile>
     <ClCompile Include="WindowTitleSetter.cpp">
       <Filter>ソース ファイル\Util\WindowTitleSetter</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleLogoView.cpp">
+      <Filter>ソース ファイル\TITLE\TitleLogoView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -750,6 +756,9 @@
     </ClInclude>
     <ClInclude Include="WindowTitleSetter.h">
       <Filter>ソース ファイル\Util\WindowTitleSetter</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleLogoView.h">
+      <Filter>ソース ファイル\TITLE\TitleLogoView</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

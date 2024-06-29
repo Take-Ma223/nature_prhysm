@@ -26,6 +26,7 @@
 #include "NPVsync.h"
 #include "KeyConfigValidator.h"
 #include "WindowTitleSetter.h"
+#include "TitleLogoView.h"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	//コンテキスト
 	AppContext appContext = AppContext(NULL, option, &config);
 	ActivityContext context = ActivityContext(&appContext, &asset);
-	
+
 	int H_BG;//背景画像
 	int H_CLOUD;//雲画像
 	int H_TITLE_LOGO;//ロゴ画像
@@ -113,6 +114,9 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
 
+
+	TitleLogoView title_logo_view = TitleLogoView(&context);
+
 	SH_START = NPLoadBgmSoundMem(L"sound/nature_prhysm_jingle.wav", option);
 	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
 	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
@@ -140,6 +144,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	Get_Key_State(Buf, Key, AC);
 	while (1) {
 		appContext.updateTime();
+		if (!title_logo_view.isPlaying())title_logo_view.startAnimation();
 
 		//Calc
 		GAME_passed_time = GetNowCount_d(config) - GAME_start_time;//経過時間計算
@@ -216,6 +221,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 				if (menuSelectStat == MENU_GAME_START) {
 					start = 1;
 					PlaySoundMem(SH_START, DX_PLAYTYPE_BACK, TRUE);
+					title_logo_view.hide();
 				}
 				else if(menuSelectStat == MENU_IR_SETTING){
 					stat = STATE_IR_SETTING;
@@ -504,7 +510,8 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 		//LOGO_draw_alpha = 0;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(LOGO_draw_alpha * OtherDrawCounter));
-		DrawGraph(0, 0, H_TITLE_LOGO, TRUE);//ロゴ
+		//DrawGraph(0, 0, H_TITLE_LOGO, TRUE);//ロゴ
+		title_logo_view.draw();
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 		/*

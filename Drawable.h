@@ -176,6 +176,10 @@ public:
 		return handle.getSize();
 	}
 
+	int getHandle() {
+		return handle.getHandle();
+	}
+
 protected:
 	ActivityContext* context = NULL;
 

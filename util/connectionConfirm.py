@@ -22,7 +22,7 @@ class DataStructure(Structure):
     )
 
 class ConnectionResultWriter():
-    def write(data:int):
+    def write(self, data:int):
         # フォルダ作成
         os.makedirs(CONNECTION_RESULT_SAVE_PATH, exist_ok=True)
         with open(os.path.join(CONNECTION_RESULT_SAVE_PATH, CONNECTION_RESULT_SAVE_FILE_NAME), "wb") as f:

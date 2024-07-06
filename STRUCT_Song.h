@@ -16,10 +16,16 @@ enum RainbowMode {
 	Rainbow=1
 };
 
+enum UnlockState {
+	Normal = 0,
+	Secret = 1,
+	Unlocked = 2
+};
+
 class Song {
 public:
 	BOOL exist[5] = { 0,0,0,0,0 };//この難易度があるかどうか(0:無い 1:ある)
-	char secret = 0;//隠し曲かどうか(0:通常曲 1:隠し曲 2:解禁済み)
+	UnlockState secret = UnlockState::Normal;//隠し曲かどうか(0:通常曲 1:隠し曲 2:解禁済み)
 	unsigned int StrColor[5] = { 0,0,0,0,0 };//曲名を表示する色(GetColorの値)
 	unsigned int StrShadowColor[5] = { 0,0,0,0,0 };//曲名の枠を表示する色(GetColorの値)
 	wchar_t* KindFolder;//種類フォルダの名前(songs/folder のfolder部分)

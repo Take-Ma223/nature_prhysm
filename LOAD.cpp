@@ -298,7 +298,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 						//解禁しているか確認
 						secret_save_LOAD(secret, secret->total, Music[i].SaveFolder);//隠し曲のセーブファイル確認
 						if (secret->get_song_number[secret->total] == 1) {//解禁していた
-							Music[i].secret = 2;
+							Music[i].secret = UnlockState::Unlocked;
 						}
 						secret->total++;//隠し曲総数+1
 					}

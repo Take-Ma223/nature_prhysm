@@ -22,7 +22,7 @@ ActionEvent* TransAction::actionEvent(Event* _event)
 void TransAction::onPlay(BOOL isReverse)
 {
 
-	actionEvent(transition[eventIndex])->action();
+	//actionEvent(transition[eventIndex])->action();
 }
 
 void TransAction::onReverse(BOOL isReverse)
@@ -36,11 +36,11 @@ void TransAction::onUpdate()
 void TransAction::onLoop(BOOL isReverse)
 {
 	if (!isReverse) {
-		actionEvent(transition.back())->action();
+		//actionEvent(transition.back())->action();
 		actionEvent(transition[eventIndex])->action();
 	}
 	else {
-		actionEvent(transition.front())->action();
+		//actionEvent(transition.front())->action();
 		actionEvent(transition[eventIndex])->action();
 	}
 

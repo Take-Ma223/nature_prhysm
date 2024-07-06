@@ -91,6 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		SetUseASIODriverIndex(config.AsioDriver);
 		SetEnableASIOFlag(TRUE, config.Buffer);
 	}
+	SetUseTransColor(false);//透過色を使用しない
 
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{
@@ -278,7 +279,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (ProcessMessage() != 0) {dxLibFinishProcess();return -1;}
 
 	while (1) {
-		TITLE(Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
+		TITLE(Music, &NumberOfSongs, Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
 		if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
 		int StageCount = 0;
 		bool isBackToTitle = false;

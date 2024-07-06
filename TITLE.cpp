@@ -30,7 +30,7 @@
 
 using namespace std;
 
-void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, Config config, Option *option, IR_SETTING *ir) {
+void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CONTROLLER* AC, Config config, Option* option, IR_SETTING* ir) {
 	Asset asset;//使う画像セット
 	//コンテキスト
 	AppContext appContext = AppContext(NULL, option, &config);
@@ -115,7 +115,14 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
 
 
-	TitleLogoView title_logo_view = TitleLogoView(&context);
+	TitleLogoView title_logo_view = TitleLogoView(Music, NumberOfSongs, &context);
+	TransValue str_press_key_alpha = TransValue(&context);
+	auto str_press_key_alpha_start_animation = [&] {
+		str_press_key_alpha.eChange(Point(255), Point(128), Converter(ConvertMode::Linear), 0, 413.79310344827586206896551724138);
+		str_press_key_alpha.setLoop(true);
+		str_press_key_alpha.play();
+		};
+
 
 	SH_START = NPLoadBgmSoundMem(L"sound/nature_prhysm_jingle.wav", option);
 	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
@@ -144,7 +151,12 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 	Get_Key_State(Buf, Key, AC);
 	while (1) {
 		appContext.updateTime();
-		if (!title_logo_view.isPlaying())title_logo_view.startAnimation();
+		str_press_key_alpha.process();
+
+		if (!title_logo_view.isPlaying()) {
+			title_logo_view.startAnimation();
+			str_press_key_alpha_start_animation();
+		}
 
 		//Calc
 		GAME_passed_time = GetNowCount_d(config) - GAME_start_time;//経過時間計算
@@ -223,7 +235,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 					PlaySoundMem(SH_START, DX_PLAYTYPE_BACK, TRUE);
 					title_logo_view.hide();
 				}
-				else if(menuSelectStat == MENU_IR_SETTING){
+				else if (menuSelectStat == MENU_IR_SETTING) {
 					stat = STATE_IR_SETTING;
 				}
 				else if (menuSelectStat == MENU_KEY_CONFIG) {
@@ -241,16 +253,16 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 
 		}
-		else if(stat == STATE_IR_SETTING){
+		else if (stat == STATE_IR_SETTING) {
 			if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {
 				if (IRMenuStat == IRMENU_PLAYER_NAME) {
 					DrawBoxWithLine(640 - 240, 470, 640 + 240, 510, GetColor(100, 100, 100));
 
 					wchar_t* str1 = L"\"注意:インターネットランキングで公開されるため個人情報は入力しないでください\"";
 					int width1 = GetDrawStringWidth(str1, wcslen(str1));
-					ShowExtendedStrFit(640, 430, str1, width1, 1280, config,GetColor(255, 255, 255), GetColor(0, 0, 0));					
+					ShowExtendedStrFit(640, 430, str1, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
-					wchar_t strbuf[17]=L"";
+					wchar_t strbuf[17] = L"";
 					KeyInputString(410, 480,
 						16, strbuf,
 						TRUE);
@@ -260,7 +272,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 					SaveIRSetting(*ir);
 					LoadIRSetting(ir);
-					
+
 					wchar_t str2[64];
 					sprintfDx(str2, L"%sに変更しました", strbuf);
 					width1 = GetDrawStringWidth(str2, wcslen(str2));
@@ -299,7 +311,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 				else if (IRMenuStat == IRMENU_PARTICIPATE) {
 					int width1;
 					wchar_t str[64];
-					
+
 
 					if (ir->IR_Enable == FALSE) {
 						ir->IR_Enable = TRUE;
@@ -315,7 +327,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 
 					width1 = GetDrawStringWidth(str, wcslen(str));
-					ShowExtendedStrFit(640, 500, str, width1, 1280, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+					ShowExtendedStrFit(640, 500, str, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
 					ScreenFlip();
 					Sleep(2000);
 				}
@@ -390,8 +402,8 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 					}
 				}
-					
-				
+
+
 			}
 		}
 
@@ -494,7 +506,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 			}
 		}
-		
+
 		//printfDx(L"BackDrawCounter:%f\n", BackDrawCounter);
 		//printfDx(L"OtherDrawCounter:%f\n", OtherDrawCounter);
 
@@ -524,16 +536,13 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		*/
 
 		if (stat == STATE_PRESS_ANY_KEY) {
-			if ((int(GAME_passed_time) - 100) % 480 <= 370 && start == 0) {
-				wchar_t* str = L"\"Press Any Key\"";
-				int width = GetDrawStringWidth(str, wcslen(str));
-				ShowExtendedStrFit(640, 590, str, width, 300, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
-				//DrawString(502, 622, L"\"Press Any Key\"", GetColor(0, 0, 0));
-				//DrawString(500, 620, L"\"Press Any Key\"", GetColor(255, 255, 255));
-			}
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, str_press_key_alpha.value);
+			wchar_t* str = L"\"Press Any Key\"";
+			int width = GetDrawStringWidth(str, wcslen(str));
+			ShowExtendedStrFit(640, 590, str, width, 300, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
 		}
-		else if(stat == STATE_SELECT_MENU){
-			SetDrawBright(255,255,255);
+		else if (stat == STATE_SELECT_MENU) {
+			SetDrawBright(255, 255, 255);
 
 			wchar_t* str1 = L"\"GAME START\"";
 			int width1 = GetDrawStringWidth(str1, wcslen(str1));
@@ -578,15 +587,15 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 
 			wchar_t* str5 = L"―――注意―――";
 			int width5 = GetDrawStringWidth(str5, wcslen(str5));
-			ShowExtendedStrFit(640, 315, str5, width5, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+			ShowExtendedStrFit(640, 315, str5, width5, 800, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 			wchar_t* str6 = L"インターネットランキングに参加すると";
 			int width6 = GetDrawStringWidth(str6, wcslen(str6));
-			ShowExtendedStrFit(640, 345, str6, width6, 800, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+			ShowExtendedStrFit(640, 345, str6, width6, 800, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 			wchar_t* str7 = L"プレイヤー名、プレイした譜面の情報、スコアがサーバーに送信されます";
 			int width7 = GetDrawStringWidth(str7, wcslen(str7));
-			ShowExtendedStrFit(640, 375, str7, width7, 1000, config,GetColor(255, 255, 255), GetColor(0, 0, 0));
+			ShowExtendedStrFit(640, 375, str7, width7, 1000, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 
 		}
@@ -606,20 +615,20 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 				int width1 = GetDrawStringWidth(str1, wcslen(str1));
 				ShowExtendedStrFit(640, 400, str1, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
-				DrawBoxWithLine(640 - 80, 440, 640 - 40, 480,	settingKeyPosition.y == 0 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
-				DrawBoxWithLine(640 - 40, 440, 640, 480,		settingKeyPosition.y == 0 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
-				DrawBoxWithLine(640, 440, 640 + 40, 480,		settingKeyPosition.y == 0 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
-				DrawBoxWithLine(640 + 40, 440, 640 + 80, 480,	settingKeyPosition.y == 0 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+				DrawBoxWithLine(640 - 80, 440, 640 - 40, 480, settingKeyPosition.y == 0 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+				DrawBoxWithLine(640 - 40, 440, 640, 480, settingKeyPosition.y == 0 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+				DrawBoxWithLine(640, 440, 640 + 40, 480, settingKeyPosition.y == 0 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
+				DrawBoxWithLine(640 + 40, 440, 640 + 80, 480, settingKeyPosition.y == 0 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
 
-				DrawBoxWithLine(640 - 40, 480, 640, 520,		settingKeyPosition.y == 1 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
-				DrawBoxWithLine(640, 480, 640 + 40, 520,		settingKeyPosition.y == 1 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
-				DrawBoxWithLine(640 + 40, 480, 640 + 80, 520,	settingKeyPosition.y == 1 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
-				DrawBoxWithLine(640 - 80, 480, 640 - 40, 520,	settingKeyPosition.y == 1 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+				DrawBoxWithLine(640 - 40, 480, 640, 520, settingKeyPosition.y == 1 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+				DrawBoxWithLine(640, 480, 640 + 40, 520, settingKeyPosition.y == 1 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+				DrawBoxWithLine(640 + 40, 480, 640 + 80, 520, settingKeyPosition.y == 1 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
+				DrawBoxWithLine(640 - 80, 480, 640 - 40, 520, settingKeyPosition.y == 1 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(50, 255, 50), 150);
 
-				DrawBoxWithLine(640 - 80, 520, 640 - 40, 560,	settingKeyPosition.y == 2 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
-				DrawBoxWithLine(640 - 40, 520, 640, 560,		settingKeyPosition.y == 2 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
-				DrawBoxWithLine(640, 520, 640 + 40, 560,		settingKeyPosition.y == 2 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
-				DrawBoxWithLine(640 + 40, 520, 640 + 80, 560,	settingKeyPosition.y == 2 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+				DrawBoxWithLine(640 - 80, 520, 640 - 40, 560, settingKeyPosition.y == 2 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+				DrawBoxWithLine(640 - 40, 520, 640, 560, settingKeyPosition.y == 2 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+				DrawBoxWithLine(640, 520, 640 + 40, 560, settingKeyPosition.y == 2 && settingKeyPosition.x == 2 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
+				DrawBoxWithLine(640 + 40, 520, 640 + 80, 560, settingKeyPosition.y == 2 && settingKeyPosition.x == 3 ? GetColor(brightness, brightness, brightness) : GetColor(255, 50, 50), 150);
 			}
 		}
 
@@ -633,13 +642,13 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 		clsDx();
 
 		//BGM再生
-		if (BGMPlay == 0 && GAME_passed_time >= 500) {
+		if (BGMPlay == 0 && GAME_passed_time >= 0) {
 			PlaySoundMem(SH_BGM, DX_PLAYTYPE_BACK, TRUE);
 			BGMPlay = 1;
 		}
 		int bgmMaxVol = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::BgmSoundVol::Vol_100;
 
-		ChangeVolumeSoundMem(int(LOGO_draw_alpha*LOGO_draw_alpha * bgmMaxVol), SH_BGM);
+		ChangeVolumeSoundMem(int(LOGO_draw_alpha * LOGO_draw_alpha * bgmMaxVol), SH_BGM);
 
 		//Sleep(1);
 	}
@@ -654,7 +663,7 @@ void TITLE(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDROID_CO
 }
 
 
-void OPEN_COVER(int difficulty,Config config) {
+void OPEN_COVER(int difficulty, Config config) {
 	int H_COVER = 0;//カバー画像
 	int H_COVER_MIDDLE;//中心カバー
 	int H_BG;
@@ -686,9 +695,9 @@ void OPEN_COVER(int difficulty,Config config) {
 		//Draw
 		ClearDrawScreen();
 		DrawGraph(0, 0, H_BG, TRUE);//背景
-		DrawGraph(int(-320 * (-(cos((3.14 / 2)*c_m_draw_counter) - 1)) + 0), 0, H_COVER, TRUE);//カバー表示
-		DrawGraph(int(320 * (-(cos((3.14 / 2)*c_m_draw_counter) - 1)) + 960), 0, H_COVER, TRUE);//右側
-		DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+		DrawGraph(int(-320 * (-(cos((3.14 / 2) * c_m_draw_counter) - 1)) + 0), 0, H_COVER, TRUE);//カバー表示
+		DrawGraph(int(320 * (-(cos((3.14 / 2) * c_m_draw_counter) - 1)) + 960), 0, H_COVER, TRUE);//右側
+		DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
 		if (c_m_draw_counter > 1) {
 			InitGraph();//メモリ開放
 			InitSoundMem();//
@@ -747,9 +756,9 @@ void CLOSE_COVER(int difficulty, Config config, Option* option) {
 		//Draw
 		ClearDrawScreen();
 		DrawGraph(0, 0, H_BG, TRUE);//背景
-		DrawGraph(int(-320 * (-(cos((3.14 / 2)*c_m_draw_counter) - 1)) + 0), 0, H_COVER, TRUE);//カバー表示
-		DrawGraph(int(320 * (-(cos((3.14 / 2)*c_m_draw_counter) - 1)) + 960), 0, H_COVER, TRUE);//右側
-		DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+		DrawGraph(int(-320 * (-(cos((3.14 / 2) * c_m_draw_counter) - 1)) + 0), 0, H_COVER, TRUE);//カバー表示
+		DrawGraph(int(320 * (-(cos((3.14 / 2) * c_m_draw_counter) - 1)) + 960), 0, H_COVER, TRUE);//右側
+		DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
 		if (c_m_draw_counter < 0) {
 			PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
 			for (i = 0; i <= 1500; i++) {//1.5s待つ

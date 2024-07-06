@@ -19,7 +19,7 @@ int secret_LOAD(Song *Music, int song_number) {//隠し曲設定ファイルの�
 
 	fp = FileRead_open(path);
 	if (fp == 0) {//無かったら戻る
-		Music[song_number].secret = 0;//隠し曲ではない
+		Music[song_number].secret = UnlockState::Normal;//隠し曲ではない
 		return 0;
 	}
 	FileRead_seek(fp, 2, SEEK_SET);//BOM飛ばし
@@ -32,12 +32,12 @@ int secret_LOAD(Song *Music, int song_number) {//隠し曲設定ファイルの�
 		swscanf_s(str, L"%[^:\n]:%[^:\n]\n", sharp1, _countof(sharp1), sharp2, _countof(sharp2));
 		if (wcscmp(L"#SECRET", sharp1) == 0) {
 			if (wcscmp(L"1", sharp2) == 0) {//1なら隠し曲にする
-				Music[song_number].secret = 1;//隠し曲
+				Music[song_number].secret = UnlockState::Secret;//隠し曲
 				FileRead_close(fp);
 				return 1;
 			}
 			else {
-				Music[song_number].secret = 0;//隠し曲ではない
+				Music[song_number].secret = UnlockState::Normal;//隠し曲ではない
 				FileRead_close(fp);
 				return 0;
 			}

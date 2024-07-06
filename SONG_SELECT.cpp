@@ -1350,7 +1350,7 @@ void SONG_SELECT(int *l_n,
 
 	int BGM_continue = 0;//BGMを選曲画面で流し続けるかどうかのフラグ(0:流さない 1:流す)
 	if (secret->song_appear_number != -1) {//隠し曲演出時
-		if (wcscmp(L"\0", secret->BGM) != 0 && Music[secret->song_appear_number].secret == 1) {//未解禁隠し曲の出現時で専用BGMがあったら
+		if (wcscmp(L"\0", secret->BGM) != 0 && Music[secret->song_appear_number].secret == UnlockState::Secret) {//未解禁隠し曲の出現時で専用BGMがあったら
 			BGM_continue = 1;//BGMを鳴らし続ける
 		}
 		else {
@@ -1759,8 +1759,8 @@ void SONG_SELECT(int *l_n,
 						
 						if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//曲決定
 							if (folder->folder[folder->selected_folder][list_number].kind == 0) {//内容が「フォルダ選択に戻る」じゃなくて「曲」のとき
-								if ((Music[song_number].exist[difficulty] == 1 && Music[song_number].secret != 1)//その難易度が存在して隠し曲ではない
-									|| (Music[song_number].exist[difficulty] == 1 && Music[song_number].secret == 1 && secret->song_appear_number == song_number)//それか隠し曲で出現対象になっているとき
+								if ((Music[song_number].exist[difficulty] == 1 && Music[song_number].secret != UnlockState::Secret)//その難易度が存在して隠し曲ではない
+									|| (Music[song_number].exist[difficulty] == 1 && Music[song_number].secret == UnlockState::Secret && secret->song_appear_number == song_number)//それか隠し曲で出現対象になっているとき
 									) {
 									activityState = FLAG_CLOSING_STATE;
 									PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
@@ -2188,7 +2188,7 @@ void SONG_SELECT(int *l_n,
 
 			
 
-			if (Music[song_number].secret == 1 && secret->song_appear_number != song_number && SelectingTarget == SELECTING_SONG) {//隠し曲はレーダー,グラフを表示しない
+			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number && SelectingTarget == SELECTING_SONG) {//隠し曲はレーダー,グラフを表示しない
 				DRShowGlobal += 0.01 * ((double)0 - DRShowGlobal);
 				DRShowLocal += 0.01 * ((double)0 - DRShowLocal);
 				DRShowChain += 0.01 * ((double)0 - DRShowChain);
@@ -2292,7 +2292,7 @@ void SONG_SELECT(int *l_n,
 				jacket_alpha = 1;
 			}
 			if (jacket_alpha < 1 && CheckHandleASyncLoad(H_JACKET) == FALSE && jacket_show_counter == -2) {
-				if (Music[song_number].secret != 1 || secret->song_appear_number == song_number) {
+				if (Music[song_number].secret != UnlockState::Secret || secret->song_appear_number == song_number) {
 					//隠し曲ではないまたは隠し曲の出現中の時のみジャケットを表示する
 					jacket_alpha += 0.003;
 				}
@@ -2357,7 +2357,7 @@ void SONG_SELECT(int *l_n,
 			if (CheckHandleASyncLoad(SH_SONG) == FALSE && song_play_counter == -1) {//曲の読み込みが終了したので再生
 				song_play_counter = -2;
 				SetCurrentPositionSoundMem(int(((double)Music[song_number].demostart[difficulty] / 1000) * 44100), SH_SONG);
-				if (Music[song_number].secret == 1 && secret->song_appear_number != song_number) {//隠し曲なら鳴らさない
+				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら鳴らさない
 					//鳴らさない
 				}
 				else {//隠し曲ではない(解禁済み)なので鳴らす
@@ -2366,7 +2366,7 @@ void SONG_SELECT(int *l_n,
 			}
 
 			//曲の再生が終了したらループ再生
-			if (Music[song_number].secret == 1 && secret->song_appear_number != song_number) {//隠し曲なら鳴らさない
+			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら鳴らさない
 					//鳴らさない
 			}
 			else {//隠し曲ではない(解禁済み)なので鳴らす
@@ -2423,7 +2423,7 @@ void SONG_SELECT(int *l_n,
 
 					int gauge_buf = (int)option->op.gauge;//今選んでいるゲージ種類を保存
 					int AllowExit = 1;//途中退出可能か
-					if (Music[song_number].secret == 1 && secret->song_appear_number == song_number) {//隠し曲出現中にその隠し曲を選択したので
+					if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number == song_number) {//隠し曲出現中にその隠し曲を選択したので
 						//debug取り消し
 						*debug = 0;
 						//ゲージ種類決定
@@ -2466,7 +2466,7 @@ void SONG_SELECT(int *l_n,
 					} while ((Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
 						&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1)
 						&& (retryAble == 1)
-						&& (secret->song_appear_number != song_number || Music[song_number].secret != 1)//リトライできるときの条件(隠し曲演出中の未解禁隠し曲プレイはリトライできない)
+						&& (secret->song_appear_number != song_number || Music[song_number].secret != UnlockState::Secret)//リトライできるときの条件(隠し曲演出中の未解禁隠し曲プレイはリトライできない)
 						);
 
 					RESULT STResDummy;
@@ -2503,7 +2503,7 @@ void SONG_SELECT(int *l_n,
 								if (res.clear >= CLEARTYPE_EASY_CLEARED && song_number == secret->song_appear_number) {//対象曲をクリアしていた
 									//解禁情報を更新
 									secret->get_song_number[secret->secret_song_appear_number] = 1;//解禁済みにする
-									Music[secret->song_appear_number].secret = 2;
+									Music[secret->song_appear_number].secret = UnlockState::Unlocked;
 									//全解禁したか確認
 									secret_all_get(secret);//全解禁されているならall_getは1
 								}
@@ -2576,7 +2576,7 @@ void SONG_SELECT(int *l_n,
 								i + 1);//結果発表
 						}
 
-						if (Result[i].clear >= CLEARTYPE_FULL_COMBO && Music[SongNumberList[i]].secret == 1) {//隠し曲をフルコンボ以上でクリアした
+						if (Result[i].clear >= CLEARTYPE_FULL_COMBO && Music[SongNumberList[i]].secret == UnlockState::Secret) {//隠し曲をフルコンボ以上でクリアした
 							//解禁情報を更新
 							int secretSongNnumber = 0;
 							//隠し曲番号の確認
@@ -2586,7 +2586,7 @@ void SONG_SELECT(int *l_n,
 								}
 							}
 							secret->get_song_number[secretSongNnumber] = 1;//解禁済みにする
-							Music[SongNumberList[i]].secret = 2;
+							Music[SongNumberList[i]].secret = UnlockState::Unlocked;
 							//全解禁したか確認
 							secret_all_get(secret);//全解禁されているならall_getは1
 						}
@@ -2700,7 +2700,7 @@ void SONG_SELECT(int *l_n,
 
 					season_banner_buf[i] = Music[sn_buf].season[difficulty_buf];//季節のバナー飾りのための値をバッファに格納
 					
-					if (Music[sn_buf].secret != 1) {//隠し曲ではない、それか隠し曲でも解禁済みの曲のときは通常表示
+					if (Music[sn_buf].secret != UnlockState::Secret) {//隠し曲ではない、それか隠し曲でも解禁済みの曲のときは通常表示
 						//タイトル
 						title_buf[i] =
 							Music[sn_buf].title[difficulty_buf];//曲名の先頭ポインタを配列に格納
@@ -2768,7 +2768,7 @@ void SONG_SELECT(int *l_n,
 				}
 
 				//ジャンル、アーティストのwidthの計算
-				if (Music[song_number].secret == 1 && secret->song_appear_number != song_number) {//隠し曲なら???にする
+				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
 					genre_width = GetDrawStringWidth(secret_str, wcslen(secret_str));
 					artist_width = GetDrawStringWidth(secret_str, wcslen(secret_str));
 				}
@@ -2953,7 +2953,7 @@ void SONG_SELECT(int *l_n,
 
 			//ぼかしたジャケットで隙間を埋める
 			SetDrawArea(320, 96, 960, 624);//描画可能エリアを指定
-			if (Music[song_number].secret == 1 && secret->song_appear_number != song_number) {//隠し曲なら表示しない
+			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら表示しない
 			  //表示しない
 			}
 			else {
@@ -3066,7 +3066,7 @@ void SONG_SELECT(int *l_n,
 				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
 
 
-				if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == 1)) {//隠し曲が出現対象になっている
+				if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == UnlockState::Secret)) {//隠し曲が出現対象になっている
 					//Attack the Secret Song!の表示
 					SetDrawBright(brightness, brightness, brightness);//点滅
 					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(255 * jacket_alpha));
@@ -3086,7 +3086,7 @@ void SONG_SELECT(int *l_n,
 			int sn_buf = folder->folder[folder->selected_folder]
 				[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
 
-			if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == 1)) {//隠し曲が出現対象になっている
+			if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == UnlockState::Secret)) {//隠し曲が出現対象になっている
 				//Attack the Secret Song!の表示
 				SetDrawBright(brightness, brightness, brightness);//点滅
 				DrawGraph(320, int(336 + (12 - Column / 2) * 48) - 48 + 48.0 * jacket_alpha, H_BANNER_FLAME_SECRET, TRUE);
@@ -3128,7 +3128,7 @@ void SONG_SELECT(int *l_n,
 		//ジャンル、アーティスト表示
 		if (SelectingTarget == SELECTING_SONG) {
 			if (Music[song_number].genre[difficulty][0] != 0) {//ジャンルが存在
-				if (Music[song_number].secret == 1 && secret->song_appear_number != song_number) {//隠し曲なら???にする
+				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
 					ShowExtendedStrFitToHandle(640, int(11 + 336 + (0 + 3 - 20 / 2) * 48), secret_str, genre_width, 500, config, FontHandle);//ジャンル表示「???」
 				}
 				else {
@@ -3137,7 +3137,7 @@ void SONG_SELECT(int *l_n,
 				DrawGraph(320, 0, H_BANNER_AREA, TRUE);//AREA文字表示
 			}
 			if (Music[song_number].artist[difficulty][0] != 0) {//アーティストが存在
-				if (Music[song_number].secret == 1 && secret->song_appear_number != song_number) {//隠し曲なら???にする
+				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
 					ShowExtendedStrFitToHandle(640, int(6 + 336 + (0 + 4 - 20 / 2) * 48), secret_str, artist_width, 480, config, FontHandle);//アーティスト表示「???」
 				}
 				else {
@@ -3527,7 +3527,7 @@ void SONG_SELECT(int *l_n,
 				if (SelectingTarget == SELECTING_SONG) {
 					//開いたら曲再生
 					SetCurrentPositionSoundMem(int(((double)Music[song_number].demostart[difficulty] / 1000) * 44100), SH_SONG);
-					if ((Music[song_number].secret == 1 && secret->song_appear_number != song_number) || BGM_continue == 1) {//隠し曲,専用BGM再生中なら鳴らさない
+					if ((Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) || BGM_continue == 1) {//隠し曲,専用BGM再生中なら鳴らさない
 						//鳴らさない
 					}
 					else {

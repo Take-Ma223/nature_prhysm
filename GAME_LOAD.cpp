@@ -1460,12 +1460,14 @@ void GAME_LOAD(int song_number,
 								continue;
 							}
 						}
-						
+						latestColor = note[i][j].color;
 						note[i][j].color = (NoteColor)lane;
 						note[i][j].color_init = note[i][j].color;
 					}
 				}
-				latestColor = note[i][j].color;
+				else {
+					latestColor = note[i][j].color;
+				}
 			}
 		}
 	}

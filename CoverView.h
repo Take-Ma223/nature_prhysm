@@ -67,7 +67,7 @@ public:
 		makeScreen(Size(sizeX, sizeY));
 
 		wstring themeStr1(L"img/themes/");
-		wstring themeStr2(c->getOption()->theme[c->getOption()->op.theme]);
+		wstring themeStr2(c->getOption()->op.theme.toString());
 
 		ImageHandle leftCoverHandle = ImageHandle();
 		ImageHandle  middleCoverHandle = c->getAsset()->img((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());

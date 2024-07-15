@@ -344,13 +344,6 @@ void SONG_SELECT(int *l_n,
 	//それぞれの文字列長を格納
 	int folder_name_width[NUMBER_OF_FOLDERS];
 
-	//int *width_option_name = new int[Option->OPTION_NUM];//オプション名表示
-	int *width_sent_speed = new int[option->SPEED_NUM];
-	int *width_sent_gauge = new int[option->GAUGE_NUM];
-	int *width_sent_lane = new int[option->LANE_NUM];
-	int *width_sent_color = new int[option->COLOR_NUM];
-	//int width_sent_note, width_sent_hitsound;
-
 	int width_ope_ins[OPERATION_INSTRUCTION_NUMBER];
 	int oi_counter = 0;
 	SetFontSize(28);
@@ -451,7 +444,7 @@ void SONG_SELECT(int *l_n,
 	}
 	
 	wstring themeStr1(L"img/themes/");
-	wstring themeStr2(option->theme[option->op.theme]);
+	wstring themeStr2(option->op.theme.toString());
 
 	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 	H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
@@ -563,9 +556,10 @@ void SONG_SELECT(int *l_n,
 	//NOTEプレビュー画像読み込み
 	wchar_t* ReadNameRGB[10] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",L"bright"};
 	wchar_t strcash[128];
-	sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
+	auto note_folder = option->op.note.toString();
+	sprintfDx(strcash, L"img/notes/%s/%s.png", note_folder.c_str(), ReadNameRGB[1]);
 	H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
-	sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[8]);
+	sprintfDx(strcash, L"img/notes/%s/%s.png", note_folder.c_str(), ReadNameRGB[8]);
 	H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 
 	//グラデーション画像の用意
@@ -592,14 +586,15 @@ void SONG_SELECT(int *l_n,
 	SH_SHUTTER = NPLoadFxSoundMem(L"sound/shutter.wav", option);
 	SH_SHUTTER_SIGNAL = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
 
-	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
+	auto hit_sound_folder = option->op.hitSound.toString();
+	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", hit_sound_folder.c_str());
 	SH_OPTION_HITSOUND_PREVIEW = NPLoadFxSoundMem(strcash, option, 1);//HIT SOUNDプレビュー音声読み込み
 	
 	double bgm_vol_ratio = 1;//BGMの音量
 
 	auto updateVolume = [&]() {
-		const int fxVolume = 255 * (double)option->op.fxSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
-		const int bgmVolume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+		const int fxVolume = option->op.fxSoundVol.getVolume();
+		const int bgmVolume = option->op.bgmSoundVol.getVolume();
 
 		ChangeVolumeSoundMem(fxVolume,  SH_CLOSE);
 		ChangeVolumeSoundMem(fxVolume,  SH_CLOSED);
@@ -1030,7 +1025,7 @@ void SONG_SELECT(int *l_n,
 	//曲リストのソート
 	vector<vector<vector<vector<vector<SortSongListIndex>>>>> SortList;//曲番号ソートリスト[][][][][]
 
-	for (int SortKind = 0; SortKind < option->SORT_NUM+10; SortKind++) {//ソート種類の数だけ用意[*][][][][]
+	for (int SortKind = 0; SortKind < option->op.sort.itemCount() + 10; SortKind++) {//ソート種類の数だけ用意[*][][][][]
 		SortList.push_back(vector<vector<vector<vector<SortSongListIndex>>>>());
 		for (int FolderInd = 0; FolderInd < NUMBER_OF_FOLDERS; FolderInd++) {//ソート種類ごとにフォルダの数を追加[][*][][][]
 			SortList[SortKind].push_back(vector<vector<vector<SortSongListIndex>>>());
@@ -1160,10 +1155,10 @@ void SONG_SELECT(int *l_n,
 						}
 						else if (SortKind >= (int)OptionItem::Sort::RED_DENSITY && SortKind <= (int)OptionItem::Sort::RAINBOW_DENSITY) {
 							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
-								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].ColorNotesAmount[folder->folder[FolderInd][ListInd].difficulty][SortKind - (int)OptionItem::Sort::RED_DENSITY];
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].ColorNotesAmount[RainbowInd][folder->folder[FolderInd][ListInd].difficulty][SortKind - (int)OptionItem::Sort::RED_DENSITY];
 							}
 							else {
-								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].ColorNotesAmount[DifficultyInd + 1][SortKind - (int)OptionItem::Sort::RED_DENSITY];
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].ColorNotesAmount[RainbowInd][DifficultyInd + 1][SortKind - (int)OptionItem::Sort::RED_DENSITY];
 							}
 						}
 						else if (SortKind == (int)OptionItem::Sort::MAX_BPM) {
@@ -1205,7 +1200,7 @@ void SONG_SELECT(int *l_n,
 	}
 	
 	//ソート処理
-	for (int SortKind = 0; SortKind < option->SORT_NUM; SortKind++) {//ソートの仕方の数だけ用意[*][][][][]
+	for (int SortKind = 0; SortKind < option->op.sort.itemCount(); SortKind++) {//ソートの仕方の数だけ用意[*][][][][]
 		for (int FolderInd = 0; FolderInd < NUMBER_OF_FOLDERS; FolderInd++) {//ソート種類ごとにフォルダの数を追加[][*][][][]
 
 			for (int RainbowInd = 0; RainbowInd < 2; RainbowInd++) {//フォルダ内リスト毎に正規、虹のソート対象の値を追加[][][][*][]
@@ -1229,7 +1224,7 @@ void SONG_SELECT(int *l_n,
 		int notSortedIndex = 0;//ソート前のリストのインデックスを指す
 		for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {//ソート後のリストのインデックスを指す
 		    //ソート前のリストのインデックスに変換
-			notSortedIndex = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][SearchListNumberBase].index;
+			notSortedIndex = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.getIndex() == (int)OptionItem::Color::RAINBOW][difficulty - 1][SearchListNumberBase].index;
 
 			if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY) {//難易度別フォルダを選んでいた時は曲番号と難易度も合っているか確認する
 				//前回選んでいた曲番号と難易度が一致していたらこのソート前のリストのインデックスが正しい
@@ -1257,7 +1252,7 @@ void SONG_SELECT(int *l_n,
 		}
 
 		//list_number_baseが見つかったのでlist_number算出
-		list_number = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
+		list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.getIndex() == (int)OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
 	}
 
 	if (PlayCountSum <= 2) {//3回目のプレイ後からフォルダ選択に戻されなくなる
@@ -1362,10 +1357,10 @@ void SONG_SELECT(int *l_n,
 	}
 
 
-	if (option->op.color != OptionItem::Color::RAINBOW) {//虹オプション選択フラグの設定
+	if (!option->op.color.isRainbow()) {//虹オプション選択フラグの設定
 		select_rainbow = 0;
 	}
-	if (option->op.color == OptionItem::Color::RAINBOW) {
+	if (option->op.color.isRainbow()) {
 		select_rainbow = 4;
 	}
 
@@ -1416,7 +1411,7 @@ void SONG_SELECT(int *l_n,
 			BGM_play = 1;
 		}
 		if (activityState != FLAG_END_FUNCTION_STATE) {//シャッター閉まったらここではBGMの音量調整は行わない
-			int bgmVolume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+			int bgmVolume = option->op.bgmSoundVol.getVolume();
 			ChangeVolumeSoundMem(int(bgm_vol_ratio * bgmVolume), SH_BGM);
 		}
 
@@ -1462,8 +1457,8 @@ void SONG_SELECT(int *l_n,
 			if (Key[KEY_INPUT_F2] == 1) {//スコア再送信&ランキング表示
 				if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {//存在する譜面を選んでいる時
 					PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
-					IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == OptionItem::Color::RAINBOW, config);
-					IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == OptionItem::Color::RAINBOW, config);
+					IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color.isRainbow(), config);
+					IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color.isRainbow(), config);
 				}
 				//if (ScoreShowMode == 0) {
 				//	ScoreShowMode = 1;
@@ -1493,8 +1488,8 @@ void SONG_SELECT(int *l_n,
 				IrScore.max_combo = Highscore[song_number].max_combo[difficulty + select_rainbow];
 				IrScore.play_count = Highscore[song_number].play_count[difficulty + select_rainbow];
 
-				IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, IrScore, difficulty, Music[song_number].season[difficulty], option->op.color == OptionItem::Color::RAINBOW, 0, config);
-				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == OptionItem::Color::RAINBOW, config);
+				IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, IrScore, difficulty, Music[song_number].season[difficulty], option->op.color.isRainbow(), 0, config);
+				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color.isRainbow(), config);
 			}
 
 			if (Key[KEY_INPUT_F4] == 1) {
@@ -1572,7 +1567,7 @@ void SONG_SELECT(int *l_n,
 								//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
 								int now_list_number = list_number;
 								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-									if (now_list_number == SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1 - 1][SearchListNumberBase].index) {
+									if (now_list_number == SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1 - 1][SearchListNumberBase].index) {
 										list_number_base = SearchListNumberBase;
 									}
 								}
@@ -1605,7 +1600,7 @@ void SONG_SELECT(int *l_n,
 								//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
 								int now_list_number = list_number;
 								for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-									if (now_list_number == SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty + 1 - 1][SearchListNumberBase].index) {
+									if (now_list_number == SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty + 1 - 1][SearchListNumberBase].index) {
 										list_number_base = SearchListNumberBase;
 									}
 								}
@@ -1627,7 +1622,7 @@ void SONG_SELECT(int *l_n,
 							list_number_base--;
 							list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
 
-							list_number = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
+							list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
 
 							song_number = folder->folder[folder->selected_folder][list_number].song_number;
 
@@ -1661,7 +1656,7 @@ void SONG_SELECT(int *l_n,
 									list_number_base--;
 									list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
 
-									list_number = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
+									list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
 									song_number = folder->folder[folder->selected_folder][list_number].song_number;
 
 									titleStrUpdateFlag = TOP;
@@ -1697,7 +1692,7 @@ void SONG_SELECT(int *l_n,
 							list_number_base++;
 							list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
 
-							list_number = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
+							list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
 							song_number = folder->folder[folder->selected_folder][list_number].song_number;
 
 							titleStrUpdateFlag = BOTTOM;
@@ -1731,7 +1726,7 @@ void SONG_SELECT(int *l_n,
 									list_number_base++;
 									list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
 
-									list_number = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
+									list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
 									song_number = folder->folder[folder->selected_folder][list_number].song_number;
 
 									titleStrUpdateFlag = BOTTOM;
@@ -1966,7 +1961,7 @@ void SONG_SELECT(int *l_n,
 								SelectingTarget = SELECTING_SONG;
 								list_number_base = 0;
 
-								list_number = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
+								list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
 
 								song_number = folder->folder[folder->selected_folder][list_number].song_number;
 
@@ -2064,7 +2059,7 @@ void SONG_SELECT(int *l_n,
 							//元のlist_numberと同じ番号を指すlist_number_baseを探す
 							int now_list_number = list_number;
 							for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
-								if (now_list_number == SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][SearchListNumberBase].index) {
+								if (now_list_number == SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][SearchListNumberBase].index) {
 									list_number_base = SearchListNumberBase;
 								}
 							}
@@ -2075,21 +2070,21 @@ void SONG_SELECT(int *l_n,
 						if (option_select == (int)OptionItem::Name::NOTE) {
 							DeleteGraph(H_OPTION_NOTE_PREVIEW[0]);
 							DeleteGraph(H_OPTION_NOTE_PREVIEW[1]);
-							sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[1]);
+							sprintfDx(strcash, L"img/notes/%s/%s.png", option->op.note.toString().c_str(), ReadNameRGB[1]);
 							H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
-							sprintfDx(strcash, L"img/notes/%s/%s.png", option->note[option->op.note], ReadNameRGB[8]);
+							sprintfDx(strcash, L"img/notes/%s/%s.png", option->op.note.toString().c_str(), ReadNameRGB[8]);
 							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 						}
 						if (option_select == (int)OptionItem::Name::HITSOUND) {
 							DeleteSoundMem(SH_OPTION_HITSOUND_PREVIEW);
-							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->hitSound[option->op.hitSound]);
+							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->op.hitSound.toString().c_str());
 							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
 							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
 						}
 						if (option_select == (int)OptionItem::Name::THEME) {
 							deleteCoverImage();
 							wstring themeStr1(L"img/themes/");
-							wstring themeStr2(option->theme[option->op.theme]);
+							wstring themeStr2(option->op.theme.toString());
 							H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 							H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
 							H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
@@ -2154,10 +2149,10 @@ void SONG_SELECT(int *l_n,
 				optionListView.releaseRightArrow();
 			}
 
-			if (option->op.color != OptionItem::Color::RAINBOW) {//虹オプション選択フラグの設定
+			if (!option->op.color.isRainbow()) {//虹オプション選択フラグの設定
 				select_rainbow = 0;
 			}
-			if (option->op.color == OptionItem::Color::RAINBOW) {
+			if (option->op.color.isRainbow()) {
 				select_rainbow = 4;
 			}
 
@@ -2203,7 +2198,7 @@ void SONG_SELECT(int *l_n,
 			}
 			else {//通常曲、解禁曲はレーダー,グラフ表示
 				int R = 0;
-				if (option->op.color == OptionItem::Color::RAINBOW)R = 1;
+				if (option->op.color.isRainbow())R = 1;
 
 
 				if (SelectingTarget == SELECTING_SONG) {
@@ -2388,7 +2383,7 @@ void SONG_SELECT(int *l_n,
 			if (demo_vol < 0) {
 				demo_vol = 0;
 			}
-			int bgmVolume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+			int bgmVolume = option->op.bgmSoundVol.getVolume();
 
 			ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_SONG);//デモの音量は曲決定後にフェードアウト
 			if (BGM_continue == 1) {
@@ -2421,7 +2416,7 @@ void SONG_SELECT(int *l_n,
 			if (*isBackToTitle == false) {//タイトルに戻る場合演奏画面には遷移しない
 				if (SelectingTarget == SELECTING_SONG) {//曲選択の時
 
-					int gauge_buf = (int)option->op.gauge;//今選んでいるゲージ種類を保存
+					int gauge_buf = (int)option->op.gauge.getIndex();//今選んでいるゲージ種類を保存
 					int AllowExit = 1;//途中退出可能か
 					if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number == song_number) {//隠し曲出現中にその隠し曲を選択したので
 						//debug取り消し
@@ -2433,16 +2428,16 @@ void SONG_SELECT(int *l_n,
 
 
 							if (rank_point == 5 * 3) {//全てBランク(rank_point==15)
-								option->op.gauge = OptionItem::Gauge::FC_ATTACK;//強制FC ATTACKゲージ
+								option->op.gauge.setIndex((int)OptionItem::Gauge::FC_ATTACK);//強制FC ATTACKゲージ
 							}
 							else if (rank_point < 6 * 3) {//平均がAランクより小さい値(rank_point==16~17)
-								option->op.gauge = OptionItem::Gauge::SUPER_HARD;//強制SUPER HARDゲージ
+								option->op.gauge.setIndex((int)OptionItem::Gauge::SUPER_HARD);//強制SUPER HARDゲージ
 							}
 							else if (rank_point < 7 * 3) {//平均がSランクより小さい値(rank_point==18~20)
-								option->op.gauge = OptionItem::Gauge::HARD;//強制HARDゲージ
+								option->op.gauge.setIndex((int)OptionItem::Gauge::HARD);//強制HARDゲージ
 							}
 							else {//全てSランク(rank_point==21)
-								option->op.gauge = OptionItem::Gauge::NORMAL;//強制NORMALゲージ
+								option->op.gauge.setIndex((int)OptionItem::Gauge::NORMAL);//強制NORMALゲージ
 							}
 						}
 
@@ -2512,7 +2507,7 @@ void SONG_SELECT(int *l_n,
 								secret->song_appear_number = -1;
 							}
 						}
-						option->op.gauge = (OptionItem::Gauge)gauge_buf;//ゲージをもとに戻す
+						option->op.gauge.setIndex((int)(OptionItem::Gauge)gauge_buf);//ゲージをもとに戻す
 					}
 
 				}
@@ -2521,22 +2516,22 @@ void SONG_SELECT(int *l_n,
 					//対象曲パス読み込み
 
 					//オプションを直す
-					int gauge_buf = (int)option->op.gauge;//後で戻すためのバッファ
+					int gauge_buf = (int)option->op.gauge.getIndex();//後で戻すためのバッファ
 
-					option->op.gauge = OptionItem::Gauge::SKILL_TEST;
+					option->op.gauge.setIndex((int)OptionItem::Gauge::SKILL_TEST);
 
-					if (option->op.lane != OptionItem::Lane::MIRROR) {//MIRROR以外を選んだときは正規にする
-						option->op.lane = OptionItem::Lane::NONE;
+					if (option->op.lane.getIndex() != (int)OptionItem::Lane::MIRROR) {//MIRROR以外を選んだときは正規にする
+						option->op.lane.setIndex((int)OptionItem::Lane::NONE);
 					}
 
 
-					option->op.color = OptionItem::Color::NONE;
+					option->op.color.setIndex((int)OptionItem::Color::NONE);
 
 
 
 					//基本なら虹オプションにする
 					if (STList->Kind[list_number] == 0) {
-						option->op.color = OptionItem::Color::RAINBOW;
+						option->op.color.setIndex((int)OptionItem::Color::RAINBOW);
 					}
 
 					int SongNumberList[4];//曲番号リスト
@@ -2649,7 +2644,7 @@ void SONG_SELECT(int *l_n,
 							ir,
 							SHOW_SKILL_TEST_RESULT);//結果発表
 					}
-					option->op.gauge = (OptionItem::Gauge)gauge_buf;//ゲージを元に戻す
+					option->op.gauge.setIndex((int)(OptionItem::Gauge)gauge_buf);//ゲージを元に戻す
 				}
 			}
 
@@ -2660,16 +2655,10 @@ void SONG_SELECT(int *l_n,
 			
 			//プレイオプションの保存
 			OP op_buf = option->op;//オプション保存用
-			if (op_buf.gauge == OptionItem::Gauge::SKILL_TEST) {//段位ゲージの時はNORMALゲージで保存
-				op_buf.gauge = OptionItem::Gauge::NORMAL;
+			if (op_buf.gauge.getIndex() == (int)OptionItem::Gauge::SKILL_TEST) {//段位ゲージの時はNORMALゲージで保存
+				op_buf.gauge.setIndex((int)OptionItem::Gauge::NORMAL);
 			}
 			SaveOptionState(op_buf);
-
-			//メモリ開放
-			delete[] width_sent_speed;
-			delete[] width_sent_gauge;
-			delete[] width_sent_lane;
-			delete[] width_sent_color;
 
 			free(Highscore);
 			free(HighscoreRival);
@@ -2685,7 +2674,7 @@ void SONG_SELECT(int *l_n,
 	                //title_width[i] = GetDrawStringWidth(Music[number_ring(list_number + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1)].title[difficulty],wcslen(Music[number_ring(song_number + (i - Column / 2), NumberOfSongs - 1)].title[difficulty]));
 					int list_number_base_buf = number_ring(list_number_base + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1);
 
-					int list_number_buf = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base_buf].index;
+					int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
 
 					int sn_buf = folder->folder[folder->selected_folder]
 						[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
@@ -2882,7 +2871,7 @@ void SONG_SELECT(int *l_n,
 			}
 		}
 		else if (SelectingTarget == SELECTING_FOLDER) {//ハイスコアを桁ごとに格納
-			int R = option->op.color == OptionItem::Color::RAINBOW;
+			int R = option->op.color.isRainbow();
 			number_digit(int(FolderScore[R][folder->selected_folder][difficulty].AverageScore + 0.5), score_digit, 5);
 		}
 		else if(SelectingTarget == SELECTING_COURSE) {//ハイスコアを桁ごとに格納
@@ -2978,7 +2967,7 @@ void SONG_SELECT(int *l_n,
 			//SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(155 * jacket_alpha));
 			int list_number_base_buf = number_ring(list_number_base + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1);
 
-			int list_number_buf = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base_buf].index;
+			int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
 
 
 			if (SelectingTarget == SELECTING_SONG) {
@@ -3053,7 +3042,7 @@ void SONG_SELECT(int *l_n,
 			for (i = 0; i <= Column; i++) {
 				int list_number_base_buf = number_ring(list_number_base + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1);
 
-				int list_number_buf = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base_buf].index;
+				int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
 
 				int sn_buf = folder->folder[folder->selected_folder]
 					[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
@@ -3082,7 +3071,7 @@ void SONG_SELECT(int *l_n,
 			DrawGraph(320, int(336 + (12 - Column / 2) * 48) - 48 + 48.0 * jacket_alpha, H_TITLE_STR[index], TRUE);
 
 			int list_number_base_buf = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
-			int list_number_buf = SortList[(int)option->op.sort][folder->selected_folder][option->op.color == OptionItem::Color::RAINBOW][difficulty - 1][list_number_base_buf].index;
+			int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
 			int sn_buf = folder->folder[folder->selected_folder]
 				[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
 
@@ -3187,7 +3176,7 @@ void SONG_SELECT(int *l_n,
 
 		//実際のハイスピを決める
 		if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-			option->op.speedVal = option->speedVal[option->op.speed] / (double)Music[song_number].bpm_suggested[difficulty];
+			option->op.speedVal = option->op.speed.getVal()  / (double)Music[song_number].bpm_suggested[difficulty];
 		}
 		else {
 			option->op.speedVal = 1;
@@ -3362,7 +3351,7 @@ void SONG_SELECT(int *l_n,
 		//スコア描画
 
 		int R_ShowFlag = 0;//R表示フラグ
-		if ((SelectingTarget == SELECTING_SONG || SelectingTarget == SELECTING_FOLDER )&& option->op.color == OptionItem::Color::RAINBOW) {
+		if ((SelectingTarget == SELECTING_SONG || SelectingTarget == SELECTING_FOLDER )&& option->op.color.isRainbow()) {
 			R_ShowFlag = 1;
 		}
 		else if(SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] == 0){
@@ -3420,7 +3409,7 @@ void SONG_SELECT(int *l_n,
 			DrawNumber(1216, 196, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_BPM_NUMBER_MAX);
 			DrawFloatNumber(1090, 246, Music[song_number].version[difficulty], 20, 3, 0.5, H_VERSION_NUMBER, H_VERSION_DECIMAL);
 
-			DrawNumber(1235, 246, Music[song_number].maxChords[option->op.color == OptionItem::Color::RAINBOW][difficulty], 25, 0, 0, H_MAX_CHORDS_NUMBER);
+			DrawNumber(1235, 246, Music[song_number].maxChords[option->op.color.isRainbow()][difficulty], 25, 0, 0, H_MAX_CHORDS_NUMBER);
 		}
 		else if(SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2){//段位
 			DrawNumber(1062, 196, STList->bpmmin[list_number], 25, 0, 0, H_BPM_NUMBER_MIN);
@@ -3455,8 +3444,8 @@ void SONG_SELECT(int *l_n,
 				ExistBuf = 1;
 			}
 			else if (SelectingTarget == SELECTING_FOLDER) {
-				RankBuf = FolderScore[option->op.color == OptionItem::Color::RAINBOW][folder->selected_folder][difficulty].folderRank;
-				ClearStateBuf = FolderScore[option->op.color == OptionItem::Color::RAINBOW][folder->selected_folder][difficulty].ClearType;
+				RankBuf = FolderScore[option->op.color.isRainbow()][folder->selected_folder][difficulty].folderRank;
+				ClearStateBuf = FolderScore[option->op.color.isRainbow()][folder->selected_folder][difficulty].ClearType;
 				PlayCountBuf = 1;
 				ExistBuf = 1;
 			}
@@ -3717,7 +3706,7 @@ void SONG_SELECT(int *l_n,
 			//フォルダ記録
 			//クリア状態
 			int R = 0;
-			if (option->op.color == OptionItem::Color::RAINBOW)R = 1;
+			if (option->op.color.isRainbow())R = 1;
 
 			FolderScore[R][folder->selected_folder][difficulty].clearState[CLEARTYPE_PERFECT];
 
@@ -3746,7 +3735,7 @@ void SONG_SELECT(int *l_n,
 			//トータル記録
 			DrawNumber((cache - 960) + 1248, 536, saveData.totalBootCount, 22, 1, 0, H_PLAY_COUNT_NUMBER);
 			DrawNumber((cache - 960) + 1248, 576, saveData.totalPlayCount, 22, 1, 0, H_PLAY_COUNT_NUMBER);
-			if (option->op.color == OptionItem::Color::RAINBOW) {
+			if (option->op.color.isRainbow()) {
 				DrawNumber((cache - 960) + 1248, 616, saveData.totalHighScoreRainbow, 22, 1, 0, H_PLAY_COUNT_NUMBER);
 			}
 			else {
@@ -4102,28 +4091,27 @@ void DrawHexagon(short v1, short v2, short v3, short v4, short v5, short v6) {
 }
 
 void OptionValueChange(Option *Option, int option_select, int add) {//オプションの値変更関数
-	*Option->ArrayValue[option_select] = *Option->ArrayValue[option_select] + add;
-	*Option->ArrayValue[option_select] = number_ring(*Option->ArrayValue[option_select], *Option->ArrayOptionNum[option_select] - 1);//数値を収める
 
+	if (add >= 0) {
+		for (int i = 0; i < add; i++) {
+			Option->op.list[option_select]->incrementIndex();
+		}
+	}
+	else {
+		for (int i = 0; i < -add; i++) {
+			Option->op.list[option_select]->decrementIndex();
+		}
+	}
 	return;
 }
 
 void DrawOptionSentence(Option* Option, OptionItem::Name option_select, Config config, int FontHandle) {//Option->H_SENTにオプションの説明を描画
 	int i = 0;
-	wchar_t* StrAddress;//選んでいるオプションの説明文の先頭アドレス
 
-	if (option_select == OptionItem::Name::NOTE) {
-		StrAddress = Option->ArrayOptionSent[(int)OptionItem::Name::NOTE][0];
-	}
-	else if (option_select == OptionItem::Name::HITSOUND) {
-		StrAddress = Option->ArrayOptionSent[(int)OptionItem::Name::HITSOUND][0];
-	}
-	else if (option_select == OptionItem::Name::THEME) {
-		StrAddress = Option->ArrayOptionSent[(int)OptionItem::Name::THEME][0];
-	}
-	else {
-		StrAddress = Option->ArrayOptionSent[(int)option_select][*(Option->ArrayValue[(int)option_select])];
-	}
+	//選んでいるオプションの説明文の先頭アドレス
+	const auto desc = Option->op.list[(int)option_select]->getDescription();
+
+	const auto StrAddress = desc.c_str();
 
 	int width = 0;
 	width = GetDrawStringWidth(StrAddress, wcslen(StrAddress));

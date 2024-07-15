@@ -206,7 +206,7 @@ void SHOW_RESULT(RESULT res,
 	wchar_t *Rainbow[2] = { L"",L"_虹" };
 	int RainbowUse = 0;
 
-	if (option->op.color == OptionItem::Color::RAINBOW) {
+	if (option->op.color.isRainbow()) {
 		RainbowUse = 1;
 	}
 	else {
@@ -261,11 +261,11 @@ void SHOW_RESULT(RESULT res,
 		CreateDirectory(str, NULL);//スコア保存用の種類ディレクトリ(official)作成
 		CreateDirectory(Music[song_number].SaveFolder, NULL);//スコア保存用の曲ディレクトリ作成
 
-		if (option->op.color != OptionItem::Color::RAINBOW) {//通常モードだったら
+		if (!option->op.color.isRainbow()) {//通常モードだったら
 			sprintfDx(filename, L"%s/result_%s.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 			sprintfDx(filenameLatest, L"%s/latest_result_%s.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 		}
-		if (option->op.color == OptionItem::Color::RAINBOW) {//虹モードだったら
+		if (option->op.color.isRainbow()) {//虹モードだったら
 			sprintfDx(filename, L"%s/result_%s_r.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 			sprintfDx(filenameLatest, L"%s/latest_result_%s_r.dat", Music[song_number].SaveFolder, season[difficulty - 1]);
 		}
@@ -326,9 +326,9 @@ void SHOW_RESULT(RESULT res,
 		}
 
 		//ONLYオプションを使用しているかどうか
-		BOOL isOnlyOption = option->op.color == OptionItem::Color::RGB_ONLY || 
-			option->op.color == OptionItem::Color::CMY_ONLY ||
-			option->op.color == OptionItem::Color::W_ONLY;
+		BOOL isOnlyOption = option->op.color.getIndex() == (int)OptionItem::Color::RGB_ONLY ||
+			option->op.color.getIndex() == (int)OptionItem::Color::CMY_ONLY ||
+			option->op.color.getIndex() == (int)OptionItem::Color::W_ONLY;
 
 		if (firstplay == 0) {//2回目以降のプレイ
 
@@ -437,7 +437,7 @@ void SHOW_RESULT(RESULT res,
 
 		}
 
-		if (option->op.color == OptionItem::Color::RAINBOW) {//虹オプションなら難易度+4しておく(今はしてない)
+		if (option->op.color.isRainbow()) {//虹オプションなら難易度+4しておく(今はしてない)
 			save.difficulty = difficulty;
 		}
 
@@ -467,8 +467,8 @@ void SHOW_RESULT(RESULT res,
 		writeSaveData(saveData);
 
 		//インターネットランキング送信用スコアの保存、送信
-		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color == OptionItem::Color::RAINBOW, isOnlyOption, config);
-		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == OptionItem::Color::RAINBOW, config);
+		IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, res, difficulty, Music[song_number].season[difficulty], option->op.color.isRainbow(), isOnlyOption, config);
+		IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color.isRainbow(), config);
 
 	}
 	else if(*debug == 0 && SkillTestFlag == SHOW_SKILL_TEST_RESULT){//段位スコア保存
@@ -554,7 +554,7 @@ void SHOW_RESULT(RESULT res,
 
 
 	wstring themeStr1(L"img/themes/");
-	wstring themeStr2(option->theme[option->op.theme]);
+	wstring themeStr2(option->op.theme.toString());
 
 
 	if (SkillTestFlag == SHOW_SKILL_TEST_RESULT) {
@@ -690,7 +690,7 @@ void SHOW_RESULT(RESULT res,
 	}
 	else {
 		if (res.clear == CLEARTYPE_PLAY) {
-			if (option->op.gauge == OptionItem::Gauge::SKILL_TEST) {//段位認定ゲージ
+			if (option->op.gauge.getIndex() == (int)OptionItem::Gauge::SKILL_TEST) {//段位認定ゲージ
 				H_CLEARED = LoadGraph(L"img/cleared.png");
 			}
 			else {
@@ -864,8 +864,8 @@ void SHOW_RESULT(RESULT res,
 
 			if (Key[KEY_INPUT_F2] == 1 && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {//スコア再送信&ランキング表示
 				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
-				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color == OptionItem::Color::RAINBOW, config);
-				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color == OptionItem::Color::RAINBOW, config);
+				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color.isRainbow(), config);
+				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color.isRainbow(), config);
 			}
 
 			if (Key[KEY_INPUT_F11] == 1 && *debug == 0) {//ツイート
@@ -883,7 +883,7 @@ void SHOW_RESULT(RESULT res,
 				};
 				
 				if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-					if (option->op.color == OptionItem::Color::RAINBOW) {//RAINBOWモードは「虹」追加
+					if (option->op.color.isRainbow()) {//RAINBOWモードは「虹」追加
 						sprintfDx(rainbow_sent, L",虹");
 					}
 
@@ -1070,7 +1070,7 @@ void SHOW_RESULT(RESULT res,
 		int entireAlpha = 200;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
 
-		if (option->op.color == OptionItem::Color::RAINBOW && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
+		if (option->op.color.isRainbow() && SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
 			//SetDrawBright(brightness2, brightness2, brightness2);
 			DrawGraph(155, int(25 + (1 - draw_alpha) * 50), H_R, TRUE);//R_out
 		}
@@ -1284,21 +1284,25 @@ void SHOW_RESULT(RESULT res,
 		//オプション名称描画
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 
-		StrLength = GetDrawStringWidth(option->speed[option->op.speed], wcslen(option->speed[option->op.speed]));
-		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, option->speed[option->op.speed], GetColor(0, 0, 0));//speed
-		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, option->speed[option->op.speed], GetColor(255, 255, 255));//speed
+		auto optionName = option->op.speed.toString();
+		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
+		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//speed
+		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//speed
 
-		StrLength = GetDrawStringWidth(option->gauge[(int)option->op.gauge], wcslen(option->gauge[(int)option->op.gauge]));
-		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, option->gauge[(int)option->op.gauge], GetColor(0, 0, 0));//gauge
-		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, option->gauge[(int)option->op.gauge], GetColor(255, 255, 255));//gauge
+		optionName = option->op.gauge.toString();
+		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
+		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//gauge
+		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//gauge
 
-		StrLength = GetDrawStringWidth(option->lane[(int)option->op.lane], wcslen(option->lane[(int)option->op.lane]));
-		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, option->lane[(int)option->op.lane], GetColor(0, 0, 0));//lane
-		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, option->lane[(int)option->op.lane], GetColor(255, 255, 255));//lane
+		optionName = option->op.lane.toString();
+		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
+		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//lane
+		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//lane
 
-		StrLength = GetDrawStringWidth(option->color[(int)option->op.color], wcslen(option->color[(int)option->op.color]));
-		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, option->color[(int)option->op.color], GetColor(0, 0, 0));//color
-		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, option->color[(int)option->op.color], GetColor(255, 255, 255));//color
+		optionName = option->op.color.toString();
+		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
+		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//color
+		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//color
 
 
 

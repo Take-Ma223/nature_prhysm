@@ -18,7 +18,7 @@ void show_str(int time, int time_base, int H_STR, int x, int y, int width) {//�
 
 }
 
-void ShowExtendedStrFit(int x, int y, wchar_t *str, int str_width,int area_width, Config config, int color ,int shadow_color) {//領域(area)より大きい文字は縮小して表示する関数
+void ShowExtendedStrFit(int x, int y, const wchar_t *str, int str_width,int area_width, Config config, int color ,int shadow_color) {//領域(area)より大きい文字は縮小して表示する関数
 	if (str_width <= area_width) {//エリア内に収まっているときは普通に描画
 		if (config.ShowStrShadow == TRUE)DrawString(int(x - ((double)str_width / 2)) + 2, y + 2, str, shadow_color);//(影)
 		DrawString(int(x - ((double)str_width / 2)), y, str, color);//表示
@@ -30,7 +30,7 @@ void ShowExtendedStrFit(int x, int y, wchar_t *str, int str_width,int area_width
 	return;
 }
 
-void ShowExtendedStrFitToHandle(int x, int y, wchar_t *str, int str_width, int area_width, Config config, int FontHandle, int color, int shadow_color) {//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)
+void ShowExtendedStrFitToHandle(int x, int y, const wchar_t *str, int str_width, int area_width, Config config, int FontHandle, int color, int shadow_color) {//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)
 	if (str_width <= area_width) {//エリア内に収まっているときは普通に描画
 		if (config.ShowStrShadow == TRUE)DrawStringToHandle(int(x - ((double)str_width / 2)) + 2, y + 2, str, shadow_color,FontHandle);//(影)
 		DrawStringToHandle(int(x - ((double)str_width / 2)), y, str, color, FontHandle);//表示(影)
@@ -42,7 +42,7 @@ void ShowExtendedStrFitToHandle(int x, int y, wchar_t *str, int str_width, int a
 	return;
 }
 
-void ShowExtendedStrFitToHandleNoShadow(int x, int y, wchar_t* str, int str_width, int area_width, Config config, int FontHandle, int color) {//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)(影無し)
+void ShowExtendedStrFitToHandleNoShadow(int x, int y, const wchar_t* str, int str_width, int area_width, Config config, int FontHandle, int color) {//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)(影無し)
 	if (str_width <= area_width) {//エリア内に収まっているときは普通に描画
 		DrawStringToHandle(int(x - ((double)str_width / 2)), y, str, color, FontHandle);//表示
 	}

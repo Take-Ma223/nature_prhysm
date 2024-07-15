@@ -304,6 +304,7 @@
     <ClInclude Include="DetailView.h" />
     <ClInclude Include="DifficultyRadar.h" />
     <ClInclude Include="DxLibUtil.h" />
+    <ClInclude Include="FileUtil.h" />
     <ClInclude Include="GradationNoteImage.h" />
     <ClInclude Include="KeyConfigValidator.h" />
     <ClInclude Include="KEY_CONFIG.h" />
@@ -344,6 +345,28 @@
     <ClInclude Include="NPTimer.h" />
     <ClInclude Include="NumberView.h" />
     <ClInclude Include="NumberViewShowType.h" />
+    <ClInclude Include="OptionItemBarline.h" />
+    <ClInclude Include="OptionItemBase.h" />
+    <ClInclude Include="OptionItemBgmSoundVol.h" />
+    <ClInclude Include="OptionItemBlackGradation.h" />
+    <ClInclude Include="OptionItemColor.h" />
+    <ClInclude Include="OptionItemDarkness.h" />
+    <ClInclude Include="OptionItemFastSlow.h" />
+    <ClInclude Include="OptionItemFxSoundVol.h" />
+    <ClInclude Include="OptionItemGauge.h" />
+    <ClInclude Include="OptionItemHitSound.h" />
+    <ClInclude Include="OptionItemHitSoundVol.h" />
+    <ClInclude Include="OptionItemLane.h" />
+    <ClInclude Include="OptionItemMovie.h" />
+    <ClInclude Include="OptionItemNote.h" />
+    <ClInclude Include="OptionItemNoteOffset.h" />
+    <ClInclude Include="OptionItemScoreGraph.h" />
+    <ClInclude Include="OptionItemSort.h" />
+    <ClInclude Include="OptionItemSpeed.h" />
+    <ClInclude Include="OptionItemTargetScore1.h" />
+    <ClInclude Include="OptionItemTargetScore2.h" />
+    <ClInclude Include="OptionItemTheme.h" />
+    <ClInclude Include="OptionItemWindbreak.h" />
     <ClInclude Include="OptionListView.h" />
     <ClInclude Include="OptionStateSaveLoad.h" />
     <ClInclude Include="GetValueFromController.h" />
@@ -407,6 +430,17 @@
     <ClInclude Include="WindowTitleSetter.h" />
     <ClInclude Include="xtosinx.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets" Condition="Exists('packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\nlohmann.json.3.11.2\build\native\nlohmann.json.targets'))" />
+  </Target>
 </Project>

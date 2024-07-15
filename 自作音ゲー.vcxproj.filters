@@ -166,6 +166,12 @@
     <Filter Include="ソース ファイル\TITLE\TitleLogoView">
       <UniqueIdentifier>{97345e8e-bca4-4f7f-ac25-80d6c339d98a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\Option\OptionItem">
+      <UniqueIdentifier>{5057993e-5aef-407e-ac1b-36a2b0b3e8d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Util\File">
+      <UniqueIdentifier>{b2c41770-136a-4c6c-a4b1-2b721b686649}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -760,5 +766,77 @@
     <ClInclude Include="TitleLogoView.h">
       <Filter>ソース ファイル\TITLE\TitleLogoView</Filter>
     </ClInclude>
+    <ClInclude Include="OptionItemBase.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemGauge.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemLane.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemColor.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemWindbreak.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemFastSlow.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemBarline.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemDarkness.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemNoteOffset.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemSpeed.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemBlackGradation.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemScoreGraph.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemTargetScore1.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemTargetScore2.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemSort.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemHitSoundVol.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemFxSoundVol.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemBgmSoundVol.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileUtil.h">
+      <Filter>ソース ファイル\Util\File</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemMovie.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemNote.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemHitSound.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemTheme.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

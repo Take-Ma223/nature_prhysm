@@ -30,7 +30,7 @@ public:
 		alpha.value = 255;
 
 		themeStr1 = wstring(L"img/themes/");
-		themeStr2 = wstring(option->theme[option->op.theme]);
+		themeStr2 = wstring(option->op.theme.toString());
 
 		backGround = unique_ptr<Image>(new Image(c, c->getAsset()->img((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str())));
 		addDrawable(backGround.get());
@@ -55,7 +55,7 @@ public:
 
 
 			NPTextViewParam itemNameTextViewParam = NPTextViewParam(
-				option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
+				option->op.list[optionIndex]->toString(),
 				fontItemName, itemNameColor, itemNameShadowColor);
 			drawableParam = DrawableInitParam(Cordinate(162, getYPos(i) + selectingOptionY), CenterRatio(0.5, 0.5));
 			listItemName[i] = unique_ptr<NPGradTextView>(new NPGradTextView(this, context, itemNameTextViewParam, drawableParam));
@@ -145,7 +145,7 @@ public:
 
 	void setCoverImage() {
 		themeStr1 = wstring(L"img/themes/");
-		themeStr2 = wstring(option->theme[option->op.theme]);
+		themeStr2 = wstring(option->op.theme.toString());
 		backGround.get()->setImage(c->getAsset()->img((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str()));
 	}
 
@@ -264,7 +264,7 @@ private:
 	{
 		listItemName[listIndex].get()->setText(
 			NPTextViewParam(
-				option->ArrayOptionKindName[optionIndex][*option->ArrayValue[optionIndex]],
+				option->op.list[optionIndex]->toString(),
 				fontItemName, itemNameColor, itemNameShadowColor)
 		);
 	}
@@ -285,8 +285,8 @@ private:
 		}
 
 		bool isGauge = optionIndex == (int)OptionItem::Name::GAUGE;
-		bool isLaneRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::RANDOM);
-		bool isLaneSuperRandom = (optionIndex == (int)OptionItem::Name::LANE) && (*option->ArrayValue[optionIndex] == (int)OptionItem::Lane::SUPER_RAND);
+		bool isLaneRandom = (optionIndex == (int)OptionItem::Name::LANE) && (option->op.list[optionIndex]->getIndex() == (int)OptionItem::Lane::RANDOM);
+		bool isLaneSuperRandom = (optionIndex == (int)OptionItem::Name::LANE) && (option->op.list[optionIndex]->getIndex() == (int)OptionItem::Lane::SUPER_RAND);
 		bool isColor = optionIndex == (int)OptionItem::Name::COLOR;
 		bool isAvailable = !isGauge && !isLaneRandom && !isLaneSuperRandom && !isColor;
 

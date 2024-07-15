@@ -108,7 +108,7 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 	int KeyConfigMenuStat = KEY_CONFIG_MENU_SETTING;
 
 	wstring themeStr1(L"img/themes/");
-	wstring themeStr2(option->theme[option->op.theme]);
+	wstring themeStr2(option->op.theme.toString());
 	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 	H_CLOUD = LoadGraph(L"img/cloud.png");
 
@@ -646,7 +646,7 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 			PlaySoundMem(SH_BGM, DX_PLAYTYPE_BACK, TRUE);
 			BGMPlay = 1;
 		}
-		int bgmMaxVol = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::BgmSoundVol::Vol_100;
+		int bgmMaxVol = 255 * (double)option->op.bgmSoundVol.getIndex() / (int)OptionItem::BgmSoundVol::Vol_100;
 
 		ChangeVolumeSoundMem(int(LOGO_draw_alpha * LOGO_draw_alpha * bgmMaxVol), SH_BGM);
 
@@ -728,7 +728,7 @@ void CLOSE_COVER(int difficulty, Config config, Option* option) {
 	int i = 0;
 
 	wstring themeStr1(L"img/themes/");
-	wstring themeStr2(option->theme[option->op.theme]);
+	wstring themeStr2(option->op.theme.toString());
 	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 	if (difficulty == 1)H_COVER = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更

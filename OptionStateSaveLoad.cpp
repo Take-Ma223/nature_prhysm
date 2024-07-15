@@ -2,49 +2,87 @@
 #include"DxLib.h"
 #include<sys/stat.h>
 #include"STRUCT_OP.h"
+#include<nlohmann/json.hpp>
+#include <fstream>
+#include <iostream>
+#include <codecvt> // codecvt_utf8
+#include<algorithm>
+
+using json = nlohmann::json;
+
+// encoding function
+std::string to_utf8(std::wstring& wide_string)
+{
+	static std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+	return utf8_conv.to_bytes(wide_string);
+}
+
+// decoding function
+std::wstring from_utf8(const std::string& utf8_string)
+{
+	static std::wstring_convert<std::codecvt_utf8<wchar_t>> utf8_conv;
+	return utf8_conv.from_bytes(utf8_string);
+}
+
 
 void SaveOptionState(OP option) {
-	FILE *fp = 0;
-	errno_t error = 0;
+	json option_json;
 
-	error = _wfopen_s(&fp, L"save_data/OptionState.dat", L"wb");
-	if (error != 0) {
-		printfDx(L"%sのオープンに失敗しました.\n", L"save_data/OptionState.dat");
-		printfDx(L"エラー番号:%d", error);
-		ScreenFlip();
-
-		Sleep(100000);
-		exit(EXIT_FAILURE);
+	for (const auto& i : option.list) {
+		option_json[to_utf8(i->getTitle())] = to_utf8(i->toString());
 	}
 
-	fwrite(&option, sizeof(option), 1, fp);
-	fclose(fp);
+	std::ofstream file(L"save_data/OptionState.dat");
+	file << option_json.dump(4);
+
 	return;
 }
 
 
 void LoadOptionState(Option *option) {
-	FILE *fp = 0;
-	errno_t error = 0;
+	std::ifstream file(L"save_data/OptionState.dat");
+	std::string jsonstr;
 
-	error = _wfopen_s(&fp, L"save_data/OptionState.dat", L"rb");
-	if (error != 0) {//ファイル見つからなかったら
+	if (file.fail()) {//ファイル見つからなかったら
 		//何もしない
-	}
-	else {
-		fread(&(option->op), sizeof(option->op), 1, fp);//前回のオプション読み込み
-		fclose(fp);
+		return;
 	}
 
-	//異常な値を収める
-	Option defaultOption;
-	int i = 0;
-	for (i = 0; i < option->OPTION_NUM; i++) {
-		if (*(option->ArrayValue[i]) < 0 || *(option->ArrayValue[i]) > * (option->ArrayOptionNum[i]) - 1) {//オプションの最小、最大値を超えていたら0にする
-			*option->ArrayValue[i] = *(defaultOption.ArrayValue[i]);
+	try
+	{
+		auto data = json::parse(file);
+
+		for (const auto& i : data.items()) {
+			//keyがオプションリストに存在するか確認
+			auto result = std::find_if(
+				option->op.list.begin(), option->op.list.end(),
+				[&](OptionItemBase *op) {
+					auto title = op->getTitle();
+					auto key = from_utf8(i.key());
+					return title == key;
+				}
+			);
+
+			if (result == option->op.list.end()) {
+
+			}
+			else {
+				(*result)->setIndexFromString(from_utf8(i.value()));
+			}
+
+			
 		}
 
+
+
 	}
+	catch (const std::exception&)
+	{
+		//json読み込みに失敗した場合何もしない
+		return;
+	}
+
+
 
 
 	return;

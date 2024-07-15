@@ -25,7 +25,7 @@ void KEY_CONFIG(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDRO
 	double time_cash = 0;
 
 	wstring themeStr1(L"img/themes/");
-	wstring themeStr2(option->theme[option->op.theme]);
+	wstring themeStr2(option->op.theme.toString());
 	int H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 	int SH_ERROR = NPLoadFxSoundMem(L"sound/no.wav", option);
 

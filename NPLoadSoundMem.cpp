@@ -3,19 +3,19 @@
 
 int NPLoadHitSoundMem(const wchar_t* FileName, Option* option, int BufferNum, int UnionHandle)
 {
-	const int volume = 255 * (double)option->op.hitSoundVol / (int)OptionItem::HitSoundVol::Vol_100;
+	const int volume = option->op.hitSoundVol.getVolume();
 	return NPLoadSoundMem(FileName, volume, BufferNum, UnionHandle);
 }
 
 int NPLoadFxSoundMem(const wchar_t* FileName, Option* option, int BufferNum, int UnionHandle)
 {
-	const int volume = 255 * (double)option->op.fxSoundVol / (int)OptionItem::FxSoundVol::Vol_100;
+	const int volume = option->op.fxSoundVol.getVolume();
 	return NPLoadSoundMem(FileName, volume, BufferNum, UnionHandle);
 }
 
 int NPLoadBgmSoundMem(const wchar_t* FileName, Option* option, int BufferNum, int UnionHandle)
 {
-	const int volume = 255 * (double)option->op.bgmSoundVol / (int)OptionItem::BgmSoundVol::Vol_100;
+	const int volume = option->op.bgmSoundVol.getVolume();
 	return NPLoadSoundMem(FileName, volume, BufferNum, UnionHandle);
 }
 

@@ -9,10 +9,4 @@
 #define _LOAD
 
 extern void LOAD(LIST *, Song *, int *, SECRET *, SkillTestList *, Option *op, Config config, IR_SETTING* ir);
-extern void SearchThemeSkin(Option* op);
-extern void SearchNoteSkin(Option *op);
-extern void SearchHitSoundSkin(Option *op);
-
-vector<wstring> getSkinFolderList(wstring path);
-
 #endif

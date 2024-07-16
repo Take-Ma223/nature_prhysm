@@ -563,7 +563,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, bool isRainbow) {//色
 	NoteColor NoteColor = NoteColor::NONE;//今見ている音符の色
 	int k_flag[4] = { 0,0,0,0 };//前の音符が黒だった
 
-	serachNotesBFS([&](int lane, int index) {
+	serachNotesFromEarly([&](int lane, int index) {
 		if (note[lane][index].group == NoteGroup::LongNoteEnd && note[lane][index].LN_k == 1) {//黒終点の時
 			blackDifficulty += 0.5;
 			k_flag[lane] = 1;
@@ -832,98 +832,91 @@ int DifficultyRadar::CalcLongNote(bool isRainbow) {
 	return lnDegrees;
 }
 int DifficultyRadar::CalcUnstability() {
-	//BPMについて算出
+	//SCROLLによる瞬間的な影響
+	//STOPによる瞬間的な影響
+	//レーン毎の速度変化スコア
+	//瞬間風速から外れた音符の度合い
+	//を元に算出します
+
 	int BpmCount = 0;
 	double Unstability = 0;
 
-	BpmCount = 0;
-	double BpmBuf = bpmchange[BpmCount].bpm;
 	double BPMChangeSum = 0;//BPM変化量
 
 	int scrollCount = 0;
 	double scrollBuf = scrollchange[scrollCount].scroll;
 	double scrollChangeSum = 0;//Scroll変化量
 
-	/*
-	while (bpmchange[BpmCount].use == 1) {
-		if (BpmBuf != bpmchange[BpmCount].bpm) {//BPM変化があった
-			BPMChangeSum += fabs((log(bpmchange[BpmCount].bpm + 0.1) / log(2)) - (log(BpmBuf + 0.1) / log(2))) * 2;//BPM変化の重みは2倍
-			//2の対数をとりBPMを比較 倍の関係になっていたら1加算
-			BpmBuf = bpmchange[BpmCount].bpm;
-		}
-		BpmCount++;
-	}
-	BPMChangeSum = 0;//不使用
-	*/
+	int lane = 0;
+	double HS[4] = { 0,0,0,0 };//各レーンのHS度
+	int NoteCounter[4] = {0,0,0,0};
+	bool firstFlag[4] = {false,false,false,false};
+	double BpmBuf[4] = { bpmchange[BpmCount].bpm,bpmchange[BpmCount].bpm,bpmchange[BpmCount].bpm,bpmchange[BpmCount].bpm };
 
-
-	//ScrollChangeについて算出
-	while (scrollchange[scrollCount].use == 1) {
-		if (scrollBuf != scrollchange[scrollCount].scroll) {//Scroll変化があった
-			scrollChangeSum += fabs((log(abs(scrollchange[scrollCount].scroll) + 0.1) / log(2)) - (log(abs(scrollBuf) + 0.1) / log(2))) * 2;//Scroll変化の重みは2倍
-			//2の対数をとりScrollを比較 倍の関係になっていたら1加算
-			scrollBuf = scrollchange[scrollCount].scroll;
-		}
-		scrollCount++;
-	}
-	Unstability += scrollChangeSum;
-
-
-	//Stopについて算出
 	int StopCount = 0;
 	double stopSum = 0;
 
-	while (stopSequence[StopCount].use == 1) {
-		stopSum += fabs(stopSequence[StopCount].stop_time);//停止時間を加算
-		StopCount++;
-	}
-
-	Unstability += stopSum * 0.5 + (double)StopCount * 4;//BPM,HSとの重みバランス調節
-
-
-	//HS,瞬間風速から離れた速さの音符について算出
-	int lane = 0;
-	double HS[4] = { 0,0,0,0 };//各レーンのHS度
-	int NoteCounter = 0;
-	int TimingBuf = 0;
-
-	int firstFlag = 0;
-	BpmBuf = 0;
-
 	double OutlierAmount = 0;//瞬間風速から外れた音符の度合い
 
-	//レーン毎の音符速度変化を見る
-	for (lane = 0; lane <= 3; lane++) {
-		firstFlag = 0;
-		for (NoteCounter = 0; NoteCounter <= nc[lane] - 1; NoteCounter++) {
-			if (note[lane][NoteCounter].color != NoteColor::K) {//黒は除外
-				//HS,BPM変化について
-				if (firstFlag == 0) {
-					BpmBuf = note[lane][NoteCounter].bpm_real;
-					firstFlag = 1;
-				}
-				else if (BpmBuf != note[lane][NoteCounter].bpm_real) {//BPM変化(HS変化)があった
-					HS[lane] += fabs((log(note[lane][NoteCounter].bpm_real + 0.1) / log(2)) - (log(BpmBuf + 0.1) / log(2)));
-					//2の対数をとりBPMを比較 倍の関係になっていたら1加算
-					BpmBuf = note[lane][NoteCounter].bpm_real;
-				}
+	serachNotesFromEarly([&](int lane, int index) {
+		//SCROLLによる瞬間的な影響について
+		while (scrollchange[scrollCount].use == 1 && (int)(scrollchange[scrollCount].timing_real + 0.5) < note[lane][index].timing_real) {//型が違うと同じタイミングに誤差が出るためintにキャストしてタイミング比較
+			if (scrollBuf != scrollchange[scrollCount].scroll) {//Scroll変化があった
+				auto duration = note[lane][index].timing_real - scrollchange[scrollCount].timing_real;  // 速度変化してから次の音符までのタイミング間隔
+				auto weight = 1.0 - (duration / 1000);//間隔が短い程重みを大きくする (0~1)
+				if (duration >= 1000)weight = 0;//1s以上間隔が開いてたら無効
 
-				//瞬間風速から外れた音符の度合いについて
-				OutlierAmount += abs(log((note[lane][NoteCounter].bpm_real + 0.1) / (BPM_suggest + 0.1)) / log(2));//瞬間風速から外れた速さの音符に重みを付けて加算
+				scrollChangeSum += weight * fabs((log(abs(scrollchange[scrollCount].scroll) + 0.1) / log(2)) - (log(abs(scrollBuf) + 0.1) / log(2))) * 3.5;
+				//2の対数をとりScrollを比較 倍の関係になっていたら1加算
+				scrollBuf = scrollchange[scrollCount].scroll;
 			}
+
+			scrollCount++;
 		}
-	}
+
+		//STOPによる瞬間的な影響について
+		while (stopSequence[StopCount].use == 1 && (int)(stopSequence[StopCount].timing_real + 0.5) < note[lane][index].timing_real) {//型が違うと同じタイミングに誤差が出るためintにキャストしてタイミング比較
+			//停止時間が長く、停止が終わってから次の音符までの間隔が短い停止の重みを大きくする
+
+			auto duration = note[lane][index].timing_real - (stopSequence[StopCount].timing_real + stopSequence[StopCount].stop_time * 1000);  // 停止が終わってから次の音符までのタイミング間隔
+			auto weight = 1.0 - (duration / 1000);//間隔が短い程重みを大きくする (0~1)
+			if (duration >= 1000)weight = 0;//1s以上間隔が開いてたら無効
+
+			stopSum += weight * fabs(stopSequence[StopCount].stop_time) * 12;  // 停止時間を加算
+			StopCount++;
+		}
+
+		if (note[lane][index].color != NoteColor::K) {//黒は除外
+			//レーン毎の速度変化スコアについて
+			if (firstFlag == false) {
+				BpmBuf[lane] = note[lane][index].bpm_real;
+				firstFlag[lane] = true;
+			}
+			else if (BpmBuf[lane] != note[lane][index].bpm_real) {//BPM変化(HS変化)があった
+				HS[lane] += fabs((log(note[lane][index].bpm_real + 0.1) / log(2)) - (log(BpmBuf[lane] + 0.1) / log(2)));
+				//2の対数をとりBPMを比較 倍の関係になっていたら1加算
+				BpmBuf[lane] = note[lane][index].bpm_real;
+			}
+
+			//瞬間風速から外れた音符の度合いについて
+			OutlierAmount += abs(log((note[lane][index].bpm_real + 0.1) / (BPM_suggest + 0.1)) / log(2));//瞬間風速から外れた速さの音符に重みを付けて加算
+		}
+	});
+
+	
 
 	double HS_sum = (HS[0] + HS[1] + HS[2] + HS[3]);//BPM変化度
 
 	//値の大きさを調整
-	OutlierAmount = OutlierAmount * 16 / ((double)time / 1000);
+	OutlierAmount = OutlierAmount * 26 / ((double)time / 1000);
 	//一秒あたりにどれだけ重み付け瞬間風速外れ音符があるかを計算
 	//OutlierAmount = OutlierAmount / ((double)time / 1000);
 
-	Unstability += OutlierAmount;//重み付け瞬間風速外れ音符密度を足す
+	Unstability += scrollChangeSum;
+	Unstability += stopSum;
+	Unstability += HS_sum;
+	Unstability += OutlierAmount;
 
-	Unstability += HS_sum;//BPM変化と釣り合いをとるため4で割る
 
 	Unstability *= (7.0 / unstabilityMax);//0~7ぐらいに収める
 
@@ -981,7 +974,7 @@ int DifficultyRadar::CalcChain() {
 	return (int)(chainSum * 100 / chainMax);
 }
 
-void DifficultyRadar::serachNotesBFS(function<void(int lane, int index)> handler)
+void DifficultyRadar::serachNotesFromEarly(function<void(int lane, int index)> handler)
 {
 	int noteIndex[4] = { 0,0,0,0 };
 	int lane = 0;

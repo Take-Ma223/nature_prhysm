@@ -23,7 +23,7 @@ public:
 	int CalcUnstability();//‘å‹CˆÀ’è“x(ƒ\ƒtƒ‰ƒ““x)
 	int CalcChain();//c˜A“x
 
-	void serachNotesBFS(function<void(int lane,int index)> handler);//‰¹•„‚Ì•—Dæ’Tõ
+	void serachNotesFromEarly(function<void(int lane,int index)> handler);//‰¹•„‚Ì•—Dæ’Tõ
 
 	NOTE** note;
 	int* nc;//‰¹•„ŒÂ”
@@ -42,7 +42,7 @@ public:
 	int localMax = 958;
 	int colorMax = 350;
 	int LNMax = 33;
-	int unstabilityMax = 259;
+	int unstabilityMax = 290;
 	int chainMax = 120;
 	double BPM_suggest = 0;
 private:

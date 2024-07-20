@@ -1,7 +1,20 @@
 #include "DifficultyRadar.h"
 #include<math.h>
+#include<numeric>
 
-DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, SC* scrollchange, int time, int StartTime, int EndTime, int* TimingSame, double BPM_suggest) {
+
+DifficultyRadar::DifficultyRadar(
+	NOTE** note, 
+	int* nc, 
+	BPMC* bpmchange, 
+	STOP_SE* stopSequence, 
+	SC* scrollchange, 
+	int time, 
+	int StartTime, 
+	int EndTime, 
+	int* TimingSame, 
+	double BPM_suggest, 
+	std::shared_ptr<std::vector<float>> bpmList) {
 	DifficultyRadar::note = note;
 	DifficultyRadar::nc = nc;
 	DifficultyRadar::bpmchange = bpmchange;
@@ -12,6 +25,7 @@ DifficultyRadar::DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE*
 	DifficultyRadar::EndTime = EndTime;
 	DifficultyRadar::TimingSame = TimingSame;
 	DifficultyRadar::BPM_suggest = BPM_suggest;
+	DifficultyRadar::bpmList = bpmList;
 
 }
 
@@ -835,7 +849,7 @@ int DifficultyRadar::CalcUnstability() {
 	//SCROLLによる瞬間的な影響
 	//STOPによる瞬間的な影響
 	//レーン毎の速度変化スコア
-	//瞬間風速から外れた音符の度合い
+	//相対平均偏差
 	//を元に算出します
 
 	int BpmCount = 0;
@@ -856,38 +870,57 @@ int DifficultyRadar::CalcUnstability() {
 	int StopCount = 0;
 	double stopSum = 0;
 
-	double OutlierAmount = 0;//瞬間風速から外れた音符の度合い
+	double OutlierAmount = 0;//平均速度から外れた音符の度合い
+
+	//相対平均偏差(relative_average_deviation)の算出
+	double mean = std::accumulate(bpmList->begin(), bpmList->end(), 0.0) / bpmList->size();
+	double average_deviation = 0; 
+	for (const auto &i : *bpmList) {
+		average_deviation += abs(i - mean);
+	}
+	
+	double relative_average_deviation = average_deviation / mean;
+
+	double rad_weight = 0.03 * relative_average_deviation * TotalNotesRainbow / ((double)time / 1000);//1秒あたりの相対平均偏差にする
 
 	serachNotesFromEarly([&](int lane, int index) {
 		//SCROLLによる瞬間的な影響について
-		while (scrollchange[scrollCount].use == 1 && (int)(scrollchange[scrollCount].timing_real + 0.5) < note[lane][index].timing_real) {//型が違うと同じタイミングに誤差が出るためintにキャストしてタイミング比較
-			if (scrollBuf != scrollchange[scrollCount].scroll) {//Scroll変化があった
+		while (scrollchange[scrollCount+1].use == 1 && (int)(scrollchange[scrollCount+1].timing_real + 0.5) < note[lane][index].timing_real) {//型が違うと同じタイミングに誤差が出るためintにキャストしてタイミング比較
+			scrollBuf = scrollchange[scrollCount].scroll;
+			scrollCount++;
+		}
+		if (note[lane][index].color != NoteColor::K) {//黒は除外
+			if (((int)(scrollchange[scrollCount].timing_real + 0.5) < note[lane][index].timing_real)
+				&& scrollBuf != scrollchange[scrollCount].scroll)
+			{
+				//Scroll変化があった
 				auto duration = note[lane][index].timing_real - scrollchange[scrollCount].timing_real;  // 速度変化してから次の音符までのタイミング間隔
-				auto weight = 1.0 - (duration / 1000);//間隔が短い程重みを大きくする (0~1)
+				auto weight = pow(1.0 - (duration / 1000), 2);//間隔が短い程重みを大きくする (0~1)
 				if (duration >= 1000)weight = 0;//1s以上間隔が開いてたら無効
 
-				scrollChangeSum += weight * fabs((log(abs(scrollchange[scrollCount].scroll) + 0.1) / log(2)) - (log(abs(scrollBuf) + 0.1) / log(2))) * 3.5;
+				scrollChangeSum += weight * fabs((log(abs(scrollchange[scrollCount].scroll) + 0.1) / log(2)) - (log(abs(scrollBuf) + 0.1) / log(2))) * 2;
 				//2の対数をとりScrollを比較 倍の関係になっていたら1加算
-				scrollBuf = scrollchange[scrollCount].scroll;
 			}
-
-			scrollCount++;
 		}
 
 		//STOPによる瞬間的な影響について
-		while (stopSequence[StopCount].use == 1 && (int)(stopSequence[StopCount].timing_real + 0.5) < note[lane][index].timing_real) {//型が違うと同じタイミングに誤差が出るためintにキャストしてタイミング比較
-			//停止時間が長く、停止が終わってから次の音符までの間隔が短い停止の重みを大きくする
-
-			auto duration = note[lane][index].timing_real - (stopSequence[StopCount].timing_real + stopSequence[StopCount].stop_time * 1000);  // 停止が終わってから次の音符までのタイミング間隔
-			auto weight = 1.0 - (duration / 1000);//間隔が短い程重みを大きくする (0~1)
-			if (duration >= 1000)weight = 0;//1s以上間隔が開いてたら無効
-
-			stopSum += weight * fabs(stopSequence[StopCount].stop_time) * 12;  // 停止時間を加算
+		//停止時間が長く、停止が終わってから次の音符までの間隔が短い停止の重みを大きくする
+		while (stopSequence[StopCount+1].use == 1 && (int)(stopSequence[StopCount+1].timing_real + 0.5) < note[lane][index].timing_real) {//型が違うと同じタイミングに誤差が出るためintにキャストしてタイミング比較
 			StopCount++;
 		}
 
 		if (note[lane][index].color != NoteColor::K) {//黒は除外
-			//レーン毎の速度変化スコアについて
+			if ((int)(stopSequence[StopCount].timing_real + 0.5) < note[lane][index].timing_real) {
+				auto duration = note[lane][index].timing_real - (stopSequence[StopCount].timing_real + stopSequence[StopCount].stop_time * 1000);  // 停止が終わってから次の音符までのタイミング間隔
+				auto weight = pow(1.0 - (duration / 1000), 2);//間隔が短い程重みを大きくする (0~1)
+				if (duration >= 1000)weight = 0;//1s以上間隔が開いてたら無効
+				stopSum += weight * min(stopSequence[StopCount].stop_time, 1.0) * 8;  // 停止時間を加算 最大1秒
+			}
+		}
+
+
+		//レーン毎の速度変化スコアについて
+		if (note[lane][index].color != NoteColor::K) {//黒は除外
 			if (firstFlag == false) {
 				BpmBuf[lane] = note[lane][index].bpm_real;
 				firstFlag[lane] = true;
@@ -897,25 +930,15 @@ int DifficultyRadar::CalcUnstability() {
 				//2の対数をとりBPMを比較 倍の関係になっていたら1加算
 				BpmBuf[lane] = note[lane][index].bpm_real;
 			}
-
-			//瞬間風速から外れた音符の度合いについて
-			OutlierAmount += abs(log((note[lane][index].bpm_real + 0.1) / (BPM_suggest + 0.1)) / log(2));//瞬間風速から外れた速さの音符に重みを付けて加算
 		}
 	});
 
-	
-
-	double HS_sum = (HS[0] + HS[1] + HS[2] + HS[3]);//BPM変化度
-
-	//値の大きさを調整
-	OutlierAmount = OutlierAmount * 26 / ((double)time / 1000);
-	//一秒あたりにどれだけ重み付け瞬間風速外れ音符があるかを計算
-	//OutlierAmount = OutlierAmount / ((double)time / 1000);
+	double HS_sum = (HS[0] + HS[1] + HS[2] + HS[3])/2;//BPM変化度
 
 	Unstability += scrollChangeSum;
 	Unstability += stopSum;
 	Unstability += HS_sum;
-	Unstability += OutlierAmount;
+	Unstability += rad_weight;
 
 
 	Unstability *= (7.0 / unstabilityMax);//0~7ぐらいに収める

@@ -80,8 +80,7 @@ void GAME_LOAD(int song_number,
 	double measure = 1;//小節の長さ(1で4/4拍子)デフォルトは4/4
 	double bpm = 120;
 
-	short *bpmList;//最大瞬間BPM算出用のBPMバッファリスト
-	bpmList = (short*)calloc(NOTE_MAX_NUMBER*4, sizeof(short));
+	std::unique_ptr<vector<float>> bpmList(new std::vector<float>());//最大瞬間BPM算出用のBPMバッファリスト
 
 	wchar_t high_speed_s[5][16];//ハイスピード命令の文字読み取りバッファ
 	double high_speed[5] = { 1,1,1,1,1 };//ハイスピード値 (5番目は小節線の速さ)
@@ -308,7 +307,6 @@ void GAME_LOAD(int song_number,
 		//printfDx(L"%s\n", filename);
 		//ScreenFlip();
 		//Sleep(10000);
-		free(bpmList);
 		free(timing_same);
 		return;
 	}
@@ -567,7 +565,6 @@ void GAME_LOAD(int song_number,
 	if (readflag == 1) {
 		setAiPredictedDifficultyIfEnable();
 
-		free(bpmList);
 		free(timing_same);
 
 		for (i = 0; i <= 3; i++) {
@@ -919,7 +916,7 @@ void GAME_LOAD(int song_number,
 
 								if (j != 8 && j != 10) {//黒とLN終点以外なら
 									if (note[lane][nc[lane]].group != NoteGroup::LongNoteMiddle) {//中間ノーツはコンボ・風速計算対象外
-										bpmList[Music[song_number].total_note[difficulty]] = (short)(note[lane][nc[lane]].bpm * scroll);//BPM情報格納
+										bpmList->push_back((float)(note[lane][nc[lane]].bpm* scroll));//BPM情報格納
 										Music[song_number].total_note[difficulty]++;//総ノート数+1する
 									}
 								}
@@ -1170,10 +1167,10 @@ void GAME_LOAD(int song_number,
 	int SearchAmount = int(BPM_SuggestCalcRatio * Music[song_number].total_note[difficulty]) + 1;//探索個数 最低1個
 	double weight = 0;
 	int SearchCount = 0;
-	std::sort(bpmList, bpmList + Music[song_number].total_note[difficulty]);  //bpmListを小さい順にソート
+	std::sort(bpmList->begin(),bpmList->end());  //bpmListを小さい順にソート
 	for (i = Music[song_number].total_note[difficulty] - 1; i > Music[song_number].total_note[difficulty] - 1 - SearchAmount; i--, SearchCount++) {
 		weight = (double)(SearchCount+0.5) * 2 / SearchAmount;//大きいBPMから0~2で重み付していく
-		BPM_suggest += weight*(double)bpmList[i] / SearchAmount;
+		BPM_suggest += weight*(double)(bpmList->at(i)) / SearchAmount;
 	}
 	Music[song_number].bpm_suggested[difficulty] = (short)(BPM_suggest+0.5);
 
@@ -1228,7 +1225,7 @@ void GAME_LOAD(int song_number,
 
 
 	//DIFFICULTY_RADAR,NotesAmount算出
-	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, BPM_suggest);
+	DifficultyRadar DR(note, nc, bpmchange, stopSequence, scrollchange, end_time - start_time, start_time, end_time, timing_same, BPM_suggest, std::make_shared<std::vector<float>>(*bpmList));
 	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[RainbowMode::General][difficulty], false);//音符密度グラフを得る
 	DR.GetLocalNotesGraph(Music[song_number].LocalNotesAmount[RainbowMode::Rainbow][difficulty], false);//音符密度グラフを得る
 
@@ -1609,7 +1606,6 @@ void GAME_LOAD(int song_number,
 	//ScreenFlip();
 	//Sleep(1000);
 
-	free(bpmList);
 	free(timing_same);
 
 	for (i = 0; i <= 3; i++) {

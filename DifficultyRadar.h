@@ -2,12 +2,24 @@
 #include "STRUCT_NOTE.h"
 #include "STRUCT_SEQ.h"
 #include<functional>
+#include <memory>
 
 using namespace std;
 
 class DifficultyRadar {
 public:
-	DifficultyRadar(NOTE** note, int* nc, BPMC* bpmchange, STOP_SE* stopSequence, SC* scrollchange, int time, int StartTime, int EndTime, int* TimingSame, double BPM_suggest);//イニシャライザ,各色の個数も算出
+	DifficultyRadar(
+		NOTE** note, 
+		int* nc, 
+		BPMC* bpmchange, 
+		STOP_SE* stopSequence,
+		SC* scrollchange, 
+		int time, 
+		int StartTime, 
+		int EndTime, 
+		int* TimingSame, 
+		double BPM_suggest, 
+		std::shared_ptr<std::vector<float>> bpmList);//イニシャライザ,各色の個数も算出
 	int NumberTranslation(NoteColor color);//rgbycmwdfの番号をrgbcmywdfに変換
 	void GetLocalNotesGraph(short* LocalNotesGraph, bool isRainbow);//局所降水量の9分割グラフを求める
 	void GetColorNotesGraph(short* ColorNotesGraph, short* ColorNotesGraphR);//色グラフを求める
@@ -45,6 +57,7 @@ public:
 	int unstabilityMax = 290;
 	int chainMax = 120;
 	double BPM_suggest = 0;
+	std::shared_ptr<std::vector<float>> bpmList;
 private:
 
 };

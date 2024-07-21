@@ -1163,16 +1163,24 @@ void GAME_LOAD(int song_number,
 
 	//瞬間BPM算出
 	double BPM_SuggestCalcRatio = 0.1;//瞬間BPMを算出するのに使うノーツ数の割合
-	double BPM_suggest = 0;
+	double ignore_ratio = 0.05;//瞬間BPMを算出するのに無視する上位スピードノーツの割合
+
+	float BPM_suggest = 0;
 	int SearchAmount = int(BPM_SuggestCalcRatio * Music[song_number].total_note[difficulty]) + 1;//探索個数 最低1個
+	int ignore_amount = int(ignore_ratio * Music[song_number].total_note[difficulty]);//無視個数 
+
+
 	double weight = 0;
 	int SearchCount = 0;
 	std::sort(bpmList->begin(),bpmList->end());  //bpmListを小さい順にソート
-	for (i = Music[song_number].total_note[difficulty] - 1; i > Music[song_number].total_note[difficulty] - 1 - SearchAmount; i--, SearchCount++) {
-		weight = (double)(SearchCount+0.5) * 2 / SearchAmount;//大きいBPMから0~2で重み付していく
-		BPM_suggest += weight*(double)(bpmList->at(i)) / SearchAmount;
+
+	int scan_start_ind = Music[song_number].total_note[difficulty] - 1 - ignore_amount;
+	for (i = scan_start_ind; i > scan_start_ind - SearchAmount; i--, SearchCount++) {
+		weight = (double)(SearchCount) * 2 / (SearchAmount-1);//大きいBPMから0~2で重み付していく
+		BPM_suggest += weight*(float)(bpmList->at(i)) / SearchAmount;
 	}
-	Music[song_number].bpm_suggested[difficulty] = (short)(BPM_suggest+0.5);
+
+	Music[song_number].bpm_suggested[difficulty] = BPM_suggest;
 
 
 	//エディタ用処理 #END 

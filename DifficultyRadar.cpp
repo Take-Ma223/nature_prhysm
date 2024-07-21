@@ -872,16 +872,16 @@ int DifficultyRadar::CalcUnstability() {
 
 	double OutlierAmount = 0;//•½‹Ï‘¬“x‚©‚çŠO‚ê‚½‰¹•„‚Ì“x‡‚¢
 
-	//‘Š‘Î•½‹Ï•Î·(relative_average_deviation)‚ÌZo
+	//‘Š‘Î•½‹Ï•Î·(relative_average_deviation)‚ÌZo ‚½‚¾‚µ·•ª‚Í•½‹Ï‚Å‚Í‚È‚­BPM_Suggest‚ğg‚¤
 	double mean = std::accumulate(bpmList->begin(), bpmList->end(), 0.0) / bpmList->size();
 	double average_deviation = 0; 
 	for (const auto &i : *bpmList) {
-		average_deviation += abs(i - mean);
+		average_deviation += abs(i - BPM_suggest);
 	}
 	
 	double relative_average_deviation = average_deviation / mean;
 
-	double rad_weight = 0.03 * relative_average_deviation * TotalNotesRainbow / ((double)time / 1000);//1•b‚ ‚½‚è‚Ì‘Š‘Î•½‹Ï•Î·‚É‚·‚é
+	double rad_weight = 0.025 * relative_average_deviation * TotalNotesRainbow / ((double)time / 1000);//1•b‚ ‚½‚è‚Ì‘Š‘Î•½‹Ï•Î·‚É‚·‚é
 
 	serachNotesFromEarly([&](int lane, int index) {
 		//SCROLL‚É‚æ‚éuŠÔ“I‚È‰e‹¿‚É‚Â‚¢‚Ä
@@ -898,7 +898,7 @@ int DifficultyRadar::CalcUnstability() {
 				auto weight = pow(1.0 - (duration / 1000), 2);//ŠÔŠu‚ª’Z‚¢’öd‚İ‚ğ‘å‚«‚­‚·‚é (0~1)
 				if (duration >= 1000)weight = 0;//1sˆÈãŠÔŠu‚ªŠJ‚¢‚Ä‚½‚ç–³Œø
 
-				scrollChangeSum += weight * fabs((log(abs(scrollchange[scrollCount].scroll) + 0.1) / log(2)) - (log(abs(scrollBuf) + 0.1) / log(2))) * 2;
+				scrollChangeSum += weight * fabs((log(abs(scrollchange[scrollCount].scroll) + 0.001) / log(2)) - (log(abs(scrollBuf) + 0.001) / log(2))) * 2;
 				//2‚Ì‘Î”‚ğ‚Æ‚èScroll‚ğ”äŠr ”{‚ÌŠÖŒW‚É‚È‚Á‚Ä‚¢‚½‚ç1‰ÁZ
 			}
 		}
@@ -914,7 +914,7 @@ int DifficultyRadar::CalcUnstability() {
 				auto duration = note[lane][index].timing_real - (stopSequence[StopCount].timing_real + stopSequence[StopCount].stop_time * 1000);  // ’â~‚ªI‚í‚Á‚Ä‚©‚çŸ‚Ì‰¹•„‚Ü‚Å‚Ìƒ^ƒCƒ~ƒ“ƒOŠÔŠu
 				auto weight = pow(1.0 - (duration / 1000), 2);//ŠÔŠu‚ª’Z‚¢’öd‚İ‚ğ‘å‚«‚­‚·‚é (0~1)
 				if (duration >= 1000)weight = 0;//1sˆÈãŠÔŠu‚ªŠJ‚¢‚Ä‚½‚ç–³Œø
-				stopSum += weight * min(stopSequence[StopCount].stop_time, 1.0) * 8;  // ’â~ŠÔ‚ğ‰ÁZ Å‘å1•b
+				stopSum += weight * min(stopSequence[StopCount].stop_time, 1.0) * 9;  // ’â~ŠÔ‚ğ‰ÁZ Å‘å1•b
 			}
 		}
 
@@ -926,7 +926,7 @@ int DifficultyRadar::CalcUnstability() {
 				firstFlag[lane] = true;
 			}
 			else if (BpmBuf[lane] != note[lane][index].bpm_real) {//BPM•Ï‰»(HS•Ï‰»)‚ª‚ ‚Á‚½
-				HS[lane] += fabs((log(note[lane][index].bpm_real + 0.1) / log(2)) - (log(BpmBuf[lane] + 0.1) / log(2)));
+				HS[lane] += fabs((log(note[lane][index].bpm_real + 0.001) / log(2)) - (log(BpmBuf[lane] + 0.001) / log(2)));
 				//2‚Ì‘Î”‚ğ‚Æ‚èBPM‚ğ”äŠr ”{‚ÌŠÖŒW‚É‚È‚Á‚Ä‚¢‚½‚ç1‰ÁZ
 				BpmBuf[lane] = note[lane][index].bpm_real;
 			}

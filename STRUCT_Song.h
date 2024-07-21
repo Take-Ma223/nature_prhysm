@@ -53,7 +53,7 @@ public:
 	double bpm[5];//最初のBPM
 	short bpmmin[5];//選曲画面で表示するBPMの最大値
 	short bpmmax[5];//選曲画面で表示するBPMの最大値
-	short bpm_suggested[5];//提案されるハイスピ設定に一番良いBPM
+	float bpm_suggested[5];//提案されるハイスピ設定に一番良いBPM
 	unsigned char level[5];//レベル(降水確率)
 	int songoffset[5];
 	int noteoffset[5];

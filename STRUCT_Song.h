@@ -22,6 +22,12 @@ enum UnlockState {
 	Unlocked = 2
 };
 
+enum Speed {
+	AVERAGE = 0,
+	FAST = 1,
+	MAX =2
+};
+
 class Song {
 public:
 	BOOL exist[5] = { 0,0,0,0,0 };//この難易度があるかどうか(0:無い 1:ある)
@@ -53,7 +59,9 @@ public:
 	double bpm[5];//最初のBPM
 	short bpmmin[5];//選曲画面で表示するBPMの最大値
 	short bpmmax[5];//選曲画面で表示するBPMの最大値
-	float bpm_suggested[5];//提案されるハイスピ設定に一番良いBPM
+
+	float speed_list[5][5];//提案されるハイスピ設定に一番良いBPM difficulty,種類
+
 	unsigned char level[5];//レベル(降水確率)
 	int songoffset[5];
 	int noteoffset[5];

@@ -834,7 +834,7 @@ void SHOW_RESULT(RESULT res,
 	SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
 	SetDrawMode(DX_DRAWMODE_NEAREST);
 
-	SetFontSize(28);//オプション描画フォントサイズの設定
+	SetFontSize(22);//オプション描画フォントサイズの設定
 	while (1) {
 		if (ProcessMessage() != 0) {
 			dxLibFinishProcess();
@@ -1284,25 +1284,29 @@ void SHOW_RESULT(RESULT res,
 		//オプション名称描画
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 
-		auto optionName = option->op.speed.toString();
+		auto optionName = option->op.speedAdapter.toString() + L":" + option->op.speed.toString();
 		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//speed
-		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//speed
+		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//speed adapter + speed
+		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//speed adapter + speed
 
-		optionName = option->op.gauge.toString();
+		optionName = L"COLOR:" + option->op.color.toString();
 		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//gauge
-		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//gauge
+		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//color
+		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//color
 
-		optionName = option->op.lane.toString();
+		optionName = L"LANE:" + option->op.lane.toString();
 		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
 		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//lane
 		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//lane
 
-		optionName = option->op.color.toString();
+		optionName = L"GAUGE:" + option->op.gauge.toString();
 		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//color
-		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//color
+		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//gauge
+		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//gauge
+
+
+
+
 
 
 

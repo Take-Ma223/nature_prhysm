@@ -1014,8 +1014,8 @@ void GAME(int song_number, int difficulty,
 	double draw_alpha_speed = 1;//段位用Speed表示フラグ(これが0になるまでは開始しない)
 
 	//ハイスピを計算
-	if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-		option->op.speedVal = option->op.speed.getVal() / (double)Music[song_number].bpm_suggested[difficulty];
+	if (Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
+		option->op.speedVal = option->op.speed.getVal() / (double)Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()];
 	}
 	else {
 		option->op.speedVal = 1;
@@ -1394,8 +1394,8 @@ void GAME(int song_number, int difficulty,
 				
 				option->op.speed.decrementIndex();
 				//Option->op.speedVal = Option->speedVal[Option->op.speed];//実際の倍率を入れる
-				if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-					option->op.speedVal = option->op.speed.getVal() / (double)Music[song_number].bpm_suggested[difficulty];
+				if (Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
+					option->op.speedVal = option->op.speed.getVal() / (double)Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()];
 				}
 				else {
 					option->op.speedVal = 1;
@@ -1412,8 +1412,8 @@ void GAME(int song_number, int difficulty,
 				
 				option->op.speed.incrementIndex();
 				//Option->op.speedVal = Option->speedVal[Option->op.speed];//実際の倍率を入れる
-				if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-					option->op.speedVal = option->op.speed.getVal() / (double)Music[song_number].bpm_suggested[difficulty];
+				if (Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
+					option->op.speedVal = option->op.speed.getVal() / (double)Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()];
 				}
 				else {
 					option->op.speedVal = 1;
@@ -1427,12 +1427,13 @@ void GAME(int song_number, int difficulty,
 			int SpeedStrWidth = 0;
 
 			//速さ表示
-			sprintfDx(SpeedStr, L"(%d～%d,%d)",
-				int(Music[song_number].bpmmin[difficulty] * high_speed + 0.5),
-				int(Music[song_number].bpmmax[difficulty] * high_speed + 0.5),
-				int(Music[song_number].bpm_suggested[difficulty] * high_speed + 0.5));
+			sprintfDx(SpeedStr, L"(AVG:%d MAX:%d GUST:%d)",
+				int(Music[song_number].speed_list[difficulty][Speed::AVERAGE] * high_speed + 0.5),
+				int(Music[song_number].speed_list[difficulty][Speed::FAST] * high_speed + 0.5),
+				int(Music[song_number].speed_list[difficulty][Speed::MAX] * high_speed + 0.5)
+			);
 			
-			SpeedStrWidth = GetDrawStringWidth(SpeedStr, wcslen(SpeedStr));
+			SpeedStrWidth = GetDrawStringWidthToHandle(SpeedStr, wcslen(SpeedStr), FontHandleBpm);
 			ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandleBpm);
 		}
 

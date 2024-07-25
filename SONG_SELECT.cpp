@@ -3175,8 +3175,8 @@ void SONG_SELECT(int *l_n,
 		}
 
 		//実際のハイスピを決める
-		if (Music[song_number].bpm_suggested[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
-			option->op.speedVal = option->op.speed.getVal()  / (double)Music[song_number].bpm_suggested[difficulty];
+		if (Music[song_number].speed_list[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
+			option->op.speedVal = option->op.speed.getVal()  / (double)Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()];
 		}
 		else {
 			option->op.speedVal = 1;
@@ -3184,19 +3184,20 @@ void SONG_SELECT(int *l_n,
 
 		oi_counter = int(0.0004*GetNowCount_d(config)) % OPERATION_INSTRUCTION_NUMBER;//操作説明表示用のカウンタ
 		if (OptionOpen == 1) {//オプション説明表示
-			if (option_select == (int)OptionItem::Name::SPEED) {
-				if ((SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) ||
-					(SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2)) {//曲選択の時で譜面が存在するとき(段位認定でフォルダ選択に戻る意外)は上に表示しハイスピがかかった速さも表示
+			if (option_select == (int)OptionItem::Name::SPEED ||
+				option_select == (int)OptionItem::Name::SPEED_ADAPTER) {
+				if (SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {//曲選択の時で譜面が存在するときは上に表示しハイスピがかかった速さも表示
 					wchar_t SpeedStr[128] = L"(0～0)";
 					int SpeedStrWidth = 0;
 
 					DrawGraph(320, 2 + 48 * 13, option->H_SENT, TRUE);
 					//速さ表示
 					if (SelectingTarget == SELECTING_SONG) {
-						sprintfDx(SpeedStr, L"(%d～%d,瞬間風速%d)",
-							int(Music[song_number].bpmmin[difficulty] * option->op.speedVal + 0.5),
-							int(Music[song_number].bpmmax[difficulty] * option->op.speedVal + 0.5),
-							int(Music[song_number].bpm_suggested[difficulty] * option->op.speedVal + 0.5));
+						sprintfDx(SpeedStr, L"(AVG:%d MAX:%d GUST:%d)",
+							int(Music[song_number].speed_list[difficulty][Speed::AVERAGE] * option->op.speedVal + 0.5),
+							int(Music[song_number].speed_list[difficulty][Speed::FAST] * option->op.speedVal + 0.5),
+							int(Music[song_number].speed_list[difficulty][Speed::MAX] * option->op.speedVal + 0.5)
+						);
 					}
 					else if (SelectingTarget == SELECTING_COURSE) {
 						sprintfDx(SpeedStr, L"(%d～%d)",
@@ -3206,7 +3207,7 @@ void SONG_SELECT(int *l_n,
 					SpeedStrWidth = GetDrawStringWidth(SpeedStr, wcslen(SpeedStr));
 					ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandle);
 				}
-				else {//フォルダセレクトの時は真ん中に表示
+				else {//フォルダセレクト、段位認定の時は真ん中に表示
 					DrawGraph(320, 24 + 48 * 13, option->H_SENT, TRUE);
 				}
 				
@@ -3851,7 +3852,7 @@ void SONG_SELECT(int *l_n,
 		}
 		*/
 
-		//printfDx(L"瞬間BPM:%d\n", Music[song_number].bpm_suggested[difficulty]);
+		//printfDx(L"瞬間BPM:%d\n", Music[song_number].speed_list[difficulty]);
 
 		if (config.Vsync == 0) {
 			i = 0;

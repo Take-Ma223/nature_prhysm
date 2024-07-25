@@ -19,7 +19,7 @@
 #include "OptionItemTargetScore2.h"
 #include "OptionItemTheme.h"
 #include "OptionItemWindbreak.h"
-
+#include "OptionItemSpeedAdapter.h"
 
 #ifndef _STRUCT_OP
 #define _STRUCT_OP
@@ -27,9 +27,11 @@
 namespace OptionItem {
 	enum class Name : int {
 		SPEED,
-		GAUGE,
-		LANE,
+		SPEED_ADAPTER,
 		COLOR,
+		LANE,
+		GAUGE,
+
 		WINDBREAK,
 		FAST_SLOW,
 		BARLINE,
@@ -68,9 +70,11 @@ namespace OptionItem {
 struct OP {//オプション構造体(ロード時に渡す値)
 	std::vector < std::wstring > initParam = {
 		L"120",
+		L"FAST",
+		L"NONE",
+		L"NONE",
 		L"NORMAL",
-		L"NONE",
-		L"NONE",
+
 		L"OFF",
 		L"ON:C/R",
 		L"ON",
@@ -101,6 +105,8 @@ struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItemGauge gauge;
 	OptionItemLane lane;
 	OptionItemColor color;
+
+	OptionItemSpeedAdapter speedAdapter;
 	OptionItemWindbreak windbreak;
 	OptionItemFastSlow fastSlow;
 	OptionItemBarline barline;
@@ -121,9 +127,12 @@ struct OP {//オプション構造体(ロード時に渡す値)
 
 	vector<OptionItemBase*> list = {
 		&speed,
-		&gauge,
-		&lane,
+		&speedAdapter,
 		&color,
+		&lane,
+		&gauge,
+
+		
 		&windbreak,
 		&fastSlow,
 		&barline,
@@ -149,13 +158,14 @@ struct OP {//オプション構造体(ロード時に渡す値)
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 21;//オプションの数
+	static const int OPTION_NUM = 22;//オプションの数
 
 	wchar_t* OptionName[OPTION_NUM] = { 
 		L"SPEED",
-		L"GAUGE",
-		L"LANE",
+		L"SPEED ADAPTER",
 		L"COLOR",
+		L"LANE",
+		L"GAUGE",
 		L"WINDBREAK",
 		L"FAST/SLOW",
 		L"BARLINE",
@@ -176,6 +186,7 @@ typedef struct Option {//オプション構造体(全体)
 	};
 
 	OptionItem::BannerColor bannerColor[OPTION_NUM] = {
+		OptionItem::BannerColor::GREEN,
 		OptionItem::BannerColor::GREEN,
 		OptionItem::BannerColor::GREEN,
 		OptionItem::BannerColor::GREEN,
@@ -205,100 +216,6 @@ typedef struct Option {//オプション構造体(全体)
 
 	int H_SENT;//画像ハンドル
 
-	//選曲画面で使うオプション名称配列
-	//const int* ArrayOptionNum[OPTION_NUM] = {
-	//	&SPEED_NUM,
-	//	&GAUGE_NUM,
-	//	&LANE_NUM,
-	//	&COLOR_NUM,
-	//	&WINDBREAK_NUM,
-	//	&FAST_SLOW_NUM,
-	//	&BARLINE_NUM,
-	//	&DARKNESS_NUM,
-	//	&BLACK_GRADATION_NUM,
-	//	&NOTE_OFFSET_NUM,
-	//	&SCORE_GRAPH_NUM,
-	//	&TARGET_SCORE1_NUM,
-	//	&TARGET_SCORE2_NUM,
-	//	&THEME_NUM,
-	//	&NOTE_NUM,
-	//	&HITSOUND_NUM,
-	//	&HIT_SOUND_VOL_NUM,
-	//	&FX_SOUND_VOL_NUM,
-	//	&BGM_SOUND_VOL_NUM,
-	//	&MOVIE_NUM,
-	//	&SORT_NUM };//各オプションの数
-
-	//wchar_t** ArrayOptionSent[OPTION_NUM] = {
-	//	sent_speed,
-	//	sent_gauge,
-	//	sent_lane,
-	//	sent_color,
-	//	sent_windbreak,
-	//	sent_fastSlow,
-	//	sent_barline,
-	//	sent_darkness,
-	//	sent_blackGradation,
-	//	sent_noteOffset,
-	//	sent_scoreTarget,
-	//	sent_targetScore1,
-	//	sent_targetScore2,
-	//	&sent_theme,
-	//	&sent_note,
-	//	&sent_hitSound,
-	//	sent_hit_sound_vol,
-	//	sent_fx_sound_vol,
-	//	sent_bgm_sound_vol,
-	//	sent_movie,
-	//	sent_sort };//説明文
-
-	//wchar_t** ArrayOptionKindName[OPTION_NUM] = { 
-	//	speed,
-	//	gauge,
-	//	lane,
-	//	color,
-	//	windbreak,
-	//	fastSlow,
-	//	barline,
-	//	darkness,
-	//	blackGradation,
-	//	noteOffset,
-	//	scoreTarget,
-	//	targetScore1,
-	//	targetScore2,
-	//	theme,
-	//	note,
-	//	hitSound,
-	//	hitSoundVol,
-	//	fxSoundVol,
-	//	bgmSoundVol,
-	//	movie,
-	//	sort };//オプション名称
-
-	//int* ArrayValue[OPTION_NUM] = {
-	//	&(op.speed),
-	//	(int*)&(op.gauge),
-	//	(int*)&(op.lane),
-	//	(int*)&(op.color),
-	//	(int*)&(op.windbreak),
-	//	(int*)&(op.fastSlow),
-	//	(int*)&(op.barline),
-	//	(int*)&(op.darkness),
-	//	(int*)&(op.blackGradation),
-	//	&(op.noteOffset),
-	//	(int*)&(op.scoreGraph),
-	//	(int*)&(op.targetScore1),
-	//	(int*)&(op.targetScore2),
-	//	&(op.theme),
-	//	&(op.note),
-	//	&(op.hitSound),
-	//	(int*)&(op.hitSoundVol),
-	//	(int*)&(op.fxSoundVol),
-	//	(int*)&(op.bgmSoundVol),
-	//	(int*)&(op.movie),
-	//	(int*)&(op.sort) };//選んでいるオプションの値
-
-	
  }Option;
 
 #endif

@@ -11,7 +11,7 @@
 typedef struct SongCache {//譜面キャッシュ構造体
 	FILETIME writeTime;//npsファイルの更新時間
 
-	short bpm_suggested;//提案されるハイスピ設定に一番良いBPM
+	float bpm_suggested[5];//提案されるハイスピ設定に一番良いBPM
 	unsigned short total_note;//総ノート数
 
 	short LocalNotesAmount[2][9] = { { 0,0,0,0,0,0,0,0,0 },{ 0,0,0,0,0,0,0,0,0 } };//密度変化グラフ

@@ -876,7 +876,8 @@ int DifficultyRadar::CalcUnstability() {
 	double mean = std::accumulate(bpmList->begin(), bpmList->end(), 0.0) / bpmList->size();
 	double average_deviation = 0; 
 	for (const auto &i : *bpmList) {
-		average_deviation += abs(i - BPM_suggest);
+		//‘‚¢‰¹•„‚¾‚¯”{‚Ìd‚Ý
+		average_deviation += i - BPM_suggest > 0 ? abs(i - BPM_suggest)*4 : abs(i - BPM_suggest);
 	}
 	
 	double relative_average_deviation = average_deviation / mean;

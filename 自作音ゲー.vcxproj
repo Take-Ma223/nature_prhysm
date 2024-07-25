@@ -363,6 +363,7 @@
     <ClInclude Include="OptionItemScoreGraph.h" />
     <ClInclude Include="OptionItemSort.h" />
     <ClInclude Include="OptionItemSpeed.h" />
+    <ClInclude Include="OptionItemSpeedAdapter.h" />
     <ClInclude Include="OptionItemTargetScore1.h" />
     <ClInclude Include="OptionItemTargetScore2.h" />
     <ClInclude Include="OptionItemTheme.h" />

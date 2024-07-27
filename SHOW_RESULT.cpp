@@ -1289,15 +1289,15 @@ void SHOW_RESULT(RESULT res,
 		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//speed adapter + speed
 		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//speed adapter + speed
 
-		optionName = L"COLOR:" + option->op.color.toString();
-		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//color
-		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//color
-
 		optionName = L"LANE:" + option->op.lane.toString();
 		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//lane
-		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//lane
+		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//lane
+		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//lane
+
+		optionName = L"COLOR:" + option->op.color.toString();
+		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
+		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//color
+		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//color
 
 		optionName = L"GAUGE:" + option->op.gauge.toString();
 		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));

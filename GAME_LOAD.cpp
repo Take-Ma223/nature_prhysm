@@ -1162,8 +1162,8 @@ void GAME_LOAD(int song_number,
 
 
 	//瞬間BPM算出
-	double BPM_SuggestCalcRatio = 0.15;//瞬間BPMを算出するのに使うノーツ数の割合
-	double ignore_ratio = 0.01;//瞬間BPMを算出するのに無視する上位スピードノーツの割合
+	double BPM_SuggestCalcRatio = 0.10;//瞬間BPMを算出するのに使うノーツ数の割合
+	double ignore_ratio = 0.005;//瞬間BPMを算出するのに無視する上位スピードノーツの割合
 
 	float BPM_suggest = 0;
 	int SearchAmount = int(BPM_SuggestCalcRatio * Music[song_number].total_note[difficulty]) + 1;//探索個数 最低1個

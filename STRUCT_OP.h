@@ -128,8 +128,8 @@ struct OP {//オプション構造体(ロード時に渡す値)
 	vector<OptionItemBase*> list = {
 		&speed,
 		&speedAdapter,
-		&color,
 		&lane,
+		&color,
 		&gauge,
 
 		
@@ -163,8 +163,8 @@ typedef struct Option {//オプション構造体(全体)
 	wchar_t* OptionName[OPTION_NUM] = { 
 		L"SPEED",
 		L"SPEED ADAPTER",
-		L"COLOR",
 		L"LANE",
+		L"COLOR",
 		L"GAUGE",
 		L"WINDBREAK",
 		L"FAST/SLOW",

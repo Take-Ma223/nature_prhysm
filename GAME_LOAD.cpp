@@ -1166,26 +1166,41 @@ void GAME_LOAD(int song_number,
 	double ignore_ratio = 0.005;//瞬間BPMを算出するのに無視する上位スピードノーツの割合
 
 	float BPM_suggest = 0;
-	int SearchAmount = int(BPM_SuggestCalcRatio * Music[song_number].total_note[difficulty]) + 1;//探索個数 最低1個
+	int SearchAmount = int(BPM_SuggestCalcRatio * Music[song_number].total_note[difficulty]);//探索個数
 	int ignore_amount = int(ignore_ratio * Music[song_number].total_note[difficulty]);//無視個数 
-
-
-	double weight = 0;
-	int SearchCount = 0;
-	std::sort(bpmList->begin(),bpmList->end());  //bpmListを小さい順にソート
-
 	double medium_percentile = 0.5;
 
-	Music[song_number].speed_list[difficulty][Speed::AVERAGE] = bpmList->at(medium_percentile * Music[song_number].total_note[difficulty]);
-	Music[song_number].speed_list[difficulty][Speed::MAX] = bpmList->back();
-
-	//FAST速度の算出
-	int scan_start_ind = Music[song_number].total_note[difficulty] - 1 - ignore_amount;
-	for (i = scan_start_ind; i > scan_start_ind - SearchAmount; i--, SearchCount++) {
-		weight = (double)(SearchCount) * 2 / (SearchAmount - 1);//大きいBPMから0~2で重み付していく
-		BPM_suggest += weight*(float)(bpmList->at(i)) / (SearchAmount);
+	if (SearchAmount <= 1) {
+		if (Music[song_number].total_note[difficulty] == 0) {
+			Music[song_number].speed_list[difficulty][Speed::AVERAGE] = Music[song_number].bpm[difficulty];
+			Music[song_number].speed_list[difficulty][Speed::MAX] = Music[song_number].bpm[difficulty];
+			Music[song_number].speed_list[difficulty][Speed::FAST] = Music[song_number].bpm[difficulty];
+		}
+		else {
+			Music[song_number].speed_list[difficulty][Speed::AVERAGE] = bpmList->at(medium_percentile * Music[song_number].total_note[difficulty]);
+			Music[song_number].speed_list[difficulty][Speed::MAX] = bpmList->back();
+			Music[song_number].speed_list[difficulty][Speed::FAST] = bpmList->back();
+		}
 	}
-	Music[song_number].speed_list[difficulty][Speed::FAST] = BPM_suggest;
+	else {
+		double weight = 0;
+		int SearchCount = 0;
+		std::sort(bpmList->begin(), bpmList->end());  //bpmListを小さい順にソート
+
+
+		Music[song_number].speed_list[difficulty][Speed::AVERAGE] = bpmList->at(medium_percentile * Music[song_number].total_note[difficulty]);
+		Music[song_number].speed_list[difficulty][Speed::MAX] = bpmList->back();
+
+		//FAST速度の算出
+		int scan_start_ind = Music[song_number].total_note[difficulty] - 1 - ignore_amount;
+		for (i = scan_start_ind; i > scan_start_ind - SearchAmount; i--, SearchCount++) {
+			weight = (double)(SearchCount) * 2 / (SearchAmount - 1);//大きいBPMから0~2で重み付していく
+			BPM_suggest += weight * (float)(bpmList->at(i)) / (SearchAmount);
+		}
+
+		Music[song_number].speed_list[difficulty][Speed::FAST] = BPM_suggest;
+
+	}
 
 
 	//エディタ用処理 #END 

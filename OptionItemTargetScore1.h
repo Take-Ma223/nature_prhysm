@@ -10,7 +10,7 @@ namespace OptionItem {
 		A,
 		S,
 		POINT_10000,
-		MAX
+		FAST
 	};
 }
 

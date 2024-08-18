@@ -1172,14 +1172,14 @@ void GAME_LOAD(int song_number,
 
 	if (SearchAmount <= 1) {
 		if (Music[song_number].total_note[difficulty] == 0) {
-			Music[song_number].speed_list[difficulty][Speed::AVERAGE] = Music[song_number].bpm[difficulty];
-			Music[song_number].speed_list[difficulty][Speed::MAX] = Music[song_number].bpm[difficulty];
+			Music[song_number].speed_list[difficulty][Speed::MID] = Music[song_number].bpm[difficulty];
 			Music[song_number].speed_list[difficulty][Speed::FAST] = Music[song_number].bpm[difficulty];
+			Music[song_number].speed_list[difficulty][Speed::MAX] = Music[song_number].bpm[difficulty];
 		}
 		else {
-			Music[song_number].speed_list[difficulty][Speed::AVERAGE] = bpmList->at(medium_percentile * Music[song_number].total_note[difficulty]);
-			Music[song_number].speed_list[difficulty][Speed::MAX] = bpmList->back();
+			Music[song_number].speed_list[difficulty][Speed::MID] = bpmList->at(medium_percentile * Music[song_number].total_note[difficulty]);
 			Music[song_number].speed_list[difficulty][Speed::FAST] = bpmList->back();
+			Music[song_number].speed_list[difficulty][Speed::MAX] = bpmList->back();
 		}
 	}
 	else {
@@ -1188,7 +1188,7 @@ void GAME_LOAD(int song_number,
 		std::sort(bpmList->begin(), bpmList->end());  //bpmListを小さい順にソート
 
 
-		Music[song_number].speed_list[difficulty][Speed::AVERAGE] = bpmList->at(medium_percentile * Music[song_number].total_note[difficulty]);
+		Music[song_number].speed_list[difficulty][Speed::MID] = bpmList->at(medium_percentile * Music[song_number].total_note[difficulty]);
 		Music[song_number].speed_list[difficulty][Speed::MAX] = bpmList->back();
 
 		//FAST速度の算出

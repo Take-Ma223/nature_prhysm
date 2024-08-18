@@ -137,6 +137,7 @@ void SONG_SELECT(int *l_n,
 	int H_RADER_NUMBER[10];
 
 	int H_OPTION_NOTE_PREVIEW[2];
+	int H_OPTION_NOTE_SYMBOL_PREVIEW[2];
 
 	TransValue coverAlpha = TransValue(&context);
 	auto coverAlphaOpen = [&coverAlpha] {
@@ -554,13 +555,20 @@ void SONG_SELECT(int *l_n,
 	H_CURSOR = LoadGraph(L"img/cursor.png");
 
 	//NOTEプレビュー画像読み込み
-	wchar_t* ReadNameRGB[10] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",L"bright"};
+	wchar_t* ReadNameRGB[10] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"k",L"f",L"bright"};
 	wchar_t strcash[128];
 	auto note_folder = option->op.note.toString();
 	sprintfDx(strcash, L"img/notes/%s/%s.png", note_folder.c_str(), ReadNameRGB[1]);
 	H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
 	sprintfDx(strcash, L"img/notes/%s/%s.png", note_folder.c_str(), ReadNameRGB[8]);
 	H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+
+	auto note_symbol_folder = option->op.noteSymbol.toString();
+	sprintfDx(strcash, L"img/note_symbol/%s/%s.png", note_symbol_folder.c_str(), ReadNameRGB[1]);
+	H_OPTION_NOTE_SYMBOL_PREVIEW[0] = LoadGraph(strcash);
+	sprintfDx(strcash, L"img/note_symbol/%s/%s.png", note_symbol_folder.c_str(), ReadNameRGB[8]);
+	H_OPTION_NOTE_SYMBOL_PREVIEW[1] = LoadGraph(strcash);
+
 
 	//グラデーション画像の用意
 	int screenHandle;
@@ -2075,6 +2083,14 @@ void SONG_SELECT(int *l_n,
 							sprintfDx(strcash, L"img/notes/%s/%s.png", option->op.note.toString().c_str(), ReadNameRGB[8]);
 							H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
 						}
+						if (option_select == (int)OptionItem::Name::NOTE_SYMBOL) {
+							DeleteGraph(H_OPTION_NOTE_SYMBOL_PREVIEW[0]);
+							DeleteGraph(H_OPTION_NOTE_SYMBOL_PREVIEW[1]);
+							sprintfDx(strcash, L"img/note_symbol/%s/%s.png", option->op.noteSymbol.toString().c_str(), ReadNameRGB[1]);
+							H_OPTION_NOTE_SYMBOL_PREVIEW[0] = LoadGraph(strcash);
+							sprintfDx(strcash, L"img/note_symbol/%s/%s.png", option->op.noteSymbol.toString().c_str(), ReadNameRGB[8]);
+							H_OPTION_NOTE_SYMBOL_PREVIEW[1] = LoadGraph(strcash);
+						}
 						if (option_select == (int)OptionItem::Name::HITSOUND) {
 							DeleteSoundMem(SH_OPTION_HITSOUND_PREVIEW);
 							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->op.hitSound.toString().c_str());
@@ -3193,8 +3209,8 @@ void SONG_SELECT(int *l_n,
 					DrawGraph(320, 2 + 48 * 13, option->H_SENT, TRUE);
 					//速さ表示
 					if (SelectingTarget == SELECTING_SONG) {
-						sprintfDx(SpeedStr, L"(AVG:%d MAX:%d GUST:%d)",
-							int(Music[song_number].speed_list[difficulty][Speed::AVERAGE] * option->op.speedVal + 0.5),
+						sprintfDx(SpeedStr, L"(MID:%d FAST:%d MAX:%d)",
+							int(Music[song_number].speed_list[difficulty][Speed::MID] * option->op.speedVal + 0.5),
 							int(Music[song_number].speed_list[difficulty][Speed::FAST] * option->op.speedVal + 0.5),
 							int(Music[song_number].speed_list[difficulty][Speed::MAX] * option->op.speedVal + 0.5)
 						);
@@ -3597,6 +3613,16 @@ void SONG_SELECT(int *l_n,
 			DrawExtendGraph(868, 632, 948, 712, H_OPTION_NOTE_PREVIEW[1], TRUE);
 			SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
 		}
+
+		//NOTE SYMBOLを選択しているときはプレビュー画像を表示
+		if (OptionOpen == 1 && option_select == (int)OptionItem::Name::NOTE_SYMBOL) {
+			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+			DrawExtendGraph(332, 632, 412, 712, H_OPTION_NOTE_SYMBOL_PREVIEW[0], TRUE);
+			DrawExtendGraph(868, 632, 948, 712, H_OPTION_NOTE_SYMBOL_PREVIEW[1], TRUE);
+			SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+		}
+
+
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		optionListView.draw();

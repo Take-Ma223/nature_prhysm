@@ -23,9 +23,9 @@ enum UnlockState {
 };
 
 enum Speed {
-	AVERAGE = 0,
+	MID = 0,
 	FAST = 1,
-	MAX =2
+	MAX = 2
 };
 
 class Song {

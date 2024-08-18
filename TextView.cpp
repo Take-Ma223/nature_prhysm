@@ -47,6 +47,7 @@ void TextView::setText(TextViewParam p) {
 		param.getColor(),
 		fh.getHandle()
 	);
+
 	//Log(wstring(L"ï`âÊÉGÉâÅ[      :") + to_wstring(err));
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 

@@ -3,9 +3,9 @@
 
 namespace OptionItem {
 	enum class SpeedAdapter : int {
-		AVERAGE,
-		MAX,
-		GUST
+		MID,
+		FAST,
+		MAX
 	};
 }
 
@@ -18,15 +18,15 @@ private:
 	virtual void initData() override {
 		title = L"Speed Adapter";
 		nameList = {
-			L"AVG",
+			L"MID",
+			L"FAST",
 			L"MAX",
-			L"GUST",
 		
 		};
 		descriptionList = {
-			L"平均速度(AVG)にスピードを合わせます",
-			L"早い音符(MAX)にスピードを合わせます",
-			L"一番早い音符(GUST)にスピードを合わせます"
+			L"中央速度(MID)にスピードを合わせます",
+			L"早い音符(FAST)にスピードを合わせます",
+			L"一番早い音符(MAX)にスピードを合わせます"
 		};
 	}
 };

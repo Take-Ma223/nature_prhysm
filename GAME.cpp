@@ -572,7 +572,7 @@ void GAME(int song_number, int difficulty,
 
 
 	//画像音ハンドル値代入
-	wchar_t *ReadNameRGB[10] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",L"bright" };
+	wchar_t *ReadNameRGB[10] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"k",L"f",L"bright" };
 	auto note_folder = option->op.note.toString();
 	for (i = 0; i <= 9; i++) {
 		wchar_t strcash[128];
@@ -593,7 +593,7 @@ void GAME(int song_number, int difficulty,
 	H_JUDGE_AREA_PAINT = LoadGraph(tmpPath);
 
 	GradationNoteImage gradationLongNote(wstring(L"img/notes/")+wstring(note_folder.c_str()));
-	NoteTextImage noteText(config);
+	NoteSymbolImage noteSymbol(config, option->op.noteSymbol.toString());
 
 	int Keylist[3][4] = { { Button[0][0],Button[0][1],Button[0][2],Button[0][3] },
 	{ Button[1][0],Button[1][1],Button[1][2],Button[1][3] },
@@ -1034,7 +1034,7 @@ void GAME(int song_number, int difficulty,
 	if (option->op.targetScore1.getIndex() == (int)OptionItem::TargetScore1::A)targetScore = 9000;
 	if (option->op.targetScore1.getIndex() == (int)OptionItem::TargetScore1::S)targetScore = 9500;
 	if (option->op.targetScore1.getIndex() == (int)OptionItem::TargetScore1::POINT_10000)targetScore = 10000;
-	if (option->op.targetScore1.getIndex() == (int)OptionItem::TargetScore1::MAX)targetScore = 10000 + Music[song_number].total_note[difficulty];
+	if (option->op.targetScore1.getIndex() == (int)OptionItem::TargetScore1::FAST)targetScore = 10000 + Music[song_number].total_note[difficulty];
 
 	if (option->op.targetScore2.getIndex() == (int)OptionItem::TargetScore2::LATEST) {
 		targetScore2 = latestScore.score;
@@ -1427,8 +1427,8 @@ void GAME(int song_number, int difficulty,
 			int SpeedStrWidth = 0;
 
 			//速さ表示
-			sprintfDx(SpeedStr, L"(AVG:%d MAX:%d GUST:%d)",
-				int(Music[song_number].speed_list[difficulty][Speed::AVERAGE] * high_speed + 0.5),
+			sprintfDx(SpeedStr, L"(MID:%d FAST:%d MAX:%d)",
+				int(Music[song_number].speed_list[difficulty][Speed::MID] * high_speed + 0.5),
 				int(Music[song_number].speed_list[difficulty][Speed::FAST] * high_speed + 0.5),
 				int(Music[song_number].speed_list[difficulty][Speed::MAX] * high_speed + 0.5)
 			);
@@ -3288,22 +3288,22 @@ void GAME(int song_number, int difficulty,
 						if (isBeforeUnder && isNextUpper) {//前が自信より下、次が自身より上  ／／
 							//LN中間表示
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else if (!isBeforeUnder && isNextUpper) {//前が自信より上、次が自身より上  ＼／
 							//LN中間表示
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else if (isBeforeUnder && !isNextUpper) {//前が自信より下、次が自身より下  ／＼
 							//LN中間表示
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else if (!isBeforeUnder && !isNextUpper) {//前が自信より上、次が自身より下 ＼＼
 							//LN中間表示
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i + 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i + 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 
 						if (isNextUpper) {//次が自身より上にある場合
@@ -3449,18 +3449,18 @@ void GAME(int song_number, int difficulty,
 					if (note[j][i].group == NoteGroup::Single) {
 						SetDrawBlendMode(BlendMode, BlendVal);
 
-						DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color], TRUE);//単ノートの場合
+						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color], TRUE);//単ノートの場合
 
 					}
 
 					if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
 						if (note[j][i].y >= note[j][i+1].y) {//次が自身より上にある場合
 							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else {////次が自身より下にある場合
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i+1].LN_k==true)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i+1].LN_k==true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 					}
 					if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
@@ -3470,32 +3470,32 @@ void GAME(int song_number, int difficulty,
 
 						if (isBeforeUnder && isNextUpper) {//前が自身より下、次が自身より上  ／／
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else if(!isBeforeUnder && isNextUpper) {//前が自身より上、次が自身より上  ＼／
 							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else if (isBeforeUnder && !isNextUpper) {//前が自身より下、次が自身より下  ／＼
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else if(!isBeforeUnder && !isNextUpper){//前が自身より上、次が自身より下 ＼＼
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i + 1].LN_k == true)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i + 1].LN_k == true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 					}
 					if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
 						if (note[j][i].LN_k == true) {
 							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)NoteColor::K], TRUE);
+							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)NoteColor::K], TRUE);
 						}else if (note[j][i-1].y >= note[j][i].y) {//前が自身より下にある場合
 							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 						else {//前が自身より上にある場合
 							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteText.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 						}
 					}
 

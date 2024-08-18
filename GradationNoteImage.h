@@ -16,7 +16,7 @@ class GradationNoteImage
 		wstring(L"ml.png"),
 		wstring(L"yl.png"),
 		wstring(L"wl.png"),
-		wstring(L"dl.png"),
+		wstring(L"kl.png"),
 		wstring(L"fl.png"),
 	};
 

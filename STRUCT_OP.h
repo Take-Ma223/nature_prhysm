@@ -20,6 +20,7 @@
 #include "OptionItemTheme.h"
 #include "OptionItemWindbreak.h"
 #include "OptionItemSpeedAdapter.h"
+#include "OptionItemNoteSymbol.h"
 
 #ifndef _STRUCT_OP
 #define _STRUCT_OP
@@ -43,6 +44,7 @@ namespace OptionItem {
 		TARGETSCORE2,
 		THEME,
 		NOTE,
+		NOTE_SYMBOL,
 		HITSOUND,
 		HITSOUNDVOL,
 		FXSOUNDVOL,
@@ -87,6 +89,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		L"",
 		L"",
 		L"",
+		L"",
 		L"100%",
 		L"100%",
 		L"100%",
@@ -118,6 +121,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItemTargetScore2 targetScore2;
 	OptionItemTheme theme;
 	OptionItemNote note;
+	OptionItemNoteSymbol noteSymbol;
 	OptionItemHitSound hitSound;
 	OptionItemHitSoundVol hitSoundVol;
 	OptionItemFxSoundVol fxSoundVol;
@@ -132,7 +136,6 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		&color,
 		&gauge,
 
-		
 		&windbreak,
 		&fastSlow,
 		&barline,
@@ -144,6 +147,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		&targetScore2,
 		&theme,
 		&note,
+		&noteSymbol,
 		&hitSound,
 		&hitSoundVol,
 		&fxSoundVol,
@@ -158,7 +162,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 22;//オプションの数
+	static const int OPTION_NUM = 23;//オプションの数
 
 	wchar_t* OptionName[OPTION_NUM] = { 
 		L"SPEED",
@@ -177,6 +181,7 @@ typedef struct Option {//オプション構造体(全体)
 		L"TARGET SCORE2",
 		L"THEME",
 		L"NOTE",
+		L"NOTE SYMBOL",
 		L"HIT SOUND",
 		L"HIT SOUND VOL",
 		L"FX VOL",
@@ -203,6 +208,7 @@ typedef struct Option {//オプション構造体(全体)
 		OptionItem::BannerColor::RED,
 		OptionItem::BannerColor::RED,
 
+		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,
 		OptionItem::BannerColor::YELLOW,

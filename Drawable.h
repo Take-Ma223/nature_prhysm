@@ -63,7 +63,21 @@ struct BlendModeParam {
 	}
 };
 
-	
+struct ExtendParam {
+	bool isExtend = false;
+	double ratioX = 1;
+	double ratioY = 1;
+
+	ExtendParam(
+		bool isExtend = false,
+		double ratioX = 1,
+		double ratioY = 1
+	) {
+		ExtendParam::isExtend = isExtend;
+		ExtendParam::ratioX = ratioX;
+		ExtendParam::ratioY = ratioY;
+	}
+};
 
 
 
@@ -82,6 +96,7 @@ struct DrawableInitParam {
 	int brightnessB = 255;
 
 	BlendModeParam blendModeParam = BlendModeParam();
+	ExtendParam extendParam = ExtendParam();
 
 	/// <summary>
 	/// コンストラクタ
@@ -101,7 +116,8 @@ struct DrawableInitParam {
 		int bR = 255,
 		int bG = 255,
 		int bB = 255,
-		BlendModeParam bm = BlendModeParam()
+		BlendModeParam bm = BlendModeParam(),
+		ExtendParam ep = ExtendParam()
 	) {
 		cordinate = co;
 		centerRatio = cr;
@@ -111,6 +127,7 @@ struct DrawableInitParam {
 		brightnessG = bG;
 		brightnessB = bB;
 		blendModeParam = bm;
+		extendParam = ep;
 	}
 };
 
@@ -138,9 +155,7 @@ public:
 	double centerRatioX = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
 	double centerRatioY = 0;//左上を(0,0)としたときの中心座標(このDrawable内の割合)
 
-	bool isExtend = false;
-	double extendRatioX = 1;
-	double extendRatioY = 1;
+	ExtendParam extendParam = ExtendParam();
 
 	Drawable() {};
 
@@ -222,6 +237,8 @@ private:
 		Drawable::brightnessB.value = param.brightnessB;
 
 		Drawable::blendModeParam = param.blendModeParam;
+
+		Drawable::extendParam = param.extendParam;
 	}
 
 	void setParentHandle(ImageHandle h) {

@@ -28,7 +28,6 @@ protected:
 	/// <summary>
 	/// qDrawable‚Ìíœ
 	/// </summary>
-	/// <param name="d"></param>
 	void removeDrawable() {
 		drawables.clear();
 	}

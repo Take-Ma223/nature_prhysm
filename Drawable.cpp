@@ -89,10 +89,29 @@ void Drawable::drawWithProcessing(int drawScreen)
 		if (blendModeParam.mode != BlendMode::GRAPH_BLEND_NORMAL) {
 			GraphBlend(drawScreen, handle.getHandle(), blendModeParam.blendRatio.value, blendModeParam.convert());
 		}
+		else if (extendParam.isExtend) {
+			auto start_to_center = handle.getSize().x * centerRatioX;
+			auto top_to_center = handle.getSize().y * centerRatioY;
+			auto end_to_center = handle.getSize().x * centerRatioX;
+			auto bottom_to_center = handle.getSize().y * centerRatioY;
+
+			auto x1 = X.value - start_to_center * extendParam.ratioX;
+			auto y1 = Y.value - top_to_center * extendParam.ratioY;
+			auto x2 = X.value + end_to_center * extendParam.ratioX;
+			auto y2 = Y.value + bottom_to_center * extendParam.ratioY;
+
+			DrawExtendGraphF(
+				x1,y1,x2,y2,
+				handle.getHandle(),
+				TRUE);
+		}
 		else {
+			auto x1 = X.value - handle.getSize().x * centerRatioX;
+			auto y1 = Y.value - handle.getSize().y * centerRatioY;
+
 			DrawGraph(
-				X.value - handle.getSize().x * centerRatioX,
-				Y.value - handle.getSize().y * centerRatioY,
+				x1,
+				y1,
 				handle.getHandle(),
 				TRUE);
 		}

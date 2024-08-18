@@ -267,6 +267,16 @@ private:
 				option->op.list[optionIndex]->toString(),
 				fontItemName, itemNameColor, itemNameShadowColor)
 		);
+
+		//•¶Žš‚ª’·‚¢Žž‚Í‰¡•ûŒü‚Ék¬
+		const auto MAX_WIDTH = 230;
+		if (listItemName[listIndex].get()->getSize().x > MAX_WIDTH) {
+			listItemName[listIndex].get()->extendParam.isExtend = true;
+			listItemName[listIndex].get()->extendParam.ratioX = (double)MAX_WIDTH / listItemName[listIndex].get()->getSize().x;
+		}
+		else {
+			listItemName[listIndex].get()->extendParam.isExtend = false;
+		}
 	}
 
 	void updateOptionName(int listIndex, int optionIndex)

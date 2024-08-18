@@ -21,7 +21,12 @@ public:
     /// <param name="fontInfo">フォント</param>
     /// <param name="frontColor">手前の色 GetColorで指定</param>
     /// <param name="shadowColor">影の色 GetColorで指定</param>
-    NPTextViewParam(wstring string = wstring(L""), FontInfo fontInfo = FontInfo(), int frontColor = GetColor(255, 255, 255), int shadowColor = GetColor(0, 0, 0)) {
+    NPTextViewParam(
+        wstring string = wstring(L""), 
+        FontInfo fontInfo = FontInfo(), 
+        int frontColor = GetColor(255, 255, 255), 
+        int shadowColor = GetColor(0, 0, 0)
+    ) {
         NPTextViewParam::string = string;
         NPTextViewParam::frontColor = frontColor;
         NPTextViewParam::shadowColor = shadowColor;

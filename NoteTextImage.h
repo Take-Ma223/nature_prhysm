@@ -6,7 +6,7 @@
 using namespace std;
 
 #pragma once
-class NoteTextImage
+class NoteSymbolImage
 {
 	wstring fileName[10] = {
 		wstring(L""),
@@ -21,7 +21,7 @@ class NoteTextImage
 		wstring(L"f.png"),
 	};
 
-	wstring rootPath = wstring(L"img/note_text");
+	wstring rootPath = wstring(L"img/note_symbol");
 
 public:
 	int H_NOTE_TEXT[10];
@@ -29,21 +29,23 @@ public:
 	/// <summary>
 	/// コンストラクタ
 	/// </summary>
-	/// <param name="path">ノーツテキスト画像へのパス img/notes/XXX</param>
-	NoteTextImage(Config& config) {
-		if (config.NoteText[0] == 1) loadImage(NoteColor::R);
-		if (config.NoteText[1] == 1) loadImage(NoteColor::G);
-		if (config.NoteText[2] == 1) loadImage(NoteColor::B);
-		if (config.NoteText[3] == 1) loadImage(NoteColor::C);
-		if (config.NoteText[4] == 1) loadImage(NoteColor::M);
-		if (config.NoteText[5] == 1) loadImage(NoteColor::Y);
-		if (config.NoteText[6] == 1) loadImage(NoteColor::W);
-		if (config.NoteText[7] == 1) loadImage(NoteColor::K);
-		if (config.NoteText[8] == 1) loadImage(NoteColor::F);
+	/// <param name="config">config</param>
+	/// <param name="folder">どのnote symbolを使うかを決めるフォルダパス</param>
+
+	NoteSymbolImage(Config& config, wstring folder) {
+		if (config.NoteText[0] == 1) loadImage(NoteColor::R, folder);
+		if (config.NoteText[1] == 1) loadImage(NoteColor::G, folder);
+		if (config.NoteText[2] == 1) loadImage(NoteColor::B, folder);
+		if (config.NoteText[3] == 1) loadImage(NoteColor::C, folder);
+		if (config.NoteText[4] == 1) loadImage(NoteColor::M, folder);
+		if (config.NoteText[5] == 1) loadImage(NoteColor::Y, folder);
+		if (config.NoteText[6] == 1) loadImage(NoteColor::W, folder);
+		if (config.NoteText[7] == 1) loadImage(NoteColor::K, folder);
+		if (config.NoteText[8] == 1) loadImage(NoteColor::F, folder);
 	}
 
-	void loadImage(NoteColor noteColor) {
-		H_NOTE_TEXT[(int)noteColor] = LoadGraph((rootPath + L"/" + fileName[(int)noteColor]).c_str());
+	void loadImage(NoteColor noteColor, wstring folder) {
+		H_NOTE_TEXT[(int)noteColor] = LoadGraph((rootPath + L"/" + folder + L"/" + fileName[(int)noteColor]).c_str());
 	}
 };
 

@@ -4,7 +4,7 @@
 namespace OptionItem {
 	enum class TargetScore2 : int {
 		RIVAL,
-		AVERAGE,
+		MID,
 		MEDIAN,
 		NEXTRANK,
 		TOP,

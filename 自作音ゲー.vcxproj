@@ -360,6 +360,7 @@
     <ClInclude Include="OptionItemMovie.h" />
     <ClInclude Include="OptionItemNote.h" />
     <ClInclude Include="OptionItemNoteOffset.h" />
+    <ClInclude Include="OptionItemNoteSymbol.h" />
     <ClInclude Include="OptionItemScoreGraph.h" />
     <ClInclude Include="OptionItemSort.h" />
     <ClInclude Include="OptionItemSpeed.h" />

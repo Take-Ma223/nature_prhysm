@@ -7,7 +7,7 @@
 
 void writeCacheToMusic(SongCache* Cache, Song* Music, int song_number, int difficulty) {
 	int i = 0;
-	for (i = Speed::AVERAGE; i <= Speed::MAX; i++) {
+	for (i = Speed::MID; i <= Speed::FAST; i++) {
 		Music[song_number].speed_list[difficulty][i] = Cache->bpm_suggested[i];
 	}
 
@@ -36,7 +36,7 @@ void writeCacheToMusic(SongCache* Cache, Song* Music, int song_number, int diffi
 
 void writeMusicToCache(SongCache *Cache, Song* Music, int song_number, int difficulty) {
 	int i = 0;
-	for (i = Speed::AVERAGE; i <= Speed::MAX; i++) {
+	for (i = Speed::MID; i <= Speed::FAST; i++) {
 		Cache->bpm_suggested[i] = Music[song_number].speed_list[difficulty][i];
 	}
 	Cache->total_note = Music[song_number].total_note[difficulty];

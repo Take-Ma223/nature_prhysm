@@ -150,7 +150,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	BOOL isInstructionAppear = 1;//操作説明表示フラグ
 
 	//画像音ハンドル値代入
-	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"d",L"f",
+	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"k",L"f",
 		L"bright",L"note_Long_hit_b" };
 
 	GradationNoteImage gradationLongNote(wstring(L"img/notes/") + wstring(option->op.note.toString()));

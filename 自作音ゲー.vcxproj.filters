@@ -838,6 +838,9 @@
     <ClInclude Include="OptionItemSpeedAdapter.h">
       <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
     </ClInclude>
+    <ClInclude Include="OptionItemNoteSymbol.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

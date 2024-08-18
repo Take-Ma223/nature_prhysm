@@ -946,7 +946,7 @@ int DifficultyRadar::CalcUnstability() {
 
 	Unstability = (log(Unstability + 1) / log(2));//0~7‚ª0~3‚É‘Î‰‚·‚é‘Î” •Ï‰»”‚ª­‚È‚¢‚¤‚¿‚Í’l‚ª‘½‚­ã‚ª‚é‚æ‚¤‚É‚·‚é
 
-	Unstability *= 51.666 * 0.7;
+	Unstability *= 35.2258788;
 
 	//Unstability = (Unstability / ((double)time / 1000)) * 60;//1•ª‚ ‚½‚è‚Ì‘Î”BPM•Ï‰»–§“x‚É‚·‚é
 	return (int)(Unstability);

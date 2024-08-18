@@ -33,15 +33,15 @@ public:
 	/// <param name="folder">どのnote symbolを使うかを決めるフォルダパス</param>
 
 	NoteSymbolImage(Config& config, wstring folder) {
-		if (config.NoteText[0] == 1) loadImage(NoteColor::R, folder);
-		if (config.NoteText[1] == 1) loadImage(NoteColor::G, folder);
-		if (config.NoteText[2] == 1) loadImage(NoteColor::B, folder);
-		if (config.NoteText[3] == 1) loadImage(NoteColor::C, folder);
-		if (config.NoteText[4] == 1) loadImage(NoteColor::M, folder);
-		if (config.NoteText[5] == 1) loadImage(NoteColor::Y, folder);
-		if (config.NoteText[6] == 1) loadImage(NoteColor::W, folder);
-		if (config.NoteText[7] == 1) loadImage(NoteColor::K, folder);
-		if (config.NoteText[8] == 1) loadImage(NoteColor::F, folder);
+		if (config.NoteSymbol[0] == 1) loadImage(NoteColor::R, folder);
+		if (config.NoteSymbol[1] == 1) loadImage(NoteColor::G, folder);
+		if (config.NoteSymbol[2] == 1) loadImage(NoteColor::B, folder);
+		if (config.NoteSymbol[3] == 1) loadImage(NoteColor::C, folder);
+		if (config.NoteSymbol[4] == 1) loadImage(NoteColor::M, folder);
+		if (config.NoteSymbol[5] == 1) loadImage(NoteColor::Y, folder);
+		if (config.NoteSymbol[6] == 1) loadImage(NoteColor::W, folder);
+		if (config.NoteSymbol[7] == 1) loadImage(NoteColor::K, folder);
+		if (config.NoteSymbol[8] == 1) loadImage(NoteColor::F, folder);
 	}
 
 	void loadImage(NoteColor noteColor, wstring folder) {

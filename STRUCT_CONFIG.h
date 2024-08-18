@@ -34,7 +34,7 @@ typedef struct Config {//コンフィグデータ
 	int Editable = 0;
 	int UseAiPredictedDifficulty = 0;
 
-	int NoteText[9] = {0,0,0,0,0,0,0,0,0};
+	int NoteSymbol[9] = {0,0,0,0,0,0,0,0,0};
 
 } Config;
 

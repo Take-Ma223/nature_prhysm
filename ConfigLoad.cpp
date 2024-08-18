@@ -18,16 +18,16 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 	wchar_t str[256];
 	sharp2[0] = L'\0';
 
-	wchar_t* noteText[] = {
-		L"NOTE_TEXT_R",
-		L"NOTE_TEXT_G",
-		L"NOTE_TEXT_B",
-		L"NOTE_TEXT_C",
-		L"NOTE_TEXT_M",
-		L"NOTE_TEXT_Y",
-		L"NOTE_TEXT_W",
-		L"NOTE_TEXT_K",
-		L"NOTE_TEXT_F",
+	wchar_t* noteSymbol[] = {
+		L"NOTE_SYMBOL_R",
+		L"NOTE_SYMBOL_G",
+		L"NOTE_SYMBOL_B",
+		L"NOTE_SYMBOL_C",
+		L"NOTE_SYMBOL_M",
+		L"NOTE_SYMBOL_Y",
+		L"NOTE_SYMBOL_W",
+		L"NOTE_SYMBOL_K",
+		L"NOTE_SYMBOL_F",
 	};
 
 	while (FileRead_gets(str, 256, fp) != -1) {//一行取得(\nは入らない)
@@ -206,17 +206,17 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 		}
 
 		for (int i = 0; i < 9; i++) {
-			if (wcscmp(noteText[i], sharp1) == 0) {
+			if (wcscmp(noteSymbol[i], sharp1) == 0) {
 				wchar_t Val[3];
 				swscanf_s(sharp2, L"%[^,\n]",
 					Val, _countof(Val));
-				config->NoteText[i] = _wtoi(Val);//数値格納
+				config->NoteSymbol[i] = _wtoi(Val);//数値格納
 
-				if (config->NoteText[i] == 1) {
-					config->NoteText[i] = TRUE;
+				if (config->NoteSymbol[i] == 1) {
+					config->NoteSymbol[i] = TRUE;
 				}
 				else {
-					config->NoteText[i] = FALSE;
+					config->NoteSymbol[i] = FALSE;
 				}
 			}
 		}

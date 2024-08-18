@@ -42,6 +42,7 @@
 #include "GradationNoteImage.h"
 #include "NoteTextImage.h"
 #include "WindowTitleSetter.h"
+#include "RetryView.h"
 
 using namespace std;
 
@@ -139,6 +140,10 @@ void GAME(int song_number, int difficulty,
 	int H_DARKNESS;//背景を暗くする用の黒い画像
 	int H_GAME_STR_JUDGE_BPM;
 	int H_GAME_STR_SCORE_GRAPH;
+
+	DrawableInitParam retryViewParam;
+	retryViewParam.cordinate = Cordinate(320, 600);
+	RetryView retryView(&context, retryViewParam);
 
 	TransValue viewAlpha = TransValue(&context);
 	viewAlpha.value = 255;
@@ -668,7 +673,6 @@ void GAME(int song_number, int difficulty,
 	CoverView coverView = CoverView(&context, coverViewParam);
 	
 	
-	
 	H_FAILED = LoadGraph(L"img/failed.png");
 	H_CLEARED = LoadGraph(L"img/cleared.png");
 
@@ -1089,6 +1093,7 @@ void GAME(int song_number, int difficulty,
 			draw_alpha = 1;
 			jingleVolume.play();
 			playAnimationOnEscAtStart();
+			if (SkillTestFlag == 0 && Music[song_number].secret != UnlockState::Secret)retryView.showImmediately();
 			break;
 			/*
 			*escape = 1;
@@ -1512,6 +1517,7 @@ void GAME(int song_number, int difficulty,
 			}
 			songVolume.play();
 			playAnimationOnEscAtPlay();
+			if (SkillTestFlag == 0 && Music[song_number].secret != UnlockState::Secret)retryView.show();
 		}
 		if (Key[Button_Shutter] == 1) {//スクリーンショット
 			ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
@@ -2836,6 +2842,7 @@ void GAME(int song_number, int difficulty,
 
 			coverView.finishMiddleCover();//カバーを下げる
 			playAnimationOnFinish();
+			if(SkillTestFlag==0 && Music[song_number].secret != UnlockState::Secret)retryView.show();//リトライ方法の表示
 		}
 		if (GAME_passed_time >= Music[song_number].TimeToEnd[difficulty] && ClearFlag == 0
 			&& note[0][j_n_n[0]].color == NoteColor::NONE
@@ -2948,8 +2955,14 @@ void GAME(int song_number, int difficulty,
 
 		bool isShowingFinishStrTimeOver = (GAME_passed_time - cleared_time) >= TimeFromEndOfGameToResult;
 		bool retryRequest = false;
-		if (isGameFinishStrShowComplete && ClearFlag == 2 && !retryRequest && secret == 0) {
+		if (isGameFinishStrShowComplete && 
+			ClearFlag == 2 && 
+			!retryRequest && 
+			SkillTestFlag == 0 && 
+			Music[song_number].secret != UnlockState::Secret
+		) {
 			retryRequest = (Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
+				&& (Key[Button[1][0]] >= 1 || Key[Button[1][1]] >= 1 || Key[Button[1][2]] >= 1 || Key[Button[1][3]] >= 1)
 				&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1);
 		}
 
@@ -3102,6 +3115,7 @@ void GAME(int song_number, int difficulty,
 		//----Draw-----------------------------------------------------------------------------------/////////////////
 		SetDrawScreen(appContext.baseHandle.getHandle());
 		ClearDrawScreen();//グラフィックを初期化
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 		DrawGraph(0, 0, H_BG, TRUE);//背景
 		show_cloud(H_CLOUD, &pos_cloud, (stopFlag != 1)*cbpm / 150, LOOP_passed_time);//雲
 
@@ -3906,6 +3920,8 @@ void GAME(int song_number, int difficulty,
 				}
 			}
 		}
+		retryView.updateFlashState(Key, Button);
+		retryView.draw(DX_SCREEN_BACK);
 
 
 		if (*debug == 1 && SHOW_DEBUG_MODE == 1 && config.ShowDebug == 1) {

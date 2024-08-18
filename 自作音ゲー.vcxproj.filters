@@ -172,6 +172,9 @@
     <Filter Include="ソース ファイル\Util\File">
       <UniqueIdentifier>{b2c41770-136a-4c6c-a4b1-2b721b686649}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\GAME\RetryView">
+      <UniqueIdentifier>{08663504-0c22-478b-b9e6-e3195118f1b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -840,6 +843,9 @@
     </ClInclude>
     <ClInclude Include="OptionItemNoteSymbol.h">
       <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="RetryView.h">
+      <Filter>ソース ファイル\GAME\RetryView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

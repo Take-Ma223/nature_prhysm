@@ -2475,6 +2475,7 @@ void SONG_SELECT(int *l_n,
 							0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ
 						Get_Key_State(Buf, Key, AC);
 					} while ((Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
+						&& (Key[Button[1][0]] >= 1 || Key[Button[1][1]] >= 1 || Key[Button[1][2]] >= 1 || Key[Button[1][3]] >= 1)
 						&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1)
 						&& (retryAble == 1)
 						&& (secret->song_appear_number != song_number || Music[song_number].secret != UnlockState::Secret)//リトライできるときの条件(隠し曲演出中の未解禁隠し曲プレイはリトライできない)

@@ -373,6 +373,7 @@
     <ClInclude Include="OptionStateSaveLoad.h" />
     <ClInclude Include="GetValueFromController.h" />
     <ClInclude Include="Processable.h" />
+    <ClInclude Include="RetryView.h" />
     <ClInclude Include="SaveDataSaveLoad.h" />
     <ClInclude Include="ScreenShot.h" />
     <ClInclude Include="ShowErrorName.h" />

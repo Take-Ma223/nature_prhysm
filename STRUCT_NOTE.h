@@ -56,6 +56,9 @@ public:
 	BOOL LN_k = 0;//LNの終端で離すべきか(0:離さなくても良い 1:離さないといけない黒終点)
 	short textLine = 0;//譜面データ上の行(見つけやすくする)
 	BOOL isBright = 0;//鳴らす音を大きくするかどうか(0:通常 1で長くする) 長く鳴る音符は点滅する
+	float brightRingAlpha = 0;//光る音符の輪の透明度(出現時にフェードインさせる)
+
+
 	BOOL ignore = 0;//ワープ区間のため無視される音符なら1 それ以外0
 	//std::vector<GradationLongNoteNode*> j;
 };

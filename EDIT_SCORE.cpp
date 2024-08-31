@@ -1568,7 +1568,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 							}
 							if (show->data.note.isBright[i] == true) {
 								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[(int)show->data.note.color[i]], TRUE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 								DrawExtendGraph(lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5), H_NOTE[10], TRUE);
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 							}
@@ -1609,7 +1609,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 						
 							//光るノーツ
 							if (show->data.note.isBright[i] == true) {
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 105);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 								DrawRectExtendGraph(
 									lane[i] - 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw - 0 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw)*scale*scale_score_draw + 64 + 0.5),
 									0, 128, 256, 128,
@@ -1656,7 +1656,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 
 							//光るノーツ
 							if (show->data.note.isBright[i] == true) {
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 105);
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
 								DrawRectExtendGraph(//LN中間表示
 									lane[i] - 64, int(judge_area - (score_cell_find_next_note(show, i)->step - step_count_draw) * scale * scale_score_draw - 0 + 0.5),
@@ -1681,8 +1681,8 @@ void EDIT_SCORE(SCORE_CELL* head,
 							);
 
 
-							if (show->data.note.LN_k[i] == false && show->data.note.isBright[i] == true) {//光る音符の場合
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(105));
+							if (show->data.note.isBright[i] == true) {//光る音符の場合
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 								DrawRectExtendGraph(
 									lane[i] - 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw - 64 + 0.5), lane[i] + 64, int(judge_area - (show->step - step_count_draw) * scale * scale_score_draw + 0 + 0.5),
 									0, 0, 256, 128,

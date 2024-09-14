@@ -3212,317 +3212,9 @@ void GAME(int song_number, int difficulty,
 			}
 		}
 
-		for (j = 0; j <= 3; j++) {
-			for (i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツの描画
+		drawNotes(MusicSub, difficulty, note, BlendMode, BlendVal, H_NOTE, flash, FLASH_VALUE, FLASH_VALUE_ALWAYS, noteSearcher, option, gradationLongNote, H_LNOTE, LN_flash, j_n_n, FLASH_VALUE_LN_PUSH, noteSymbol);
 
-
-				if (note[j][i].fall == NoteFall::Faling) {
-					if (note[j][i].group == NoteGroup::Single) {
-						SetDrawBlendMode(BlendMode, BlendVal);
-
-						DrawGraph(note[j][i].x, note[j][i].y, H_NOTE[(int)note[j][i].color], TRUE);//単ノートの場合
-
-
-
-						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawGraph(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//白く光らせる
-							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawGraph(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//常に白くする
-						}
-
-					}
-
-					if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
-						int endInd = i;
-						try {
-							endInd = noteSearcher.searchLnEnd(j, i);
-						}
-						catch(exception){
-
-						}
-
-						//各LNノードは自身と上のノーツまでの中間部分を描画
-						if (note[j][i].y >= note[j][i+1].y) {//始点が終点より下にある場合
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i + 1].LN_k == 1 && option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON) {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
-							}
-							else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i + 1].color_init != note[j][i].color_init)) {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
-							}
-							else {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
-							}
-
-							if (LN_flash[j] == 1 && j_n_n[j] - 1 == i) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);//白く光らせる
-							}
-
-							if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-							}
-
-							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//LN始点の場合(始点下半分と中間を表示)
-							if (LN_flash[j] == 1 && j_n_n[j] - 1 == i && note[j][i].group == NoteGroup::LongNoteStart) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[11], TRUE, FALSE);//LN始点の場合(始点下半分を表示)
-							}
-
-							if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//白く光らせる
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//常に白くする
-
-							}
-						}
-						else {////始点が終点より上にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-
-							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//通常終端
-
-							if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE* note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
-							}
-							
-
-						}
-					}
-					if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
-						bool isBeforeUnder = note[j][i].y <= note[j][i - 1].y;
-						bool isNextUpper = note[j][i].y >= note[j][i + 1].y;
-						if (isBeforeUnder && isNextUpper) {//前が自信より下、次が自身より上  ／／
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else if (!isBeforeUnder && isNextUpper) {//前が自信より上、次が自身より上  ＼／
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else if (isBeforeUnder && !isNextUpper) {//前が自信より下、次が自身より下  ／＼
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else if (!isBeforeUnder && !isNextUpper) {//前が自信より上、次が自身より下 ＼＼
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i + 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-
-						if (isNextUpper) {//次が自身より上にある場合
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-
-							if (note[j][i + 1].LN_k == 1 && option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON) {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
-							}
-							else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i + 1].color_init != note[j][i].color_init)) {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
-							}
-							else {
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
-							}
-
-
-							if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);//白く光らせる
-							}
-
-							if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE* note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS* note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-							}
-						}
-						if(!isBeforeUnder) {//前が自身より上にある場合
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i - 1].color_init != note[j][i].color_init)) {
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
-							}
-							else {
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
-							}
-
-
-							if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);
-							}
-
-							if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE* note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS* note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-							}
-
-						}
-					}
-					if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
-						int startInd = noteSearcher.searchLnStart(j, i);
-
-						if (note[j][i-1].y >= note[j][i].y) {//始点が終点より下にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-
-							if (note[j][i].LN_k == 0) {
-								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//上半分表示
-							}
-							else if (note[j][i].LN_k == 1) {
-								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[8], TRUE, FALSE);//上半分黒音符表示
-							}
-
-							if (note[j][i].LN_k == 0) {//黒終端はLN叩いてるとき光らせない
-								if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
-									SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-									DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[11], TRUE, FALSE);
-								}
-							}
-
-							if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS* note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
-							}
-						}
-						else {//始点が終点より上にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-
-							if (note[j][i].LN_k == 0) {
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//下半分表示
-
-							}
-							else if (note[j][i].LN_k == 1) {
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[8], TRUE, FALSE);//下半分表示
-							}
-
-
-							if (note[j][i - 1].isBright == 1) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE* note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS* note[j][i].brightRingAlpha));
-								DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);
-							}
-
-							//LN中間表示
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && note[j][i].LN_k == 1) {
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)NoteColor::K], TRUE);
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
-							}
-							else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i].color_init != note[j][i - 1].color_init)) {
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
-							}
-							else {
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i - 1].color_init], TRUE);
-							}
-
-							//DrawRectExtendGraph
-							//DrawRect
-							if (LN_flash[j] == 1 && j_n_n[j] == i && note[j][i].group == NoteGroup::LongNoteEnd) {//LNを叩いているとき
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);
-							}
-
-							if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE* note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-								SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS* note[j][i].brightRingAlpha));
-								DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
-							}
-
-
-
-							
-						}
-					}
-
-				}
-			}
-		}
-
-		for (j = 0; j <= 3; j++) {
-			for (i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツテキストの描画
-				if (note[j][i].fall == NoteFall::Faling) {
-					if (note[j][i].group == NoteGroup::Single) {
-						SetDrawBlendMode(BlendMode, BlendVal);
-
-						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color], TRUE);//単ノートの場合
-
-					}
-
-					if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
-						if (note[j][i].y >= note[j][i+1].y) {//次が自身より上にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else {////次が自身より下にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i+1].LN_k==true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-					}
-					if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
-						bool isBeforeUnder = note[j][i].y <= note[j][i - 1].y;
-						bool isNextUpper = note[j][i].y >= note[j][i + 1].y;
-
-
-						if (isBeforeUnder && isNextUpper) {//前が自身より下、次が自身より上  ／／
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else if(!isBeforeUnder && isNextUpper) {//前が自身より上、次が自身より上  ＼／
-							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else if (isBeforeUnder && !isNextUpper) {//前が自身より下、次が自身より下  ／＼
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else if(!isBeforeUnder && !isNextUpper){//前が自身より上、次が自身より下 ＼＼
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i + 1].LN_k == true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-					}
-					if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
-						if (note[j][i].LN_k == true) {
-							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)NoteColor::K], TRUE);
-						}else if (note[j][i-1].y >= note[j][i].y) {//前が自身より下にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-							if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-						else {//前が自身より上にある場合
-							SetDrawBlendMode(BlendMode, BlendVal);
-							DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-						}
-					}
-
-				}
-			}
-		}
+		
 
 
 		int sideCoverAlphaRatioGeneral = 195;
@@ -4081,6 +3773,382 @@ void GAME(int song_number, int difficulty,
 	}
 
 	return;
+}
+
+void drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, int BlendVal, int  H_NOTE[12], double flash, const int FLASH_VALUE, const int FLASH_VALUE_ALWAYS, NoteSearcher& noteSearcher, Option* option, GradationNoteImage& gradationLongNote, int  H_LNOTE[12], int  LN_flash[4], int  j_n_n[4], const int FLASH_VALUE_LN_PUSH, NoteSymbolImage& noteSymbol)
+{
+	struct SymbolLocation {
+		int x;
+		int y;
+		NoteColor note_color;
+		NoteFall note_fall;
+
+		SymbolLocation(int x, int y, NoteColor note_color, NoteFall note_fall) {
+			SymbolLocation::x = x;
+			SymbolLocation::y = y;
+			SymbolLocation::note_color = note_color;
+			SymbolLocation::note_fall = note_fall;
+
+		};
+	};
+
+	std::vector<SymbolLocation> symbol_location = {};
+
+	auto drawLnSymbols = [&]() {
+		SetDrawBlendMode(BlendMode, BlendVal);
+
+		for (int i = 0; i < symbol_location.size();i++) {
+			if (symbol_location[i].note_fall != NoteFall::Faling) continue;
+
+			if (i + 1 < symbol_location.size()) {
+				//同じ色が続くときは一番早いタイミングのものだけを描画する
+				bool is_next_same_color = symbol_location[i].note_color == symbol_location[i + 1].note_color;
+
+				if (is_next_same_color) continue;
+			}
+
+			DrawGraph(
+				symbol_location[i].x, 
+				symbol_location[i].y, 
+				noteSymbol.H_NOTE_TEXT[static_cast<int>(symbol_location[i].note_color)], 
+				TRUE
+			);
+		}
+		symbol_location.clear();
+
+	};
+
+	for (int j = 0; j <= 3; j++) {
+		for (int i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツの描画
+
+
+			if (note[j][i].group == NoteGroup::Single) {
+				if (note[j][i].fall == NoteFall::Faling) {
+					SetDrawBlendMode(BlendMode, BlendVal);
+
+					DrawGraph(note[j][i].x, note[j][i].y, H_NOTE[static_cast<int>(note[j][i].color)], TRUE);//単ノートの場合
+
+					if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+						SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+						DrawGraph(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//白く光らせる
+						SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+						DrawGraph(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//常に白くする
+					}
+
+					
+				}
+
+				//Note Symbolの描画
+				SetDrawBlendMode(BlendMode, BlendVal);
+				DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[static_cast<int>(note[j][i].color)], TRUE);
+			}
+
+			if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
+				if (note[j][i].fall == NoteFall::Faling) {
+					int endInd = i;
+					try {
+						endInd = noteSearcher.searchLnEnd(j, i);
+					}
+					catch (exception) {
+
+					}
+
+					//各LNノードは自身と上のノーツまでの中間部分を描画
+					if (note[j][i].y >= note[j][i + 1].y) {//始点が終点より下にある場合
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+						if (note[j][i + 1].LN_k == 1 && option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON) {
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+						}
+						else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i + 1].color_init != note[j][i].color_init)) {
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+						}
+						else {
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
+						}
+
+						if (LN_flash[j] == 1 && j_n_n[j] - 1 == i) {//LNを叩いているとき
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
+
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);//白く光らせる
+						}
+
+						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+						}
+
+						SetDrawBlendMode(BlendMode, BlendVal);
+						DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//LN始点の場合(始点下半分と中間を表示)
+						if (LN_flash[j] == 1 && j_n_n[j] - 1 == i && note[j][i].group == NoteGroup::LongNoteStart) {//LNを叩いているとき
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[11], TRUE, FALSE);//LN始点の場合(始点下半分を表示)
+						}
+
+						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//白く光らせる
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//常に白くする
+
+						}
+					}
+					else {////始点が終点より上にある場合
+						SetDrawBlendMode(BlendMode, BlendVal);
+
+						DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//通常終端
+
+						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+						}
+
+
+					}
+				}
+				//Note Symbolの追加
+				symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color, note[j][i].fall));
+				drawLnSymbols();
+			}
+			if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
+				if (note[j][i].fall == NoteFall::Faling) {
+					bool isBeforeUnder = note[j][i].y <= note[j][i - 1].y;
+					bool isNextUpper = note[j][i].y >= note[j][i + 1].y;
+					if (isBeforeUnder && isNextUpper) {//前が自信より下、次が自身より上  ／／
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+					}
+					else if (!isBeforeUnder && isNextUpper) {//前が自信より上、次が自身より上  ＼／
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+					}
+					else if (isBeforeUnder && !isNextUpper) {//前が自信より下、次が自身より下  ／＼
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+					}
+					else if (!isBeforeUnder && !isNextUpper) {//前が自信より上、次が自身より下 ＼＼
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+						if (note[j][i].color_init != note[j][i + 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+					}
+
+					if (isNextUpper) {//次が自身より上にある場合
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+
+						if (note[j][i + 1].LN_k == 1 && option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON) {
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+						}
+						else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i + 1].color_init != note[j][i].color_init)) {
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+						}
+						else {
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
+						}
+
+
+						if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);//白く光らせる
+						}
+
+						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+						}
+					}
+					if (!isBeforeUnder) {//前が自身より上にある場合
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+						if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i - 1].color_init != note[j][i].color_init)) {
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+						}
+						else {
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
+						}
+
+
+						if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);
+						}
+
+						if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+						}
+
+					}
+				}
+				//Note Symbolの追加
+				symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color, note[j][i].fall));
+			}
+			if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
+				if (note[j][i].fall == NoteFall::Faling) {
+					int startInd = noteSearcher.searchLnStart(j, i);
+
+					if (note[j][i - 1].y >= note[j][i].y) {//始点が終点より下にある場合
+						SetDrawBlendMode(BlendMode, BlendVal);
+
+						if (note[j][i].LN_k == 0) {
+							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//上半分表示
+						}
+						else if (note[j][i].LN_k == 1) {
+							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[8], TRUE, FALSE);//上半分黒音符表示
+						}
+
+						if (note[j][i].LN_k == 0) {//黒終端はLN叩いてるとき光らせない
+							if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
+								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
+								DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[11], TRUE, FALSE);
+							}
+						}
+
+						if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+						}
+					}
+					else {//始点が終点より上にある場合
+						SetDrawBlendMode(BlendMode, BlendVal);
+
+						if (note[j][i].LN_k == 0) {
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//下半分表示
+
+						}
+						else if (note[j][i].LN_k == 1) {
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[8], TRUE, FALSE);//下半分表示
+						}
+
+
+						if (note[j][i - 1].isBright == 1) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawRectGraph(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);
+						}
+
+						//LN中間表示
+						SetDrawBlendMode(BlendMode, BlendVal);
+						if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && note[j][i].LN_k == 1) {
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)NoteColor::K], TRUE);
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
+						}
+						else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i].color_init != note[j][i - 1].color_init)) {
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
+						}
+						else {
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i - 1].color_init], TRUE);
+						}
+
+						//DrawRectExtendGraph
+						//DrawRect
+						if (LN_flash[j] == 1 && j_n_n[j] == i && note[j][i].group == NoteGroup::LongNoteEnd) {//LNを叩いているとき
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);
+						}
+
+						if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
+							DrawExtendGraph(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+						}
+					}
+				}
+
+				//Note Symbolの追加
+				if (note[j][i].LN_k) {
+					symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, NoteColor::K, note[j][i].fall));
+				}
+				else {
+					symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color, note[j][i].fall));
+				}
+
+			}
+		}
+	}
+
+
+
+	//for (int j = 0; j <= 3; j++) {
+	//		for (int i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツテキストの描画
+	//			if (note[j][i].fall == NoteFall::Faling) {
+	//				if (note[j][i].group == NoteGroup::Single) {
+	//					SetDrawBlendMode(BlendMode, BlendVal);
+
+	//					DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color], TRUE);//単ノートの場合
+
+	//				}
+
+	//				if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
+	//					if (note[j][i].y >= note[j][i+1].y) {//次が自身より上にある場合
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//					else {////次が自身より下にある場合
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i+1].LN_k==true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//				}
+	//				if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
+	//					bool isBeforeUnder = note[j][i].y <= note[j][i - 1].y;
+	//					bool isNextUpper = note[j][i].y >= note[j][i + 1].y;
+
+
+	//					if (isBeforeUnder && isNextUpper) {//前が自身より下、次が自身より上  ／／
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//					else if(!isBeforeUnder && isNextUpper) {//前が自身より上、次が自身より上  ＼／
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//					else if (isBeforeUnder && !isNextUpper) {//前が自身より下、次が自身より下  ／＼
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//					else if(!isBeforeUnder && !isNextUpper){//前が自身より上、次が自身より下 ＼＼
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i + 1].LN_k == true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//				}
+	//				if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
+	//					if (note[j][i].LN_k == true) {
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)NoteColor::K], TRUE);
+	//					}else if (note[j][i-1].y >= note[j][i].y) {//前が自身より下にある場合
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//					else {//前が自身より上にある場合
+	//						SetDrawBlendMode(BlendMode, BlendVal);
+	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+	//					}
+	//				}
+
+	//			}
+	//		}
+	//	}
 }
 
 void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effectResourceHandle, int *playingEffectHandle, int PFC) {//フルコンボエフェクト

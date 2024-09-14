@@ -5,6 +5,8 @@
 #include"STRUCT_ANDROID_CONTROLLER.h"
 #include"STRUCT_CONFIG.h"
 #include"STRUCT_IR_SETTING.h"
+#include"GradationNoteImage.h"
+#include"NoteTextImage.h"
 
 #ifndef _GAME
 #define _GAME
@@ -31,6 +33,8 @@ extern void GAME(int song_number,
 	int* CourseMaxCombo = 0,
 	int AllowExit = 1
 	);
+
+void drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, int BlendVal, int  H_NOTE[12], double flash, const int FLASH_VALUE, const int FLASH_VALUE_ALWAYS, NoteSearcher& noteSearcher, Option* option, GradationNoteImage& gradationLongNote, int  H_LNOTE[12], int  LN_flash[4], int  j_n_n[4], const int FLASH_VALUE_LN_PUSH, NoteSymbolImage& noteSymbol);
 
 extern void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effectResourceHandle, int *playingEffectHandle, int PFC);//フルコンボエフェクト
 

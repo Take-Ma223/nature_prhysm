@@ -962,12 +962,16 @@ int DifficultyRadar::CalcChain() {
 	int TimingBuf = 0;
 
 	int firstFlag = 0;
-	double chainBuf = 0;
+	double chainBuf_16 = 0;
+	double chainBuf_8 = 0;
 
 	int BaseBPM = 150;//16•ª‚ğc˜A‚Æ‚İ‚È‚·Šî€BPM
 
-	double normalizer = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 4.0));//Šî€BPM‚Å‚Ì16•ª‰¹•„‚ÌŠÔŠÔŠu
+	double normalizer_16 = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 4.0));//Šî€BPM‚Å‚Ì16•ª‰¹•„‚ÌŠÔŠÔŠu
+	double normalizer_8 = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 2.0));//Šî€BPM‚Å‚Ì8•ª‰¹•„‚ÌŠÔŠÔŠu
 
+	double weight_ratio_16 = 0.8;//16•ªŒŸ’m‚Ìd‚İ
+	double weight_ratio_8 = 1 - weight_ratio_16;//8•ªŒŸ’m‚Ìd‚İ
 
 	for (lane = 0; lane <= 3; lane++) {
 		firstFlag = 0;
@@ -978,9 +982,16 @@ int DifficultyRadar::CalcChain() {
 					firstFlag = 1;
 				}
 				else {
-					chainBuf = (double)1 / pow((((double)note[lane][NoteCounter].timing_real - TimingBuf) * normalizer), 8);//BaseBPM‚Ì16•ª‚æ‚è’Z‚¢‚Æ1‚©‚ç‚Ç‚ñ‚Ç‚ñã‚ª‚Á‚Ä‚¢‚­
-					if (chainBuf >= 1)chainBuf = 1;//1ˆÈã‚É‚Í‚µ‚È‚¢
-					chain[lane] += chainBuf;//
+					chainBuf_16 = (double)weight_ratio_16 / pow((((double)note[lane][NoteCounter].timing_real - TimingBuf) * normalizer_16), 8);//BaseBPM‚Ì16•ª‚æ‚è’Z‚¢‚Æ1‚©‚ç‚Ç‚ñ‚Ç‚ñã‚ª‚Á‚Ä‚¢‚­
+					chainBuf_8 = (double)weight_ratio_8 / pow((((double)note[lane][NoteCounter].timing_real - TimingBuf) * normalizer_8), 4);//BaseBPM‚Ì8•ª‚æ‚è’Z‚¢‚Æ1‚©‚ç‚Ç‚ñ‚Ç‚ñã‚ª‚Á‚Ä‚¢‚­
+
+					if (chainBuf_16 >= weight_ratio_16) {
+						chainBuf_16 = weight_ratio_16;
+					}
+					if (chainBuf_8 >= weight_ratio_8) {
+						chainBuf_8 = weight_ratio_8;
+					}
+					chain[lane] += chainBuf_16 > chainBuf_8 ? chainBuf_16 : chainBuf_8;//‘å‚«‚¢•û‚Ì’l‚ğ‘«‚·
 					TimingBuf = note[lane][NoteCounter].timing_real;
 				}
 			}
@@ -990,7 +1001,7 @@ int DifficultyRadar::CalcChain() {
 	double chainSum = chain[0] + chain[1] + chain[2] + chain[3];
 	chainSum = (chainSum / ((double)time_use / 1000)) * 60;//1•ª‚ ‚½‚è‚Ìc˜A–§“x‚É‚·‚é
 
-	chainSum *= 0.07992;//316‚ğ12‚Éû‚ß‚é
+	chainSum *= 0.073;//316‚ğ12‚Éû‚ß‚é
 	chainSum = (log(chainSum + 1) / log(2));//12‚ª3.5‚Éˆ³k‚³‚ê‚é
 
 	chainSum *= 49.723;//‘å‚«‚³’²®

@@ -6,6 +6,8 @@
 constexpr auto SONG_MAX_NUMBER = 9999;//最大曲数
 const wchar_t APPLICATION_VERSION[] = L"1.39";//バージョン
 
+constexpr int OFFSET_MARGIN = 100;//音声、動画の先頭を合わせるためのオフセットマージン
+
 #define SECRET_SONG_APPEAR_CYCLE 3//3曲Aを連続で取れば隠し曲が一回出現
 
 #define SECRET_ALWAYS_APPEAR 0//隠し曲を毎回出現させる

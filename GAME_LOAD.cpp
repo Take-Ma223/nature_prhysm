@@ -88,7 +88,7 @@ void GAME_LOAD(int song_number,
 	double time_counter = 0;//単位はミリ秒
 	double time_counter_real = 0;//実際の(GAME_time_passed)経過時間
 
-	int offsetMargin = 50;//音声、動画の先頭を合わせるためのオフセットマージン
+	int offsetMargin = OFFSET_MARGIN;//音声、動画の先頭を合わせるためのオフセットマージン
 
 	int DN = 0;//Division Number一小節の分割数
 

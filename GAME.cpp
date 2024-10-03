@@ -3474,15 +3474,17 @@ void GAME(int song_number, int difficulty,
 			SetDrawMode(DX_DRAWMODE_NEAREST);
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 
-			for (i = 0; i < CRTBuf; i++) {
-				if ((c_m_draw_counter < 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
-					c_m_draw_counter += 0.0012;
-				}
-				if ((c_m_draw_counter > 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {//カバーが上がり切った
-					c_m_draw_counter = 1;
-					isStartCoverMoveUpComplete = 1;
+			if (GAME_passed_time >= OFFSET_MARGIN) {
+				for (i = 0; i < CRTBuf; i++) {
+					if ((c_m_draw_counter < 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {
+						c_m_draw_counter += 0.0012;
+					}
+					if ((c_m_draw_counter > 1) && (gauge_draw_counter >= gauge - 0.001) && (draw_alpha == 1)) {//カバーが上がり切った
+						c_m_draw_counter = 1;
+						isStartCoverMoveUpComplete = 1;
 
-					coverView.startWindbreak();
+						coverView.startWindbreak();
+					}
 				}
 			}
 		}

@@ -1,5 +1,6 @@
 #include "CoverView.h"
 #include <string>
+#include "CONSTANT_VALUE.h"
 using namespace std;
 
 int CoverView::easing(int x)//時間から位置
@@ -81,7 +82,7 @@ void CoverView::startMiddleCover()
 	//カバーアニメーション設定
 	middleCover.clearAllEvent();
 	middleCover.Y.eSet(YMiddleCoverClose);
-	middleCover.Y.eChange(YMiddleCoverClose, YMiddleCoverOpen + easing(CoverFirstRatio), Converter(QuarterSine), 0, 833);
+	middleCover.Y.eChange(YMiddleCoverClose, YMiddleCoverOpen + easing(CoverFirstRatio), Converter(QuarterSine), OFFSET_MARGIN, 833);
 	middleCover.Y.eSet(YMiddleCoverOpen + easing(CoverFirstRatio), 833);
 	middleCover.setReverseAll(FALSE);
 	middleCover.playAll();

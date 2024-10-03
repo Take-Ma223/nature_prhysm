@@ -10,7 +10,7 @@ class RequestMethod(Enum):
     POST=1,
 
 class RequestResult(Enum):
-    TIMEOUT=0,
+    FAILED=0,
     HTTP_STATUS_NOT_200=1,
     HTTP_STATUS_200=2,
 
@@ -21,13 +21,13 @@ class RequestOperator():
     def request(self, url:str, method:RequestMethod, data:dict=None)->Tuple[RequestResult, requests.Response]:
         result_ok, response = self.__request(url, method=method, data=data)
         if not result_ok:
-            # タイムアウト
-            return RequestResult.TIMEOUT, None
+            # 接続失敗(タイムアウト含む)
+            return RequestResult.FAILED, None
 
         result_ok = self.__is_response_200(response)
         if not result_ok:
             # HTTPレスポンスエラー
-            return RequestResult.HTTP_STATUS_NOT_200, None
+            return RequestResult.HTTP_STATUS_NOT_200, response
         
         return RequestResult.HTTP_STATUS_200, response
 
@@ -42,6 +42,10 @@ class RequestOperator():
             elif method==RequestMethod.POST:
                 response = requests.post(url, data=json_data, headers=header, timeout=(self.Timeout, self.Timeout))
         except requests.Timeout as e:
+            return False, None
+        except requests.ConnectionError as e:
+            return False, None
+        except:
             return False, None
         
         return True, response

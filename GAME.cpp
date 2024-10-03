@@ -3913,7 +3913,7 @@ void drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, in
 					}
 				}
 				//Note Symbolの追加
-				symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color, note[j][i].fall));
+				symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color_init, note[j][i].fall));
 				drawLnSymbols();
 			}
 			if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
@@ -3997,7 +3997,7 @@ void drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, in
 					}
 				}
 				//Note Symbolの追加
-				symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color, note[j][i].fall));
+				symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color_init, note[j][i].fall));
 			}
 			if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
 				if (note[j][i].fall == NoteFall::Faling) {
@@ -4081,7 +4081,7 @@ void drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, in
 					symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, NoteColor::K, note[j][i].fall));
 				}
 				else {
-					symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color, note[j][i].fall));
+					symbol_location.push_back(SymbolLocation(note[j][i].x, note[j][i].y, note[j][i].color_init, note[j][i].fall));
 				}
 
 			}

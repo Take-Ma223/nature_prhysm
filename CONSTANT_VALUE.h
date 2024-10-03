@@ -18,6 +18,8 @@ const wchar_t APPLICATION_VERSION[] = L"1.39";//バージョン
 
 #define ENABLE_GENERATING_LERNING_DATA 0//学習用データ生成
 
+#define ENABLE_GENERATING_RADAR_LIST 0 //レーダーリスト作成
+
 const wchar_t RUN_PASS[] = L"223210";
 
 #define NATURE_PRHYSM_FONT L"メイリオ"

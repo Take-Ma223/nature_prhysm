@@ -22,5 +22,18 @@ const int CONNECTION_SERVER_NOT_FOUND = 1;  // サーバーが見つからない
 const int CONNECTION_VERSION_ERROR = 2;  // サーバーには繋がったがバージョンが違う
 void connectionConfirm(Config config);
 
+/// <summary>
+/// 楽曲DBマスターデータ設定用CSVの生成
+/// 公式譜面のフラグとレーダー値の設定を行う用途
+/// CSVの一項目を書き込みます
+/// </summary>
+/// <param name="npsPath"></param>
+/// <param name="global"></param>
+/// <param name="local"></param>
+/// <param name="chain"></param>
+/// <param name="unstability"></param>
+/// <param name="streak"></param>
+/// <param name="color"></param>
+void addRadarListItem(wchar_t* npsPath, int global, int local, int chain, int unstability, int streak, int color, Config config);
 
 #endif

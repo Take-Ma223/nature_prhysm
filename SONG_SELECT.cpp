@@ -83,6 +83,8 @@ void SONG_SELECT(int *l_n,
 	int H_OPTION_BANNER;
 	int H_COVER_HIGH_SCORE;
 	int H_COVER_RADAR;
+	int H_COVER_RADAR_NAME_ROBUSTNESS;
+	int H_COVER_RADAR_NAME_TOTAL;
 	int H_COVER_POP;
 	int H_COVER_SKILL_TEST_POP;
 	int H_COVER_STATUS_STR;
@@ -314,6 +316,7 @@ void SONG_SELECT(int *l_n,
 	int select_rainbow = 0;//虹オプションを選んでいたら4、選んでいなかったら0になる
 
 	//レーダー表示用変数
+	double DRShowTotal = 0;
 	double DRShowGlobal = 0;
 	double DRShowLocal = 0;
 	double DRShowChain = 0;
@@ -490,6 +493,9 @@ void SONG_SELECT(int *l_n,
 
 	H_COVER_HIGH_SCORE = LoadGraph(L"img/cover_title_high_score.png");
 	H_COVER_RADAR = LoadGraph(L"img/cover_radar.png");
+	H_COVER_RADAR_NAME_ROBUSTNESS = LoadGraph(L"img/radar_name_1.png");
+	H_COVER_RADAR_NAME_TOTAL = LoadGraph(L"img/radar_name_2.png");
+
 
 	H_COVER_POP = LoadGraph(L"img/cover_title_pop.png");
 	H_COVER_SKILL_TEST_POP = LoadGraph(L"img/cover_title_pop.png");
@@ -867,6 +873,7 @@ void SONG_SELECT(int *l_n,
 		SkillList unstability = {};
 		SkillList streak = {};
 		SkillList color = {};
+		SkillList robustness = {};
 	};
 	RadarSkillList radar_skill_list;
 
@@ -879,7 +886,8 @@ void SONG_SELECT(int *l_n,
 				auto unstability = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].unstability[1][diff];
 				auto streak = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].longNote[1][diff];
 				auto color = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].color[1][diff];
-				
+				auto total = global+local+chain+unstability+streak+color;
+
 				auto score = Highscore[folder->folder[FolderIndex::ALL_SONGS][j].song_number].score[diff];
 
 				radar_skill_list.global.add((double)score / 10000 * global, j, diff);
@@ -888,6 +896,8 @@ void SONG_SELECT(int *l_n,
 				radar_skill_list.unstability.add((double)score / 10000 * unstability, j, diff);
 				radar_skill_list.streak.add((double)score / 10000 * streak, j, diff);
 				radar_skill_list.color.add((double)score / 10000 * color, j, diff);
+				radar_skill_list.robustness.add((double)score / 10000 * total, j, diff);
+
 			}
 		}
 	}
@@ -899,6 +909,7 @@ void SONG_SELECT(int *l_n,
 		int unstability = 0;
 		int streak = 0;
 		int color = 0;
+		int robustness = 0;
 	};
 	
 	SkillRadarResult skill_radar_result;
@@ -908,17 +919,12 @@ void SONG_SELECT(int *l_n,
 	skill_radar_result.unstability = radar_skill_list.unstability.average();
 	skill_radar_result.streak = radar_skill_list.streak.average();
 	skill_radar_result.color = radar_skill_list.color.average();
+	skill_radar_result.robustness = radar_skill_list.robustness.average();
 
 
 
 	typedef struct FolderScore {//フォルダ全体のスコア構造体
 		int AverageScore = 0;//平均点
-		//int Global = 0;
-		//int Local = 0;
-		//int Chain = 0;
-		//int Unstability = 0;
-		//int Streak = 0;
-		//int Color = 0;
 
 		int clearState[9] = { 0,0,0,0,0,0,0,0,0 };
 		int rank[8] = { 0,0,0,0,0,0,0,0 };
@@ -929,17 +935,6 @@ void SONG_SELECT(int *l_n,
 	}FolderScore;
 		
 	FolderScore FolderScore[2][NUMBER_OF_FOLDERS][5];
-
-	//typedef struct FolderScoreRaderBuf {
-	//	int Global = 0;
-	//	int Local = 0;
-	//	int Chain = 0;
-	//	int Unstability = 0;
-	//	int Streak = 0;
-	//	int Color = 0;
-	//}FolderScoreRaderBuf;
-
-
 
 	//フォルダ毎の成績を算出
 	for (int rainbow = 0; rainbow < 2; rainbow++) {
@@ -955,22 +950,6 @@ void SONG_SELECT(int *l_n,
 							FolderScore[rainbow][i][diff].AverageScore += Highscore[folder->folder[i][j].song_number].score[diff+ rainbow*4];
 							double ScoreRate = (double)Highscore[folder->folder[i][j].song_number].score[diff + rainbow * 4] / 10000;
 
-
-							//FolderScoreRaderBuf.Global      += Music[folder->folder[i][j].song_number].global[rainbow][diff];
-							//FolderScoreRaderBuf.Local       += Music[folder->folder[i][j].song_number].local[rainbow][diff];
-							//FolderScoreRaderBuf.Chain       += Music[folder->folder[i][j].song_number].chain[rainbow][diff];
-							//FolderScoreRaderBuf.Unstability += Music[folder->folder[i][j].song_number].unstability[rainbow][diff];
-							//FolderScoreRaderBuf.Streak      += Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
-							//FolderScoreRaderBuf.Color       += Music[folder->folder[i][j].song_number].color[rainbow][diff];
-
-							//FolderScore[rainbow][i][diff].Global      += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].global[rainbow][diff];
-							//FolderScore[rainbow][i][diff].Local       += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].local[rainbow][diff];
-							//FolderScore[rainbow][i][diff].Chain       += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].chain[rainbow][diff];
-							//FolderScore[rainbow][i][diff].Unstability += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].unstability[rainbow][diff];
-							//FolderScore[rainbow][i][diff].Streak      += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
-							//FolderScore[rainbow][i][diff].Color       += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].color[rainbow][diff];
-
-
 							FolderScore[rainbow][i][diff].clearState[clearStateConverter(Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4])]++;
 							FolderScore[rainbow][i][diff].rank[Highscore[folder->folder[i][j].song_number].rank[diff + rainbow * 4]]++;
 
@@ -984,12 +963,6 @@ void SONG_SELECT(int *l_n,
 					}
 					if (count != 0)FolderScore[rainbow][i][diff].AverageScore = (double)FolderScore[rainbow][i][diff].AverageScore / count;
 
-				//	if (FolderScoreRaderBuf.Global != 0)     FolderScore[rainbow][i][diff].Global = FolderScore[rainbow][i][diff].Global / FolderScoreRaderBuf.Global;
-				//	if (FolderScoreRaderBuf.Local != 0)      FolderScore[rainbow][i][diff].Local       =  FolderScore[rainbow][i][diff].Local/FolderScoreRaderBuf.Local;
-				//	if (FolderScoreRaderBuf.Chain != 0)      FolderScore[rainbow][i][diff].Chain       =  FolderScore[rainbow][i][diff].Chain/FolderScoreRaderBuf.Chain;
-				//	if (FolderScoreRaderBuf.Unstability != 0)FolderScore[rainbow][i][diff].Unstability = FolderScore[rainbow][i][diff].Unstability/ FolderScoreRaderBuf.Unstability;
-				//	if (FolderScoreRaderBuf.Streak != 0)     FolderScore[rainbow][i][diff].Streak      = FolderScore[rainbow][i][diff].Streak/ FolderScoreRaderBuf.Streak;
-				//	if (FolderScoreRaderBuf.Color != 0)      FolderScore[rainbow][i][diff].Color       = FolderScore[rainbow][i][diff].Color / FolderScoreRaderBuf.Color;
 				}
 				
 			}
@@ -1007,21 +980,6 @@ void SONG_SELECT(int *l_n,
 						FolderScore[rainbow][i][1].AverageScore += Highscore[folder->folder[i][j].song_number].score[diff + rainbow * 4];
 						double ScoreRate = (double)Highscore[folder->folder[i][j].song_number].score[diff + rainbow * 4] / 10000;
 
-
-						//FolderScoreRaderBuf.Global += Music[folder->folder[i][j].song_number].global[rainbow][diff];
-						//FolderScoreRaderBuf.Local += Music[folder->folder[i][j].song_number].local[rainbow][diff];
-						//FolderScoreRaderBuf.Chain += Music[folder->folder[i][j].song_number].chain[rainbow][diff];
-						//FolderScoreRaderBuf.Unstability += Music[folder->folder[i][j].song_number].unstability[rainbow][diff];
-						//FolderScoreRaderBuf.Streak += Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
-						//FolderScoreRaderBuf.Color += Music[folder->folder[i][j].song_number].color[rainbow][diff];
-
-						//FolderScore[rainbow][i][1].Global += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].global[rainbow][diff];
-						//FolderScore[rainbow][i][1].Local += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].local[rainbow][diff];
-						//FolderScore[rainbow][i][1].Chain += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].chain[rainbow][diff];
-						//FolderScore[rainbow][i][1].Unstability += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].unstability[rainbow][diff];
-						//FolderScore[rainbow][i][1].Streak += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].longNote[rainbow][diff];
-						//FolderScore[rainbow][i][1].Color += 100.0 * ScoreRate * Music[folder->folder[i][j].song_number].color[rainbow][diff];
-
 						FolderScore[rainbow][i][1].clearState[clearStateConverter(Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4])]++;
 						FolderScore[rainbow][i][1].rank[Highscore[folder->folder[i][j].song_number].rank[diff + rainbow * 4]]++;
 
@@ -1035,22 +993,9 @@ void SONG_SELECT(int *l_n,
 				}
 				if (count != 0)FolderScore[rainbow][i][1].AverageScore = (double)FolderScore[rainbow][i][1].AverageScore / count;
 
-				//if (FolderScoreRaderBuf.Global != 0)     FolderScore[rainbow][i][1].Global =  FolderScore[rainbow][i][1].Global / FolderScoreRaderBuf.Global;
-				//if (FolderScoreRaderBuf.Local != 0)      FolderScore[rainbow][i][1].Local = FolderScore[rainbow][i][1].Local / FolderScoreRaderBuf.Local;
-				//if (FolderScoreRaderBuf.Chain != 0)      FolderScore[rainbow][i][1].Chain = FolderScore[rainbow][i][1].Chain / FolderScoreRaderBuf.Chain;
-				//if (FolderScoreRaderBuf.Unstability != 0)FolderScore[rainbow][i][1].Unstability =  FolderScore[rainbow][i][1].Unstability / FolderScoreRaderBuf.Unstability;
-				//if (FolderScoreRaderBuf.Streak != 0)     FolderScore[rainbow][i][1].Streak =  FolderScore[rainbow][i][1].Streak / FolderScoreRaderBuf.Streak;
-				//if (FolderScoreRaderBuf.Color != 0)      FolderScore[rainbow][i][1].Color = FolderScore[rainbow][i][1].Color / FolderScoreRaderBuf.Color;
-
+			
 				for (int diff = 2; diff <= 4; diff++) {//難易度固定フォルダはフォルダ選択時にどの譜面難易度を選んでいても同じ値を表示するために値をコピー
 					FolderScore[rainbow][i][diff].AverageScore = FolderScore[rainbow][i][1].AverageScore;
-
-					//FolderScore[rainbow][i][diff].Global = FolderScore[rainbow][i][1].Global;
-					//FolderScore[rainbow][i][diff].Local = FolderScore[rainbow][i][1].Local;
-					//FolderScore[rainbow][i][diff].Chain = FolderScore[rainbow][i][1].Chain;
-					//FolderScore[rainbow][i][diff].Unstability = FolderScore[rainbow][i][1].Unstability;
-					//FolderScore[rainbow][i][diff].Streak = FolderScore[rainbow][i][1].Streak;
-					//FolderScore[rainbow][i][diff].Color = FolderScore[rainbow][i][1].Color;
 
 					FolderScore[rainbow][i][diff].ClearType = FolderScore[rainbow][i][1].ClearType;
 
@@ -2293,6 +2238,7 @@ void SONG_SELECT(int *l_n,
 			
 
 			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number && SelectingTarget == SELECTING_SONG) {//隠し曲はレーダー,グラフを表示しない
+				DRShowTotal += 0.01 * ((double)0 - DRShowTotal);
 				DRShowGlobal += 0.01 * ((double)0 - DRShowGlobal);
 				DRShowLocal += 0.01 * ((double)0 - DRShowLocal);
 				DRShowChain += 0.01 * ((double)0 - DRShowChain);
@@ -2309,6 +2255,13 @@ void SONG_SELECT(int *l_n,
 				int R = 0;
 				if (option->op.color.isRainbow())R = 1;
 
+				int total =
+					Music[song_number].global[R][difficulty] + 
+					Music[song_number].local[R][difficulty] + 
+					Music[song_number].chain[R][difficulty] + 
+					Music[song_number].unstability[R][difficulty] + 
+					Music[song_number].longNote[R][difficulty] + 
+					Music[song_number].color[R][difficulty];
 
 				if (SelectingTarget == SELECTING_SONG) {
 					DRShowGlobal += 0.01 * ((double)Music[song_number].global[R][difficulty] - DRShowGlobal);
@@ -2317,6 +2270,7 @@ void SONG_SELECT(int *l_n,
 					DRShowUnstability += 0.01 * ((double)Music[song_number].unstability[R][difficulty] - DRShowUnstability);
 					DRShowStreak += 0.01 * ((double)Music[song_number].longNote[R][difficulty] - DRShowStreak);
 					DRShowColor += 0.01 * ((double)Music[song_number].color[R][difficulty] - DRShowColor);
+					DRShowTotal += 0.01 * ((double)total - DRShowTotal);
 				}
 				else if (SelectingTarget == SELECTING_FOLDER) {
 					DRShowGlobal += 0.01 * (skill_radar_result.global - DRShowGlobal);
@@ -2325,6 +2279,7 @@ void SONG_SELECT(int *l_n,
 					DRShowUnstability += 0.01 * (skill_radar_result.unstability - DRShowUnstability);
 					DRShowStreak += 0.01 * (skill_radar_result.streak - DRShowStreak);
 					DRShowColor += 0.01 * (skill_radar_result.color - DRShowColor);
+					DRShowTotal += 0.01 * (skill_radar_result.robustness - DRShowTotal);
 				}
 
 
@@ -2339,6 +2294,8 @@ void SONG_SELECT(int *l_n,
 			if (DRShowUnstability < 0)DRShowUnstability = 0;
 			if (DRShowStreak < 0)DRShowStreak = 0;
 			if (DRShowColor < 0)DRShowColor = 0;
+			if (DRShowTotal < 0)DRShowTotal = 0;
+
 			for (j = 0; j < 9; j++) {
 				if (ShowLocalNotesGraph[j] < 0)ShowLocalNotesGraph[j] = 0;
 				if (ShowColorNotesGraph[j] < 0)ShowColorNotesGraph[j] = 0;
@@ -3420,6 +3377,16 @@ void SONG_SELECT(int *l_n,
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * 255);
 		DrawGraph(0, 0, H_COVER_RADAR, TRUE);
+		
+		if (SelectingTarget == SELECTING_SONG) {
+			DrawGraph(0, 0, H_COVER_RADAR_NAME_TOTAL, TRUE);
+		}
+		else if(SelectingTarget == SELECTING_FOLDER) {
+			DrawGraph(0, 0, H_COVER_RADAR_NAME_ROBUSTNESS, TRUE);
+		}
+
+
+
 		DrawGraph(0, 0, H_COVER_HIGH_SCORE, TRUE);//左側の文字
 
 		//レベル描画
@@ -3680,6 +3647,8 @@ void SONG_SELECT(int *l_n,
 			DrawNumber(160, 502, int(DRShowUnstability + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
 			DrawNumber(34, 445, int(DRShowStreak + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
 			DrawNumber(34, 257, int(DRShowColor + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+			DrawNumber(218, 348, int(DRShowTotal + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+
 		}
 
 
@@ -4200,13 +4169,13 @@ void DrawHexagon(short v1, short v2, short v3, short v4, short v5, short v6) {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 	//内側
 	for (int i = 0; i <= 5; i++) {
-		DrawTriangle((int)posX_i[i], (int)posY_i[i], (int)posX_i[(i + 1) % 6], (int)posY_i[(i + 1) % 6], o[0], o[1], color, TRUE);
+		DrawTriangleAA(posX_i[i], posY_i[i], posX_i[(i + 1) % 6], posY_i[(i + 1) % 6], o[0], o[1], color, TRUE);
 	}
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 256);
 	//外枠
 	for (int i = 0; i <= 5; i++) {
-		DrawLineAA(posX[i], posY[i], posX[(i + 1) % 6], posY[(i + 1) % 6], GetColor(30, 30, 30), 2);
+		DrawLineAA(posX[i], posY[i], posX[(i + 1) % 6], posY[(i + 1) % 6], GetColor(30,30,30), 2);
 	}
 
 	return;

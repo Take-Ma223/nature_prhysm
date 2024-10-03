@@ -253,3 +253,35 @@ void connectionConfirm(Config config) {
 	::CloseHandle(pi.hProcess);
 	::CloseHandle(pi.hThread);
 }
+
+
+void addRadarListItem(wchar_t* npsPath, int global, int local, int chain, int unstability, int streak, int color, Config config)
+{
+	//サーバー接続状態の取得
+	struct stat statBuf;
+	wchar_t passbuf[512] = L"";
+
+	wchar_t* command[2] = {
+	L"util/add_radar_list_item.exe",
+	L"python3 util/add_radar_list_item.py"
+	};
+
+
+	sprintfDx(passbuf, L"%s \"%s\" %d %d %d %d %d %d --run %s", command[config.UsePy], 
+		npsPath,
+		global,
+		local,
+		chain,
+		unstability,
+		streak,
+		color,
+		RUN_PASS);
+	
+
+	STARTUPINFO si = { sizeof(STARTUPINFO) };
+	PROCESS_INFORMATION pi;
+	BOOL CPres = ::CreateProcessW(NULL, passbuf, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi);
+	WaitForSingleObject(pi.hProcess, INFINITE);//終了を待つ
+	::CloseHandle(pi.hProcess);
+	::CloseHandle(pi.hThread);
+}

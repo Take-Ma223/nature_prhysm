@@ -4,7 +4,7 @@ import webbrowser
 from enum import Enum
 from typing import Tuple
 
-NP_SERVER_ADDRESS_DEV = 'http://localhost/php_note'
+NP_SERVER_ADDRESS_DEV = 'http://nature-prhysm.main.jp/ranking/'
 NP_SERVER_ADDRESS_PR = 'http://honban'
 
 CONNECTION_RESULT_KEY_SERVER_VERSION = 'server_version'
@@ -15,7 +15,7 @@ class Variant(Enum):
     Pr=1
 
 class NPServerRequestNGReason(Enum):
-    TIMEOUT=0,  # タイムアウト
+    FAILED=0,  # 接続失敗
     HTTP_STATUS_NOT_200=1,  # HTTPステータスが200以外
     JSON_DECODE_ERROR=2,  # JSONデコードエラー
     SERVER_VERSION_NOT_FOUND=3  # サーバーバージョン情報無し
@@ -59,9 +59,9 @@ class NPServerRequestOperator():
         
         result, response = self.operator.request(url=url, method=method, data=post_data)
         if result!=request_operator.RequestResult.HTTP_STATUS_200:
-            if result==request_operator.RequestResult.TIMEOUT:
-                # タイムアウト
-                return NPRequestResult(result=False, NG_reason=NPServerRequestNGReason.TIMEOUT)
+            if result==request_operator.RequestResult.FAILED:
+                # 接続失敗
+                return NPRequestResult(result=False, NG_reason=NPServerRequestNGReason.FAILED)
             elif result==request_operator.RequestResult.HTTP_STATUS_NOT_200:
                 # HTTPステータスが200以外
                 return NPRequestResult(result=False, status_code=response.status_code, NG_reason=NPServerRequestNGReason.HTTP_STATUS_NOT_200)

@@ -842,7 +842,7 @@ int DifficultyRadar::CalcLongNote(bool isRainbow) {
 	lnDegrees *= 2;
 	lnDegrees *= 130;
 
-	lnDegrees = lnDegrees * 0.315;//大きさ調整
+	lnDegrees = lnDegrees * 0.343;//大きさ調整
 	return lnDegrees;
 }
 int DifficultyRadar::CalcUnstability() {
@@ -970,7 +970,7 @@ int DifficultyRadar::CalcChain() {
 	double normalizer_16 = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 4.0));//基準BPMでの16分音符の時間間隔
 	double normalizer_8 = 1.0 / (1000.0 * ((60.0 / BaseBPM) / 2.0));//基準BPMでの8分音符の時間間隔
 
-	double weight_ratio_16 = 0.8;//16分検知の重み
+	double weight_ratio_16 = 0.85;//16分検知の重み
 	double weight_ratio_8 = 1 - weight_ratio_16;//8分検知の重み
 
 	for (lane = 0; lane <= 3; lane++) {
@@ -1001,10 +1001,11 @@ int DifficultyRadar::CalcChain() {
 	double chainSum = chain[0] + chain[1] + chain[2] + chain[3];
 	chainSum = (chainSum / ((double)time_use / 1000)) * 60;//1分あたりの縦連密度にする
 
-	chainSum *= 0.073;//316を12に収める
-	chainSum = (log(chainSum + 1) / log(2));//12が3.5に圧縮される
+	chainSum *= 0.02;//316を12に収める
+	chainSum = pow(chainSum, 0.5);
+	//chainSum = (log(chainSum + 1) / log(2));//12が3.5に圧縮される
 
-	chainSum *= 49.723;//大きさ調整
+	chainSum *= 106.003;//大きさ調整
 
 	return (int)(chainSum * 100 / chainMax);
 }

@@ -288,6 +288,20 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 						learningDataGenerator.writeData(&Music[i],j);
 #endif
 
+#if ENABLE_GENERATING_RADAR_LIST
+						addRadarListItem(
+							Music[i].SongPath[j],
+							Music[i].global[1][j],
+							Music[i].local[1][j],
+							Music[i].chain[1][j],
+							Music[i].unstability[1][j],
+							Music[i].longNote[1][j],
+							Music[i].color[1][j],
+							config
+						);
+#endif
+
+
 						folder_insert(song_folder, i, j, Music);
 						folder_insert_radar(song_folder, i, j, Music);
 					} while (FindNextFile(hFind_nps, &file_lp));

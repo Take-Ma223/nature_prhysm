@@ -22,7 +22,7 @@ public:
 	static void setText(ShowFlag flag) {
 		std::wstring version = flag.version ? std::wstring(L"nature prhysm ver ") + APPLICATION_VERSION : L"";
 		std::wstring autoPlay = flag.autoPlay ? std::wstring(L"F1:オートプレイ") : L"";
-		std::wstring scoreRanking = flag.scoreRanking ? std::wstring(L"F2:スコアランキング表示") : L"";
+		std::wstring scoreRanking = flag.scoreRanking ? std::wstring(L"F2:インターネットランキングを表示") : L"";
 		std::wstring keyConfig = flag.keyConfig ? std::wstring(L"F3:キーコンフィグ") : L"";
 		std::wstring twitter = flag.twitter ? std::wstring(L"F11:Twitterに投稿") : L"";
 		std::wstring screenShot = flag.screenShot ? std::wstring(L"PrtSc:スクリーンショット") : L"";

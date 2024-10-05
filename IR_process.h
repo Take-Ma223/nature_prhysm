@@ -15,6 +15,7 @@ void IRgetID(Config config);
 void IRsave(wchar_t* npsPath, wchar_t* folderPath, RESULT res, int difficulty, int season, BOOL rainbow, BOOL onlyOption, Config config);
 void IRsend(IR_SETTING* ir, wchar_t* npsPath, wchar_t* folderPath, int difficulty, int rainbow, Config config);
 void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, Config config);
+void viewSkillRadarRanking(Config config);
 void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mode, int score, int rivalID, Config config);
 
 const int CONNECTION_SUCCESS = 0;  // ê⁄ë±ê¨å˜

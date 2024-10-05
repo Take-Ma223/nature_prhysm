@@ -202,6 +202,19 @@ void IRview(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, Config config) 
 	::CloseHandle(pi.hThread);
 }
 
+void viewSkillRadarRanking(Config config) {
+	//スキルレーダーランキングの表示
+
+	if (config.Local == 1) {
+		HINSTANCE ret = ShellExecute(NULL, L"open", L"http://nature-prhysm.main.jp/ranking/skill_radar_ranking.php?sort=total", NULL, NULL, SW_SHOW);
+
+	}
+	else {
+		HINSTANCE ret = ShellExecute(NULL, L"open", L"http://nature-prhysm.main.jp/ranking/skill_radar_ranking.php?sort=total", NULL, NULL, SW_SHOW);
+
+	}
+}
+
 void getTargetScore(wchar_t* npsPath, wchar_t* folderPath, BOOL rainbow, int mode, int score, int rivalID, Config config) {
 	//ターゲットスコアの取得
 	struct stat statBuf;

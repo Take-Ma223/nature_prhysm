@@ -39,8 +39,8 @@ enum NoteGroup {
 
 class NOTE {
 public:
-	short x = 0;//ノートのx座標
-	short y = -128;//ノートのy座標
+	float x = 0;//ノートのx座標
+	float y = -128;//ノートのy座標
 	int timing = 0;//表示用タイミング(マイクロ秒)
 	int timing_real = 0;//叩く実際のタイミング(ミリ秒)
 	int timing_init = 0;//LN始点の表示用タイミング保存用変数
@@ -140,8 +140,8 @@ public:
 
 class BARLINE {//演奏画面で表示する小節線の構造体
 public:
-	short x = 0;//ノートのx座標
-	short y = -128;//ノートのy座標
+	float x = 0;//ノートのx座標
+	float y = -128;//ノートのy座標
 	int timing = 0;//表示用タイミング(ミリ秒)
 	int timing_real = 0;//叩く実際のタイミング(ミリ秒)
 	//char sound_number = 0;//鳴らす音の種類をビットで記入

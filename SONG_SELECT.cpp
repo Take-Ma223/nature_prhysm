@@ -1506,6 +1506,11 @@ void SONG_SELECT(int *l_n,
 					IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color.isRainbow(), config);
 					IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color.isRainbow(), config);
 				}
+				else if (SelectingTarget == SELECTING_FOLDER) {
+					//スキルレーダーランキングを開く
+					PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
+					viewSkillRadarRanking(config);
+				}
 				//if (ScoreShowMode == 0) {
 				//	ScoreShowMode = 1;
 				//	PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);

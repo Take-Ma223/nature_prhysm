@@ -94,7 +94,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		L"100%",
 		L"100%",
 		L"ON:NORMAL",
-		L"NAME",
+		L"DEFAULT",
 	};
 
 	OP() {

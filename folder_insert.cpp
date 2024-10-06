@@ -1,4 +1,5 @@
 ﻿#include"folder_insert.h"
+#include <cassert>
 
 void folder_insert(LIST *song_folder, int song_number, int difficulty, Song *Music) {//難易度単位でのフォルダへの挿入
 	int level = 0;
@@ -22,7 +23,6 @@ void folder_insert(LIST *song_folder, int song_number, int difficulty, Song *Mus
 
 	return;
 }
-
 
 void folder_insert_season(LIST *song_folder, int song_number, Song *Music) {//曲単位でのフォルダへの挿入　//ALL_SONGSと季節曲の分
 	int level = 0;
@@ -118,4 +118,40 @@ void folder_insert_radar(LIST* song_folder, int song_number, int difficulty, Son
 	insertIfTop(Radar::Color, FolderIndex::COLOR);
 
 	return;
+}
+
+/// <summary>
+/// フォルダ選択に戻る以外を削除
+/// </summary>
+/// <param name="song_folder"></param>
+void reset_folder_skill_radar(LIST* song_folder) {
+	song_folder->folder_c[FolderIndex::SKILL_RADAR_GLOBAL] = 0;
+	song_folder->folder_c[FolderIndex::SKILL_RADAR_LOCAL] = 0;
+	song_folder->folder_c[FolderIndex::SKILL_RADAR_CHAIN] = 0;
+	song_folder->folder_c[FolderIndex::SKILL_RADAR_UNSTABILITY] = 0;
+	song_folder->folder_c[FolderIndex::SKILL_RADAR_STREAK] = 0;
+	song_folder->folder_c[FolderIndex::SKILL_RADAR_COLOR] = 0;
+	song_folder->folder_c[FolderIndex::SKILL_RADAR_ROBUSTNESS] = 0;
+}
+
+/// <summary>
+/// スキルレーダー対象フォルダへの挿入
+/// 「フォルダ選択に戻る」を最後にする
+/// </summary>
+/// <param name="song_folder"></param>
+/// <param name="song_number"></param>
+/// <param name="difficulty"></param>
+/// <param name="index"></param>
+void folder_insert_skill_radar(LIST* song_folder, int song_number, int difficulty, FolderIndex index, int kind) {
+	assert(FolderIndex::SKILL_RADAR_GLOBAL <= index);
+	assert(index <= FolderIndex::SKILL_RADAR_ROBUSTNESS);
+	assert(kind == 0 || kind == 1);
+
+	int folder = static_cast<int>(index);
+
+	song_folder->folder[folder][song_folder->folder_c[folder]].song_number = song_number;
+	song_folder->folder[folder][song_folder->folder_c[folder]].difficulty = difficulty;
+	song_folder->folder[folder][song_folder->folder_c[folder]].kind = kind;
+	song_folder->folder_c[folder]++;
+
 }

@@ -3,13 +3,13 @@
 
 namespace OptionItem {
 	enum class Sort : int {
-		NAME,
+		DEFAULT,
 		LEVEL,
 		SCORE,
 		CLEAR_STATE,
 		MIN_MISS,
 		PLAY_COUNT,
-		RADAR,
+		RADAR_TOTAL,
 		GLOBAL,
 		LOCAL,
 		CHAIN,
@@ -41,13 +41,13 @@ private:
 	virtual void initData() override {
 		title = L"SORT";
 		nameList = {
-			L"NAME", 
+			L"DEFAULT", 
 			L"LEVEL", 
 			L"SCORE", 
 			L"CLEAR STATE",
 			L"MIN MISS", 
 			L"PLAY COUNT",
-			L"RADAR",
+			L"RADAR TOTAL",
 			L"GLOBAL",
 			L"LOCAL",
 			L"CHAIN",
@@ -69,7 +69,7 @@ private:
 			L"VERSION"
 		};
 		descriptionList = {
-			 L"曲名で並び替えます",
+			 L"デフォルトの並び順にします",
 			 L"難易度(降水確率)で並び替えます",
 			 L"スコアで並び替えます",
 			 L"クリア状態で並び替えます",

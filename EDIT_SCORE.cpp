@@ -1064,23 +1064,47 @@ void EDIT_SCORE(SCORE_CELL* head,
 													score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::LongNoteStart, find_before->data.note.isBright[j]);//下にある音符をLN始点にする
 												}
 
+												//終点の色について
+												NoteColor end_color; 
+												if (insert->data.note.color[j] == NoteColor::NONE || insert->data.note.color[j] == NoteColor::K) {
+													end_color = score_cell_find_before_note(insert, j)->data.note.color[j];
+												}
+												else {end_color = insert->data.note.color[j];}
+
 												if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//SHIFT押しながらだと黒終点にする
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
+													score_cell_write_note(insert, j, end_color, NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
 												}
 												else {
-													score_cell_write_note(insert, j, score_cell_find_before_note(insert, j)->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
+													score_cell_write_note(insert, j, end_color, NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
 												}
 											}
 											else if (find_before->data.note.group[j] == NoteGroup::LongNoteEnd) {//下がLN終点のときは今の位置にずらす
+												//終点の色について
+												NoteColor end_color;
+												if (insert->data.note.color[j] == NoteColor::NONE || insert->data.note.color[j] == NoteColor::K) {
+													end_color = score_cell_find_before_note(insert, j)->data.note.color[j];
+												}
+												else {end_color = insert->data.note.color[j];}
+
 												if (Key[KEY_INPUT_LSHIFT] >= 1 || Key[KEY_INPUT_RSHIFT] >= 1) {//SHIFT押しながらだと黒終点にする
-													score_cell_write_note(insert, j, find_before->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
+													score_cell_write_note(insert, j, end_color, NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 1);//LN情報を書き込む(黒終点)
 												}
 												else {
-													score_cell_write_note(insert, j, find_before->data.note.color[j], NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
+													score_cell_write_note(insert, j, end_color, NoteGroup::LongNoteEnd, score_cell_find_before_note(insert, j)->data.note.isBright[j], 0);//LN情報を書き込む(通常終点)
 												}
 
-												score_cell_write_note(find_before, j, NoteColor::NONE, NoteGroup::Single, 0);//下にある音符を消す
-												score_cell_delete_if_no_note(&find_before);//その結果何もない行になったら行を消す
+												//下にあるLNについて
+												//GLNか確認
+												bool isGLN = score_cell_find_before_note(find_before, j)->data.note.color[j] != find_before->data.note.color[j];
+												if (isGLN){
+													score_cell_write_note(find_before, j, find_before->data.note.color[j], NoteGroup::LongNoteMiddle, find_before->data.note.isBright[j]);//下にある終点をLN中間にする
+												}
+												else {
+													score_cell_write_note(find_before, j, NoteColor::NONE, NoteGroup::Single, 0);//下にある音符を消す
+													score_cell_delete_if_no_note(&find_before);//その結果何もない行になったら行を消す
+												}
+
+												
 
 												if (find_next != NULL) {//上に音符がある
 													if (find_next->data.note.group[j] == NoteGroup::LongNoteEnd) {//それがLN終点なら消す

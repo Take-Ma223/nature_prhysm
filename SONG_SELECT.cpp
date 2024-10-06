@@ -34,6 +34,7 @@
 #include "NPLoadSoundMem.h"
 #include "KEY_CONFIG.h"
 #include "WindowTitleSetter.h"
+#include "folder_insert.h"
 
 using namespace std;
 
@@ -921,7 +922,49 @@ void SONG_SELECT(int *l_n,
 	skill_radar_result.color = radar_skill_list.color.average();
 	skill_radar_result.robustness = radar_skill_list.robustness.average();
 
+	//スキルレーダー対象譜面のフォルダ追加
+	reset_folder_skill_radar(folder);
+	for (const auto& i : radar_skill_list.global.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_GLOBAL,0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_GLOBAL, 1);
 
+	for (const auto& i : radar_skill_list.local.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_LOCAL, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_LOCAL, 1);
+
+	for (const auto& i : radar_skill_list.chain.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_CHAIN, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_CHAIN, 1);
+
+	for (const auto& i : radar_skill_list.unstability.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_UNSTABILITY, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_UNSTABILITY, 1);
+
+	for (const auto& i : radar_skill_list.streak.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_STREAK, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_STREAK, 1);
+
+	for (const auto& i : radar_skill_list.color.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_COLOR, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_COLOR, 1);
+
+	for (const auto& i : radar_skill_list.robustness.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_ROBUSTNESS, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_ROBUSTNESS, 1);
 
 	typedef struct FolderScore {//フォルダ全体のスコア構造体
 		int AverageScore = 0;//平均点
@@ -1085,7 +1128,7 @@ void SONG_SELECT(int *l_n,
 						SortList[SortKind][FolderInd][RainbowInd][DifficultyInd].push_back(SortSongListIndex());
 
 						SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].index = ListInd;
-						if (SortKind == (int)OptionItem::Sort::NAME) {
+						if (SortKind == (int)OptionItem::Sort::DEFAULT) {
 							SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = ListInd;
 						}
 						else if (SortKind == (int)OptionItem::Sort::LEVEL) {
@@ -1128,7 +1171,7 @@ void SONG_SELECT(int *l_n,
 								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].play_count[1 + DifficultyInd + RainbowInd * 4];
 							}
 						}
-						else if (SortKind == (int)OptionItem::Sort::RADAR) {
+						else if (SortKind == (int)OptionItem::Sort::RADAR_TOTAL) {
 							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
 								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value =
 									(int)Music[folder->folder[FolderInd][ListInd].song_number].global[RainbowInd][folder->folder[FolderInd][ListInd].difficulty]+
@@ -1837,7 +1880,9 @@ void SONG_SELECT(int *l_n,
 
 				if (OptionOpen == 0 && SelectingTarget == SELECTING_COURSE) {//段位認定選択モードのとき
 					if ((Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[KEY_INPUT_UP] >= 1)
-						&& (Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[KEY_INPUT_DOWN] >= 1)) {//上下同時押しでフォルダセレクトに戻る
+						&& (Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[KEY_INPUT_DOWN] >= 1)
+						|| Key[KEY_INPUT_BACK] >= 1
+						) {//上下同時押しでフォルダセレクトに戻る
 						SelectingTarget = SELECTING_FOLDER;
 						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
 						widthCalcFlag = 1;
@@ -4012,7 +4057,7 @@ wchar_t * announce_str(int StageCount, int PlayCount) {//通常アナウンス�
 		return str;
 	}
 
-	const int GeneralStrNum = 24;
+	const int GeneralStrNum = 25;
 	wchar_t *GeneralStr[GeneralStrNum] = {
 	L"【ヒント:スピード調節】音符が詰まりすぎて見づらいときは、オプションのSPEEDを変更し見やすい速さにしてみましょう。",
 	L"【ヒント:音符の種類】音符の種類は「赤,緑,青,虹」の他に「水色,紫,黄色」や「白」があります。　それぞれ曇り、雨難易度以上から出現します。　光の色を混ぜて対処しましょう。　また、叩いてはいけない黒い音符もあります。",
@@ -4027,9 +4072,10 @@ wchar_t * announce_str(int StageCount, int PlayCount) {//通常アナウンス�
 	L"【ヒント:RAINBOWオプション】色を認識するのが難しい場合は、オプションのCOLORをRAINBOWにしてみましょう。　色を気にせずプレイすることができます。",
 	L"【ヒント:クイックリトライ】クリアに失敗してしまったときは赤緑青を押し続けてみましょう。　リザルト画面に移動せずすぐにリトライすることができます。",
 	L"【ヒント:自然管理技術者検定】自然管理技術者検定会場では自分の実力を測ることができます。　より高いレベルを目指しましょう。",
-	L"【ヒント:気象レーダー(1)】曲を選ぶとき、左の気象レーダーには譜面の傾向が示されます。　Global:平均密度 Local:最大局所密度 Chain:縦連打度 Unstability:速度変化度 Streak:ロングノーツ度 Color:色の複雑さ を表しています。",
-	L"【ヒント:気象レーダー(2)】曲フォルダを選ぶとき、左の気象レーダーにはそのフォルダの傾向毎の達成度が示されます。　全項目100を目指してみましょう。",
-	L"【ヒント:黒終端ロングノート】終端が黒いロングノートは終端でしっかり離さないとMISSになります。　押しっぱなしにしないように注意しましょう。",
+	L"【ヒント:気象レーダー】曲を選ぶとき、左の気象レーダーには譜面の傾向が示されます。　Global:平均密度 Local:最大局所密度 Chain:縦連打度 Unstability:速度変化度 Streak:ロングノーツ度 Color:色の複雑さ Total:合計値 を表しています。",
+	L"【ヒント:スキルレーダー】曲フォルダを選ぶとき、左のレーダーには譜面傾向毎のスキルが示されます。　気象レーダーが大きい曲で高いスコアを取り、スキルを伸ばしましょう。",
+	L"【ヒント:ブラックロングノート】終端が黒いロングノートは終端でしっかり離さないとMISSになります。　押しっぱなしにしないように注意しましょう。",
+	L"【ヒント:グラデーションロングノート】ロングノートは途中で色が変わることがあります。　色の変化に合わせて押しましょう。",
 	L"【ヒント:雨温図】右の色の付いた棒グラフは各色の音符密度を示しています。　白い折れ線グラフは音符密度の時間推移を表しています。",
 	L"【ヒント:NIGHTオプション】音符の色が見づらいときはオプションのNIGHTを変更して背景を暗くしてみましょう。",
 	L"【ヒント:リザルト】リザルトで表示される天気予報を見てみましょう。　天気が精度推移を表し、降水確率がゲージ推移を表しています。",
@@ -4041,7 +4087,7 @@ wchar_t * announce_str(int StageCount, int PlayCount) {//通常アナウンス�
 	};
 	int GeneralStrUse = 0;//どの通常アナウンスを使うか
 	GeneralStrUse = GetRand(GeneralStrNum - 1);//
-	//GeneralStrUse = 23;
+	//GeneralStrUse = 14;
 	return GeneralStr[GeneralStrUse];
 }
 

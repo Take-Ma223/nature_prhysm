@@ -1284,7 +1284,7 @@ void SHOW_RESULT(RESULT res,
 		//オプション名称描画
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 
-		auto optionName = option->op.speedAdapter.toString() + L":" + option->op.speed.toString();
+		auto optionName = L"SPEED:" + option->op.speed.toString() + L"(" + option->op.speedAdapter.toString() + L")";
 		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
 		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//speed adapter + speed
 		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//speed adapter + speed

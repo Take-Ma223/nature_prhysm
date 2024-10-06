@@ -47,18 +47,18 @@
 using namespace std;
 
 void GAME(int song_number, int difficulty,
-	RESULT *res, int *escape, Option *option, int *retryAble,
-	int *debug, Song *Music, int Button[3][4], int Button_Shutter, int *Key, char *Buf,
+	RESULT* res, int* escape, Option* option, int* retryAble,
+	int* debug, Song* Music, int Button[3][4], int Button_Shutter, int* Key, char* Buf,
 	int secret,//隠し曲演出中か(0:通常 1:演出中)
-	ANDROID_CONTROLLER *AC,
+	ANDROID_CONTROLLER* AC,
 	Config config,
 	IR_SETTING* ir,
 	int SkillTestFlag,//段位認定モードか(0:通常 1~4:段位認定モード ステージ数を示す)
-	double *GaugeVal,
-	int *CourseCombo,
-	int *CourseMaxCombo,
+	double* GaugeVal,
+	int* CourseCombo,
+	int* CourseMaxCombo,
 	int AllowExit
-	)
+)
 {
 	Asset asset;//使う画像セット
 	//コンテキスト
@@ -109,7 +109,7 @@ void GAME(int song_number, int difficulty,
 	int H_COMBO_NUMBER[10];
 	int H_SCORE_NUMBER[10];
 	int H_HIT[16], H_HIT_LARGE[20], H_HIT_D[16];//ノートを叩いた時のフラッシュ画像ハンドル
-	int H_SKY_PERFECT,H_PERFECT, H_GOOD, H_MISS;//SKY_PERFECT,PERFECT,GOOD,MISS判定画像の画像ハンドル
+	int H_SKY_PERFECT, H_PERFECT, H_GOOD, H_MISS;//SKY_PERFECT,PERFECT,GOOD,MISS判定画像の画像ハンドル
 	int H_COVER = 0;//カバー画像
 	int H_COVER_FLASH;//カバーフラッシュ画像
 	int H_COVER_MIDDLE;//中心カバー
@@ -152,17 +152,17 @@ void GAME(int song_number, int difficulty,
 		//viewAlpha.clearEvent();
 		//viewAlpha.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 0, 500);
 		//viewAlpha.play();
-	};
+		};
 	auto playAnimationOnEscAtPlay = [&]() {
 		//viewAlpha.clearEvent();
 		//viewAlpha.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 1000, 1500);
 		//viewAlpha.play();
-	};
+		};
 	auto playAnimationOnFinish = [&]() {
 		viewAlpha.clearEvent();
 		viewAlpha.eChange(Point(255), Point(0), Converter(ConvertMode::Linear), 3400, 3900);
 		viewAlpha.play();
-	};
+		};
 
 	int FXH_FULLCOMBO = LoadEffekseerEffect(L"img/FullComboFX/FullComboFX.efk", 25.0f);//effekseerエフェクトリソースハンドル
 	// 再生中のエフェクトのハンドルを初期化する。
@@ -174,7 +174,7 @@ void GAME(int song_number, int difficulty,
 
 	int H_TITLE_STR;//画像として保存された曲名の画像ハンドル
 	H_TITLE_STR = MakeScreen(640, 48, TRUE);
-	
+
 	int H_GENRE_STR;//画像として保存されたジャンルの画像ハンドル
 	H_GENRE_STR = MakeScreen(640, 48, TRUE);
 
@@ -227,10 +227,10 @@ void GAME(int song_number, int difficulty,
 	double high_speed = 1;//ハイスピ
 	high_speed = option->op.speedVal;//段位以外ではあらかじめ決めた値を格納
 	double scale = 1;//判定の横の広がり幅
-						//int lane1 = int(512 - 240 * scale);
-						//int lane2 = int(512 - 80 * scale);
-						//int lane3 = int(512 + 80 * scale);
-						//int lane4 = int(512 + 240 * scale);
+	//int lane1 = int(512 - 240 * scale);
+	//int lane2 = int(512 - 80 * scale);
+	//int lane3 = int(512 + 80 * scale);
+	//int lane4 = int(512 + 240 * scale);
 	int laneCordinateX[4] = {
 		int(512 - 240 * scale),//レーンのx座標
 		int(512 - 80 * scale),
@@ -260,7 +260,7 @@ void GAME(int song_number, int difficulty,
 		MustPush = 2,//そこのレーンのLNを押し続けなければならない 手を離すとミスになりMissedになる
 		Completed = -1,//押し切った状態
 	};
-	
+
 	int LN_judge[4] = { 0,0,0,0 };//LNの判定を保存する(0:MISS 1:GOOD 2:PERFECT 3;SKY_PERFECT)
 	int LN_flash[4] = { 0,0,0,0 };
 	int LN_push[4] = { 0,0,0,0 };//LNの色でボタンを押しているかのフラグ 対応する色を押しているときは1,離したフレームは-1,それ以外の離しているとき0
@@ -296,7 +296,7 @@ void GAME(int song_number, int difficulty,
 	int MAX_COMBO = 0;//最大コンボ数
 	int score_MAX = 10000;//スコア理論値
 	double score_note = 0;//音符一つの得点
-	double score_dec = int(score_MAX*0.001);//ミス時のスコア減少量(理論値の0.1%分(10点)スコア減少)
+	double score_dec = int(score_MAX * 0.001);//ミス時のスコア減少量(理論値の0.1%分(10点)スコア減少)
 	int combo_digit[5] = { 0,0,0,0,0 };//コンボ数を桁ごとに格納
 	int score_digit[5] = { 0,0,0,0,0 };//スコア
 	int time_minutes_digit[2] = { 0,0 };//分
@@ -331,10 +331,10 @@ void GAME(int song_number, int difficulty,
 	const int SKILL_TEST_GAUGE_INC_BASE_NOTES_COUNT = 1500;//段位ゲージの時このノート数を基準にtotalを決める
 	int PassedTime_Minutes = 0;//Scroll時間での経過時間の分
 	int PassedTime_Hours = 6;//Scroll時間での経過時間の時間
-    double HourOfGame = 0;//左上の時間の1時間がScroll時間でいくつか
+	double HourOfGame = 0;//左上の時間の1時間がScroll時間でいくつか
 	double MinuteOfGame = 0;//左上の時間の1分がScroll時間でいくつか
 	int TimePop[18] = { 100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100 };//1時間毎の降水量popを保存
-	int TimeAcc[6] = { 0,0,0,0,0,0};//3時間毎の精度を保存
+	int TimeAcc[6] = { 0,0,0,0,0,0 };//3時間毎の精度を保存
 	int TimePerfect = 0;//Perfect数を保存(3時間毎に0にリセット)
 	int TimeGood = 0;//Good数を保存(3時間毎に0にリセット)
 	int TimeMiss = 0;//Miss数を保存(3時間毎に0にリセット)
@@ -389,7 +389,7 @@ void GAME(int song_number, int difficulty,
 	CALCDIFF Cdiff;//計算で出した難易度要素目安
 	AutoDifficultyPrediction adp;
 	double autoDifficultyPredictionResult;
-	if(*debug == 1)	autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
+	if (*debug == 1)	autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 
 
 	int bcc = 0;//bpmchangeのカウンタ
@@ -402,9 +402,9 @@ void GAME(int song_number, int difficulty,
 
 	//NOTE note[5][NOTE_MAX_NUMBER];//[レーン][ノート番号]   //[0][]はBPM情報)
 
-	BPMC *bpmchange;//BPM変更
-	SC *scrollchange;//SCROLL変更
-	STOP_SE *stopSequence;//譜面停止
+	BPMC* bpmchange;//BPM変更
+	SC* scrollchange;//SCROLL変更
+	STOP_SE* stopSequence;//譜面停止
 
 	bpmchange = (BPMC*)calloc(NOTE_MAX_NUMBER, sizeof(BPMC));
 	scrollchange = (SC*)calloc(NOTE_MAX_NUMBER, sizeof(SC));
@@ -415,8 +415,8 @@ void GAME(int song_number, int difficulty,
 	double stop_time_sum = 0;//今までの総譜面停止時間
 	int stopFlag = 0;//譜面停止中どうかのフラグ(1:停止中)
 
-	
-	NOTE **note;
+
+	NOTE** note;
 	note = (NOTE**)calloc(4, sizeof(NOTE));
 
 	for (i = 0; i <= 3; i++) {
@@ -424,9 +424,9 @@ void GAME(int song_number, int difficulty,
 	}
 
 	NoteSearcher noteSearcher(note);
-	
+
 	//小節線構造体メモリ確保
-	BARLINE *barline;
+	BARLINE* barline;
 	barline = (BARLINE*)calloc(BARLINE_MAX_NUMBER, sizeof(BARLINE));
 
 	int blc = 0;//barline counter
@@ -445,7 +445,7 @@ void GAME(int song_number, int difficulty,
 	head.y_speed = 2.406;
 	head.next = NULL;
 
-	CELL *insert;//リストに挿入する場所を示すポインタ(このポインタの挿すセルの後ろに挿入)
+	CELL* insert;//リストに挿入する場所を示すポインタ(このポインタの挿すセルの後ろに挿入)
 	insert = &head;//最初はリストの先頭を入れておく
 
 	//EDIT_SCORE関数に渡す用
@@ -503,7 +503,7 @@ void GAME(int song_number, int difficulty,
 	SpeedBuffer speedBuffer = SpeedBuffer(note, j_n_n);
 
 	GAME_LOAD(song_number, difficulty, note, barline, laneCordinateX, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
-	
+
 	speedBuffer.updateAverage();
 
 
@@ -516,14 +516,14 @@ void GAME(int song_number, int difficulty,
 	}
 
 
-	total = total_base*gauge_inc_times;
+	total = total_base * gauge_inc_times;
 
 	score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
 
 	HourOfGame = TimeToEndScroll / 18;//左上時間の1時間の単位を決定
 	MinuteOfGame = HourOfGame / 60;//分を決める
 
-	gauge_dec = ((double)100 / (miss_percent*Music[song_number].total_note[difficulty]));
+	gauge_dec = ((double)100 / (miss_percent * Music[song_number].total_note[difficulty]));
 	if (gauge_dec >= gauge_dec_MAX)gauge_dec = gauge_dec_MAX;
 	if (gauge_dec <= gauge_dec_MIN)gauge_dec = gauge_dec_MIN;
 	cbpm = Music[song_number].bpm[difficulty];//最初のBPM
@@ -537,7 +537,7 @@ void GAME(int song_number, int difficulty,
 	FILE* fpRival = 0;
 	errno_t error = 0;
 	RESULT highScore;//現在のハイスコア
-    RESULT latestScore;//前回のスコア
+	RESULT latestScore;//前回のスコア
 	RESULT rivalScore;//ライバルハイスコア
 
 	wchar_t filenameHighScore[256];
@@ -577,7 +577,7 @@ void GAME(int song_number, int difficulty,
 
 
 	//画像音ハンドル値代入
-	wchar_t *ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"k",L"f",L"bright",L"longPush" };
+	wchar_t* ReadNameRGB[11] = { L"r",L"g",L"b",L"c",L"m",L"y",L"w",L"k",L"f",L"bright",L"longPush" };
 	auto note_folder = option->op.note.toString();
 	for (i = 0; i <= 10; i++) {
 		wchar_t strcash[128];
@@ -597,7 +597,7 @@ void GAME(int song_number, int difficulty,
 	sprintfDx(tmpPath, L"img/notes/%s/JudgeAreaPaint.png", note_folder.c_str());
 	H_JUDGE_AREA_PAINT = LoadGraph(tmpPath);
 
-	GradationNoteImage gradationLongNote(wstring(L"img/notes/")+wstring(note_folder.c_str()));
+	GradationNoteImage gradationLongNote(wstring(L"img/notes/") + wstring(note_folder.c_str()));
 	NoteSymbolImage noteSymbol(config, option->op.noteSymbol.toString());
 
 	int Keylist[3][4] = { { Button[0][0],Button[0][1],Button[0][2],Button[0][3] },
@@ -671,8 +671,8 @@ void GAME(int song_number, int difficulty,
 	DrawableInitParam coverViewParam;
 	coverViewParam.cordinate = Cordinate(0, 0);
 	CoverView coverView = CoverView(&context, coverViewParam);
-	
-	
+
+
 	H_FAILED = LoadGraph(L"img/failed.png");
 	H_CLEARED = LoadGraph(L"img/cleared.png");
 
@@ -680,7 +680,7 @@ void GAME(int song_number, int difficulty,
 	if (option->op.gauge.getIndex() == (int)OptionItem::Gauge::NORMAL)H_CLEARED = LoadGraph(L"img/cleared_normal.png");
 	if (option->op.gauge.getIndex() == (int)OptionItem::Gauge::HARD)H_CLEARED = LoadGraph(L"img/cleared_hard.png");
 	if (option->op.gauge.getIndex() == (int)OptionItem::Gauge::SUPER_HARD)H_CLEARED = LoadGraph(L"img/cleared_super_hard.png");
-	if (option->op.color.getIndex() == (int)OptionItem::Color::RGB_ONLY || 
+	if (option->op.color.getIndex() == (int)OptionItem::Color::RGB_ONLY ||
 		option->op.color.getIndex() == (int)OptionItem::Color::CMY_ONLY ||
 		option->op.color.getIndex() == (int)OptionItem::Color::W_ONLY)H_CLEARED = LoadGraph(L"img/cleared_easy.png");
 
@@ -744,19 +744,45 @@ void GAME(int song_number, int difficulty,
 	DrawableInitParam fastSlowParams[4];
 	Image I_Fast[4];
 	Image I_Slow[4];
+	int fast_count = 0;
+	int slow_count = 0;
+
+	int fast_background_color;
+	int slow_background_color;
+	int* fast_count_color = nullptr;
+	int* slow_count_color = nullptr;
+
+	if (option->op.fastSlow.getIndex() == static_cast<int>(OptionItem::FastSlow::OFF) || option->op.fastSlow.getIndex() == static_cast<int>(OptionItem::FastSlow::ON_FAST_CYAN)) {
+		fast_background_color = GetColor(50, 255, 255);
+		slow_background_color = GetColor(255, 50, 50);
+		fast_count_color = H_SMALL_NUMBER_CYAN;
+		slow_count_color = H_SMALL_NUMBER_RED;
+	}
+	else if (option->op.fastSlow.getIndex() == static_cast<int>(OptionItem::FastSlow::ON_FAST_RED))
+	{
+		fast_background_color = GetColor(255, 50, 50);
+		slow_background_color = GetColor(50, 255, 255);
+		fast_count_color = H_SMALL_NUMBER_RED;
+		slow_count_color = H_SMALL_NUMBER_CYAN;
+	}
+
+
+
 
 	for (i = 0; i < 4; i++) {
 		fastSlowCordinate[i] = Cordinate(laneCordinateX[i], judge_area + fastSlowY);
 		fastSlowParams[i].visible = 0;
 		fastSlowParams[i].cordinate = fastSlowCordinate[i];
 		I_Fast[i] = Image(&context, asset.img(fast.c_str()), fastSlowParams[i]);
-		I_Slow[i] = Image(&context, asset.img(slow.c_str()),  fastSlowParams[i]);
+		I_Slow[i] = Image(&context, asset.img(slow.c_str()), fastSlowParams[i]);
 	}
 
-	//出現アニメーション
+	//FAST SLOW カウント処理と出現アニメーション
 	auto fastSlowAppear = [&] {
-		if (option->op.fastSlow.getIndex() != (int)OptionItem::FastSlow::OFF) {
-			if (timingDifference < 0) {
+
+		if (timingDifference < 0) {
+			fast_count++;
+			if (option->op.fastSlow.getIndex() != (int)OptionItem::FastSlow::OFF) {
 				I_Fast[i].clearAllEvent();
 				I_Fast[i].visible.eON();
 				I_Fast[i].alpha.eSet(255);
@@ -771,7 +797,10 @@ void GAME(int song_number, int difficulty,
 				I_Fast[i].playAll();
 				I_Slow[i].playAll();
 			}
-			else {
+		}
+		else {
+			slow_count++;
+			if (option->op.fastSlow.getIndex() != (int)OptionItem::FastSlow::OFF) {
 				I_Slow[i].clearAllEvent();
 				I_Slow[i].visible.eON();
 				I_Slow[i].alpha.eSet(255);
@@ -784,8 +813,6 @@ void GAME(int song_number, int difficulty,
 
 				I_Fast[i].playAll();
 				I_Slow[i].playAll();
-
-
 
 			}
 		}
@@ -940,6 +967,9 @@ void GAME(int song_number, int difficulty,
 		GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
 
 		speedBuffer.updateAverage();
+
+		fast_count = 0;
+		slow_count = 0;
 	};
 
 	//ボタン音再生
@@ -1353,17 +1383,26 @@ void GAME(int song_number, int difficulty,
 
 		}
 
+
+
+
+
+
+
+
 		//判定数表示欄
 		DrawBoxWithLine(976, 540, 1110, 580, GetColor(50, 255, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//SKY_PERFECT
 		DrawBoxWithLine(976, 580, 1110, 620, GetColor(255, 255, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//PERFECT
 		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//GOOD
 		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MISS
 
+		DrawBoxWithLine(1130, 540, 1264, 580, fast_background_color, int((double)draw_alpha * 80), int((double)draw_alpha * 255));//FAST
+		DrawBoxWithLine(1130, 580, 1264, 620, slow_background_color, int((double)draw_alpha * 80), int((double)draw_alpha * 255));//SLOW
+
 		//BPM描画欄
-		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MAXBPM
-		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//BPM
-		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//MINBPM
+		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(255, 50, 255), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//BPM
 		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), int((double)draw_alpha * 80), int((double)draw_alpha * 255));//SPEED
+
 
 		//判定、BPM文字表示
 		DrawGraph(0, 0, H_GAME_STR_JUDGE_BPM, TRUE);
@@ -1380,9 +1419,10 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1094, 616, GOOD, 25, 1, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1094, 656, MISS, 25, 1, 0, H_SMALL_NUMBER_BLUE);
 
-		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
-		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_MAGENTA);
-		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
+		DrawNumber(1216, 536, fast_count, 25, 0, 0, fast_count_color);
+		DrawNumber(1216, 576, slow_count, 25, 0, 0, slow_count_color);
+		DrawNumber(1216, 616, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_MAGENTA);
+
 		DrawNumber(1216, 656, int(speedBuffer.getAverage() * option->op.speedVal + 0.5), 25, 0, 0, H_SMALL_NUMBER_GREEN);
 
 
@@ -3416,10 +3456,12 @@ void GAME(int song_number, int difficulty,
 		DrawBoxWithLine(976, 620, 1110, 660, GetColor(255, 50, 50), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//GOOD
 		DrawBoxWithLine(976, 660, 1110, 700, GetColor(50, 50, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//MISS
 
+		
+		DrawBoxWithLine(1130, 540, 1264, 580, fast_background_color, judgeBoxAlphaGeneral, boxLineAlphaGeneral);//FAST
+		DrawBoxWithLine(1130, 580, 1264, 620, slow_background_color, judgeBoxAlphaGeneral, boxLineAlphaGeneral);//SLOW
+
 		//BPM描画欄
-		DrawBoxWithLine(1130, 540, 1264, 580, GetColor(255, 50, 50), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//MAXBPM
-		DrawBoxWithLine(1130, 580, 1264, 620, GetColor(255, 50, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//BPM
-		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(50, 50, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//MINBPM
+		DrawBoxWithLine(1130, 620, 1264, 660, GetColor(255, 50, 255), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//BPM
 		DrawBoxWithLine(1130, 660, 1264, 700, GetColor(25, 255, 25), judgeBoxAlphaGeneral, boxLineAlphaGeneral);//SPEED
 		
 		//判定、BPM文字表示
@@ -3439,10 +3481,9 @@ void GAME(int song_number, int difficulty,
 		DrawNumber(1094, 616, GOOD, 25, 1, 0, H_SMALL_NUMBER_RED);
 		DrawNumber(1094, 656, MISS, 25, 1, 0, H_SMALL_NUMBER_BLUE);
 
-		DrawNumber(1216, 536, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_SMALL_NUMBER_RED);
-		DrawNumber(1216, 576, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_MAGENTA);
-		DrawNumber(1216, 616, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_SMALL_NUMBER_BLUE);
-
+		DrawNumber(1216, 536, fast_count, 25, 0, 0, fast_count_color);
+		DrawNumber(1216, 576, slow_count, 25, 0, 0, slow_count_color);
+		DrawNumber(1216, 616, int(cbpm + 0.5), 25, 0, 0, H_SMALL_NUMBER_MAGENTA);
 
 		//HSを考慮したSPEEDを算出
 		//cbpm

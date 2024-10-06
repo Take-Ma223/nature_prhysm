@@ -20,7 +20,7 @@ constexpr int OFFSET_MARGIN = 100;//音声、動画の先頭を合わせるた�
 
 #define ENABLE_GENERATING_LERNING_DATA 0//学習用データ生成
 
-#define ENABLE_GENERATING_RADAR_LIST 0 //レーダーリスト作成
+#define ENABLE_GENERATING_RADAR_LIST 0 //公式譜面・レーダーリスト作成
 
 const wchar_t RUN_PASS[] = L"223210";
 

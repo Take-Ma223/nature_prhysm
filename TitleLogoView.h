@@ -138,7 +138,7 @@ public:
 		//ライト
 		light_x.eSet(0);
 		light_x.eChange(Point(0), Point(1152), Converter(ConvertMode::Exponential, 8), 5200, 5700);
-		light_x.eChange(Point(0), Point(1152), Converter(ConvertMode::Exponential, 8), 39200, 39500);
+		light_x.eChange(Point(0), Point(1152), Converter(ConvertMode::Exponential, 8), 37449, 37849);
 		light_x.play();
 
 		//文字フラッシュ
@@ -160,7 +160,7 @@ public:
 
 		//ロゴ全体フラッシュ
 		double surface_light_t1 = 6620;
-		double surface_light_t2 = 39517;
+		double surface_light_t2 = 37863;
 		double surface_light_duration = 2000;
 
 		surface_light_alpha.eSet(0);
@@ -205,7 +205,7 @@ public:
 			//アイコン点滅開始
 			icon_flush_alpha.play();
 		});
-		handler_t1.eSet(39517, [this] {
+		handler_t1.eSet(37863, [this] {
 			//アイコン点滅停止
 			icon_flush_alpha.value = 0;
 			icon_flush_alpha.stop();

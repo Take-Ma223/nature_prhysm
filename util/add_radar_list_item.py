@@ -22,7 +22,7 @@ def main():
     np_hash = NPHash()
     hash_sha3_256 = np_hash.get_nps_hash(args.nps_file_path)
 
-    f = open("test.csv","a")
+    f = open("radar.csv","a")
     f.write(hash_sha3_256+","+str(args.radar_global)+","+str(args.radar_local)+","+str(args.radar_chain)+","+str(args.radar_unstability)+","+str(args.radar_streak)+","+str(args.radar_color)+"\n")
     
 

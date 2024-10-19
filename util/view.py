@@ -22,7 +22,11 @@ def main():
     query_chart_id = "chart_id="+hash_sha3_256
     query_rainbow = "rainbow="+rainbow 
 
-    op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+    variant = operator.Variant.Pr
+    if args.local:
+        variant = operator.Variant.Dev
+
+    op = operator.NPServerRequestOperator(variant=variant)
     result = op.open_with_browser(cgi='view.php?'+query_chart_id+'&'+query_rainbow)
 
 if __name__ == "__main__":

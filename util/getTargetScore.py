@@ -53,7 +53,11 @@ def main():
 
     data = {'chart_id':hash_sha3_256, 'rainbow':rainbow, 'target_mode':target_mode, 'rival_id':args.rivalID, 'best_score':args.score}
 
-    op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+    variant = operator.Variant.Pr
+    if args.local:
+        variant = operator.Variant.Dev
+
+    op = operator.NPServerRequestOperator(variant=variant)
     result = op.request(cgi='get_target_score.php',method=RequestMethod.POST, post_data=data)
 
 

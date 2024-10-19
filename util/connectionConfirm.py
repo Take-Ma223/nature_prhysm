@@ -31,7 +31,12 @@ class ConnectionResultWriter():
 
 if __name__ == "__main__":
     # connection_confirm()
-    op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+    
+    variant = operator.Variant.Pr
+    if args.local:
+        variant = operator.Variant.Dev
+
+    op = operator.NPServerRequestOperator(variant=variant)
     result = op.request(cgi='connection.php',method=RequestMethod.GET)
     
     writer = ConnectionResultWriter()

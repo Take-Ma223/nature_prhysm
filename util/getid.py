@@ -15,7 +15,11 @@ def write(data):
         f.write(data)
 
 def main():
-    op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+    variant = operator.Variant.Pr
+    if args.local:
+        variant = operator.Variant.Dev
+
+    op = operator.NPServerRequestOperator(variant=variant)
     result = op.request(cgi='get_id.php',method=RequestMethod.POST)
 
     if not result.isOK():

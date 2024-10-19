@@ -4,8 +4,8 @@ import webbrowser
 from enum import Enum
 from typing import Tuple
 
-NP_SERVER_ADDRESS_DEV = 'http://nature-prhysm.main.jp/ranking/'
-NP_SERVER_ADDRESS_PR = 'http://honban'
+NP_SERVER_ADDRESS_DEV = 'http://localhost/ranking/'
+NP_SERVER_ADDRESS_PR = 'http://nature-prhysm.main.jp/ranking/'
 
 CONNECTION_RESULT_KEY_SERVER_VERSION = 'server_version'
 NP_SERVER_VERSION_NAME = "natureprhysmserver1.1.0"  # 接続可能なサーバーバージョン 

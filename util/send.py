@@ -66,7 +66,11 @@ def main():
         else:
             if data["hash"] == hash_sha3_256 and data["id"] == id:  # 現在のidと違うidのスコアデータは送信しない
                 data["player_name"] = player_name
-                op = operator.NPServerRequestOperator(variant=operator.Variant.Dev)
+                variant = operator.Variant.Pr
+                if args.local:
+                    variant = operator.Variant.Dev
+
+                op = operator.NPServerRequestOperator(variant=variant)
                 result = op.request(cgi='send.php',method=RequestMethod.POST, post_data=data)
 
 if __name__ == "__main__":

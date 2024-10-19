@@ -1,6 +1,8 @@
 #ifndef _STRUCT_CONFIG
 #define _STRUCT_CONFIG
 
+#include<string>
+
 enum SoundOutputType {
 	DirectSound,
 	WASAPI,
@@ -35,6 +37,10 @@ typedef struct Config {//コンフィグデータ
 	int UseAiPredictedDifficulty = 0;
 
 	int NoteSymbol[9] = {0,0,0,0,0,0,0,0,0};
+
+	std::wstring BaseFont = L"メイリオ";
+	//std::wstring AlternativeFont = L"メイリオ";
+
 
 } Config;
 

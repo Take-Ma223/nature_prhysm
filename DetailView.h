@@ -26,9 +26,11 @@ public:
 	{
 		makeScreen(Size(sizeX, sizeY));
 		alpha.value = 0;
+		
+		font = FontInfo(wstring(c->getConfig()->BaseFont), 17, 1, FontType::ANTIALIASING_EDGE_16X16);
 	}
 
-	FontInfo font = FontInfo(wstring(NATURE_PRHYSM_FONT), 17, 1, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo font;
 	//vector<TextView> detailText;
 
 	/// <summary>

@@ -138,7 +138,7 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 	SH_TEST[2] = LoadSoundMem(L"sound/3.wav", 1);
 	*/
 
-	ChangeFont(NATURE_PRHYSM_FONT);
+	ChangeFont(config.BaseFont.c_str());
 	SetFontThickness(9);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(26);

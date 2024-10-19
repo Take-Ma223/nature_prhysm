@@ -25,7 +25,7 @@ public:
 	DrawableInitParam tvp1 = DrawableInitParam(Cordinate(0, 0));
 	TextView testText1 = TextView(
 		&activityContext,
-		TextViewParam(wstring(L"曲名表示テストTEST"), FontInfo(wstring(NATURE_PRHYSM_FONT), 28, 9, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
+		TextViewParam(wstring(L"曲名表示テストTEST"), FontInfo(wstring(L"メイリオ"), 28, 9, FontType::ANTIALIASING_EDGE), GetColor(255, 255, 255)),
 		tvp1
 	);
 

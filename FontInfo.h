@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include <DxLib.h>
+#include "CONSTANT_VALUE.h"
 using namespace std;
 
 /// <summary>
@@ -38,7 +39,7 @@ public:
 	/// <param name="size">サイズ</param>
 	/// <param name="thick">厚さ</param>
 	/// <param name="fontType">フォントタイプ</param>
-	FontInfo(wstring fontName = wstring(L"メイリオ"), int size = 16, int thick = 2, FontType fontType = FontType::NORMAL);
+	FontInfo(wstring fontName = wstring(NATURE_PRHYSM_FONT), int size = 16, int thick = 2, FontType fontType = FontType::NORMAL);
 };
 
 /// <summary>

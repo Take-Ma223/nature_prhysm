@@ -43,7 +43,7 @@ void KEY_CONFIG(int Button[3][4], int Button_Shutter, int* Key, char* Buf, ANDRO
 	int brightness = 0;
 	bool isKeyConfigSetting = true;//キーコンフィグ中かどうかのフラグ
 
-	ChangeFont(NATURE_PRHYSM_FONT);
+	ChangeFont(config.BaseFont.c_str());
 	SetFontThickness(9);
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(26);

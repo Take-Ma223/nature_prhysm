@@ -117,9 +117,6 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 			config->SongSelectRowNumber = _wtoi(Val);//数値格納
 		}
 
-		if (wcscmp(L"#END", sharp1) == 0) {
-			break;
-		}
 
 		if (wcscmp(L"DISPLAY_TIMING_OFFSET", sharp1) == 0) {
 			wchar_t Val[9];
@@ -220,6 +217,21 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 				}
 			}
 		}
+
+
+		if (wcscmp(L"BASE_FONT", sharp1) == 0) {
+			wchar_t Val[256];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->BaseFont = std::wstring(Val);
+		}
+
+		//if (wcscmp(L"ALTERNATIVE_FONT", sharp1) == 0) {
+		//	wchar_t Val[256];
+		//	swscanf_s(sharp2, L"%[^,\n]",
+		//		Val, _countof(Val));
+		//	config->AlternativeFont = std::wstring(Val);
+		//}
 
 		if (wcscmp(L"#END", sharp1) == 0) {
 			break;

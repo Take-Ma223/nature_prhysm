@@ -184,8 +184,10 @@ void SONG_SELECT(int *l_n,
 	int SH_SHUTTER;
 	int SH_OPTION_HITSOUND_PREVIEW;
 
-	int FontHandle = CreateFontToHandle(NATURE_PRHYSM_FONT, 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
-	
+	int FontHandle = CreateFontToHandle(config.BaseFont.c_str(), 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
+	//int FontHandle2 = CreateFontToHandle(config.AlternativeFont.c_str(), 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//代替フォントハンドル
+	//AddSubstitutionFontToHandle(FontHandle, FontHandle2, 0, 0);
+
 	double GAME_passed_time = 0;
 	double GAME_start_time = 0;
 	double LOOP_passed_time = 1;
@@ -1453,7 +1455,7 @@ void SONG_SELECT(int *l_n,
 		select_rainbow = 4;
 	}
 
-	ChangeFont(NATURE_PRHYSM_FONT);
+	ChangeFont(config.BaseFont.c_str());
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(28);
 	SetFontThickness(9);

@@ -32,7 +32,7 @@ public:
 		alpha.value = 0;
 
 
-		FontInfo font = FontInfo(wstring(NATURE_PRHYSM_FONT), 27, 10, FontType::ANTIALIASING_EDGE_16X16);
+		FontInfo font = FontInfo(c->getConfig()->BaseFont, 27, 10, FontType::ANTIALIASING_EDGE_16X16);
 		NPTextViewParam textParam = NPTextViewParam(L"Press to Retry Å® ", font, GetColor(255, 255, 255));
 		DrawableInitParam drawableParam = DrawableInitParam(Cordinate(165, 50), CenterRatio(0, 0.5));
 		text = unique_ptr<NPTextView>(new NPTextView(this, context, textParam, drawableParam));

@@ -29,6 +29,9 @@ public:
 		makeScreen(Size(sizeX, sizeY));
 		alpha.value = 255;
 
+		fontOptionName = FontInfo(c->getConfig()->BaseFont, 21, 9, FontType::ANTIALIASING_EDGE_16X16);
+		fontItemName = FontInfo(c->getConfig()->BaseFont, 22, 9, FontType::ANTIALIASING_EDGE_16X16);
+
 		themeStr1 = wstring(L"img/themes/");
 		themeStr2 = wstring(option->op.theme.toString());
 
@@ -209,8 +212,8 @@ private:
 	unique_ptr<Image> arrowLeft;
 	unique_ptr<Image> arrowRight;
 
-	FontInfo fontOptionName = FontInfo(wstring(NATURE_PRHYSM_FONT), 21, 9, FontType::ANTIALIASING_EDGE_16X16);
-	FontInfo fontItemName = FontInfo(wstring(NATURE_PRHYSM_FONT), 22, 9, FontType::ANTIALIASING_EDGE_16X16);
+	FontInfo fontOptionName;
+	FontInfo fontItemName;
 
 	Option* option;
 

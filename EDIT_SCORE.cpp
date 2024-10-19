@@ -338,7 +338,7 @@ void EDIT_SCORE(SCORE_CELL* head,
 	step_count_draw = step_count;
 
 	//フォント設定
-	ChangeFont(NATURE_PRHYSM_FONT);
+	ChangeFont(config.BaseFont.c_str());
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(15);
 	SetFontThickness(9);

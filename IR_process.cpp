@@ -206,11 +206,11 @@ void viewSkillRadarRanking(Config config) {
 	//スキルレーダーランキングの表示
 
 	if (config.Local == 1) {
-		HINSTANCE ret = ShellExecute(NULL, L"open", L"http://nature-prhysm.main.jp/ranking/skill_radar_ranking.php?sort=total", NULL, NULL, SW_SHOW);
+		HINSTANCE ret = ShellExecute(NULL, L"open", L"http://nature-prhysm.main.jp/ranking/skill_radar_ranking.php?sort=robustness", NULL, NULL, SW_SHOW);
 
 	}
 	else {
-		HINSTANCE ret = ShellExecute(NULL, L"open", L"http://nature-prhysm.main.jp/ranking/skill_radar_ranking.php?sort=total", NULL, NULL, SW_SHOW);
+		HINSTANCE ret = ShellExecute(NULL, L"open", L"http://nature-prhysm.main.jp/ranking/skill_radar_ranking.php?sort=robustness", NULL, NULL, SW_SHOW);
 
 	}
 }

@@ -803,7 +803,7 @@ void SHOW_RESULT(RESULT res,
 	int show_inst_flag = 1;//F11:左上の説明(DEBUG_MODE除く)を表示するフラグ(1:する 0:しない)
 
 	GAME_start_time = GetNowCount_d(config);
-	ChangeFont(NATURE_PRHYSM_FONT);
+	ChangeFont(config.BaseFont.c_str());
 	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
 	SetFontSize(35);
 	SetFontThickness(9);

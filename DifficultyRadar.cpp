@@ -579,7 +579,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, bool isRainbow) {//色
 
 	serachNotesFromEarly([&](int lane, int index) {
 		if (note[lane][index].group == NoteGroup::LongNoteEnd && note[lane][index].LN_k == 1) {//黒終点の時
-			blackDifficulty += 0.5;
+			//blackDifficulty += 0.5;
 			k_flag[lane] = 1;
 		}
 		else {//単ノートかLN始点か中間ノート
@@ -633,7 +633,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, bool isRainbow) {//色
 	}); 
 
 	ColorChangeCount = (ColorChangeCount / ((double)LocalTime / 1000)) * 60;
-	ColorChangeCount *= 1.725;//大きさ調整
+	ColorChangeCount *= 1.7713;//大きさ調整
 	//ColorChangeCount = ColorChangeCount / TotalNotesK;//譜面単位でどれだけ色が複雑か
 	
 	//黒音符の難しさの重みが目立つようにする
@@ -660,6 +660,7 @@ int DifficultyRadar::CalcLongNote(bool isRainbow) {
 	int firstFlag = 0;
 	double LNBuf = 0;
 
+	double valid_length = 400;//このミリ秒数以下の長さのLNは重みを小さくする
 	int weight = 1;//音符の色で重み付け (RGB:1 CMY:2 W:3)
 	int WeightOfColor[3] = { 1,2,3 };//それぞれの音符グループの重み
 
@@ -763,21 +764,9 @@ int DifficultyRadar::CalcLongNote(bool isRainbow) {
 			if (note[lane][noteIndex[lane]].timing == minTiming)existNote[lane] = 1;
 		}
 
-		//レーン毎のLN数(色重み付き)を加算
-		int lnFindCount = 0;//今回加算した分
-		for (lane = 0; lane < 4; lane++) {
-			if (existNote[lane]) {
-				if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart || note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle || note[lane][noteIndex[lane]].group == NoteGroup::LongNoteEnd) {
-					NoteColor color = note[lane][noteIndex[lane]].color;
 
-					if(note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart)lnFindCount += color2weight(color);
-					lnCount.setLnCount(lane, color2weight(color));
-				}
-			}
-		}
 
-		//LN数(色重み付き)をLN度に加算
-		lnDegrees += lnFindCount;
+
 
 		//各レーンの音符の指拘束押し度合いをLN度に加算
 		for (lane = 0; lane < 4; lane++) {
@@ -816,6 +805,41 @@ int DifficultyRadar::CalcLongNote(bool isRainbow) {
 			}
 		}
 
+		//レーン毎の現在のLN個数状態をセット
+		int lnFindCount = 0;//今回加算した分
+		for (lane = 0; lane < 4; lane++) {
+			if (existNote[lane]) {
+				if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart || note[lane][noteIndex[lane]].group == NoteGroup::LongNoteMiddle || note[lane][noteIndex[lane]].group == NoteGroup::LongNoteEnd) {
+					NoteColor color = note[lane][noteIndex[lane]].color;
+
+					if (note[lane][noteIndex[lane]].group == NoteGroup::LongNoteStart) {
+						lnFindCount += color2weight(color);
+
+						//終点を探す
+						int end_index = noteIndex[lane];
+						while (true) {
+							end_index++;
+							if (note[lane][end_index].group == NoteGroup::LongNoteEnd)break;
+						}
+
+
+						double length_weight = (double)(note[lane][end_index].timing - note[lane][noteIndex[lane]].timing) / (valid_length*1000);
+						if (length_weight > 1)length_weight = 1;
+						//長さ重みづけ個数を加算
+						lnDegrees += lnFindCount * length_weight;
+					}
+
+					//現在のLN個数状態をセット
+					lnCount.setLnCount(lane, color2weight(color));
+
+					//黒終端なら加算
+					if (note[lane][noteIndex[lane]].LN_k)lnDegrees += 0.5;
+				}
+			}
+		}
+
+
+
 		//レーン毎のLN数(色重み付き)を引く
 		for (lane = 0; lane < 4; lane++) {
 			if (existNote[lane]) {
@@ -838,11 +862,11 @@ int DifficultyRadar::CalcLongNote(bool isRainbow) {
 
 	lnDegrees = (lnDegrees / ((double)time / 1000)) * 60;//1分あたりのLN密度にする
 	lnDegrees *= 0.005;
-	lnDegrees = (log(lnDegrees + 1) / log(2));//
+	lnDegrees = (log(lnDegrees + 1) / log(2.718));//
 	lnDegrees *= 2;
 	lnDegrees *= 130;
 
-	lnDegrees = lnDegrees * 0.343;//大きさ調整
+	lnDegrees = lnDegrees * 0.5702;//大きさ調整
 	return lnDegrees;
 }
 int DifficultyRadar::CalcUnstability() {

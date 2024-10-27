@@ -602,7 +602,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, bool isRainbow) {//色
 				}
 				if (NoteColor == NoteColor::Y ||
 					NoteColor == NoteColor::C ||
-					NoteColor == NoteColor::M) {//cmyなら4倍の重み
+					NoteColor == NoteColor::M) {//cmyなら3倍の重み
 					ColorChangeCount += 4 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
 				}
@@ -616,8 +616,8 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, bool isRainbow) {//色
 					blackDifficulty += 4 / (pow(distance * 0.01, 2) + 1);//前の音符に近い位置にある黒ノーツ程重みを大きくする(最大4)
 					k_flag[lane] = 1;
 				}
-				else if (NoteColor == NoteColor::F) {//fなら1倍の重み
-					ColorChangeCount += 1 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
+				else if (NoteColor == NoteColor::F) {//fなら0.5倍の重み
+					ColorChangeCount += 0.5 * colorRingBuf.getThisLaneColorForgettingWeight(lane, NoteColor) * colorRingBuf.getThisRowColorDifferenceWeight(lane, NoteColor) * weight;
 					ColorBuf[lane] = NoteColor;
 				}
 				else if (NoteColor == NoteColor::R ||
@@ -633,7 +633,7 @@ int DifficultyRadar::CalcColor(int StartTime, int EndTime, bool isRainbow) {//色
 	}); 
 
 	ColorChangeCount = (ColorChangeCount / ((double)LocalTime / 1000)) * 60;
-	ColorChangeCount *= 1.7713;//大きさ調整
+	ColorChangeCount *= 1.9;//大きさ調整
 	//ColorChangeCount = ColorChangeCount / TotalNotesK;//譜面単位でどれだけ色が複雑か
 	
 	//黒音符の難しさの重みが目立つようにする
@@ -866,7 +866,7 @@ int DifficultyRadar::CalcLongNote(bool isRainbow) {
 	lnDegrees *= 2;
 	lnDegrees *= 130;
 
-	lnDegrees = lnDegrees * 0.5702;//大きさ調整
+	lnDegrees = lnDegrees * 0.5839;//大きさ調整
 	return lnDegrees;
 }
 int DifficultyRadar::CalcUnstability() {

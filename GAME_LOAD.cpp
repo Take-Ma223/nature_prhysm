@@ -896,7 +896,7 @@ void GAME_LOAD(int song_number,
 								note[lane][nc[lane]].timing = int((time_counter + note_offset_scroll) * TIMING_SHOW_RATIO + 0.5);//表示用タイミング
 								note[lane][nc[lane]].timing_init = note[lane][nc[lane]].timing;//表示用タイミング(保存用)
 								note[lane][nc[lane]].timing_real = int(time_counter_real + Music[song_number].noteoffset[difficulty]
-									+ stopTimeSum * 1000 + 0.5 + config.VsyncOffsetCompensation);//実際に叩くタイミング
+									+ stopTimeSum * 1000 + 0.5);//実際に叩くタイミング
 								note[lane][nc[lane]].timing_init_real = note[lane][nc[lane]].timing_real;//実際に叩くタイミング(保存用)
 
 								note[lane][nc[lane]].color = (NoteColor)j;
@@ -1286,8 +1286,14 @@ void GAME_LOAD(int song_number,
 	Music[song_number].unstability[CALC_MODE_RAINBOW][difficulty] = Cdiff->unstability;
 	Music[song_number].chain[CALC_MODE_RAINBOW][difficulty] = Cdiff->chain;
 
-
-
+	for (i = 0; i < 4; i++) {
+		int j = 0;
+		while (note[i][j].color != NoteColor::NONE) {
+			note[i][j].timing_real += config.VsyncOffsetCompensation;
+			note[i][j].timing_init_real += config.VsyncOffsetCompensation;
+			j++;
+		}
+	}
 	
 	//Cdiff->global = DR.CalcGlobal(CALC_MODE_RAINBOW);
 	//Cdiff->local = DR.CalcLocal(CALC_MODE_RAINBOW);

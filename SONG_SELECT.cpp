@@ -2184,7 +2184,7 @@ void SONG_SELECT(int *l_n,
 						if (option_select == (int)OptionItem::Name::HITSOUND) {
 							DeleteSoundMem(SH_OPTION_HITSOUND_PREVIEW);
 							sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->op.hitSound.toString().c_str());
-							SH_OPTION_HITSOUND_PREVIEW = LoadSoundMem(strcash, 1);//HIT SOUNDプレビュー音声読み込み
+							SH_OPTION_HITSOUND_PREVIEW = NPLoadHitSoundMem(strcash, option);//HIT SOUNDプレビュー音声読み込み
 							PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
 						}
 						if (option_select == (int)OptionItem::Name::THEME) {

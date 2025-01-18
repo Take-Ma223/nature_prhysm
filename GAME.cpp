@@ -3747,13 +3747,13 @@ void GAME(int song_number, int difficulty,
 		if (!CheckHandleASyncLoad(SH_SONG)) {
 			int maxVol = option->op.bgmSoundVol.getVolume();
 			double missVolEasing = ((double)1 - cos(volume * (3.1415 / 2)));//0~1
-			int vol = int(maxVol * missVolEasing * BGM_VolTowardResult * debug_music * ((double)songVolume.value/255));
+			int vol = int(maxVol * BGM_VolTowardResult * debug_music * ((double)songVolume.value/255));
 
 			ChangeVolumeSoundMem(vol, SH_SONG);//曲の音量セット
 		}
 
 		jingleVolume.process();
-		ChangeVolumeSoundMem(jingleVolume.value, SH_JINGLE);//ジングル音の音量セット
+		ChangeVolumeSoundMem(((double)jingleVolume.value / 255) * option->op.bgmSoundVol.getVolume(), SH_JINGLE);//ジングル音の音量セット
 
 		//printfDx("%d\n", int(((double)44100 * (GAME_passed_time - Music[song_number].songoffset[difficulty])) / 1000));
 

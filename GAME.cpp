@@ -43,6 +43,7 @@
 #include "NoteTextImage.h"
 #include "WindowTitleSetter.h"
 #include "RetryView.h"
+#include "EscapingView.h"
 
 using namespace std;
 
@@ -369,6 +370,14 @@ void GAME(int song_number, int difficulty,
 	int debug_fail = 1;//0:閉店無し 1:閉店あり
 	int debug_music = 1;//曲を鳴らすかどうか
 	if (*debug == 1)debug_fail = 0;//デバッグモードならデフォルトで閉店無し
+
+	const int ESC_PRESS_TIME = 750;//ESCキー長押し時間
+	int esc_press_counter = 0;
+
+	EscapingView escaping_view = EscapingView(&context);
+	escaping_view.X.value = 640;
+	escaping_view.Y.value = 180;
+
 #define ROOT12_2 1.0594630943592952645618252949463
 	char pitch_step = 0;//ピッチが半音単位でどれだけ上がっているか
 	double pitch = 1;//この数値だけ再生速度を倍にする
@@ -1113,7 +1122,21 @@ void GAME(int song_number, int difficulty,
 		}
 
 		Get_Key_State(Buf, Key, AC);
-		if (Key[KEY_INPUT_ESCAPE] == 1 && *escape == 0 && AllowExit == 1) {
+		if (Key[KEY_INPUT_ESCAPE] >= 1 && *escape == 0 && ClearFlag == 0 && AllowExit == 1) {
+			for (i = 0; i < CRTBuf; i++) {
+				esc_press_counter += 1;
+			}
+			double ratio = (double)esc_press_counter / ESC_PRESS_TIME;
+			escaping_view.setRatio(ratio);
+			escaping_view.alpha.value = 255;
+		}
+		else {
+			esc_press_counter = 0;
+			escaping_view.setRatio(0);
+			escaping_view.alpha.value = 0;
+		}
+
+		if (esc_press_counter >= ESC_PRESS_TIME && *escape == 0 && AllowExit == 1) {
 			*escape = 1;
 			ClearFlag = 2;
 			c_m_draw_counter = 0.00001;
@@ -1482,6 +1505,9 @@ void GAME(int song_number, int difficulty,
 			ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandleBpm);
 		}
 
+		escaping_view.process();
+		escaping_view.draw();
+
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 255));
 		//SOUND
 		if (jingleflag == 0) {
@@ -1543,7 +1569,35 @@ void GAME(int song_number, int difficulty,
 
 		Get_Key_State(Buf, Key, AC);
 
-		if (Key[KEY_INPUT_ESCAPE] == 1 && *escape == 0 && ClearFlag == 0 && AllowExit == 1) {
+		//----CALC----
+		GAME_passed_time = (((double)GetNowCount_d(config) - (double)GAME_start_time) + ((double)debug_time_passed - (double)debug_stop_time));//経過時間計算
+		GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
+		LOOP_passed_time = ((double)GetNowCount_d(config) - GAME_start_time) - time_cash;//1ループにかかった時間を算出
+		time_cash = ((double)GetNowCount_d(config) - GAME_start_time);
+		GAME_passed_time_scroll = (sc_timing + ((GAME_passed_time_for_draw - stop_time - stop_time_sum) - real_timing) * (cscroll));
+
+		CounterRemainTime -= int(CounterRemainTime);
+		CounterRemainTime += LOOP_passed_time;
+		int CRTBuf = int(CounterRemainTime);
+
+		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
+
+		if (Key[KEY_INPUT_ESCAPE] >= 1 && *escape == 0 && ClearFlag == 0 && AllowExit == 1) {
+			for (i = 0; i < CRTBuf; i++) {
+				esc_press_counter += 1;
+			}
+			double ratio = (double)esc_press_counter / ESC_PRESS_TIME;
+			escaping_view.setRatio(ratio);
+			escaping_view.alpha.value = 255;
+		}
+		else {
+			esc_press_counter = 0;
+			escaping_view.setRatio(0);
+			escaping_view.alpha.value = 0;
+		}
+		
+
+		if (esc_press_counter >= ESC_PRESS_TIME && *escape == 0 && ClearFlag == 0 && AllowExit == 1) {
 			*escape = 1;
 			ClearFlag = 2;
 			//c_m_draw_counter = 0;
@@ -1559,24 +1613,14 @@ void GAME(int song_number, int difficulty,
 			playAnimationOnEscAtPlay();
 			if (SkillTestFlag == 0 && Music[song_number].secret != UnlockState::Secret)retryView.show();
 		}
+	
 		if (Key[Button_Shutter] == 1) {//スクリーンショット
 			ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
 		}
 
 		//printfDx("%d %d\n",Key[KEY_INPUT_F],Key[KEY_INPUT_G]);
 
-		//----CALC----
-		GAME_passed_time = (((double)GetNowCount_d(config) - (double)GAME_start_time) + ((double)debug_time_passed - (double)debug_stop_time));//経過時間計算
-		GAME_passed_time_for_draw = GAME_passed_time + config.DisplayTimingOffset;//ディスプレイ遅延補正用経過時間計算
-		LOOP_passed_time = ((double)GetNowCount_d(config) - GAME_start_time) - time_cash;//1ループにかかった時間を算出
-		time_cash = ((double)GetNowCount_d(config) - GAME_start_time);
-		GAME_passed_time_scroll = (sc_timing + ((GAME_passed_time_for_draw - stop_time - stop_time_sum) - real_timing)*(cscroll));
-
-		CounterRemainTime -= int(CounterRemainTime);
-		CounterRemainTime += LOOP_passed_time;
-		int CRTBuf = int(CounterRemainTime);
-
-		ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
+		
 
 		//printfDx("Loop:%f\n", LOOP_passed_time);
 
@@ -3549,6 +3593,9 @@ void GAME(int song_number, int difficulty,
 			coverView.draw(DX_SCREEN_BACK);
 		}
 
+		escaping_view.process();
+		escaping_view.draw();
+
 
 		int ComboBuf = combo;
 		if (SkillTestFlag != 0)ComboBuf = *CourseCombo;//コースモードの時はコース全体のコンボで表示
@@ -3747,8 +3794,13 @@ void GAME(int song_number, int difficulty,
 		if (!CheckHandleASyncLoad(SH_SONG)) {
 			int maxVol = option->op.bgmSoundVol.getVolume();
 			double missVolEasing = ((double)1 - cos(volume * (3.1415 / 2)));//0~1
-			int vol = int(maxVol * BGM_VolTowardResult * debug_music * ((double)songVolume.value/255));
 
+			if (option->op.missEffect.getIndex() == static_cast<int>(OptionItem::MissEffect::OFF)) {
+				//MissEffectがOFFの時はMISS時にBGM音量を変えない
+				missVolEasing = 1;
+			}
+
+			int vol = int(maxVol * missVolEasing * BGM_VolTowardResult * debug_music * ((double)songVolume.value/255));
 			ChangeVolumeSoundMem(vol, SH_SONG);//曲の音量セット
 		}
 

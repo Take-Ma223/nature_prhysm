@@ -175,6 +175,9 @@
     <Filter Include="ソース ファイル\GAME\RetryView">
       <UniqueIdentifier>{08663504-0c22-478b-b9e6-e3195118f1b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\GAME\EscapingView">
+      <UniqueIdentifier>{0daeefae-ca3c-4d01-960d-595d63eab222}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -443,6 +446,9 @@
     </ClCompile>
     <ClCompile Include="TitleLogoView.cpp">
       <Filter>ソース ファイル\TITLE\TitleLogoView</Filter>
+    </ClCompile>
+    <ClCompile Include="EscapingView.cpp">
+      <Filter>ソース ファイル\GAME\EscapingView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -846,6 +852,12 @@
     </ClInclude>
     <ClInclude Include="RetryView.h">
       <Filter>ソース ファイル\GAME\RetryView</Filter>
+    </ClInclude>
+    <ClInclude Include="OptionItemMissEffect.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="EscapingView.h">
+      <Filter>ソース ファイル\GAME\EscapingView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

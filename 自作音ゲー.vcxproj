@@ -210,6 +210,7 @@
     <ClCompile Include="DetailView.cpp" />
     <ClCompile Include="DifficultyRadar.cpp" />
     <ClCompile Include="DxLibUtil.cpp" />
+    <ClCompile Include="EscapingView.cpp" />
     <ClCompile Include="GradationNoteImage.cpp" />
     <ClCompile Include="KeyConfigValidator.cpp" />
     <ClCompile Include="KEY_CONFIG.cpp" />
@@ -304,6 +305,7 @@
     <ClInclude Include="DetailView.h" />
     <ClInclude Include="DifficultyRadar.h" />
     <ClInclude Include="DxLibUtil.h" />
+    <ClInclude Include="EscapingView.h" />
     <ClInclude Include="FileUtil.h" />
     <ClInclude Include="GradationNoteImage.h" />
     <ClInclude Include="KeyConfigValidator.h" />
@@ -357,6 +359,7 @@
     <ClInclude Include="OptionItemHitSound.h" />
     <ClInclude Include="OptionItemHitSoundVol.h" />
     <ClInclude Include="OptionItemLane.h" />
+    <ClInclude Include="OptionItemMissEffect.h" />
     <ClInclude Include="OptionItemMovie.h" />
     <ClInclude Include="OptionItemNote.h" />
     <ClInclude Include="OptionItemNoteOffset.h" />

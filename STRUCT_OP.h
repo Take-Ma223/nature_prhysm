@@ -21,6 +21,7 @@
 #include "OptionItemWindbreak.h"
 #include "OptionItemSpeedAdapter.h"
 #include "OptionItemNoteSymbol.h"
+#include "OptionItemMissEffect.h"
 
 #ifndef _STRUCT_OP
 #define _STRUCT_OP
@@ -38,10 +39,13 @@ namespace OptionItem {
 		BARLINE,
 		DARKNESS,
 		GRADATION,
+		MISS_EFFECT,
 		NOTE_OFFSET,
+
 		SCORETARGET,
 		TARGETSCORE1,
 		TARGETSCORE2,
+
 		THEME,
 		NOTE,
 		NOTE_SYMBOL,
@@ -50,6 +54,7 @@ namespace OptionItem {
 		FXSOUNDVOL,
 		BGMSOUNDVOL,
 		MOVIE,
+
 		SORT
 	};
 
@@ -82,10 +87,13 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		L"ON",
 		L"25%",
 		L"ON",
+		L"BGM FADE",
 		L"0ms",
+
 		L"OFF",
 		L"E",
 		L"RIVAL",
+
 		L"",
 		L"",
 		L"2.arrow",
@@ -94,6 +102,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		L"100%",
 		L"100%",
 		L"ON:NORMAL",
+
 		L"DEFAULT",
 	};
 
@@ -105,20 +114,23 @@ struct OP {//オプション構造体(ロード時に渡す値)
 	}
 
 	OptionItemSpeed speed;
-	OptionItemGauge gauge;
+	OptionItemSpeedAdapter speedAdapter;
 	OptionItemLane lane;
 	OptionItemColor color;
+	OptionItemGauge gauge;
 
-	OptionItemSpeedAdapter speedAdapter;
 	OptionItemWindbreak windbreak;
 	OptionItemFastSlow fastSlow;
 	OptionItemBarline barline;
 	OptionItemDarkness darkness;
 	OptionItemBlackGradation blackGradation;
+	OptionItemMissEffect missEffect;
 	OptionItemNoteOffset noteOffset;
+
 	OptionItemScoreGraph scoreGraph;
 	OptionItemTargetScore1 targetScore1;
 	OptionItemTargetScore2 targetScore2;
+
 	OptionItemTheme theme;
 	OptionItemNote note;
 	OptionItemNoteSymbol noteSymbol;
@@ -127,6 +139,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItemFxSoundVol fxSoundVol;
 	OptionItemBgmSoundVol bgmSoundVol;
 	OptionItemMovie movie;
+
 	OptionItemSort sort;
 
 	vector<OptionItemBase*> list = {
@@ -141,10 +154,13 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		&barline,
 		&darkness,
 		&blackGradation,
+		&missEffect,
 		&noteOffset,
+
 		&scoreGraph,
 		&targetScore1,
 		&targetScore2,
+
 		&theme,
 		&note,
 		&noteSymbol,
@@ -153,6 +169,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		&fxSoundVol,
 		&bgmSoundVol,
 		&movie,
+
 		&sort,
 	};
 
@@ -162,7 +179,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 23;//オプションの数
+	static const int OPTION_NUM = 24;//オプションの数
 
 	wchar_t* OptionName[OPTION_NUM] = { 
 		L"SPEED",
@@ -170,15 +187,19 @@ typedef struct Option {//オプション構造体(全体)
 		L"LANE",
 		L"COLOR",
 		L"GAUGE",
+
 		L"WINDBREAK",
 		L"FAST/SLOW",
 		L"BARLINE",
 		L"NIGHT",
 		L"GRADATION",
+		L"MISS EFFECT",
 		L"NOTE OFFSET",
+
 		L"SCORE GRAPH",
 		L"TARGET SCORE1",
 		L"TARGET SCORE2",
+
 		L"THEME",
 		L"NOTE",
 		L"NOTE SYMBOL",
@@ -187,6 +208,7 @@ typedef struct Option {//オプション構造体(全体)
 		L"FX VOL",
 		L"BGM VOL",
 		L"MOVIE",
+
 		L"SORT"
 	};
 
@@ -197,6 +219,7 @@ typedef struct Option {//オプション構造体(全体)
 		OptionItem::BannerColor::GREEN,
 		OptionItem::BannerColor::GREEN,
 
+		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,

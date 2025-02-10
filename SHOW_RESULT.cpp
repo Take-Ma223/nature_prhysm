@@ -1553,7 +1553,8 @@ void GetBG(wchar_t *SearchPass, wchar_t *ImagePass) {//背景画像を指定フ�
 			dxLibFinishProcess();
 			return;
 		}
-		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを除いて通常のファイルを見つけた
+		bool is_directory = lp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && !is_directory) {//自身と親以外のディレクトリを除いて通常のファイルを見つけた
 			ImageCount++;
 		}
 	} while (FindNextFile(hFind_Images, &lp));//何も見つからなかったら0になりループを抜ける
@@ -1575,7 +1576,8 @@ void GetBG(wchar_t *SearchPass, wchar_t *ImagePass) {//背景画像を指定フ�
 			dxLibFinishProcess();
 			return;
 		}
-		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
+		bool is_directory = lp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && !is_directory) {//自身と親以外のディレクトリを見つけた
 
 			if (ImageCount == ReadIndex) {//読み込むと決めた画像なので読み込む
 				break;

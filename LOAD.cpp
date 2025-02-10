@@ -122,7 +122,9 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 		return;
 	}
 	do {
-		if ((wcscmp(folder_lp.cFileName, L".") != 0) && (wcscmp(folder_lp.cFileName, L"..") != 0) && (folder_lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
+		bool is_directory = folder_lp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+
+		if ((wcscmp(folder_lp.cFileName, L".") != 0) && (wcscmp(folder_lp.cFileName, L"..") != 0) && is_directory) {//自身と親以外のディレクトリを見つけた
 
 		    //----曲フォルダ探し----(Music.SongPath[][]にnpsファイルのパスを入れる)
 			sprintfDx(Path, L"songs/%s/*", folder_lp.cFileName);
@@ -187,7 +189,7 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 				}
 				*/
 
-				if ((wcscmp(song_lp.cFileName, L".") != 0) && (wcscmp(song_lp.cFileName, L"..") != 0) && (song_lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
+				if ((wcscmp(song_lp.cFileName, L".") != 0) && (wcscmp(song_lp.cFileName, L"..") != 0) && is_directory) {//自身と親以外のディレクトリを見つけた
 					//printfDx("曲フォルダ発見!\n");
 					//wcscpy_s(folder, lp.cFileName);
 					//wcscpy_s(Path, L"songs/official/");
@@ -350,85 +352,6 @@ void LOAD(LIST *song_folder, Song *Music, int *NumberOfSongs, SECRET *secret, Sk
 		dxLibFinishProcess();
 		return;
 	}
-
-	/*
-	//userフォルダの探索
-	wcscpy_s(Path, L"songs/user/");
-	hFind_Songs = FindFirstFile(L"songs/user/*", &lp);//Songフォルダの最初の探索
-	do {
-		if (ProcessMessage() != 0) {
-			dxLibFinishProcess();
-			return;
-		}
-
-		if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
-																																		 //printfDx("曲フォルダ発見!\n");
-			wcscpy_s(folder, lp.cFileName);
-			wcscpy_s(Path, L"songs/user/");
-			wcscat_s(Path, folder);
-			wcscpy_s(Music[i].FolderPath, Path);//フォルダのパスを保存
-			wcscat_s(Path, L"/*.nps");//SongPath[i]はsongs/folder/*.npsになる
-
-			wcscpy_s(Music[i].SaveFolder, L"score/user/");//セーブデータフォルダー名を格納
-			wcscat_s(Music[i].SaveFolder, folder);
-
-			wcscpy_s(Music[i].RivalSaveFolder, L"score_rival/user/");//ライバルセーブデータフォルダー名を格納
-			wcscat_s(Music[i].RivalSaveFolder, folder);
-
-			hFind_nps = FindFirstFile(Path, &lp);
-			do {
-				wcscpy_s(Path, L"songs/user/");
-				wcscat_s(Path, folder);
-				wcscat_s(Path, L"/");
-				wcscat_s(Path, lp.cFileName);
-				j = 0;
-				if (wcscmp(lp.cFileName, L"1.nps") == 0) {
-					j = 1;
-					Music[i].exist[j] = 1;
-				}
-				if (wcscmp(lp.cFileName, L"2.nps") == 0) {
-					j = 2;
-					Music[i].exist[j] = 1;
-				}
-				if (wcscmp(lp.cFileName, L"3.nps") == 0) {
-					j = 3;
-					Music[i].exist[j] = 1;
-				}
-				if (wcscmp(lp.cFileName, L"4.nps") == 0) {
-					j = 4;
-					Music[i].exist[j] = 1;
-				}
-
-				wcscpy_s(Music[i].SongPath[j], Path);
-				GAME_LOAD(i, j, note, lane_dummy, 0, &Cdiff_dummy, &opt_dummy, bpmchange,scrollchange, stopSequence, &hash, Music, &TimeToEndScrollDummy,&playing_time_dummy);
-				folder_insert(song_folder, i, j, Music);
-
-				Music[i].hash[j] = hash;
-			} while (FindNextFile(hFind_nps, &lp));
-
-			//隠し曲設定があるか確認
-			if (secret_LOAD(Music, i) == 1) {//隠し曲だったら
-				secret->song_number[secret->total] = i;//隠し曲番号を格納
-
-													   //解禁しているか確認
-				secret_save_LOAD(secret, secret->total, Music[i].SaveFolder);//隠し曲のセーブファイル確認
-				if (secret->get_song_number[secret->total] == 1) {//解禁していた
-					Music[i].secret = 2;
-				}
-				secret->total++;//隠し曲総数+1
-			}
-
-			folder_insert_season(song_folder, i, Music);
-			//song_folder->folder[0][song_folder->folder_c[0]].song_number = i;
-			//song_folder->folder_c[0]++;
-			i++;//曲番号
-			if (FindClose(hFind_nps) == 0) {
-				dxLibFinishProcess();
-				return;
-			}
-		}
-	} while (FindNextFile(hFind_Songs, &lp));//何も見つからなかったら0になりループを抜ける
-	*/
 
 	//隠し曲が全解禁されているか確認
 	secret_all_get(secret);//全解禁されているならall_getは1

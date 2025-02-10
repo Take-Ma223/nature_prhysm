@@ -24,7 +24,8 @@ struct FileUtil {
 			if (ProcessMessage() != 0) {
 				dxLibFinishProcess();
 			}
-			if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && (lp.dwFileAttributes == FILE_ATTRIBUTE_DIRECTORY)) {//自身と親以外のディレクトリを見つけた
+			bool is_directory = lp.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY;
+			if ((wcscmp(lp.cFileName, L".") != 0) && (wcscmp(lp.cFileName, L"..") != 0) && is_directory) {//自身と親以外のディレクトリを見つけた
 				pathList.push_back(lp.cFileName);
 			}
 		} while (FindNextFile(hFind_HitSounds, &lp));//何も見つからなかったら0になりループを抜ける

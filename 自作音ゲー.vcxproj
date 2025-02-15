@@ -270,6 +270,8 @@
     <ClCompile Include="GetValueFromController.cpp" />
     <ClCompile Include="Processable.cpp" />
     <ClCompile Include="SaveDataSaveLoad.cpp" />
+    <ClCompile Include="ScoreGraphDiffView.cpp" />
+    <ClCompile Include="ScoreGraphNumberView.cpp" />
     <ClCompile Include="score_cell_operation.cpp" />
     <ClCompile Include="ScreenShot.cpp" />
     <ClCompile Include="secret_LOAD.cpp" />
@@ -378,6 +380,8 @@
     <ClInclude Include="Processable.h" />
     <ClInclude Include="RetryView.h" />
     <ClInclude Include="SaveDataSaveLoad.h" />
+    <ClInclude Include="ScoreGraphDiffView.h" />
+    <ClInclude Include="ScoreGraphNumberView.h" />
     <ClInclude Include="ScreenShot.h" />
     <ClInclude Include="ShowErrorName.h" />
     <ClInclude Include="ShowFps.h" />

@@ -178,6 +178,9 @@
     <Filter Include="ソース ファイル\GAME\EscapingView">
       <UniqueIdentifier>{0daeefae-ca3c-4d01-960d-595d63eab222}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\GAME\ScoreGraphView">
+      <UniqueIdentifier>{d1be1c19-774b-4a5c-8e37-a52e1825e676}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -449,6 +452,12 @@
     </ClCompile>
     <ClCompile Include="EscapingView.cpp">
       <Filter>ソース ファイル\GAME\EscapingView</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreGraphNumberView.cpp">
+      <Filter>ソース ファイル\GAME\ScoreGraphView</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreGraphDiffView.cpp">
+      <Filter>ソース ファイル\GAME\ScoreGraphView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -858,6 +867,12 @@
     </ClInclude>
     <ClInclude Include="EscapingView.h">
       <Filter>ソース ファイル\GAME\EscapingView</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreGraphNumberView.h">
+      <Filter>ソース ファイル\GAME\ScoreGraphView</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreGraphDiffView.h">
+      <Filter>ソース ファイル\GAME\ScoreGraphView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

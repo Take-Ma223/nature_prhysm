@@ -15,6 +15,9 @@ void NumberView::beforeDrawProcess(int drawScreen)
 
 	int numberWidth = format.getHandles().getNumbers()[0].getSize().x;
 	int floatingOffset = format.getHandles().getPoint().getSize().x + format.getInterval();
+	
+	SetDrawMode(DX_DRAWMODE_BILINEAR);
+	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, alpha.value);
 
 	//âEÇ©ÇÁç∂Ç…ï`âÊ
 	for (int i = 0; i < digit; i++) {

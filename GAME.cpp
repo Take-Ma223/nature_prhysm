@@ -44,6 +44,8 @@
 #include "WindowTitleSetter.h"
 #include "RetryView.h"
 #include "EscapingView.h"
+#include "ScoreGraphNumberView.h"
+#include "ScoreGraphDiffView.h"
 
 using namespace std;
 
@@ -195,6 +197,9 @@ void GAME(int song_number, int difficulty,
 		context.getAsset()->img(L"img/gradation.png").getHandle(),
 		true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+	DrawableInitParam high_score_diff_init_param(Cordinate(960, 450), CenterRatio(0, 0));
+	ScoreGraphDiffView high_score_diff(&context, high_score_diff_init_param);
 
 	GAME_SH SH;
 	int AllowSound[3][4] = { { 1,1,1,1 },{ 1,1,1,1 },{ 1,1,1,1 } };//そのフレームでコントローラを叩いた時の音を出すか コントローラの並び順と同じ(0:B 1:G 2:R)
@@ -1403,7 +1408,9 @@ void GAME(int song_number, int difficulty,
 			DrawBox(960 + 160, 482, 960 + 80 + 160, 482 - 0.04 * targetScore * (gauge_draw_counter / 100), GetColor(100, 50, 50), TRUE);
 			DrawBox(960 + 240, 482, 960 + 80 + 240, 482 - 0.04 * targetScore2 * (gauge_draw_counter / 100), GetColor(100, 100, 50), TRUE);
 
-
+			high_score_diff.setValue(0,0,0,0);
+			high_score_diff.alpha.value = draw_alpha * 255;
+			high_score_diff.draw();
 		}
 
 
@@ -3457,7 +3464,7 @@ void GAME(int song_number, int difficulty,
 		int boxLineAlphaGeneral = viewAlphaRatio * getAlpha(255, 255, 0);
 		int scoreGraphAlphaGeneral = viewAlphaRatio * getAlpha(160, 60, 0, 160);
 		int judgeBoxAlphaGeneral = viewAlphaRatio * getAlpha(80, 60, 0, 80);
-
+		int scoreDiffAlphaGeneral = viewAlphaRatio * getAlpha(255, 160, 0);
 		if (option->op.scoreGraph.getIndex() != (int)OptionItem::ScoreGraph::OFF) {
 			DrawBoxWithLine(960, 482, 960 + 80, 482 + 40, GetColor(50, 50, 255), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//現在のスコア
 			DrawBoxWithLine(960 + 80, 482, 960 + 80 + 80, 482 + 40, GetColor(50, 255, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);//ハイスコア
@@ -3489,6 +3496,15 @@ void GAME(int song_number, int difficulty,
 				DrawBoxWithLine(960 + 160, 482 - 0.04 * targetScore * noteCountRatio, 960 + 80 + 160, 482, GetColor(255, 50, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);
 				DrawBoxWithLine(960 + 240, 482 - 0.04 * targetScore2 * noteCountRatio, 960 + 80 + 240, 482, GetColor(255, 255, 50), scoreGraphAlphaGeneral, boxLineAlphaGeneral);
 			}
+
+			high_score_diff.setValue(
+				score,
+				highScore.score * noteCountRatio,
+				targetScore * noteCountRatio,
+				targetScore2 * noteCountRatio
+			);
+			high_score_diff.alpha.value = viewAlphaRatio * scoreDiffAlphaGeneral;
+			high_score_diff.draw();
 		}
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, judgeBoxAlphaGeneral);
@@ -4184,67 +4200,6 @@ void drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, in
 		}
 	}
 	SetDrawMode(DX_DRAWMODE_NEAREST);
-
-
-	//for (int j = 0; j <= 3; j++) {
-	//		for (int i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツテキストの描画
-	//			if (note[j][i].fall == NoteFall::Faling) {
-	//				if (note[j][i].group == NoteGroup::Single) {
-	//					SetDrawBlendMode(BlendMode, BlendVal);
-
-	//					DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color], TRUE);//単ノートの場合
-
-	//				}
-
-	//				if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
-	//					if (note[j][i].y >= note[j][i+1].y) {//次が自身より上にある場合
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//					else {////次が自身より下にある場合
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i+1].LN_k==true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//				}
-	//				if (note[j][i].group == NoteGroup::LongNoteMiddle) {//中間点ノーツについて
-	//					bool isBeforeUnder = note[j][i].y <= note[j][i - 1].y;
-	//					bool isNextUpper = note[j][i].y >= note[j][i + 1].y;
-
-
-	//					if (isBeforeUnder && isNextUpper) {//前が自身より下、次が自身より上  ／／
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//					else if(!isBeforeUnder && isNextUpper) {//前が自身より上、次が自身より上  ＼／
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//					else if (isBeforeUnder && !isNextUpper) {//前が自身より下、次が自身より下  ／＼
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//					else if(!isBeforeUnder && !isNextUpper){//前が自身より上、次が自身より下 ＼＼
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						if (note[j][i].color_init != note[j][i + 1].color_init || note[j][i + 1].LN_k == true)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//				}
-	//				if (note[j][i].group == NoteGroup::LongNoteEnd) {//終点について
-	//					if (note[j][i].LN_k == true) {
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)NoteColor::K], TRUE);
-	//					}else if (note[j][i-1].y >= note[j][i].y) {//前が自身より下にある場合
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//					else {//前が自身より上にある場合
-	//						SetDrawBlendMode(BlendMode, BlendVal);
-	//						DrawGraph(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
-	//					}
-	//				}
-
-	//			}
-	//		}
-	//	}
 }
 
 void DrawFullComboRainbow(int *play, int *step, int Time, int baseTime, int effectResourceHandle, int *playingEffectHandle, int PFC) {//フルコンボエフェクト

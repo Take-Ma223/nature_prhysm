@@ -30,8 +30,8 @@ namespace OptionItem {
 	enum class Name : int {
 		SPEED,
 		SPEED_ADAPTER,
-		COLOR,
 		LANE,
+		COLOR,
 		GAUGE,
 
 		WINDBREAK,

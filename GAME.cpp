@@ -3826,13 +3826,16 @@ void GAME(int song_number, int difficulty,
 		//printfDx("%d\n", int(((double)44100 * (GAME_passed_time - Music[song_number].songoffset[difficulty])) / 1000));
 
 		isOverSongPlayTiming = (GAME_passed_time + TimePerFrame > Music[song_number].songoffset[difficulty]);
+		LONGLONG song_play_position = GetCurrentPositionSoundMem(SH_SONG);
+		LONGLONG song_play_position_should_be = LONGLONG(((double)44100 * pitch * ((GAME_passed_time + TimePerFrame) - Music[song_number].songoffset[difficulty])) / 1000);
+
 		if (isOverSongPlayTiming
 			&& (CheckSoundMem(SH_SONG) == 0 && debug_stop == 0)
 			&& (ClearFlag == 0) 
 			&& (bgmplay == 0)) {
 			// 1/60sの後ろずれを防ぐためフレーム時間分前倒しで再生
 			if (FirstBgmPlay == 0) {//最初のBGM再生でないときのみ再生位置変更処理を行う(先頭が削れて再生されるのを防ぐため)
-				SetCurrentPositionSoundMem(int(((double)44100 * pitch * ((GAME_passed_time + TimePerFrame) - Music[song_number].songoffset[difficulty])) / 1000), SH_SONG);
+				SetCurrentPositionSoundMem(song_play_position_should_be, SH_SONG);
 			}
 
 			PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);//曲の再生開始
@@ -3840,13 +3843,23 @@ void GAME(int song_number, int difficulty,
 			bgmplay = 1;
 			FirstBgmPlay = 0;
 		}
-		if (!isOverSongPlayTiming){
+
+		if(isOverSongPlayTiming && debug_stop == 0 && (ClearFlag == 0)){
+			//0.016秒以上譜面とBGMがずれていたら再再生 (44100*0.016 = 735)
+			int diff_threathold = 735;
+			if (std::abs(song_play_position_should_be - song_play_position) >= diff_threathold) {
+				StopSoundMem(SH_SONG);
+				SetCurrentPositionSoundMem(song_play_position_should_be, SH_SONG);
+				PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);//曲の再生開始
+			}
+		}
+
+		if(!isOverSongPlayTiming) {
 			if (FirstBgmPlay == 0 && CheckSoundMem(SH_SONG) == 0) {
 				FirstBgmPlay = 1;
 				SetCurrentPositionSoundMem(0, SH_SONG);
 			}
 		}
-
 		isOverMoviePlayTiming = (GAME_passed_time + TimePerFrame + 0.001*movieFrameTime > Music[song_number].movieoffset[difficulty]);
 		if (isOverMoviePlayTiming
 			&& (debug_stop == 0)

@@ -3844,7 +3844,7 @@ void GAME(int song_number, int difficulty,
 			FirstBgmPlay = 0;
 		}
 
-		if(isOverSongPlayTiming && debug_stop == 0 && (ClearFlag == 0)){
+		if(CheckSoundMem(SH_SONG) == 1 && isOverSongPlayTiming && debug_stop == 0 && (ClearFlag == 0)){
 			//0.016秒以上譜面とBGMがずれていたら再再生 (44100*0.016 = 735)
 			int diff_threathold = 735;
 			if (std::abs(song_play_position_should_be - song_play_position) >= diff_threathold) {

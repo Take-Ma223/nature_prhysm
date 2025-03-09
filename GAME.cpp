@@ -516,6 +516,10 @@ void GAME(int song_number, int difficulty,
 	SongSub MusicSub;
 	SpeedBuffer speedBuffer = SpeedBuffer(note, j_n_n);
 
+	DATEDATA DateBuf;
+	GetDateTime(&DateBuf);
+	int rand_seed = DateBuf.Hour * 3600 + DateBuf.Min * 60 + DateBuf.Sec;
+	SRand(rand_seed);//乱数シード値決定
 	GAME_LOAD(song_number, difficulty, note, barline, laneCordinateX, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
 
 	speedBuffer.updateAverage();
@@ -1700,6 +1704,8 @@ void GAME(int song_number, int difficulty,
 
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time / ROOT12_2;//再生位置のずれを補正 GAME_passed_time-GAME_passed_time/ROOT12_2が差 
+					
+					SRand(rand_seed);//乱数シード値設定
 					GAME_LOAD(song_number, difficulty, note, barline, laneCordinateX, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 					autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1731,6 +1737,8 @@ void GAME(int song_number, int difficulty,
 
 					debug_warp = 1;
 					debug_time_passed -= GAME_passed_time - GAME_passed_time * ROOT12_2;//再生位置のずれを補正 GAME_passed_time - GAME_passed_time * ROOT12_2が差 
+					
+					SRand(rand_seed);//乱数シード値設定
 					GAME_LOAD(song_number, difficulty, note, barline, laneCordinateX, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScroll,&playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 					autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 					score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1798,6 +1806,9 @@ void GAME(int song_number, int difficulty,
 				double startTime = GetNowCount_d(config);
 
 				debug_warp = 1;
+
+				rand_seed = int(GAME_passed_time_for_draw);//乱数シード変更
+				SRand(rand_seed);//乱数シード値設定
 				GAME_LOAD(song_number, difficulty, note, barline, laneCordinateX, 0, &Cdiff, option, bpmchange,scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 				score_note = (double)score_MAX / Music[song_number].total_note[difficulty];//音符一つの得点を決める
@@ -1897,6 +1908,7 @@ void GAME(int song_number, int difficulty,
 
 				//譜面再読み込み
 				debug_warp = 1;
+				SRand(rand_seed);//乱数シード値設定
 				GAME_LOAD(song_number, difficulty, note, barline, laneCordinateX, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, pitch);//noteに譜面情報を入れる(譜面部分のロード)
 				autoDifficultyPredictionResult = adp.getDifficulty(Music[song_number], difficulty);
 

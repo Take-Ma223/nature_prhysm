@@ -218,6 +218,13 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 			}
 		}
 
+		if (wcscmp(L"USE_DEFAULT_FONT", sharp1) == 0) {
+			wchar_t Val[9];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->UseDefaultFont = _wtoi(Val);//数値格納
+		}
+
 
 		if (wcscmp(L"BASE_FONT", sharp1) == 0) {
 			wchar_t Val[256];
@@ -251,6 +258,10 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
 
 		config->Fps = RefreshRate;
+	}
+
+	if (config->UseDefaultFont == TRUE) {
+		config->BaseFont = Config().BaseFont;
 	}
 
 	FileRead_close(fp);

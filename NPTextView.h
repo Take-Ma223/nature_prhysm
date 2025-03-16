@@ -22,8 +22,8 @@ public:
 
     void setText(NPTextViewParam p) {
         frontText.get()->setText(getFrontTextViewParam(p));
-        shadowText.get()->setText(getShadowTextViewParam(p));
-        makeScreen(Size(frontText.get()->getSize().x + 2, frontText.get()->getSize().y + 2));
+//        shadowText.get()->setText(getShadowTextViewParam(p));
+        makeScreen(Size(frontText.get()->getSize().x + 0, frontText.get()->getSize().y + 0));
     }
 
 protected:
@@ -38,18 +38,18 @@ protected:
             )
         );
 
-        DrawableInitParam shadowDrawableParam = DrawableInitParam(Cordinate(2, 2));
-        shadowText = unique_ptr<TextView>(new
-            TextView(
-                c,
-                getShadowTextViewParam(npTextViewInitParam),
-                shadowDrawableParam
-            )
-        );
+        //DrawableInitParam shadowDrawableParam = DrawableInitParam(Cordinate(2, 2));
+        //shadowText = unique_ptr<TextView>(new
+        //    TextView(
+        //        c,
+        //        getShadowTextViewParam(npTextViewInitParam),
+        //        shadowDrawableParam
+        //    )
+        //);
 
-        makeScreen(Size(frontText.get()->getSize().x + 2, frontText.get()->getSize().y + 2));
+        makeScreen(Size(frontText.get()->getSize().x + 0, frontText.get()->getSize().y + 0));
 
-        addDrawable(shadowText.get());
+        //addDrawable(shadowText.get());
         addDrawable(frontText.get());
     }
 

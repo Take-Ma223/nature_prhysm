@@ -138,10 +138,7 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 	SH_TEST[2] = LoadSoundMem(L"sound/3.wav", 1);
 	*/
 
-	ChangeFont(config.BaseFont.c_str());
-	SetFontThickness(9);
-	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(26);
+	int FontHandle = CreateFontToHandle(config.BaseFont.c_str(), 26, 9, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);//フォントハンドル
 
 	NPVsync npVsync = NPVsync(config.Vsync, config.Fps);
 	auto flag = ShowFlag(); flag.version = true;
@@ -259,8 +256,8 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 					DrawBoxWithLine(640 - 240, 470, 640 + 240, 510, GetColor(100, 100, 100));
 
 					wchar_t* str1 = L"\"注意:インターネットランキングで公開されるため個人情報は入力しないでください\"";
-					int width1 = GetDrawStringWidth(str1, wcslen(str1));
-					ShowExtendedStrFit(640, 430, str1, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+					int width1 = GetDrawStringWidthToHandle(str1, wcslen(str1), FontHandle);
+					ShowExtendedStrFitToHandle(640, 430, str1, width1, 1280, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 					wchar_t strbuf[17] = L"";
 					KeyInputString(410, 480,
@@ -275,8 +272,8 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 
 					wchar_t str2[64];
 					sprintfDx(str2, L"%sに変更しました", strbuf);
-					width1 = GetDrawStringWidth(str2, wcslen(str2));
-					ShowExtendedStrFit(640, 530, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+					width1 = GetDrawStringWidthToHandle(str2, wcslen(str2), FontHandle);
+					ShowExtendedStrFitToHandle(640, 530, str2, width1, 1280, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 					ScreenFlip();
 					Sleep(2000);
 
@@ -287,8 +284,8 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 					DrawBoxWithLine(640 - 240, 470, 640 + 240, 510, GetColor(100, 100, 100));
 
 					wchar_t* str1 = L"\"ライバルに設定したいプレーヤーのIDを半角数字で入力してください\"";
-					int width1 = GetDrawStringWidth(str1, wcslen(str1));
-					ShowExtendedStrFit(640, 430, str1, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+					int width1 = GetDrawStringWidthToHandle(str1, wcslen(str1), FontHandle);
+					ShowExtendedStrFitToHandle(640, 430, str1, width1, 1280, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 					wchar_t strbuf[17] = L"";
 					KeyInputString(410, 480,
@@ -303,8 +300,8 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 
 					wchar_t str2[64];
 					sprintfDx(str2, L"RIVAL ID:%dに設定しました", ir->rivalID);
-					width1 = GetDrawStringWidth(str2, wcslen(str2));
-					ShowExtendedStrFit(640, 530, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+					width1 = GetDrawStringWidthToHandle(str2, wcslen(str2), FontHandle);
+					ShowExtendedStrFitToHandle(640, 530, str2, width1, 1280, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 					ScreenFlip();
 					Sleep(2000);
 				}
@@ -326,8 +323,8 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 					LoadIRSetting(ir);
 
 
-					width1 = GetDrawStringWidth(str, wcslen(str));
-					ShowExtendedStrFit(640, 500, str, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+					width1 = GetDrawStringWidthToHandle(str, wcslen(str), FontHandle);
+					ShowExtendedStrFitToHandle(640, 500, str, width1, 1280, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 					ScreenFlip();
 					Sleep(2000);
 				}
@@ -386,8 +383,8 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 									int width1;
 									wchar_t str2[64];
 									sprintfDx(str2, L"キー配置設定を保存しました");
-									width1 = GetDrawStringWidth(str2, wcslen(str2));
-									ShowExtendedStrFit(640, 500, str2, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+									width1 = GetDrawStringWidthToHandle(str2, wcslen(str2), FontHandle);
+									ShowExtendedStrFitToHandle(640, 500, str2, width1, 1280, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 									ScreenFlip();
 									Sleep(2000);
 									keyConfigSettingFlag = 0;
@@ -538,23 +535,23 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 		if (stat == STATE_PRESS_ANY_KEY) {
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, str_press_key_alpha.value);
 			wchar_t* str = L"\"Press Any Key\"";
-			int width = GetDrawStringWidth(str, wcslen(str));
-			ShowExtendedStrFit(640, 590, str, width, 300, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+			int width = GetDrawStringWidthToHandle(str, wcslen(str), FontHandle);
+			ShowExtendedStrFitToHandle(640, 590, str, width, 300, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 		}
 		else if (stat == STATE_SELECT_MENU) {
 			SetDrawBright(255, 255, 255);
 
 			wchar_t* str1 = L"\"GAME START\"";
-			int width1 = GetDrawStringWidth(str1, wcslen(str1));
-			ShowExtendedStrFit(640, 590, str1, width1, 300, config, menuSelectStat == MENU_GAME_START ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width1 = GetDrawStringWidthToHandle(str1, wcslen(str1), FontHandle);
+			ShowExtendedStrFitToHandle(640, 590, str1, width1, 300, config, FontHandle, menuSelectStat == MENU_GAME_START ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 			wchar_t* str2 = L"\"IR SETTING\"";
-			int width2 = GetDrawStringWidth(str2, wcslen(str2));
-			ShowExtendedStrFit(640, 620, str2, width2, 300, config, menuSelectStat == MENU_IR_SETTING ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width2 = GetDrawStringWidthToHandle(str2, wcslen(str2), FontHandle);
+			ShowExtendedStrFitToHandle(640, 620, str2, width2, 300, config, FontHandle, menuSelectStat == MENU_IR_SETTING ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 			wchar_t* str3 = L"\"KEY CONFIG\"";
-			int width3 = GetDrawStringWidth(str3, wcslen(str3));
-			ShowExtendedStrFit(640, 650, str3, width3, 300, config, menuSelectStat == MENU_KEY_CONFIG ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width3 = GetDrawStringWidthToHandle(str3, wcslen(str3), FontHandle);
+			ShowExtendedStrFitToHandle(640, 650, str3, width3, 300, config, FontHandle, menuSelectStat == MENU_KEY_CONFIG ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 
 		}
@@ -569,33 +566,33 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 				sprintfDx(str1, L"\"インターネットランキング参加:しない\"");
 			}
 
-			int width1 = GetDrawStringWidth(str1, wcslen(str1));
-			ShowExtendedStrFit(640, 590, str1, width1, 500, config, IRMenuStat == IRMENU_PARTICIPATE ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width1 = GetDrawStringWidthToHandle(str1, wcslen(str1), FontHandle);
+			ShowExtendedStrFitToHandle(640, 590, str1, width1, 500, config, FontHandle, IRMenuStat == IRMENU_PARTICIPATE ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 			wchar_t* str2 = L"\"PLAYER NAME変更\"";
-			int width2 = GetDrawStringWidth(str2, wcslen(str2));
-			ShowExtendedStrFit(640, 620, str2, width2, 300, config, IRMenuStat == IRMENU_PLAYER_NAME ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width2 = GetDrawStringWidthToHandle(str2, wcslen(str2), FontHandle);
+			ShowExtendedStrFitToHandle(640, 620, str2, width2, 300, config, FontHandle, IRMenuStat == IRMENU_PLAYER_NAME ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 			wchar_t* str3 = L"\"RIVAL ID 設定\"";
-			int width3 = GetDrawStringWidth(str3, wcslen(str3));
-			ShowExtendedStrFit(640, 650, str3, width3, 300, config, IRMenuStat == IRMENU_SET_RIVAL_ID ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width3 = GetDrawStringWidthToHandle(str3, wcslen(str3), FontHandle);
+			ShowExtendedStrFitToHandle(640, 650, str3, width3, 300, config, FontHandle, IRMenuStat == IRMENU_SET_RIVAL_ID ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 			wchar_t* str4 = L"\"戻る\"";
-			int width4 = GetDrawStringWidth(str4, wcslen(str4));
-			ShowExtendedStrFit(640, 680, str4, width4, 300, config, IRMenuStat == IRMENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width4 = GetDrawStringWidthToHandle(str4, wcslen(str4), FontHandle);
+			ShowExtendedStrFitToHandle(640, 680, str4, width4, 300, config, FontHandle, IRMenuStat == IRMENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 
 			wchar_t* str5 = L"―――注意―――";
-			int width5 = GetDrawStringWidth(str5, wcslen(str5));
-			ShowExtendedStrFit(640, 315, str5, width5, 800, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+			int width5 = GetDrawStringWidthToHandle(str5, wcslen(str5), FontHandle);
+			ShowExtendedStrFitToHandle(640, 315, str5, width5, 800, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 			wchar_t* str6 = L"インターネットランキングに参加すると";
-			int width6 = GetDrawStringWidth(str6, wcslen(str6));
-			ShowExtendedStrFit(640, 345, str6, width6, 800, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+			int width6 = GetDrawStringWidthToHandle(str6, wcslen(str6), FontHandle);
+			ShowExtendedStrFitToHandle(640, 345, str6, width6, 800, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 			wchar_t* str7 = L"プレイヤー名、プレイした譜面の情報、スコアがサーバーに送信されます";
-			int width7 = GetDrawStringWidth(str7, wcslen(str7));
-			ShowExtendedStrFit(640, 375, str7, width7, 1000, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+			int width7 = GetDrawStringWidthToHandle(str7, wcslen(str7), FontHandle);
+			ShowExtendedStrFitToHandle(640, 375, str7, width7, 1000, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 
 		}
@@ -603,17 +600,17 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 			SetDrawBright(255, 255, 255);
 
 			wchar_t* str1 = L"\"キー設定を変更する\"";
-			int width1 = GetDrawStringWidth(str1, wcslen(str1));
-			ShowExtendedStrFit(640, 590, str1, width1, 300, config, KeyConfigMenuStat == KEY_CONFIG_MENU_SETTING ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width1 = GetDrawStringWidthToHandle(str1, wcslen(str1), FontHandle);
+			ShowExtendedStrFitToHandle(640, 590, str1, width1, 300, config, FontHandle, KeyConfigMenuStat == KEY_CONFIG_MENU_SETTING ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 			wchar_t* str2 = L"\"戻る\"";
-			int width2 = GetDrawStringWidth(str2, wcslen(str2));
-			ShowExtendedStrFit(640, 620, str2, width2, 300, config, KeyConfigMenuStat == KEY_CONFIG_MENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
+			int width2 = GetDrawStringWidthToHandle(str2, wcslen(str2), FontHandle);
+			ShowExtendedStrFitToHandle(640, 620, str2, width2, 300, config, FontHandle, KeyConfigMenuStat == KEY_CONFIG_MENU_EXIT ? GetColor(255, 255, 255) : GetColor(100, 100, 100), GetColor(0, 0, 0));
 
 			if (keyConfigSettingFlag == 1) {
 				wchar_t* str1 = L"\"設定するキーを順に押してください\"";
-				int width1 = GetDrawStringWidth(str1, wcslen(str1));
-				ShowExtendedStrFit(640, 400, str1, width1, 1280, config, GetColor(255, 255, 255), GetColor(0, 0, 0));
+				int width1 = GetDrawStringWidthToHandle(str1, wcslen(str1), FontHandle);
+				ShowExtendedStrFitToHandle(640, 400, str1, width1, 1280, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 
 				DrawBoxWithLine(640 - 80, 440, 640 - 40, 480, settingKeyPosition.y == 0 && settingKeyPosition.x == 0 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);
 				DrawBoxWithLine(640 - 40, 440, 640, 480, settingKeyPosition.y == 0 && settingKeyPosition.x == 1 ? GetColor(brightness, brightness, brightness) : GetColor(50, 50, 255), 150);

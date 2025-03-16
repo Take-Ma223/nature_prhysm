@@ -27,7 +27,7 @@ public:
 		makeScreen(Size(sizeX, sizeY));
 		alpha.value = 0;
 		
-		font = FontInfo(wstring(c->getConfig()->BaseFont), 17, 1, FontType::ANTIALIASING_EDGE_16X16);
+		font = FontInfo(wstring(c->getConfig()->BaseFont), 17, 1, FontType::ANTIALIASING_EDGE_16X16, 1);
 	}
 
 	FontInfo font;

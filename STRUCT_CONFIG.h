@@ -38,7 +38,8 @@ typedef struct Config {//コンフィグデータ
 
 	int NoteSymbol[9] = {0,0,0,0,0,0,0,0,0};
 
-	std::wstring BaseFont = L"メイリオ";
+	std::wstring BaseFont = L"Noto Sans CJK JP Black";
+	int UseDefaultFont = 1;
 	//std::wstring AlternativeFont = L"メイリオ";
 
 

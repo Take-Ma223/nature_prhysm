@@ -7,7 +7,9 @@ void FontSet::registFont(FontInfo fontInfo)
 		fontInfo.fontName.c_str(),
 		fontInfo.size,
 		fontInfo.thick,
-		(int)(fontInfo.fontType)
+		(int)(fontInfo.fontType),
+		-1,
+		fontInfo.edge_size
 	);
 	if (handle == -1) {
 		throw std::runtime_error("ÉtÉHÉìÉgÇÃì«Ç›çûÇ›Ç…é∏îsÇµÇ‹ÇµÇΩ");

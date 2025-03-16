@@ -27,7 +27,9 @@ void TextView::setText(TextViewParam p) {
 		param.getString().length(),
 		fh.getHandle());
 
-	int height = fh.getSize() + 9;//小さいフォントサイズだと下が欠けるため縦サイズは多めにとる
+	double padding = 1 * fh.getSize();
+
+	int height = int(fh.getSize() + padding + 0.5);//ディセンダー部分が欠けるため縦サイズは多めにとる
 	//テキスト画像の用意
 	DeleteGraph(textImageHandle.getHandle());
 	int screenHandle = MakeScreen(width, height, TRUE);
@@ -42,7 +44,7 @@ void TextView::setText(TextViewParam p) {
 	// 乗算済みアルファ用アルファブレンドのブレンドモードに設定する
 	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, 255);
 	err = DrawStringToHandle(
-		0, 2,
+		0, 0,
 		param.getString().c_str(),
 		param.getColor(),
 		fh.getHandle()

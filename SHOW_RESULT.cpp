@@ -93,7 +93,7 @@ void SHOW_RESULT(RESULT res,
 	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 	SetDrawBright(255, 255, 255);
 
-	err = DrawExtendGraph(0, 6, 1280, 45,
+	err = DrawExtendGraph(0, 6, 1280, 50,
 		context.getAsset()->img(L"img/gradation.png").getHandle(),
 		true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
@@ -803,18 +803,16 @@ void SHOW_RESULT(RESULT res,
 	int show_inst_flag = 1;//F11:左上の説明(DEBUG_MODE除く)を表示するフラグ(1:する 0:しない)
 
 	GAME_start_time = GetNowCount_d(config);
-	ChangeFont(config.BaseFont.c_str());
-	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
-	SetFontSize(35);
-	SetFontThickness(9);
+
+	int FontHandle = CreateFontToHandle(config.BaseFont.c_str(), 35, 9, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);//曲名フォントハンドル
 
 	int title_width = 1;
 
 	if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-		title_width = GetDrawStringWidth(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]));//曲名の横の長さを入れる
+		title_width = GetDrawStringWidthToHandle(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]), FontHandle);//曲名の横の長さを入れる
 	}
 	else {
-		title_width = GetDrawStringWidth(STList->title[list_number], wcslen(STList->title[list_number]));//曲名の横の長さを入れる
+		title_width = GetDrawStringWidthToHandle(STList->title[list_number], wcslen(STList->title[list_number]), FontHandle);//曲名の横の長さを入れる
 	}
 
 	int H_TITLE_IMG = MakeScreen(1280, 100, TRUE);//タイトル画像ハンドル作成
@@ -822,11 +820,11 @@ void SHOW_RESULT(RESULT res,
 	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 	SetDrawScreen(H_TITLE_IMG);//タイトル文字画像を描画対象に
 	if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-		ShowExtendedStrFit(640, 5, Music[song_number].title[difficulty], title_width, 800, config,
+		ShowExtendedStrFitToHandle2(640, 2, Music[song_number].title[difficulty], title_width, 800, config, FontHandle,
 			Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//タイトルを描画して画像作成
 	}
 	else {
-		ShowExtendedStrFit(640, 5, STList->title[list_number], title_width, 800, config,
+		ShowExtendedStrFitToHandle2(640, 2, STList->title[list_number], title_width, 800, config, FontHandle,
 			STList->Color[list_number], STList->ShadowColor[list_number]);//コース名描画
 	}
 	GraphBlend(H_TITLE_IMG, screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
@@ -834,7 +832,8 @@ void SHOW_RESULT(RESULT res,
 	SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
 	SetDrawMode(DX_DRAWMODE_NEAREST);
 
-	SetFontSize(22);//オプション描画フォントサイズの設定
+	int FontHandle2 = CreateFontToHandle(config.BaseFont.c_str(), 22, 9, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);//オプション描画フォントハンドル
+
 	while (1) {
 		if (ProcessMessage() != 0) {
 			dxLibFinishProcess();
@@ -1160,10 +1159,10 @@ void SHOW_RESULT(RESULT res,
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * 200));
 
 		if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
-			DrawGraph(0, int(60 + 2 + (1 - draw_alpha) * 50), H_TITLE_IMG, TRUE);//タイトル画像表示
+			DrawGraph(0, int(58 + (1 - draw_alpha) * 50), H_TITLE_IMG, TRUE);//タイトル画像表示
 		}
 		else {
-			DrawGraph(0, int(170 + 2 + (1 - draw_alpha) * 50), H_TITLE_IMG, TRUE);//タイトル画像表示
+			DrawGraph(0, int(168 + (1 - draw_alpha) * 50), H_TITLE_IMG, TRUE);//タイトル画像表示
 		}
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((double)draw_alpha * entireAlpha));
@@ -1285,24 +1284,20 @@ void SHOW_RESULT(RESULT res,
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255));
 
 		auto optionName = L"SPEED:" + option->op.speed.toString() + L"(" + option->op.speedAdapter.toString() + L")";
-		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 1 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//speed adapter + speed
-		DrawString(-160 + 320 * 1 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//speed adapter + speed
+		StrLength = GetDrawStringWidthToHandle(optionName.c_str(), wcslen(optionName.c_str()), FontHandle2);
+		DrawStringToHandle(-160 + 320 * 1 - (StrLength / 2), 688, optionName.c_str(), GetColor(255, 255, 255), FontHandle2);//speed adapter + speed
 
 		optionName = L"LANE:" + option->op.lane.toString();
-		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 2 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//lane
-		DrawString(-160 + 320 * 2 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//lane
+		StrLength = GetDrawStringWidthToHandle(optionName.c_str(), wcslen(optionName.c_str()), FontHandle2);
+		DrawStringToHandle(-160 + 320 * 2 - (StrLength / 2), 688, optionName.c_str(), GetColor(255, 255, 255), FontHandle2);//lane
 
 		optionName = L"COLOR:" + option->op.color.toString();
-		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 3 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//color
-		DrawString(-160 + 320 * 3 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//color
+		StrLength = GetDrawStringWidthToHandle(optionName.c_str(), wcslen(optionName.c_str()), FontHandle2);
+		DrawStringToHandle(-160 + 320 * 3 - (StrLength / 2), 688, optionName.c_str(), GetColor(255, 255, 255), FontHandle2);//color
 
 		optionName = L"GAUGE:" + option->op.gauge.toString();
-		StrLength = GetDrawStringWidth(optionName.c_str(), wcslen(optionName.c_str()));
-		DrawString(-160 + 320 * 4 - (StrLength / 2) + 2, 690 + 2, optionName.c_str(), GetColor(0, 0, 0));//gauge
-		DrawString(-160 + 320 * 4 - (StrLength / 2), 690, optionName.c_str(), GetColor(255, 255, 255));//gauge
+		StrLength = GetDrawStringWidthToHandle(optionName.c_str(), wcslen(optionName.c_str()), FontHandle2);
+		DrawStringToHandle(-160 + 320 * 4 - (StrLength / 2), 688, optionName.c_str(), GetColor(255, 255, 255), FontHandle2);//gauge
 
 
 

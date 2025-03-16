@@ -31,6 +31,7 @@ public:
 	int size;
 	int thick;
 	FontType fontType;
+	int edge_size;
 
 	/// <summary>
 	/// フォント情報クラスコンストラクタ
@@ -39,7 +40,13 @@ public:
 	/// <param name="size">サイズ</param>
 	/// <param name="thick">厚さ</param>
 	/// <param name="fontType">フォントタイプ</param>
-	FontInfo(wstring fontName = wstring(NATURE_PRHYSM_FONT), int size = 16, int thick = 2, FontType fontType = FontType::NORMAL);
+	FontInfo(
+		wstring fontName = wstring(NATURE_PRHYSM_FONT), 
+		int size = 16, 
+		int thick = 2, 
+		FontType fontType = FontType::NORMAL,
+		int edge_size = 2
+	);
 };
 
 /// <summary>
@@ -53,7 +60,8 @@ inline bool operator==(const FontInfo& a, const FontInfo& b)
 	return a.fontName == b.fontName
 		&& a.size == b.size
 		&& a.thick == b.thick
-		&& a.fontType == b.fontType;
+		&& a.fontType == b.fontType
+		&& a.edge_size == b.edge_size;
 }
 
 /// <summary>
@@ -65,6 +73,7 @@ struct FontInfoHash {
 		std::size_t h2 = hash<int>()(fontInfo.size);
 		std::size_t h3 = hash<int>()(fontInfo.thick);
 		std::size_t h4 = hash<FontType>()(fontInfo.fontType);
-		return h1 ^ h2 ^ h3 ^ h4;
+		std::size_t h5 = hash<int>()(fontInfo.edge_size);
+		return h1 ^ h2 ^ h3 ^ h4 ^ h5;
 	}
 };

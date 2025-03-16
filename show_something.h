@@ -8,6 +8,8 @@
 extern void show_str(int time, int time_base, int H_STR, int x, int y, int width);
 void ShowExtendedStrFit(int x, int y, const wchar_t *str, int str_width, int area_width, Config, int color = GetColor(255, 255, 255), int shadow_color = GetColor(0, 0, 0));
 void ShowExtendedStrFitToHandle(int x, int y, const wchar_t *str, int str_width, int area_width, Config, int FontHandle, int color = GetColor(255, 255, 255), int shadow_color = GetColor(0, 0, 0));
+void ShowExtendedStrFitToHandle2(int x, int y, const wchar_t* str, int str_width, int area_width, Config, int FontHandle, int color = GetColor(255, 255, 255), int shadow_color = GetColor(0, 0, 0));
+
 void ShowExtendedStrFitToHandleNoShadow(int x, int y, const wchar_t* str, int str_width, int area_width, Config config, int FontHandle, int color = GetColor(255, 255, 255));//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)(影無し)
 
 extern void show_cloud(int, XY *, double, double);

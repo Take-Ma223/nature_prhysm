@@ -193,7 +193,7 @@ void GAME(int song_number, int difficulty,
 	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 	SetDrawBright(255, 255, 255);
 
-	err = DrawExtendGraph(0, 0, 640, 35,
+	err = DrawExtendGraph(0, 0, 640, 45,
 		context.getAsset()->img(L"img/gradation.png").getHandle(),
 		true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
@@ -1036,8 +1036,8 @@ void GAME(int song_number, int difficulty,
 
 	gauge_draw_counter = 0;
 
-	int FontHandleBpm = CreateFontToHandle(config.BaseFont.c_str(), 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
-	int FontHandleCommon = CreateFontToHandle(config.BaseFont.c_str(), 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
+	int FontHandleBpm = CreateFontToHandle(config.BaseFont.c_str(), 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);//フォントハンドル
+	int FontHandleCommon = CreateFontToHandle(config.BaseFont.c_str(), 30, 9, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);//フォントハンドル
 
 	genre_width = GetDrawStringWidthToHandle(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]), FontHandleCommon);//ジャンル名の横の長さを入れる
 	title_width = GetDrawStringWidthToHandle(Music[song_number].title[difficulty], wcslen(Music[song_number].title[difficulty]), FontHandleCommon);//曲名の横の長さを入れる
@@ -1046,15 +1046,15 @@ void GAME(int song_number, int difficulty,
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 	SetDrawScreen(H_TITLE_STR);
-	ShowExtendedStrFitToHandle(320, 1, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
+	ShowExtendedStrFitToHandle2(320, 0, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
 
 	GraphBlend(H_TITLE_STR, screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
 
 	SetDrawScreen(H_ARTIST_STR);
-	ShowExtendedStrFitToHandle(320, 1, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
+	ShowExtendedStrFitToHandle(320, 0, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
 	
 	SetDrawScreen(H_GENRE_STR);
-	ShowExtendedStrFitToHandle(320, 1, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
+	ShowExtendedStrFitToHandle(320, 0, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
 	
 	SetDrawScreen(DX_SCREEN_BACK);
 
@@ -1318,9 +1318,9 @@ void GAME(int song_number, int difficulty,
 		}
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 
-		DrawGraph(320, 350, H_TITLE_STR, TRUE);
-		DrawGraph(320, 450, H_ARTIST_STR, TRUE);
-		DrawGraph(320, 260, H_GENRE_STR, TRUE);
+		DrawGraph(320, 348, H_TITLE_STR, TRUE);
+		DrawGraph(320, 448, H_ARTIST_STR, TRUE);
+		DrawGraph(320, 258, H_GENRE_STR, TRUE);
 		//DrawGraph(320, 100, context.getAsset()->img(L"img/gradation.png").getHandle(), TRUE);
 
 		//ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
@@ -3576,9 +3576,9 @@ void GAME(int song_number, int difficulty,
 			}
 			SetFontSize(30);
 			SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-			DrawGraph(320, 350, H_TITLE_STR, TRUE);
-			DrawGraph(320, 450, H_ARTIST_STR, TRUE);
-			DrawGraph(320, 260, H_GENRE_STR, TRUE);
+			DrawGraph(320, 348, H_TITLE_STR, TRUE);
+			DrawGraph(320, 448, H_ARTIST_STR, TRUE);
+			DrawGraph(320, 258, H_GENRE_STR, TRUE);
 			//ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
 			//ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
 			//ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル

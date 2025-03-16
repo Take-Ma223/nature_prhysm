@@ -31,13 +31,13 @@ public:
 	EscapingView(ActivityContext* c, DrawableInitParam param = DrawableInitParam()) : View(c, param)
 	{
 		makeScreen(Size(size_x, size_y));
-		font = FontInfo(wstring(c->getConfig()->BaseFont), 17, 1, FontType::ANTIALIASING_EDGE_16X16);
+		font = FontInfo(wstring(c->getConfig()->BaseFont), 17, 1, FontType::ANTIALIASING_EDGE_16X16, 1);
 		this->centerRatioX = 0.5;
 		this->centerRatioY = 0.5;
 
 		auto text = std::wstring(L"STOP PLAYING");
 		NPTextViewParam text_view_param = NPTextViewParam(text, font, GetColor(255, 255, 255));
-		DrawableInitParam drawableParam = DrawableInitParam(Cordinate(text_center_x, text_center_y), CenterRatio(0.5, 0.5));
+		DrawableInitParam drawableParam = DrawableInitParam(Cordinate(text_center_x, text_center_y), CenterRatio(0.5, 0.333));
 
 		text_view = unique_ptr<NPTextView>(new NPTextView(this, c, text_view_param, drawableParam));
 

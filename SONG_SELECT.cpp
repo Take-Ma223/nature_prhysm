@@ -184,7 +184,9 @@ void SONG_SELECT(int *l_n,
 	int SH_SHUTTER;
 	int SH_OPTION_HITSOUND_PREVIEW;
 
-	int FontHandle = CreateFontToHandle(config.BaseFont.c_str(), 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//フォントハンドル
+	int FontHandle = CreateFontToHandle(config.BaseFont.c_str(), 27, 9, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);//フォントハンドル
+	//int FontHandleShadow = CreateFontToHandle(config.BaseFont.c_str(), 26, 1, DX_FONTTYPE_ANTIALIASING, -1, 2);//フォントハンドル
+
 	//int FontHandle2 = CreateFontToHandle(config.AlternativeFont.c_str(), 28, 9, DX_FONTTYPE_ANTIALIASING_EDGE);//代替フォントハンドル
 	//AddSubstitutionFontToHandle(FontHandle, FontHandle2, 0, 0);
 
@@ -212,6 +214,7 @@ void SONG_SELECT(int *l_n,
 	int title_color[20 + 1];//曲名の色
 	int title_shadow_color[20 + 1];//曲名の縁の色(白or黒)
 	int H_TITLE_STR[20 + 1];//画像として保存された曲名の画像ハンドル
+
 	for (i = 0; i <= 20; i++) {//初期化
 		title_color[i] = colorRatio(255, 255, 255);
 		title_shadow_color[i] = colorRatio(0, 0, 0);
@@ -369,8 +372,8 @@ void SONG_SELECT(int *l_n,
 	SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
 
 
-	Des1_width = GetDrawStringWidth(Des1, wcslen(Des1));
-	Des2_width = GetDrawStringWidth(Des2, wcslen(Des2));
+	Des1_width = GetDrawStringWidthToHandle(Des1, wcslen(Des1), FontHandle);
+	Des2_width = GetDrawStringWidthToHandle(Des2, wcslen(Des2), FontHandle);
 
 	DrawableInitParam optionListParam = DrawableInitParam(Cordinate(-320, 0));
 	OptionListView optionListView(option, &context, optionListParam);
@@ -585,7 +588,7 @@ void SONG_SELECT(int *l_n,
 	int err = SetDrawScreen(screenHandle);
 	// 乗算済みアルファ用アルファブレンドのブレンドモードに設定する
 	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, 255);
-	err = DrawExtendGraph(0, 6, 640, 42,
+	err = DrawExtendGraph(0, 6, 640, 44,
 		context.getAsset()->img(L"img/gradation.png").getHandle(),
 		true);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
@@ -2860,7 +2863,7 @@ void SONG_SELECT(int *l_n,
 					SetDrawScreen(H_TITLE_STR[index]);//曲名画像を描画対象に
 					ClearDrawScreen();//前に描かれていた文字を消す
 					//画像として一時的に描画
-					ShowExtendedStrFitToHandle(320, 7,
+					ShowExtendedStrFitToHandle2(320, 4,
 						title_buf[i],
 						title_width[index],
 						620, config,
@@ -2869,20 +2872,23 @@ void SONG_SELECT(int *l_n,
 						title_shadow_color[i]);//曲名描画
 
 					SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+					GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+
 					SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
 					SetDrawMode(DX_DRAWMODE_NEAREST);
-					GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+
+					
 
 				}
 
 				//ジャンル、アーティストのwidthの計算
 				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
-					genre_width = GetDrawStringWidth(secret_str, wcslen(secret_str));
-					artist_width = GetDrawStringWidth(secret_str, wcslen(secret_str));
+					genre_width = GetDrawStringWidthToHandle(secret_str, wcslen(secret_str), FontHandle);
+					artist_width = GetDrawStringWidthToHandle(secret_str, wcslen(secret_str), FontHandle);
 				}
 				else {
-					genre_width = GetDrawStringWidth(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]));
-					artist_width = GetDrawStringWidth(Music[song_number].artist[difficulty], wcslen(Music[song_number].artist[difficulty]));
+					genre_width = GetDrawStringWidthToHandle(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]), FontHandle);
+					artist_width = GetDrawStringWidthToHandle(Music[song_number].artist[difficulty], wcslen(Music[song_number].artist[difficulty]), FontHandle);
 				}
 				widthCalcFlag = 0;
 
@@ -2920,7 +2926,7 @@ void SONG_SELECT(int *l_n,
 					SetDrawScreen(H_TITLE_STR[index]);//段位認定コース名画像を描画対象に
 					ClearDrawScreen();//前に描かれていた文字を消す
 					//画像として一時的に描画
-					ShowExtendedStrFitToHandle(320, 7,
+					ShowExtendedStrFitToHandle2(320, 4,
 						title_buf[i],
 						title_width[index],
 						620, config,
@@ -2959,7 +2965,7 @@ void SONG_SELECT(int *l_n,
 					ClearDrawScreen();//前に描かれていた文字を消す
 									  //画像として一時的に描画
 					
-					ShowExtendedStrFitToHandle(320, 7,
+					ShowExtendedStrFitToHandle2(320, 4,
 						folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)],
 						folder_name_width[index],
 						620, config,
@@ -3237,19 +3243,19 @@ void SONG_SELECT(int *l_n,
 		if (SelectingTarget == SELECTING_SONG) {
 			if (Music[song_number].genre[difficulty][0] != 0) {//ジャンルが存在
 				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
-					ShowExtendedStrFitToHandle(640, int(11 + 336 + (0 + 3 - 20 / 2) * 48), secret_str, genre_width, 500, config, FontHandle);//ジャンル表示「???」
+					ShowExtendedStrFitToHandle(640, int(8 + 336 + (0 + 3 - 20 / 2) * 48), secret_str, genre_width, 500, config, FontHandle);//ジャンル表示「???」
 				}
 				else {
-					ShowExtendedStrFitToHandle(640, int(11 + 336 + (0 + 3 - 20 / 2) * 48), Music[song_number].genre[difficulty], genre_width, 500, config, FontHandle);//ジャンル表示
+					ShowExtendedStrFitToHandle(640, int(8 + 336 + (0 + 3 - 20 / 2) * 48), Music[song_number].genre[difficulty], genre_width, 500, config, FontHandle);//ジャンル表示
 				}
 				DrawGraph(320, 0, H_BANNER_AREA, TRUE);//AREA文字表示
 			}
 			if (Music[song_number].artist[difficulty][0] != 0) {//アーティストが存在
 				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
-					ShowExtendedStrFitToHandle(640, int(6 + 336 + (0 + 4 - 20 / 2) * 48), secret_str, artist_width, 480, config, FontHandle);//アーティスト表示「???」
+					ShowExtendedStrFitToHandle(640, int(1 + 336 + (0 + 4 - 20 / 2) * 48), secret_str, artist_width, 480, config, FontHandle);//アーティスト表示「???」
 				}
 				else {
-					ShowExtendedStrFitToHandle(640, int(6 + 336 + (0 + 4 - 20 / 2) * 48), Music[song_number].artist[difficulty], artist_width, 480, config, FontHandle);//アーティスト表示
+					ShowExtendedStrFitToHandle(640, int(1 + 336 + (0 + 4 - 20 / 2) * 48), Music[song_number].artist[difficulty], artist_width, 480, config, FontHandle);//アーティスト表示
 				}
 				DrawGraph(320, 0, H_BANNER_ARTIST, TRUE);//ARTIST文字表示
 			}
@@ -3264,8 +3270,8 @@ void SONG_SELECT(int *l_n,
 		    */
 		}
 		else if (SelectingTarget == SELECTING_COURSE) {//段位認定用説明
-			ShowExtendedStrFitToHandle(640, int(11 + 336 + (0 + 3 - 20 / 2) * 48), Des1, Des1_width, 640, config, FontHandle);//ジャンル表示
-			ShowExtendedStrFitToHandle(640, int(6 + 336 + (0 + 4 - 20 / 2) * 48), Des2, Des2_width, 640, config, FontHandle);//アーティスト表示
+			ShowExtendedStrFitToHandle(640, int(8 + 336 + (0 + 3 - 20 / 2) * 48), Des1, Des1_width, 640, config, FontHandle);//ジャンル表示
+			ShowExtendedStrFitToHandle(640, int(1 + 336 + (0 + 4 - 20 / 2) * 48), Des2, Des2_width, 640, config, FontHandle);//アーティスト表示
 		}
 		SetDrawMode(DX_DRAWMODE_NEAREST);
 
@@ -3281,12 +3287,12 @@ void SONG_SELECT(int *l_n,
 		if (SelectingTarget == SELECTING_FOLDER) {
 			SetDrawArea(328, 8, 953, 88);//描画可能エリアを指定
 			if (secret->song_appear_number != -1) {//隠し曲出現演出中
-				show_str(GetNowCount(), Announse_show_time_base, H_ANNOUNSE, 960, 32, secret->Announce_width);
+				show_str(GetNowCount(), Announse_show_time_base, H_ANNOUNSE, 960, 29, secret->Announce_width);
 
 				//show_str(GetNowCount(), Announse_show_time_base, secret->Announce, 330 * 3, 32, secret->Announce_width, config, FontHandle, secret->Color, secret->ShadowColor);
 			}
 			else {//通常状態は通常アナウンス
-				show_str(GetNowCount(), Announse_show_time_base, H_ANNOUNSE, 960, 32, AnnounceWidth);
+				show_str(GetNowCount(), Announse_show_time_base, H_ANNOUNSE, 960, 29, AnnounceWidth);
 
 				//show_str(GetNowCount(), Announse_show_time_base, StrAnnounce,      330 * 3, 32, AnnounceWidth, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
 			}
@@ -3323,7 +3329,7 @@ void SONG_SELECT(int *l_n,
 							int(STList->bpmmin[list_number] * option->op.speedVal + 0.5),
 							int(STList->bpmmax[list_number] * option->op.speedVal + 0.5));
 					}
-					SpeedStrWidth = GetDrawStringWidth(SpeedStr, wcslen(SpeedStr));
+					SpeedStrWidth = GetDrawStringWidthToHandle(SpeedStr, wcslen(SpeedStr), FontHandle);
 					ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandle);
 				}
 				else {//フォルダセレクト、段位認定の時は真ん中に表示
@@ -4258,7 +4264,7 @@ void DrawOptionSentence(Option* Option, OptionItem::Name option_select, Config c
 	const auto StrAddress = desc.c_str();
 
 	int width = 0;
-	width = GetDrawStringWidth(StrAddress, wcslen(StrAddress));
+	width = GetDrawStringWidthToHandle(StrAddress, wcslen(StrAddress), FontHandle);
 	SetDrawScreen(Option->H_SENT);//オプション説明画像を描画対象に
 	ClearDrawScreen();//前の画像を消去
 	//説明を描画して画像作成

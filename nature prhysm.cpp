@@ -93,6 +93,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	SetUseTransColor(false);//透過色を使用しない
 
+	LPCWSTR font_path = L"font/NotoSansCJKjp-Black.otf"; // 読み込むフォントファイルのパス
+	AddFontResourceEx(font_path, FR_PRIVATE, NULL);
+	ChangeFont(L"Noto Sans CJK JP Black", DX_CHARSET_DEFAULT);
+
 	if (DxLib_Init() == -1)		// ＤＸライブラリ初期化処理
 	{
 		return -1;			// エラーが起きたら直ちに終了

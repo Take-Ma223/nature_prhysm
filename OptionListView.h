@@ -51,7 +51,7 @@ public:
 			NPTextViewParam textViewParam = NPTextViewParam(
 				option->OptionName[optionIndex], 
 				fontOptionName, optionNameColor, itemNameShadowColor);
-			drawableParam = DrawableInitParam(Cordinate(40, getYPos(i) + optionNameY), CenterRatio(0, 0.5));
+			drawableParam = DrawableInitParam(Cordinate(40, getYPos(i) + optionNameY), CenterRatio(0, 0.333));
 			listOptionName[i] = unique_ptr<NPGradTextView>(new NPGradTextView(this, c, textViewParam, drawableParam));
 			if (i != rowCenterIndex)listOptionName[i].get()->alpha.value = notSelectedFrameAlpha;
 			addDrawable(listOptionName[i].get());
@@ -188,8 +188,8 @@ private:
 
 
 
-	static const int optionNameY = -35;
-	static const int selectingOptionY = 4;
+	static const int optionNameY = -39;
+	static const int selectingOptionY = 8;
 
 	bool isSkillTestMode = false;
 	static const int defaultBrightness = 255;

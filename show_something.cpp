@@ -32,11 +32,23 @@ void ShowExtendedStrFit(int x, int y, const wchar_t *str, int str_width,int area
 
 void ShowExtendedStrFitToHandle(int x, int y, const wchar_t *str, int str_width, int area_width, Config config, int FontHandle, int color, int shadow_color) {//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)
 	if (str_width <= area_width) {//エリア内に収まっているときは普通に描画
-		if (config.ShowStrShadow == TRUE)DrawStringToHandle(int(x - ((double)str_width / 2)) + 2, y + 2, str, shadow_color,FontHandle);//(影)
+		//if (config.ShowStrShadow == TRUE)DrawStringToHandle(int(x - ((double)str_width / 2)) + 2, y + 2, str, shadow_color,FontHandle);//(影)
 		DrawStringToHandle(int(x - ((double)str_width / 2)), y, str, color, FontHandle);//表示(影)
 	}
 	else {//収まっていないときは縮小して描画
-		if (config.ShowStrShadow == TRUE)DrawExtendStringToHandle(int(x - ((double)area_width / 2)) + 2, y + 2, (double)area_width / (double)str_width, 1, str, shadow_color, FontHandle);
+		//if (config.ShowStrShadow == TRUE)DrawExtendStringToHandle(int(x - ((double)area_width / 2)) + 2, y + 2, (double)area_width / (double)str_width, 1, str, shadow_color, FontHandle);
+		DrawExtendStringToHandle(int(x - ((double)area_width / 2)), y, (double)area_width / (double)str_width, 1, str, color, FontHandle);
+	}
+	return;
+}
+
+void ShowExtendedStrFitToHandle2(int x, int y, const wchar_t* str, int str_width, int area_width, Config config, int FontHandle, int color, int shadow_color) {//領域(area)より大きい文字は縮小して表示する関数(ToHandle版)
+	if (str_width <= area_width) {//エリア内に収まっているときは普通に描画
+		if (config.ShowStrShadow == TRUE)DrawStringToHandle(int(x - ((double)str_width / 2)) + 2, y + 2, str, shadow_color, FontHandle, shadow_color);//(影)
+		DrawStringToHandle(int(x - ((double)str_width / 2)), y, str, color, FontHandle);//表示(影)
+	}
+	else {//収まっていないときは縮小して描画
+		if (config.ShowStrShadow == TRUE)DrawExtendStringToHandle(int(x - ((double)area_width / 2)) + 2, y + 2, (double)area_width / (double)str_width, 1, str, shadow_color, FontHandle, shadow_color);
 		DrawExtendStringToHandle(int(x - ((double)area_width / 2)), y, (double)area_width / (double)str_width, 1, str, color, FontHandle);
 	}
 	return;

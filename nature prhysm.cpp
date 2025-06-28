@@ -27,6 +27,7 @@
 #include "DxLibUtil.h"
 #include "AutoDifficultyPrediction.h"
 #include "WindowTitleSetter.h"
+#include "SongSelectScreen.h"
 
 void MakeScoreDate(wchar_t *title, int difficulty, int score, int Perfect, int Good, int Miss, int MaxCombo, int SkyPerfect, int MinMiss, int Clear, int Rainbow);
 void EffekseerInitProcess();
@@ -282,14 +283,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config, &ir);
 	if (ProcessMessage() != 0) {dxLibFinishProcess();return -1;}
 
+	int SelectingTarget = SongSelectScreen::SELECTING_FOLDER;
 	while (1) {
 		TITLE(Music, &NumberOfSongs, Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
 		if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
 		int StageCount = 0;
 		bool isBackToTitle = false;
+		
 		while (1) {
 			if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
-			SONG_SELECT(&list_number,
+			auto song_select_screen = SongSelectScreen(
+				&list_number,
 				&song_number, &difficulty,
 				&option,
 				&folder,
@@ -305,7 +309,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				&STList,
 				config,
 				&ir,
-				&isBackToTitle);
+				&isBackToTitle,
+				&SelectingTarget
+			);
+			song_select_screen.run();
+
+			//SONG_SELECT(&list_number,
+			//	&song_number, &difficulty,
+			//	&option,
+			//	&folder,
+			//	Music,
+			//	Button, Button_Shutter, Key, Buf,
+			//	&debug,
+			//	&NumberOfSongs,
+			//	&result_count,
+			//	result_rank_buf,
+			//	&secret,
+			//	&AC,
+			//	&StageCount,
+			//	&STList,
+			//	config,
+			//	&ir,
+			//	&isBackToTitle);
 			StageCount++;
 
 			if (isBackToTitle)break;

@@ -181,6 +181,9 @@
     <Filter Include="ソース ファイル\GAME\ScoreGraphView">
       <UniqueIdentifier>{d1be1c19-774b-4a5c-8e37-a52e1825e676}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Util\Screen">
+      <UniqueIdentifier>{45743136-31f0-4437-ba5d-f1ffc96f3b24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -458,6 +461,12 @@
     </ClCompile>
     <ClCompile Include="ScoreGraphDiffView.cpp">
       <Filter>ソース ファイル\GAME\ScoreGraphView</Filter>
+    </ClCompile>
+    <ClCompile Include="SongSelectScreen.cpp">
+      <Filter>ソース ファイル\SONG_SELECT</Filter>
+    </ClCompile>
+    <ClCompile Include="Screen.cpp">
+      <Filter>ソース ファイル\Util\Screen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -873,6 +882,12 @@
     </ClInclude>
     <ClInclude Include="ScoreGraphDiffView.h">
       <Filter>ソース ファイル\GAME\ScoreGraphView</Filter>
+    </ClInclude>
+    <ClInclude Include="SongSelectScreen.h">
+      <Filter>ソース ファイル\SONG_SELECT</Filter>
+    </ClInclude>
+    <ClInclude Include="Screen.h">
+      <Filter>ソース ファイル\Util\Screen</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

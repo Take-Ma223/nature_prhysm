@@ -468,6 +468,9 @@
     <ClCompile Include="Screen.cpp">
       <Filter>ソース ファイル\Util\Screen</Filter>
     </ClCompile>
+    <ClCompile Include="GameScreen.cpp">
+      <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
@@ -888,6 +891,9 @@
     </ClInclude>
     <ClInclude Include="Screen.h">
       <Filter>ソース ファイル\Util\Screen</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScreen.h">
+      <Filter>ソース ファイル\GAME</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -211,6 +211,7 @@
     <ClCompile Include="DifficultyRadar.cpp" />
     <ClCompile Include="DxLibUtil.cpp" />
     <ClCompile Include="EscapingView.cpp" />
+    <ClCompile Include="GameScreen.cpp" />
     <ClCompile Include="GradationNoteImage.cpp" />
     <ClCompile Include="KeyConfigValidator.cpp" />
     <ClCompile Include="KEY_CONFIG.cpp" />
@@ -311,6 +312,7 @@
     <ClInclude Include="DxLibUtil.h" />
     <ClInclude Include="EscapingView.h" />
     <ClInclude Include="FileUtil.h" />
+    <ClInclude Include="GameScreen.h" />
     <ClInclude Include="GradationNoteImage.h" />
     <ClInclude Include="KeyConfigValidator.h" />
     <ClInclude Include="KEY_CONFIG.h" />

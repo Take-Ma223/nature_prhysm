@@ -102,6 +102,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		return -1;			// エラーが起きたら直ちに終了
 	}
+	SetSysCommandOffFlag(TRUE);
 	SetDrawScreen(DX_SCREEN_BACK);// 描画先を裏画面にする
 	EffekseerInitProcess();//Effekseer用初期化処理
 
@@ -283,7 +284,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	LOAD(&folder, Music, &NumberOfSongs, &secret, &STList, &option, config, &ir);
 	if (ProcessMessage() != 0) {dxLibFinishProcess();return -1;}
 
-	int SelectingTarget = SongSelectScreen::SELECTING_FOLDER;
+	int SelectingTarget = SongSelect::SongSelectScreen::SELECTING_FOLDER;
 	while (1) {
 		TITLE(Music, &NumberOfSongs, Button, Button_Shutter, Key, Buf, &AC, config, &option, &ir);
 		if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
@@ -292,7 +293,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		while (1) {
 			if (ProcessMessage() != 0) { dxLibFinishProcess(); return -1; }
-			auto song_select_screen = SongSelectScreen(
+			auto song_select_screen = SongSelect::SongSelectScreen(
 				&list_number,
 				&song_number, &difficulty,
 				&option,

@@ -19,7 +19,7 @@
 #include "OptionStateSaveLoad.h"
 #include "number_digit.h"
 
-void SongSelectScreen::init()
+void SongSelect::SongSelectScreen::init()
 {
 	asset;//使う画像セット
 	//コンテキスト
@@ -1131,7 +1131,7 @@ void SongSelectScreen::init()
 
 
 
-void SongSelectScreen::updateModel()
+void SongSelect::SongSelectScreen::updateModel()
 {
 	appContext.updateTime();
 	coverAlpha.process();
@@ -2670,7 +2670,7 @@ void SongSelectScreen::updateModel()
 
 
 
-void SongSelectScreen::updateView()
+void SongSelect::SongSelectScreen::updateView()
 {
 	//DRAW
 	SetDrawScreen(appContext.baseHandle.getHandle());
@@ -3665,7 +3665,7 @@ void SongSelectScreen::updateView()
 	clsDx();
 }
 
-wchar_t* SongSelectScreen::announce_str(int StageCount, int PlayCount)
+wchar_t* SongSelect::SongSelectScreen::announce_str(int StageCount, int PlayCount)
 {
 	//PlayCountが0,1,2のときは
 	static wchar_t str[300] = L" ";
@@ -3747,7 +3747,7 @@ wchar_t* SongSelectScreen::announce_str(int StageCount, int PlayCount)
 	return GeneralStr[GeneralStrUse];
 }
 
-void SongSelectScreen::DrawRadarLine(double angle)
+void SongSelect::SongSelectScreen::DrawRadarLine(double angle)
 {
 	//short r[6] = { v1,v2,v3,v4,v5,v6 };//半径
 	short r = 99;
@@ -3785,7 +3785,7 @@ void SongSelectScreen::DrawRadarLine(double angle)
 	return;
 }
 
-int SongSelectScreen::GetCylinderColor(double val, double range, unsigned int R, unsigned int G, unsigned int B)
+int SongSelect::SongSelectScreen::GetCylinderColor(double val, double range, unsigned int R, unsigned int G, unsigned int B)
 {
 	int color = 0;
 	double indR = 0;
@@ -3814,7 +3814,7 @@ int SongSelectScreen::GetCylinderColor(double val, double range, unsigned int R,
 	return color;
 }
 
-int SongSelectScreen::GetRainbowColorForRadar(int val, int th)
+int SongSelect::SongSelectScreen::GetRainbowColorForRadar(int val, int th)
 {
 	int color = 0;
 	double ind = 0;
@@ -3848,7 +3848,7 @@ int SongSelectScreen::GetRainbowColorForRadar(int val, int th)
 	return color;
 }
 
-void SongSelectScreen::DrawHexagon(short v1, short v2, short v3, short v4, short v5, short v6)
+void SongSelect::SongSelectScreen::DrawHexagon(short v1, short v2, short v3, short v4, short v5, short v6)
 {
 	short r[6] = { v1,v2,v3,v4,v5,v6 };//半径
 	short o[2] = { 160,360 };//原点座標
@@ -3892,7 +3892,7 @@ void SongSelectScreen::DrawHexagon(short v1, short v2, short v3, short v4, short
 	return;
 }
 
-void SongSelectScreen::OptionValueChange(Option* Option, int option_select, int add)
+void SongSelect::SongSelectScreen::OptionValueChange(Option* Option, int option_select, int add)
 {
 	if (add >= 0) {
 		for (int i = 0; i < add; i++) {
@@ -3907,7 +3907,7 @@ void SongSelectScreen::OptionValueChange(Option* Option, int option_select, int 
 	return;
 }
 
-void SongSelectScreen::DrawOptionSentence(Option* Option, OptionItem::Name option_select, Config config, int FontHandle)
+void SongSelect::SongSelectScreen::DrawOptionSentence(Option* Option, OptionItem::Name option_select, Config config, int FontHandle)
 {
 	int i = 0;
 
@@ -3929,7 +3929,7 @@ void SongSelectScreen::DrawOptionSentence(Option* Option, OptionItem::Name optio
 	return;
 }
 
-int SongSelectScreen::clearStateConverter(int clearState)
+int SongSelect::SongSelectScreen::clearStateConverter(int clearState)
 {
 	switch (clearState)
 	{
@@ -3965,13 +3965,3 @@ int SongSelectScreen::clearStateConverter(int clearState)
 	}
 }
 
-//SortSongListIndexに対する<>の演算子オーバーロード
-bool operator<(const SongSelectScreen::SortSongListIndex& left, const SongSelectScreen::SortSongListIndex& right)
-{
-	return left.value < right.value;
-}
-
-bool operator>(const SongSelectScreen::SortSongListIndex& left, const SongSelectScreen::SortSongListIndex& right)
-{
-	return left.value > right.value;
-}

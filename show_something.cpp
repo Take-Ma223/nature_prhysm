@@ -83,8 +83,10 @@ void show_cloud(int HANDLE, XY *pos, double speed, double loop) {//雲をスク�
 		pos->x += 1280;
 	}
 
-	DrawGraph(int(pos->x), int(pos->y), HANDLE, TRUE);//雲
-	DrawGraph(int(pos->x + 1280), int(pos->y), HANDLE, TRUE);//雲2
+	int cloud_x = int(pos->x);
+
+	DrawGraph(cloud_x, int(pos->y), HANDLE, TRUE);//雲
+	DrawGraph(cloud_x + 1280, int(pos->y), HANDLE, TRUE);//雲2
 }
 
 void DrawBoxWithLine(int x1,int y1,int x2, int y2,int color, int alphaBox, int alphaLine) {//白い枠線付きの透過DrawBox

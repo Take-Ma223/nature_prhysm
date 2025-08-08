@@ -110,7 +110,7 @@ void TITLE(Song* Music, int* NumberOfSongs, int Button[3][4], int Button_Shutter
 	wstring themeStr1(L"img/themes/");
 	wstring themeStr2(option->op.theme.toString());
 	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
-	H_CLOUD = LoadGraph(L"img/cloud.png");
+	H_CLOUD = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cloud.png")).c_str());
 
 	H_TITLE_LOGO = LoadGraph(L"img/title_logo.png");
 

@@ -245,10 +245,10 @@ void Game::GameScreen::init() {
 	H_JUDGE_AREA_PAINT = LoadGraph(tmpPath);
 
 	if (secret == 0) {//隠し曲演出中ではない
-		H_CLOUD = LoadGraph(L"img/cloud.png");
+		H_CLOUD = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cloud.png")).c_str());
 	}
 	else if (secret == 1) {//隠し曲演出中なら雲を黒に
-		H_CLOUD = LoadGraph(L"img/cloud_black.png");
+		H_CLOUD = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cloud_black.png")).c_str());
 	}
 	H_SKY_PERFECT = LoadGraph(L"img/SKY_PERFECT.png");
 	H_PERFECT = LoadGraph(L"img/PERFECT.png");
@@ -674,6 +674,7 @@ void Game::GameScreen::init() {
 	return;
 }
 
+
 void Game::GameScreen::updateModel() {
 	if (game_screen_phase == Ready) {
 		updateModelReady();
@@ -691,6 +692,75 @@ void Game::GameScreen::updateView() {
 		updateViewPlaying();
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Game::GameScreen::updateModelReady()
 {
@@ -901,15 +971,9 @@ void Game::GameScreen::updateModelReady()
 	}
 	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
 
-	DrawGraph(320, 348, H_TITLE_STR, TRUE);
-	DrawGraph(320, 448, H_ARTIST_STR, TRUE);
-	DrawGraph(320, 258, H_GENRE_STR, TRUE);
-	//DrawGraph(320, 100, context.getAsset()->img(L"img/gradation.png").getHandle(), TRUE);
-
-	//ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
-	//ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
-	//ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
-	//ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
+	DrawGraph(320, 240, H_GENRE_STR, TRUE);
+	DrawGraph(320, 340, H_TITLE_STR, TRUE);
+	DrawGraph(320, 440, H_ARTIST_STR, TRUE);
 	detailView.draw();
 	SetDrawMode(DX_DRAWMODE_NEAREST);
 
@@ -1154,6 +1218,80 @@ void Game::GameScreen::startPlaying()
 	}
 	game_screen_phase = Playing;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Game::GameScreen::updateModelPlaying()
 {
@@ -3166,13 +3304,9 @@ void Game::GameScreen::updateModelPlaying()
 		}
 		SetFontSize(30);
 		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
-		DrawGraph(320, 348, H_TITLE_STR, TRUE);
-		DrawGraph(320, 448, H_ARTIST_STR, TRUE);
-		DrawGraph(320, 258, H_GENRE_STR, TRUE);
-		//ShowExtendedStrFitToHandle(640, 350, Music[song_number].title[difficulty], title_width, 620, config, FontHandleCommon, Music[song_number].StrColor[difficulty], Music[song_number].StrShadowColor[difficulty]);//曲名
-		//ShowExtendedStrFitToHandle(640, 450, Music[song_number].artist[difficulty], artist_width, 620, config, FontHandleCommon);//アーティスト
-		//ShowExtendedStrFitToHandle(640, 260, Music[song_number].genre[difficulty], genre_width, 620, config, FontHandleCommon);//ジャンル
-		//ShowExtendedStrFitToHandleNoShadow(640, 500, Music[song_number].detail[difficulty], detail_width, 630, config, FontHandleDetail);//詳細
+		DrawGraph(320, 240, H_GENRE_STR, TRUE);
+		DrawGraph(320, 340, H_TITLE_STR, TRUE);
+		DrawGraph(320, 440, H_ARTIST_STR, TRUE);
 		detailView.draw();
 		SetDrawMode(DX_DRAWMODE_NEAREST);
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);

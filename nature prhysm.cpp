@@ -5,10 +5,8 @@
 #include"STRUCT_LIST.h"
 #include"STRUCT_SONG.h"
 #include"STRUCT_OP.h"
-#include"STRUCT_LIST.h"
 #include"STRUCT_RESULT.h"
 
-#include"SONG_SELECT.h"
 #include"LOAD.h"
 #include"TITLE.h"
 #include"KeyConfigSaveLoad.h"
@@ -20,7 +18,6 @@
 #include"CONSTANT_VALUE.h"
 
 #include "EffekseerForDXLib.h"
-#include <sys/stat.h>
 #include "STRUCT_IR_SETTING.h"
 #include "IR_process.h"
 #include "ActivityController.h"

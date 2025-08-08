@@ -13,7 +13,6 @@
 #include "LearningDataGenarator.h"
 #include "ScreenShot.h"
 #include "number_ring.h"
-#include "GAME.h"
 #include "SHOW_RESULT.h"
 #include "LoadSkillTestNpsPathList.h"
 #include "OptionStateSaveLoad.h"
@@ -1065,7 +1064,8 @@ void SongSelect::SongSelectScreen::init()
 		else {
 			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_bgm.ogg", option);//‘I‹ÈBGM‚Ì“Ç‚İ‚İ
 		}
-		H_CLOUD = LoadGraph(L"img/cloud.png");
+		
+		H_CLOUD = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cloud.png")).c_str());
 	}
 	else if (secret->song_appear_number != -1) {//‰B‚µ‹È‰‰o
 		if (wcscmp(L"\0", secret->BGM) == 0) {//‰½‚àw’è‚³‚ê‚Ä‚¢‚È‚©‚Á‚½‚ç
@@ -1074,7 +1074,7 @@ void SongSelect::SongSelectScreen::init()
 		else {
 			SH_BGM = NPLoadBgmSoundMem(secret->BGM, option);//ê—p‘I‹ÈBGM‚Ì“Ç‚İ‚İ
 		}
-		H_CLOUD = LoadGraph(L"img/cloud_black.png");//‰B‚µ‹È‰‰o‚È‚ç•‚¢‰_
+		H_CLOUD = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cloud_black.png")).c_str());//‰B‚µ‹È‰‰o‚È‚ç•‚¢‰_
 	}
 
 	if (secret->song_appear_number != -1) {//‰B‚µ‹È‰‰o

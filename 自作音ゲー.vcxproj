@@ -211,6 +211,7 @@
     <ClCompile Include="DifficultyRadar.cpp" />
     <ClCompile Include="DxLibUtil.cpp" />
     <ClCompile Include="EscapingView.cpp" />
+    <ClCompile Include="GameScreen.cpp" />
     <ClCompile Include="GradationNoteImage.cpp" />
     <ClCompile Include="KeyConfigValidator.cpp" />
     <ClCompile Include="KEY_CONFIG.cpp" />
@@ -273,6 +274,7 @@
     <ClCompile Include="ScoreGraphDiffView.cpp" />
     <ClCompile Include="ScoreGraphNumberView.cpp" />
     <ClCompile Include="score_cell_operation.cpp" />
+    <ClCompile Include="Screen.cpp" />
     <ClCompile Include="ScreenShot.cpp" />
     <ClCompile Include="secret_LOAD.cpp" />
     <ClCompile Include="setupSerial.cpp" />
@@ -282,6 +284,7 @@
     <ClCompile Include="show_something.cpp" />
     <ClCompile Include="ImageHandle.cpp" />
     <ClCompile Include="SongCacheSaveLoad.cpp" />
+    <ClCompile Include="SongSelectScreen.cpp" />
     <ClCompile Include="SONG_SELECT.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="SoundSet.cpp" />
@@ -309,6 +312,7 @@
     <ClInclude Include="DxLibUtil.h" />
     <ClInclude Include="EscapingView.h" />
     <ClInclude Include="FileUtil.h" />
+    <ClInclude Include="GameScreen.h" />
     <ClInclude Include="GradationNoteImage.h" />
     <ClInclude Include="KeyConfigValidator.h" />
     <ClInclude Include="KEY_CONFIG.h" />
@@ -382,11 +386,13 @@
     <ClInclude Include="SaveDataSaveLoad.h" />
     <ClInclude Include="ScoreGraphDiffView.h" />
     <ClInclude Include="ScoreGraphNumberView.h" />
+    <ClInclude Include="Screen.h" />
     <ClInclude Include="ScreenShot.h" />
     <ClInclude Include="ShowErrorName.h" />
     <ClInclude Include="ShowFps.h" />
     <ClInclude Include="ImageHandle.h" />
     <ClInclude Include="SongCacheSaveLoad.h" />
+    <ClInclude Include="SongSelectScreen.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="SoundSet.h" />
     <ClInclude Include="TestActivity.h" />

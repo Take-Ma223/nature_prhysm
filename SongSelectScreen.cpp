@@ -1,0 +1,3979 @@
+#include "SongSelectScreen.h"
+#include "STRUCT_RESULT.h"
+#include "NPLoadSoundMem.h"
+#include "folder_insert.h"
+#include "SaveDataSaveLoad.h"
+#include "GetNowCount_d.h"
+#include "WindowTitleSetter.h"
+#include "Get_Key_State.h"
+#include "ShowFps.h"
+#include "IR_process.h"
+#include "secret_LOAD.h"
+#include "KEY_CONFIG.h"
+#include "LearningDataGenarator.h"
+#include "ScreenShot.h"
+#include "number_ring.h"
+#include "GAME.h"
+#include "SHOW_RESULT.h"
+#include "LoadSkillTestNpsPathList.h"
+#include "OptionStateSaveLoad.h"
+#include "number_digit.h"
+#include "GameScreen.h"
+
+void SongSelect::SongSelectScreen::init()
+{
+	asset;//使う画像セット
+	//コンテキスト
+	appContext = AppContext(NULL, option, &config);
+	context = ActivityContext(&appContext, &asset);
+
+
+	list_number_base = *l_n;//曲フォルダのソート配列のインデックスに対する番号 選択したときにSortを使ってlist_number変換する
+
+	list_number = *l_n;//実際の曲フォルダ中の番号 選択したときにsong_numberへfolderの表を使って変換する 選曲画面に入る前で段位認定から戻るとき以外に再算出
+	song_number = *s_n;//選択している曲番号
+	difficulty = *diff;//選択している難易度
+
+
+
+	coverAlpha = TransValue(&context);
+	coverAlphaOpen = [this] {
+		coverAlpha.clearEvent();
+		coverAlpha.value = 255;
+		coverAlpha.eChange(255, 128, Converter(ConvertMode::Linear), 0, 500);
+		coverAlpha.play();
+		};
+	coverAlphaClose = [this] {
+		coverAlpha.clearEvent();
+		coverAlpha.value = 128;
+		coverAlpha.eChange(128, 255, Converter(ConvertMode::Linear), 0, 500);
+		coverAlpha.play();
+		};
+
+	viewAlpha = TransValue(&context);
+	viewAlpha.value = 0;
+	isViewAlphaAnimationRun = false;
+	alphaAnimationOnStart = [&]() {
+		if (isViewAlphaAnimationRun)return;
+		isViewAlphaAnimationRun = true;
+		viewAlpha.clearEvent();
+		viewAlpha.eChange(Point(0), Point(255), Converter(ConvertMode::Linear), 0, 500);
+		viewAlpha.play();
+
+		coverAlphaOpen();
+	};
+
+
+	BGM_play = 0;//BGM再生フラグ
+	FontHandle = CreateFontToHandle(config.BaseFont.c_str(), 27, 9, DX_FONTTYPE_ANTIALIASING_EDGE, -1, 2);//フォントハンドル
+
+	GAME_passed_time = 0;
+	GAME_start_time = 0;
+	LOOP_passed_time = 1;
+	CounterRemainTime = 0;//カウンターの値を1msずつ変動するための時間
+	time_cash = 0;
+	i = 0;
+	j = 0;
+
+	CoverClosedTime = 0;//カバーが閉まったタイミング
+
+	activityState = FLAG_OPENING_STATE;
+
+	Column = config.SongSelectRowNumber - 1;//バナーの縦の列数(RowNumber) -1(実際に並ぶのはColumn+1個) 偶数にする
+
+	for (i = 0; i <= 20; i++) {//初期化
+		title_color[i] = colorRatio(255, 255, 255);
+		title_shadow_color[i] = colorRatio(0, 0, 0);
+		H_TITLE_STR[i] = MakeScreen(640, 48, TRUE);
+	}
+
+	cycleIndex = [](const int value, const int range) {
+		int v = value;
+		if (v >= range)v -= range;
+		if (v < 0)v += range;
+		return v;
+	};
+
+	
+	titleCycleIndex = TitleCycleIndex(config.SongSelectRowNumber);
+	titleStrUpdateFlag = ALL;
+
+	genre_width = 1;//ジャンル名の幅
+	artist_width = 1;//アーティスト名の幅
+	brightness = 0;
+
+	show_bpm = 0;//実際に表示するBPM
+
+	Highscore = (HIGHSCORE*)calloc(SONG_MAX_NUMBER, sizeof(HIGHSCORE));
+	HighscoreRival = (HIGHSCORE*)calloc(SONG_MAX_NUMBER, sizeof(HIGHSCORE));
+
+
+
+	//それぞれの文字列長を格納
+	oi_counter = 0;
+	SetFontSize(28);
+
+	option->H_SENT = MakeScreen(640, 48, TRUE);//オプション説明文の画像ハンドル作成
+	DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
+
+
+	for (i = 0; i < OPERATION_INSTRUCTION_NUMBER; i++) {
+		H_OI_STR[i] = MakeScreen(640, 100, TRUE);
+		SetDrawScreen(H_OI_STR[i]);
+		width_ope_ins[i] = GetDrawStringWidth(ope_ins[i], wcslen(ope_ins[i]));
+		ShowExtendedStrFitToHandle(370, 1, ope_ins[i], width_ope_ins[i], 532, config, FontHandle);
+	}
+	SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
+
+
+	Des1_width = GetDrawStringWidthToHandle(Des1, wcslen(Des1), FontHandle);
+	Des2_width = GetDrawStringWidthToHandle(Des2, wcslen(Des2), FontHandle);
+
+	
+	for (i = 0; i <= SONG_MAX_NUMBER - 1; i++) {//初期化
+		for (j = 0; j <= 9; j++) {
+			Highscore[i].score[j] = 0;
+			Highscore[i].rank[j] = 0;
+			Highscore[i].clear_state[j] = CLEARTYPE_NO_PLAY;
+			Highscore[i].play_count[j] = 0;
+			Highscore[i].sky_perfect[j] = 0;//SKY_PERFECT数
+			Highscore[i].perfect[j] = 0;//PERFECT数
+			Highscore[i].good[j] = 0;//GOOD数
+			Highscore[i].miss[j] = 0;//MISS数
+			Highscore[i].max_combo[j] = 0;//最大コンボ数
+			Highscore[i].min_miss[j] = -1;//最小ミス数
+
+			HighscoreRival[i].score[j] = 0;
+			HighscoreRival[i].rank[j] = 0;
+			HighscoreRival[i].clear_state[j] = CLEARTYPE_NO_PLAY;
+			HighscoreRival[i].play_count[j] = 0;
+			HighscoreRival[i].sky_perfect[j] = 0;//SKY_PERFECT数
+			HighscoreRival[i].perfect[j] = 0;//PERFECT数
+			HighscoreRival[i].good[j] = 0;//GOOD数
+			HighscoreRival[i].miss[j] = 0;//MISS数
+			HighscoreRival[i].max_combo[j] = 0;//最大コンボ数
+			HighscoreRival[i].min_miss[j] = -1;//最小ミス数
+		}
+	}
+
+	for (i = 0; i <= NUMBER_OF_COURSES - 1; i++) {
+		STclear_state[i] = 0;//0:未プレイ 1:不合格 2:合格
+		STscore[i] = 0;//
+		STsky_perfect[i] = 0;//空パーフェクト数
+		STperfect[i] = 0;//
+		STgood[i] = 0;//
+		STmiss[i] = 0;//
+		STrank[i] = 0;//ランク(0:未プレイ 1:F 2:E 3:D 4:C 5:B 6:A 7:S)
+		STplay_count[i] = 0;//何回遊んだか
+		STmax_combo[i] = 0;
+		STmin_miss[i] = -1;
+	}
+
+	center.x = 640;
+	center.y = 360;
+	jacketArea.x = 640;
+	jacketArea.y = 528;
+
+	for (i = 0; i <= 255; i++) {//初期化
+		filename[i] = '\0';
+	}
+
+	themeStr1 = wstring(L"img/themes/");
+	themeStr2 = wstring(option->op.theme.toString());
+
+	H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+	H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());//難易度によってカバー変更
+	H_DIFFICULTY[1] = LoadGraph(L"img/weather/sunny.png");
+
+	H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
+	H_DIFFICULTY[2] = LoadGraph(L"img/weather/cloudy.png");
+
+	H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
+	H_DIFFICULTY[3] = LoadGraph(L"img/weather/rainy.png");
+
+	H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
+	H_DIFFICULTY[4] = LoadGraph(L"img/weather/thunder.png");
+
+	H_DIFFICULTY[5] = LoadGraph(L"img/weather/snowy.png");
+	H_DIFFICULTY[6] = LoadGraph(L"img/weather/snowstorm.png");
+
+	H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
+	H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
+
+	H_OPTION = LoadGraph(L"img/cover_option_str.png");
+	H_RESULT = LoadGraph(L"img/cover_title_result.png");
+	H_RESULT_OBJ = LoadGraph(L"img/cover_result_obj.png");
+
+	H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+	H_BANNER_UD = LoadGraph(L"img/banner_ud.png");
+	H_BANNER_AREA = LoadGraph(L"img/banner_Area.png");
+	H_BANNER_ARTIST = LoadGraph(L"img/banner_Artist.png");
+	H_BANNER_UD_SKIN = LoadGraph(L"img/banner_ud_skin.png");
+	H_BANNER_BACK = LoadGraph(L"img/banner_back.png");
+	H_BANNER_BACK_NE = LoadGraph(L"img/banner_back_ne.png");
+
+	H_OPTION_BANNER = LoadGraph(L"img/option_banner.png");
+	H_BANNER_FLAME = LoadGraph(L"img/banner_flame.png");
+	H_BANNER_FLAME_SECRET = LoadGraph(L"img/banner_flame_secret.png");
+	LoadDivGraph(L"img/banner_d_button.png", 6, 1, 6, 108, 80, H_BANNER_D_BUTTON);
+	H_BANNER_SELECT = LoadGraph(L"img/banner_select.png");
+	H_BANNER_SEASON[0] = LoadGraph(L"img/banner_spring.png");
+	H_BANNER_SEASON[1] = LoadGraph(L"img/banner_summer.png");
+	H_BANNER_SEASON[2] = LoadGraph(L"img/banner_autumn.png");
+	H_BANNER_SEASON[3] = LoadGraph(L"img/banner_winter.png");
+
+	H_COVER_HIGH_SCORE = LoadGraph(L"img/cover_title_high_score.png");
+	H_COVER_RADAR = LoadGraph(L"img/cover_radar.png");
+	H_COVER_RADAR_NAME_ROBUSTNESS = LoadGraph(L"img/radar_name_1.png");
+	H_COVER_RADAR_NAME_TOTAL = LoadGraph(L"img/radar_name_2.png");
+
+
+	H_COVER_POP = LoadGraph(L"img/cover_title_pop.png");
+	H_COVER_SKILL_TEST_POP = LoadGraph(L"img/cover_title_pop.png");
+
+	H_COVER_STATUS_STR = LoadGraph(L"img/cover_status_str.png");
+	H_COVER_STATUS = LoadGraph(L"img/cover_title_status.png");
+
+	LoadDivGraph(L"img/score_number.png", 10, 10, 1, 64, 100, H_SCORE_NUMBER);
+	LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_BPM_NUMBER_MAX);
+	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_BPM_NUMBER_MIN);
+	LoadDivGraph(L"img/SmallNumberGreen.png", 10, 10, 1, 25, 50, H_VERSION_NUMBER);
+	LoadDivGraph(L"img/SmallNumberBlack.png", 10, 10, 1, 25, 50, H_MAX_CHORDS_NUMBER);
+
+
+	LoadDivGraph(L"img/RaderNumber.png", 10, 10, 1, 20, 20, H_RADER_NUMBER);
+
+	H_VERSION_DECIMAL = LoadGraph(L"img/decimal.png");;
+
+	LoadDivGraph(L"img/HighScoreNumber.png", 10, 10, 1, 25, 50, H_JUDGE_NUMBER);
+	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_MIN_MISS_NUMBER);
+	LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_MAX_COMBO_NUMBER);
+	LoadDivGraph(L"img/SmallNumberBlack.png", 10, 10, 1, 25, 50, H_PLAY_COUNT_NUMBER);
+
+
+
+	H_PERCENT = LoadGraph(L"img/PERCENT.png");
+
+	H_FAILED = LoadGraph(L"img/failed.png");
+	H_CLEARED_EASY = LoadGraph(L"img/cleared_easy.png");
+	H_CLEARED_NORMAL = LoadGraph(L"img/cleared_normal.png");
+	H_CLEARED_HARD = LoadGraph(L"img/cleared_hard.png");
+	H_CLEARED_SUPER_HARD = LoadGraph(L"img/cleared_super_hard.png");
+	LoadDivGraph(L"img/FULL_COMBO.png", 6, 1, 6, 640, 100, H_FULL_COMBO);
+	H_PFC = LoadGraph(L"img/PERFECT_FULLCOMBO.png");
+	H_NO_PLAY = LoadGraph(L"img/no_play.png");
+
+	H_SKILL_TEST_PASSED = LoadGraph(L"img/合格.png");
+	H_SKILL_TEST_FAILED = LoadGraph(L"img/不合格.png");
+	//0:FAILED 1:CLEARED 2:FULL_COMBO 3:no play
+	H_RANK[1] = LoadGraph(L"img/F.png");
+	H_RANK[2] = LoadGraph(L"img/E.png");
+	H_RANK[3] = LoadGraph(L"img/D.png");
+	H_RANK[4] = LoadGraph(L"img/C.png");
+	H_RANK[5] = LoadGraph(L"img/B.png");
+	H_RANK[6] = LoadGraph(L"img/A.png");
+	H_RANK[7] = LoadGraph(L"img/S.png");
+
+	H_BUTTON_R = LoadGraph(L"img/button_R.png");
+	H_BUTTON_G = LoadGraph(L"img/button_G.png");
+	H_BUTTON_B = LoadGraph(L"img/button_B.png");
+	H_BUTTON_PRESS = LoadGraph(L"img/button_press.png");
+
+	H_R = LoadGraph(L"img/R.png");
+
+
+	H_BPM_MINMAX_STR = LoadGraph(L"img/BPM_minmax_str.png");
+	H_VER_MAX_CHORDS_STR = LoadGraph(L"img/VER_MAX_CHORDS_str.png");
+
+	H_BPM_SLASH = LoadGraph(L"img/slash.png");
+
+	H_DARKNESS = LoadGraph(L"img/BlackWall.png");
+
+	H_CURSOR = LoadGraph(L"img/cursor.png");
+
+	//NOTEプレビュー画像読み込み
+	note_folder = option->op.note.toString();
+	sprintfDx(strcash, L"img/notes/%s/%s.png", note_folder.c_str(), ReadNameRGB[1]);
+	H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
+	sprintfDx(strcash, L"img/notes/%s/%s.png", note_folder.c_str(), ReadNameRGB[8]);
+	H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+
+	note_symbol_folder = option->op.noteSymbol.toString();
+	sprintfDx(strcash, L"img/note_symbol/%s/%s.png", note_symbol_folder.c_str(), ReadNameRGB[1]);
+	H_OPTION_NOTE_SYMBOL_PREVIEW[0] = LoadGraph(strcash);
+	sprintfDx(strcash, L"img/note_symbol/%s/%s.png", note_symbol_folder.c_str(), ReadNameRGB[8]);
+	H_OPTION_NOTE_SYMBOL_PREVIEW[1] = LoadGraph(strcash);
+
+
+	//グラデーション画像の用意
+	screenHandle = MakeScreen(640, 48, TRUE);
+	int err = SetDrawScreen(screenHandle);
+	// 乗算済みアルファ用アルファブレンドのブレンドモードに設定する
+	SetDrawBlendMode(DX_BLENDMODE_PMA_ALPHA, 255);
+	err = DrawExtendGraph(0, 6, 640, 44,
+		context.getAsset()->img(L"img/gradation.png").getHandle(),
+		true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+	SH_CLOSE = NPLoadFxSoundMem(L"sound/close.wav", option);
+	SH_CLOSED = NPLoadFxSoundMem(L"sound/closed.wav", option);
+	SH_OPEN = NPLoadFxSoundMem(L"sound/open.wav", option);
+	SH_NO = NPLoadFxSoundMem(L"sound/no.wav", option);
+	SH_SONG_SELECT = NPLoadFxSoundMem(L"sound/song_select.wav", option);
+	SH_DIFFICULTY_SELECT = NPLoadFxSoundMem(L"sound/difficulty_select.wav", option);
+	SH_SONG = NPLoadBgmSoundMem(Music[song_number].wavpath[difficulty], option);//曲デモ用音声
+	
+	SH_FOLDER_SELECT = NPLoadFxSoundMem(L"sound/folder_select.wav", option);
+	SH_ALARM = NPLoadBgmSoundMem(L"sound/alarm.wav", option);
+	SH_SHUTTER = NPLoadFxSoundMem(L"sound/shutter.wav", option);
+	SH_SHUTTER_SIGNAL = NPLoadFxSoundMem(L"sound/shutter_signal.wav", option);
+
+	hit_sound_folder = option->op.hitSound.toString();
+	sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", hit_sound_folder.c_str());
+	SH_OPTION_HITSOUND_PREVIEW = NPLoadFxSoundMem(strcash, option, 1);//HIT SOUNDプレビュー音声読み込み
+
+	updateVolume = [&]() {
+		const int fxVolume = option->op.fxSoundVol.getVolume();
+		const int bgmVolume = option->op.bgmSoundVol.getVolume();
+
+		ChangeVolumeSoundMem(fxVolume, SH_CLOSE);
+		ChangeVolumeSoundMem(fxVolume, SH_CLOSED);
+		ChangeVolumeSoundMem(fxVolume, SH_OPEN);
+		ChangeVolumeSoundMem(fxVolume, SH_NO);
+		ChangeVolumeSoundMem(fxVolume, SH_SONG_SELECT);
+		ChangeVolumeSoundMem(fxVolume, SH_DIFFICULTY_SELECT);
+		ChangeVolumeSoundMem(bgmVolume, SH_SONG);
+		ChangeVolumeSoundMem(fxVolume, SH_FOLDER_SELECT);
+		ChangeVolumeSoundMem(bgmVolume, SH_ALARM);
+		ChangeVolumeSoundMem(fxVolume, SH_SHUTTER);
+		ChangeVolumeSoundMem(fxVolume, SH_SHUTTER_SIGNAL);
+		ChangeVolumeSoundMem(fxVolume, SH_OPTION_HITSOUND_PREVIEW);
+		ChangeVolumeSoundMem(bgmVolume, SH_BGM);
+
+		};
+
+	H_JACKET = LoadGraph(Music[song_number].jacketpath[difficulty]);//ジャケットの読み込み
+	H_JACKET_GAUSS = LoadGraph(Music[song_number].jacketpath[difficulty]);//ジャケットの読み込み
+
+
+
+
+	
+	//段位認定リザルト読み込み
+	for (i = 0; i <= NUMBER_OF_COURSES - 2; i++) {
+		if (ProcessMessage() != 0) {
+			dxLibFinishProcess();
+			return;
+		}
+
+		//読み込むファイル名を決定
+		sprintfDx(filename, L"save_data/skill_test/score/%s.dat", STList->title[i]);
+
+		error = _wfopen_s(&fp, filename, L"rb");
+		if (error != 0) {//スコアファイルが見つからなかったら初プレイ
+			firstplay = 1;
+		}
+		else {
+			firstplay = 0;//スコアファイルがある
+		}
+
+		before_STRes.save_data_version = 0;
+		before_STRes.max_combo = 0;
+		before_STRes.sky_perfect = 0;
+		before_STRes.min_miss = 0;
+
+		if (firstplay == 0) {
+			fread(&before_STRes, sizeof(before_STRes), 1, fp);
+
+			STscore[i] = before_STRes.score;
+			STrank[i] = before_STRes.rank;
+			STclear_state[i] = before_STRes.clear;
+			STplay_count[i] = before_STRes.play_count;
+			STsky_perfect[i] = before_STRes.sky_perfect;//SKY_PERFECT数
+			STperfect[i] = before_STRes.perfect;//PERFECT数
+			STgood[i] = before_STRes.good;//GOOD数
+			STmiss[i] = before_STRes.miss;//MISS数
+			STmax_combo[i] = before_STRes.max_combo;//最大コンボ
+			STmin_miss[i] = before_STRes.min_miss;//最小ミス
+
+			PlayCountSum += before.play_count;//プレイヤーデータの総プレイカウント
+			fclose(fp);
+		}
+	}
+
+
+	//スコア読み込み
+	for (int side = 0; side <= 1; side++) {//プレイヤースコア(side=0),おまけスコア(side=1)の読み込み
+		for (i = 0; i <= *NumberOfSongs - 1; i++) {//曲番号
+			for (j = 0; j <= 9; j++) {//難易度
+				if (ProcessMessage() != 0) {
+					dxLibFinishProcess();
+					return;
+				}
+
+				if (side == 0) {
+					wcscpy_s(filename, Music[i].SaveFolder);
+					wcscat_s(filename, L"/result_");
+				}
+				else if (side == 1) {
+					wcscpy_s(filename, Music[i].RivalSaveFolder);
+					wcscat_s(filename, L"/result_");
+				}
+
+				if (j == 1)wcscat_s(filename, L"sunny.dat");
+				if (j == 2)wcscat_s(filename, L"cloudy.dat");
+				if (j == 3)wcscat_s(filename, L"rainy.dat");
+				if (j == 4)wcscat_s(filename, L"thunder.dat");
+
+				if (j == 5)wcscat_s(filename, L"sunny_r.dat");
+				if (j == 6)wcscat_s(filename, L"cloudy_r.dat");
+				if (j == 7)wcscat_s(filename, L"rainy_r.dat");
+				if (j == 8)wcscat_s(filename, L"thunder_r.dat");
+
+				error = _wfopen_s(&fp, filename, L"rb");
+				if (error != 0) {//スコアファイルが見つからなかったら初プレイ
+					firstplay = 1;
+				}
+				else {
+					firstplay = 0;//スコアファイルがある
+				}
+
+				before.save_data_version = 0;
+				before.max_combo = 0;
+				before.sky_perfect = 0;
+				before.min_miss = 0;
+
+				if (firstplay == 0) {
+					fread(&before, sizeof(before), 1, fp);
+				}
+				/*
+				if (j <= 4 && firstplay == 0) {
+					if (ScoreData_Authentication(before, i, j, Music) == -1) {//違う曲、難易度の譜面データだったら無視する(簡単な不正防止)
+						firstplay = 1;
+						fclose(fp);
+					}
+				}
+				if (j >= 5 && firstplay == 0) {//j>=5は虹オプションのとき
+					if (ScoreData_Authentication(before, i, j, Music) == -1) {//違う曲、難易度の譜面データだったら無視する(簡単な不正防止)
+						firstplay = 1;
+						fclose(fp);
+					}
+				}
+				*/
+
+				if (firstplay == 0) {
+					if (side == 0) {
+						Highscore[i].score[j] = before.score;
+						Highscore[i].rank[j] = before.rank;
+						Highscore[i].clear_state[j] = before.clear;
+
+						Highscore[i].play_count[j] = before.play_count;
+						Highscore[i].sky_perfect[j] = before.sky_perfect;//SKY_PERFECT数
+						Highscore[i].perfect[j] = before.perfect;//PERFECT数
+						Highscore[i].good[j] = before.good;//GOOD数
+						Highscore[i].miss[j] = before.miss;//MISS数
+						if (before.save_data_version >= RESULT_DATA_VERSION_MAX_COMBO) {
+							Highscore[i].max_combo[j] = before.max_combo;//最大コンボ数記録バージョン以降のセーブデータなら読み込む
+						}
+						if (before.save_data_version >= RESULT_DATA_VERSION_MIN_MISS) {
+							Highscore[i].min_miss[j] = before.min_miss;//最小ミス記録バージョン以降のセーブデータなら読み込む
+							if (before.clear == CLEARTYPE_PLAY && Highscore[i].min_miss[j] == 0) {//MISS 0ならPLAY状態でもフルコンボを表示するようにする
+								Highscore[i].clear_state[j] = CLEARTYPE_FULL_COMBO;
+							}
+							if (before.clear == CLEARTYPE_PLAY && Highscore[i].min_miss[j] == 0 && Highscore[i].good[j] == 0) {//GOOD 0ならPLAY状態でもPERFECTを表示するようにする
+								Highscore[i].clear_state[j] = CLEARTYPE_PERFECT;
+							}
+						}
+						else {//それ以前のセーブデータ
+							if (Highscore[i].clear_state[j] == CLEARTYPE_FULL_COMBO || Highscore[i].clear_state[j] == CLEARTYPE_PERFECT) {//フルコン済みなら
+								Highscore[i].min_miss[j] = 0;
+							}
+							else if (Highscore[i].clear_state[j] == CLEARTYPE_EASY_CLEARED ||
+								Highscore[i].clear_state[j] == CLEARTYPE_CLEARED ||
+								Highscore[i].clear_state[j] == CLEARTYPE_HARD_CLEARED ||
+								Highscore[i].clear_state[j] == CLEARTYPE_SUPER_HARD_CLEARED) {//クリア済み
+								Highscore[i].min_miss[j] = Highscore[i].miss[j];
+							}
+							else {
+								Highscore[i].min_miss[j] = -1;
+							}
+						}
+
+						PlayCountSum += before.play_count;//プレイヤーデータの総プレイカウント
+						fclose(fp);
+					}
+					else if (side == 1) {
+						HighscoreRival[i].score[j] = before.score;
+						HighscoreRival[i].rank[j] = before.rank;
+						HighscoreRival[i].clear_state[j] = before.clear;
+						HighscoreRival[i].play_count[j] = before.play_count;
+						HighscoreRival[i].sky_perfect[j] = before.sky_perfect;//SKY_PERFECT数
+						HighscoreRival[i].perfect[j] = before.perfect;//PERFECT数
+						HighscoreRival[i].good[j] = before.good;//GOOD数
+						HighscoreRival[i].miss[j] = before.miss;//MISS数
+						if (before.save_data_version >= RESULT_DATA_VERSION_MAX_COMBO) {
+							HighscoreRival[i].max_combo[j] = before.max_combo;//最大コンボ数記録バージョン以降のセーブデータなら読み込む
+						}
+
+						if (before.save_data_version >= RESULT_DATA_VERSION_MIN_MISS) {
+							HighscoreRival[i].min_miss[j] = before.min_miss;//最小ミス記録バージョン以降のセーブデータなら読み込む
+							if (HighscoreRival[i].min_miss[j] == 0) {//MISS 0ならPLAY状態でもフルコンボを表示するようにする
+								HighscoreRival[i].clear_state[j] = CLEARTYPE_FULL_COMBO;
+							}
+							if (HighscoreRival[i].min_miss[j] == 0 && HighscoreRival[i].good[j] == 0) {//GOOD 0ならPLAY状態でもPERFECTを表示するようにする
+								HighscoreRival[i].clear_state[j] = CLEARTYPE_PERFECT;
+							}
+						}
+						else {//それ以前のセーブデータ
+							if (HighscoreRival[i].clear_state[j] == CLEARTYPE_FULL_COMBO || HighscoreRival[i].clear_state[j] == CLEARTYPE_PERFECT) {//フルコン済みなら
+								HighscoreRival[i].min_miss[j] = 0;
+							}
+							else if (HighscoreRival[i].clear_state[j] == CLEARTYPE_EASY_CLEARED ||
+								HighscoreRival[i].clear_state[j] == CLEARTYPE_CLEARED ||
+								HighscoreRival[i].clear_state[j] == CLEARTYPE_HARD_CLEARED ||
+								HighscoreRival[i].clear_state[j] == CLEARTYPE_SUPER_HARD_CLEARED) {//クリア済み
+								HighscoreRival[i].min_miss[j] = HighscoreRival[i].miss[j];
+							}
+							else {
+								HighscoreRival[i].min_miss[j] = -1;
+							}
+						}
+						fclose(fp);
+					}
+				}
+				//fclose(fp);
+			}
+		}
+	}
+
+
+	
+
+	for (int diff = 1; diff < 5; diff++) {//難易度
+		for (j = 0; j < folder->folder_c[FolderIndex::ALL_SONGS]; j++) {
+			if (folder->folder[FolderIndex::ALL_SONGS][j].kind == 0 && Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
+				auto global = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].global[1][diff];
+				auto local = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].local[1][diff];
+				auto chain = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].chain[1][diff];
+				auto unstability = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].unstability[1][diff];
+				auto streak = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].longNote[1][diff];
+				auto color = Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].color[1][diff];
+				auto total = global + local + chain + unstability + streak + color;
+
+				auto score = Highscore[folder->folder[FolderIndex::ALL_SONGS][j].song_number].score[diff];
+
+				radar_skill_list.global.add((double)score / 10000 * global, j, diff);
+				radar_skill_list.local.add((double)score / 10000 * local, j, diff);
+				radar_skill_list.chain.add((double)score / 10000 * chain, j, diff);
+				radar_skill_list.unstability.add((double)score / 10000 * unstability, j, diff);
+				radar_skill_list.streak.add((double)score / 10000 * streak, j, diff);
+				radar_skill_list.color.add((double)score / 10000 * color, j, diff);
+				radar_skill_list.robustness.add((double)score / 10000 * total, j, diff);
+
+			}
+		}
+	}
+
+	skill_radar_result.global = radar_skill_list.global.average();
+	skill_radar_result.local = radar_skill_list.local.average();
+	skill_radar_result.chain = radar_skill_list.chain.average();
+	skill_radar_result.unstability = radar_skill_list.unstability.average();
+	skill_radar_result.streak = radar_skill_list.streak.average();
+	skill_radar_result.color = radar_skill_list.color.average();
+	skill_radar_result.robustness = radar_skill_list.robustness.average();
+
+	//スキルレーダー対象譜面のフォルダ追加
+	reset_folder_skill_radar(folder);
+	for (const auto& i : radar_skill_list.global.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_GLOBAL, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_GLOBAL, 1);
+
+	for (const auto& i : radar_skill_list.local.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_LOCAL, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_LOCAL, 1);
+
+	for (const auto& i : radar_skill_list.chain.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_CHAIN, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_CHAIN, 1);
+
+	for (const auto& i : radar_skill_list.unstability.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_UNSTABILITY, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_UNSTABILITY, 1);
+
+	for (const auto& i : radar_skill_list.streak.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_STREAK, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_STREAK, 1);
+
+	for (const auto& i : radar_skill_list.color.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_COLOR, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_COLOR, 1);
+
+	for (const auto& i : radar_skill_list.robustness.list) {
+		if (i.score == 0)continue;
+		folder_insert_skill_radar(folder, i.song_number, i.difficulty, FolderIndex::SKILL_RADAR_ROBUSTNESS, 0);
+	}
+	folder_insert_skill_radar(folder, *NumberOfSongs, 1, FolderIndex::SKILL_RADAR_ROBUSTNESS, 1);
+
+	
+
+
+	//フォルダ毎の成績を算出
+	for (int rainbow = 0; rainbow < 2; rainbow++) {
+		int count = 0;
+
+		for (i = 0; i < NUMBER_OF_FOLDERS; i++) {
+			if (folder->FolderKind[i] == FOLDER_KIND_NORMAL) {//難易度毎に算出
+				for (int diff = 1; diff < 5; diff++) {//難易度
+					//FolderScoreRaderBuf FolderScoreRaderBuf;
+					count = 0;
+					for (j = 0; j < folder->folder_c[i]; j++) {
+						if (folder->folder[i][j].kind == 0 && Music[folder->folder[i][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
+							FolderScore[rainbow][i][diff].AverageScore += Highscore[folder->folder[i][j].song_number].score[diff + rainbow * 4];
+							double ScoreRate = (double)Highscore[folder->folder[i][j].song_number].score[diff + rainbow * 4] / 10000;
+
+							FolderScore[rainbow][i][diff].clearState[clearStateConverter(Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4])]++;
+							FolderScore[rainbow][i][diff].rank[Highscore[folder->folder[i][j].song_number].rank[diff + rainbow * 4]]++;
+
+							if (FolderScore[rainbow][i][diff].ClearType > Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4]) {//フォルダにある譜面の中で一番低いクリア状態をそのフォルダのクリア状態にする
+								FolderScore[rainbow][i][diff].ClearType = Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4];
+							}
+
+							count++;
+
+						}
+					}
+					if (count != 0)FolderScore[rainbow][i][diff].AverageScore = (double)FolderScore[rainbow][i][diff].AverageScore / count;
+
+				}
+
+			}
+			else if (folder->FolderKind[i] == FOLDER_KIND_DIFFICULTY) {//フォルダ単位で算出
+
+				//FolderScoreRaderBuf FolderScoreRaderBuf;
+				count = 0;
+
+
+
+				for (j = 0; j < folder->folder_c[i]; j++) {
+					int diff = folder->folder[i][j].difficulty;
+
+					if (folder->folder[i][j].kind == 0 && Music[folder->folder[i][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
+						FolderScore[rainbow][i][1].AverageScore += Highscore[folder->folder[i][j].song_number].score[diff + rainbow * 4];
+						double ScoreRate = (double)Highscore[folder->folder[i][j].song_number].score[diff + rainbow * 4] / 10000;
+
+						FolderScore[rainbow][i][1].clearState[clearStateConverter(Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4])]++;
+						FolderScore[rainbow][i][1].rank[Highscore[folder->folder[i][j].song_number].rank[diff + rainbow * 4]]++;
+
+						if (FolderScore[rainbow][i][1].ClearType > Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4]) {//フォルダにある譜面の中で一番低いクリア状態をそのフォルダのクリア状態にする
+							FolderScore[rainbow][i][1].ClearType = Highscore[folder->folder[i][j].song_number].clear_state[diff + rainbow * 4];
+						}
+
+						count++;
+
+					}
+				}
+				if (count != 0)FolderScore[rainbow][i][1].AverageScore = (double)FolderScore[rainbow][i][1].AverageScore / count;
+
+
+				for (int diff = 2; diff <= 4; diff++) {//難易度固定フォルダはフォルダ選択時にどの譜面難易度を選んでいても同じ値を表示するために値をコピー
+					FolderScore[rainbow][i][diff].AverageScore = FolderScore[rainbow][i][1].AverageScore;
+
+					FolderScore[rainbow][i][diff].ClearType = FolderScore[rainbow][i][1].ClearType;
+
+					for (j = 0; j < 9; j++)FolderScore[rainbow][i][diff].clearState[j] = FolderScore[rainbow][i][1].clearState[j];
+					for (j = 0; j < 8; j++)FolderScore[rainbow][i][diff].rank[j] = FolderScore[rainbow][i][1].rank[j];
+				}
+
+			}
+			//フォルダのランク決定 (0:未プレイ 1:F 2:E 3:D 4:C 5:B 6:A 7:S)
+			for (int diff = 1; diff < 5; diff++) {//難易度
+				if (FolderScore[rainbow][i][diff].AverageScore >= RANK_S_SCORE) {
+					FolderScore[rainbow][i][diff].folderRank = RANK_S;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_A_SCORE) {
+					FolderScore[rainbow][i][diff].folderRank = RANK_A;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_B_SCORE) {
+					FolderScore[rainbow][i][diff].folderRank = RANK_B;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_C_SCORE) {
+					FolderScore[rainbow][i][diff].folderRank = RANK_C;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_D_SCORE) {
+					FolderScore[rainbow][i][diff].folderRank = RANK_D;
+				}
+				else if (FolderScore[rainbow][i][diff].AverageScore >= RANK_E_SCORE) {
+					FolderScore[rainbow][i][diff].folderRank = RANK_E;
+				}
+				else {
+					FolderScore[rainbow][i][diff].folderRank = RANK_F;
+				}
+				if (FolderScore[rainbow][i][diff].AverageScore == 0) {
+					FolderScore[rainbow][i][diff].folderRank = RANK_NONE;
+				}
+
+			}
+		}
+	}
+
+
+	//セーブデータ読み込み
+
+	if (loadSaveData(&saveData) == -1) {
+		//初回作成時
+		saveData.totalPlayCount = PlayCountSum;
+		saveData.totalHitNotes = PlayCountSum * 500;//暫定で叩いた音符数を格納
+		if (saveData.totalPlayCount >= SAVE_DATA_VALUE_LIMIT)saveData.totalPlayCount = SAVE_DATA_VALUE_LIMIT;
+		if (saveData.totalHitNotes >= SAVE_DATA_VALUE_LIMIT)saveData.totalHitNotes = SAVE_DATA_VALUE_LIMIT;
+	}
+
+
+	saveData.totalHighScore = 0;
+	saveData.totalHighScoreRainbow = 0;
+	for (int diff = 1; diff < 5; diff++) {//難易度
+		for (j = 0; j < folder->folder_c[FolderIndex::ALL_SONGS]; j++) {
+			if (folder->folder[FolderIndex::ALL_SONGS][j].kind == 0 && Music[folder->folder[FolderIndex::ALL_SONGS][j].song_number].exist[diff] == 1) {//「フォルダ選択に戻る」ではなく存在する譜面
+				saveData.totalHighScore += Highscore[folder->folder[FolderIndex::ALL_SONGS][j].song_number].score[diff];
+				saveData.totalHighScoreRainbow += Highscore[folder->folder[FolderIndex::ALL_SONGS][j].song_number].score[diff + 4];
+			}
+		}
+	}
+	if (saveData.totalHighScore >= SAVE_DATA_VALUE_LIMIT)saveData.totalHighScore = SAVE_DATA_VALUE_LIMIT;
+	if (saveData.totalHighScoreRainbow >= SAVE_DATA_VALUE_LIMIT)saveData.totalHighScoreRainbow = SAVE_DATA_VALUE_LIMIT;
+	writeSaveData(saveData);
+
+
+	for (int rainbow = 0; rainbow < 2; rainbow++) {//自然管理技術者検定フォルダでランク、クリア状態を表示しないようプレイ状態扱いにする
+		for (int diff = 1; diff < 5; diff++) {
+			FolderScore[rainbow][FolderIndex::SKILL_TEST_NUMBER][diff].ClearType = CLEARTYPE_PLAY;
+		}
+	}
+
+	//曲リストのソート
+	for (int SortKind = 0; SortKind < option->op.sort.itemCount() + 10; SortKind++) {//ソート種類の数だけ用意[*][][][][]
+		SortList.push_back(vector<vector<vector<vector<SortSongListIndex>>>>());
+		for (int FolderInd = 0; FolderInd < NUMBER_OF_FOLDERS; FolderInd++) {//ソート種類ごとにフォルダの数を追加[][*][][][]
+			SortList[SortKind].push_back(vector<vector<vector<SortSongListIndex>>>());
+
+			for (int RainbowInd = 0; RainbowInd < 2; RainbowInd++) {//フォルダ内リスト毎に正規、虹のソート対象の値を追加[][][*][][]
+				SortList[SortKind][FolderInd].push_back(vector<vector<SortSongListIndex>>());
+				for (int DifficultyInd = 0; DifficultyInd < 4; DifficultyInd++) {//正規、虹のソート対象毎に難易度を追加[][][][*][] 降水確率フォルダではどれを使っても同じ
+					SortList[SortKind][FolderInd][RainbowInd].push_back(vector<SortSongListIndex>());
+
+					for (int ListInd = 0; ListInd < folder->folder_c[FolderInd]; ListInd++) {//フォルダの数ごとにフォルダ内リスト数を追加[][][][][*]
+						SortList[SortKind][FolderInd][RainbowInd][DifficultyInd].push_back(SortSongListIndex());
+
+						SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].index = ListInd;
+						if (SortKind == (int)OptionItem::Sort::DEFAULT) {
+							SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = ListInd;
+						}
+						else if (SortKind == (int)OptionItem::Sort::LEVEL) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Music[folder->folder[FolderInd][ListInd].song_number].level[folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Music[folder->folder[FolderInd][ListInd].song_number].level[DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::SCORE) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].score[folder->folder[FolderInd][ListInd].difficulty + RainbowInd * 4];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].score[1 + DifficultyInd + RainbowInd * 4];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::CLEAR_STATE) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].clear_state[folder->folder[FolderInd][ListInd].difficulty + RainbowInd * 4];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].clear_state[1 + DifficultyInd + RainbowInd * 4];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::MIN_MISS) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].min_miss[folder->folder[FolderInd][ListInd].difficulty + RainbowInd * 4];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].min_miss[1 + DifficultyInd + RainbowInd * 4];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::PLAY_COUNT) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].play_count[folder->folder[FolderInd][ListInd].difficulty + RainbowInd * 4];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = Highscore[folder->folder[FolderInd][ListInd].song_number].play_count[1 + DifficultyInd + RainbowInd * 4];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::RADAR_TOTAL) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value =
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].global[RainbowInd][folder->folder[FolderInd][ListInd].difficulty] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].local[RainbowInd][folder->folder[FolderInd][ListInd].difficulty] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].chain[RainbowInd][folder->folder[FolderInd][ListInd].difficulty] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].unstability[RainbowInd][folder->folder[FolderInd][ListInd].difficulty] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].longNote[RainbowInd][folder->folder[FolderInd][ListInd].difficulty] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].color[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+
+
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value =
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].global[RainbowInd][DifficultyInd + 1] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].local[RainbowInd][DifficultyInd + 1] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].chain[RainbowInd][DifficultyInd + 1] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].unstability[RainbowInd][DifficultyInd + 1] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].longNote[RainbowInd][DifficultyInd + 1] +
+									(int)Music[folder->folder[FolderInd][ListInd].song_number].color[RainbowInd][DifficultyInd + 1];
+
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::GLOBAL) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].global[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].global[RainbowInd][DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::LOCAL) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].local[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].local[RainbowInd][DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::CHAIN) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].chain[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].chain[RainbowInd][DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::UNSTABILITY) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].unstability[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].unstability[RainbowInd][DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::STREAK) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].longNote[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].longNote[RainbowInd][DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::COLOR) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].color[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].color[RainbowInd][DifficultyInd + 1];
+							}
+						}
+						else if (SortKind >= (int)OptionItem::Sort::RED_DENSITY && SortKind <= (int)OptionItem::Sort::RAINBOW_DENSITY) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].ColorNotesAmount[RainbowInd][folder->folder[FolderInd][ListInd].difficulty][SortKind - (int)OptionItem::Sort::RED_DENSITY];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].ColorNotesAmount[RainbowInd][DifficultyInd + 1][SortKind - (int)OptionItem::Sort::RED_DENSITY];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::MAX_BPM) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].bpmmax[folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].bpmmax[DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::MIN_BPM) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].bpmmin[folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].bpmmin[DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::MAX_CHORDS) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].maxChords[RainbowInd][folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].maxChords[RainbowInd][DifficultyInd + 1];
+							}
+						}
+						else if (SortKind == (int)OptionItem::Sort::VERSION) {
+							if (folder->FolderKind[FolderInd] == FOLDER_KIND_DIFFICULTY) {//降水確率別フォルダでは難易度を指定しておく
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].version[folder->folder[FolderInd][ListInd].difficulty];
+							}
+							else {
+								SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][ListInd].value = (int)Music[folder->folder[FolderInd][ListInd].song_number].version[DifficultyInd + 1];
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	//ソート処理
+	for (int SortKind = 0; SortKind < option->op.sort.itemCount(); SortKind++) {//ソートの仕方の数だけ用意[*][][][][]
+		for (int FolderInd = 0; FolderInd < NUMBER_OF_FOLDERS; FolderInd++) {//ソート種類ごとにフォルダの数を追加[][*][][][]
+
+			for (int RainbowInd = 0; RainbowInd < 2; RainbowInd++) {//フォルダ内リスト毎に正規、虹のソート対象の値を追加[][][][*][]
+				for (int DifficultyInd = 0; DifficultyInd < 4; DifficultyInd++) {//正規、虹のソート対象毎に難易度を追加[][][][][*] 降水確率フォルダではどれを使っても同じ
+
+
+					stable_sort(&SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][0],
+						&SortList[SortKind][FolderInd][RainbowInd][DifficultyInd][folder->folder_c[FolderInd] - 1]);
+
+				}
+			}
+
+		}
+	}
+
+	//2回目以降の選曲画面に戻ってきたときのためのlist_number_baseとlist_number算出(段位認定から戻ってきたときは行わない)
+	if (folder->selected_folder != FolderIndex::SKILL_TEST_NUMBER) {
+		//ソート結果が前と変わってた時のために、元の曲番号と同じ番号、同じ難易度を指すlist_number_baseを探す
+		int now_song_number = song_number;
+		int now_difficulty = difficulty;
+		int notSortedIndex = 0;//ソート前のリストのインデックスを指す
+		for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {//ソート後のリストのインデックスを指す
+			//ソート前のリストのインデックスに変換
+			notSortedIndex = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.getIndex() == (int)OptionItem::Color::RAINBOW][difficulty - 1][SearchListNumberBase].index;
+
+			if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY) {//難易度別フォルダを選んでいた時は曲番号と難易度も合っているか確認する
+				//前回選んでいた曲番号と難易度が一致していたらこのソート前のリストのインデックスが正しい
+				if (now_song_number ==
+					folder->folder[folder->selected_folder][notSortedIndex].song_number
+
+					&&
+
+					now_difficulty ==
+					folder->folder[folder->selected_folder][notSortedIndex].difficulty
+					) {
+
+
+					list_number_base = SearchListNumberBase;
+				}
+			}
+			else if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_NORMAL) {//通常フォルダを選んでいた時は曲番号だけ合っているか確認する
+				//前回選んでいた曲番号が一致していたらこのソート前のリストのインデックスが正しい
+				if (now_song_number ==
+					folder->folder[folder->selected_folder][notSortedIndex].song_number) {
+
+
+					list_number_base = SearchListNumberBase;
+				}
+			}
+		}
+
+		//list_number_baseが見つかったのでlist_number算出
+		list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.getIndex() == (int)OptionItem::Color::RAINBOW][difficulty - 1][list_number_base].index;
+	}
+
+	if (PlayCountSum <= 2) {//3回目のプレイ後からフォルダ選択に戻されなくなる
+		*SelectingTarget = SELECTING_FOLDER;
+	}
+
+
+	StrAnnounce = announce_str(*StageCount, PlayCountSum);
+	AnnounceWidth =//アナウンス文字長
+		GetDrawStringWidthToHandle(//文字長を取得
+			StrAnnounce, //アナウンスを出す
+			wcslen(StrAnnounce),//同じようにその文字数も引数として入れてやる
+			FontHandle);
+
+
+	int rank_point = result_rank_buf[0] + result_rank_buf[1] + result_rank_buf[2];
+	if (secret->total != 0 && secret->song_appear_number == -1) {//隠し曲があって前に発生した隠し曲演出を消化している(-1)とき
+
+		if ((rank_point >= 5 * 3) || SECRET_ALWAYS_APPEAR) {//過去3回のランクが平均B(値は5)以上で隠し曲演出へ
+			if (secret->all_get == 1) {
+				secret->secret_song_appear_number = GetRand(secret->total - 1);//現れる曲の隠し曲番号をランダムに選んで入れる
+				secret->song_appear_number = secret->song_number[secret->secret_song_appear_number];//曲番号に変換
+			}
+			else {//全曲解禁していない
+				do {
+					secret->secret_song_appear_number = GetRand(secret->total - 1);//現れる曲の隠し曲番号をランダムに選んで入れる
+					if (secret->get_song_number[secret->secret_song_appear_number] == 0) {//未解禁の隠し曲曲番号ならそれにする
+						secret->song_appear_number = secret->song_number[secret->secret_song_appear_number];//曲番号に変換
+						break;
+					}
+				} while (1);//未解禁の曲番号を選ぶまでやり直す
+			}
+			secret_LOAD_contents(Music, secret->song_appear_number, secret);//アナウンス文の読み込み(secret->Announceに格納)
+
+			secret->Announce_width =
+				GetDrawStringWidthToHandle(//文字長を取得
+					secret->Announce, //アナウンスを出す
+					wcslen(secret->Announce),//同じようにその文字数も引数として入れてやる
+					FontHandle);
+
+			if (secret->all_get == 0)*SelectingTarget = SELECTING_FOLDER;//全解禁していないときフォルダ選択状態にする(アナウンス文を見せるため)
+		}
+	}
+
+
+
+	//アナウンス用文字列画像作成
+	if (secret->song_appear_number != -1) {//隠し曲出現演出中
+		H_ANNOUNSE = MakeScreen(secret->Announce_width + 20, 100, TRUE);
+		SetDrawScreen(H_ANNOUNSE);
+		ShowExtendedStrFitToHandle((secret->Announce_width + 20) / 2, 1, secret->Announce, secret->Announce_width, secret->Announce_width + 20, config, FontHandle, secret->Color, secret->ShadowColor);
+		SetDrawScreen(DX_SCREEN_BACK);
+	}
+	else {
+		H_ANNOUNSE = MakeScreen(AnnounceWidth + 20, 100, TRUE);
+		SetDrawScreen(H_ANNOUNSE);
+		ShowExtendedStrFitToHandle((AnnounceWidth + 20) / 2, 1, StrAnnounce, AnnounceWidth, AnnounceWidth + 20, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
+		SetDrawScreen(DX_SCREEN_BACK);
+	}
+
+
+
+
+	if (secret->song_appear_number == -1) {
+		if (rank_point == 14) {//ランクの合計が丁度14だったら (Sを二回連続で取るとなる BBCでもなる)
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_bgm2.ogg", option);//選曲BGMの読み込み
+		}
+		else if (rank_point >= 12) {//A二回連続またはBBE,CCC等
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_bgm3.ogg", option);//選曲BGMの読み込み
+
+		}
+		else {
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_bgm.ogg", option);//選曲BGMの読み込み
+		}
+		H_CLOUD = LoadGraph(L"img/cloud.png");
+	}
+	else if (secret->song_appear_number != -1) {//隠し曲演出時
+		if (wcscmp(L"\0", secret->BGM) == 0) {//何も指定されていなかったら
+			SH_BGM = NPLoadBgmSoundMem(L"sound/song_select_secret_bgm.ogg", option);//隠し曲選曲BGMの読み込み
+		}
+		else {
+			SH_BGM = NPLoadBgmSoundMem(secret->BGM, option);//専用選曲BGMの読み込み
+		}
+		H_CLOUD = LoadGraph(L"img/cloud_black.png");//隠し曲演出なら黒い雲
+	}
+
+	if (secret->song_appear_number != -1) {//隠し曲演出時
+		if (wcscmp(L"\0", secret->BGM) != 0 && Music[secret->song_appear_number].secret == UnlockState::Secret) {//未解禁隠し曲の出現時で専用BGMがあったら
+			BGM_continue = 1;//BGMを鳴らし続ける
+		}
+		else {
+			BGM_continue = 0;//BGMはフォルダ選択画面のみ流す
+		}
+	}
+	else {
+		BGM_continue = 0;//BGMはフォルダ選択画面のみ流す
+	}
+
+
+	if (!option->op.color.isRainbow()) {//虹オプション選択フラグの設定
+		select_rainbow = 0;
+	}
+	if (option->op.color.isRainbow()) {
+		select_rainbow = 4;
+	}
+
+	ChangeFont(config.BaseFont.c_str());
+	ChangeFontType(DX_FONTTYPE_ANTIALIASING_EDGE);
+	SetFontSize(28);
+	SetFontThickness(9);
+
+	//非解禁隠し曲でアラーム鳴らす設定の曲は出現時にアラームを鳴らす
+	if (secret->get_song_number[secret->secret_song_appear_number] == 0 && secret->beep_alarm == 1) {
+		//NMC緊急速報表示
+		H_NMC = LoadGraph(L"img/NMC.png");
+		DrawGraph(0, 0, H_NMC, TRUE);
+		ScreenFlip();
+
+		//0.1秒待つ
+		Sleep(100);
+
+		PlaySoundMem(SH_ALARM, DX_PLAYTYPE_BACK, TRUE);
+		while (CheckSoundMem(SH_ALARM) == 1) {//なり終わるまで待機
+			if (ProcessMessage() != 0) {//×でゲーム終了
+				dxLibFinishProcess();
+				return;
+			}
+		}
+	}
+
+	if (*SelectingTarget == SELECTING_COURSE)optionListView.setSkillTestMode(true);
+
+	GAME_start_time = GetNowCount_d(config);
+	Announse_show_time_base = GetNowCount() + 1500;//アナウンス表示の基準時間
+
+	auto flag = ShowFlag(); flag.version = true; flag.autoPlay = true; flag.scoreRanking = true; flag.keyConfig = true;
+	WindowTitleSetter::setText(flag);
+}
+
+
+
+void SongSelect::SongSelectScreen::updateModel()
+{
+	appContext.updateTime();
+	coverAlpha.process();
+
+	if (ProcessMessage() != 0) {//×で終了
+		dxLibFinishProcess();
+		return;
+	}
+
+	//BGM再生
+	if (BGM_play == 0 && GAME_passed_time >= 1000) {
+		PlaySoundMem(SH_BGM, DX_PLAYTYPE_LOOP, TRUE);
+		BGM_play = 1;
+	}
+	if (activityState != FLAG_END_FUNCTION_STATE) {//シャッター閉まったらここではBGMの音量調整は行わない
+		int bgmVolume = option->op.bgmSoundVol.getVolume();
+		ChangeVolumeSoundMem(int(bgm_vol_ratio * bgmVolume), SH_BGM);
+	}
+
+	//CALC
+	GAME_passed_time = GetNowCount_d(config) - GAME_start_time;//経過時間計算
+	LOOP_passed_time = GAME_passed_time - time_cash;//1ループにかかった時間を算出
+	time_cash = GAME_passed_time;
+
+	CounterRemainTime -= int(CounterRemainTime);
+	CounterRemainTime += LOOP_passed_time;
+	CRTBuf = int(CounterRemainTime);
+
+	Get_Key_State(Buf, Key, AC);
+
+	ShowFps(GAME_passed_time, LOOP_passed_time, time_cash, config);
+
+	alphaAnimationOnStart();
+
+	if (activityState == FLAG_SELECT_STATE) {
+		int PressFrame = int(25.0 * (17.0 / LOOP_passed_time));//ボタン押し続けてカーソルが動き続けるようになるまでのフレーム
+		if (PressFrame <= 0)PressFrame = 1;//0以下にはしない
+
+		//printfDx(L"%d\n", PressFrame);
+		if (Key[KEY_INPUT_ESCAPE] == 1 && activityState != FLAG_CLOSING_STATE && activityState != FLAG_END_FUNCTION_STATE) {//ESCで画面終了
+			activityState = FLAG_CLOSING_STATE;
+			PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+			coverAlphaClose();
+			*isBackToTitle = true;
+			//dxLibFinishProcess();
+		}
+
+		if (Key[KEY_INPUT_F1] == 1) {//デバッグモードONOFF
+			if (*debug == 0) {
+				*debug = 1;
+				PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+			}
+			else {
+				*debug = 0;
+				PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+			}
+		}
+
+		if (Key[KEY_INPUT_F2] == 1) {//スコア再送信&ランキング表示
+			if (*SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {//存在する譜面を選んでいる時
+				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
+				IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color.isRainbow(), config);
+				IRview(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, option->op.color.isRainbow(), config);
+			}
+			else if (*SelectingTarget == SELECTING_FOLDER) {
+				//スキルレーダーランキングを開く
+				PlaySoundMem(SH_SHUTTER_SIGNAL, DX_PLAYTYPE_BACK, TRUE);
+				viewSkillRadarRanking(config);
+			}
+			//if (ScoreShowMode == 0) {
+			//	ScoreShowMode = 1;
+			//	PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+			//}
+			//else {
+			//	ScoreShowMode = 0;
+			//	PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+			//}
+		}
+
+		if (Key[KEY_INPUT_F3] == 1) {//キーコンフィグ画面
+			KEY_CONFIG(Button, Button_Shutter, Key, Buf, AC, config, option, ir);
+		}
+
+		if (Key[KEY_INPUT_F9] == 1 && SEND_EXIST_SCORE_TO_IR) {//既存スコアを送信
+			RESULT IrScore;
+			IrScore.difficulty = difficulty;
+			IrScore.clear = Highscore[song_number].clear_state[difficulty + select_rainbow];
+			IrScore.rank = Highscore[song_number].rank[difficulty + select_rainbow];
+			IrScore.score = Highscore[song_number].score[difficulty + select_rainbow];
+			IrScore.sky_perfect = Highscore[song_number].sky_perfect[difficulty + select_rainbow];
+			IrScore.perfect = Highscore[song_number].perfect[difficulty + select_rainbow];
+			IrScore.good = Highscore[song_number].good[difficulty + select_rainbow];
+			IrScore.miss = Highscore[song_number].miss[difficulty + select_rainbow];
+			IrScore.min_miss = Highscore[song_number].min_miss[difficulty + select_rainbow];
+			IrScore.max_combo = Highscore[song_number].max_combo[difficulty + select_rainbow];
+			IrScore.play_count = Highscore[song_number].play_count[difficulty + select_rainbow];
+
+			IRsave(Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, IrScore, difficulty, Music[song_number].season[difficulty], option->op.color.isRainbow(), 0, config);
+			IRsend(ir, Music[song_number].SongPath[difficulty], Music[song_number].SaveFolder, difficulty, option->op.color.isRainbow(), config);
+		}
+
+		if (Key[KEY_INPUT_F4] == 1) {
+			LearningDataGenarator predDataGenerator = LearningDataGenarator();
+			predDataGenerator.openFile();
+			predDataGenerator.writeData(&Music[song_number], difficulty);
+		}
+
+		if (Key[Button_Shutter] == 1) {//スクリーンショット
+			ScreenShot(SH_SHUTTER_SIGNAL, SH_SHUTTER);
+		}
+
+
+		//オプション画面ONOFF処理(この処理を行ったフレームでは他の操作を受け付けない)
+		if (OptionOpen == 0 && (Key[Button[0][0]] == 1 || Key[Button[2][0]] == 1)) {//オプション画面ON
+			OptionOpen = 1;//オプション選択モードにする
+			optionListView.show();
+			PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);
+			time_base_str = int(GetNowCount_d(config));
+		}
+		else if (OptionOpen == 1 && (Key[Button[0][0]] == 1 || Key[Button[2][0]] == 1 || Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1)) {//オプション画面OFF
+			OptionOpen = 0;//選曲モードにする
+			optionListView.hide();
+			PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);
+			time_base_str = int(GetNowCount_d(config));
+		}
+		else {//この処理を行わなかったフレーム
+
+			if (Key[Button[0][3]] == 1 || Key[Button[2][3]] == 1) {//リザルト画面ONOFF
+				if (ShowResultFlag == 0) {
+					ShowResultFlag = 1;//リザルト表示モードにする
+					PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);
+				}
+				else {
+					ShowResultFlag = 0;//選曲モードにする
+					PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);
+				}
+			}
+
+
+			if (OptionOpen == 0 && *SelectingTarget == SELECTING_SONG) {//オプション出してなくて曲選択モードのとき
+				if ((Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[KEY_INPUT_UP] >= 1)
+					&& (Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[KEY_INPUT_DOWN] >= 1)) {//上下同時押しでフォルダセレクトに戻る
+					*SelectingTarget = SELECTING_FOLDER;
+					StopSoundMem(SH_SONG);
+					PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+					song_play_counter = 1;
+					jacket_show_counter = 1;//ジャケットの読み込み
+					jacket_alpha = 0;
+					widthCalcFlag = 1;
+					titleStrUpdateFlag = ALL;
+				}
+				else {
+					if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
+						if (difficulty != 1) {
+							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+
+							if ((wcscmp(Music[song_number].wavpath[difficulty], Music[song_number].wavpath[difficulty - 1]) != 0//パスが違う
+								|| (Music[song_number].demostart[difficulty] != Music[song_number].demostart[difficulty - 1]))//それかデモスタートが違う
+								|| ((Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty - 1]))) {
+								StopSoundMem(SH_SONG);
+								//DeleteSoundMem(SH_SONG);
+								song_play_counter = 1;
+							}
+
+							if (
+								(wcscmp(Music[song_number].jacketpath[difficulty], Music[song_number].jacketpath[difficulty - 1]) != 0)
+								|| (Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty - 1])
+								) {
+								jacket_show_counter = 1;//ジャケットの読み込み
+								jacket_alpha = 0;
+							}
+							widthCalcFlag = 1;
+							titleStrUpdateFlag = ALL;
+							//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
+							int now_list_number = list_number;
+							for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
+								if (now_list_number == SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1 - 1][SearchListNumberBase].index) {
+									list_number_base = SearchListNumberBase;
+								}
+							}
+						}
+						difficulty--;
+						if (difficulty > 4)difficulty = 4;
+						if (difficulty < 1)difficulty = 1;
+					}
+
+					if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
+						if (difficulty != 4) {
+							PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+
+							if ((wcscmp(Music[song_number].wavpath[difficulty], Music[song_number].wavpath[difficulty + 1]) != 0
+								|| (Music[song_number].demostart[difficulty] != Music[song_number].demostart[difficulty + 1]))
+								|| ((Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty + 1]))) {
+								StopSoundMem(SH_SONG);
+								//DeleteSoundMem(SH_SONG);
+								song_play_counter = 1;
+							}
+							if (
+								(wcscmp(Music[song_number].jacketpath[difficulty], Music[song_number].jacketpath[difficulty + 1]) != 0)
+								|| (Music[song_number].exist[difficulty] != Music[song_number].exist[difficulty + 1])
+								) {
+								jacket_show_counter = 1;//ジャケットの読み込み
+								jacket_alpha = 0;
+							}
+							widthCalcFlag = 1;
+							titleStrUpdateFlag = ALL;
+							//別難易度で元のlist_numberと同じ番号を指すlist_number_baseを探す
+							int now_list_number = list_number;
+							for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
+								if (now_list_number == SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty + 1 - 1][SearchListNumberBase].index) {
+									list_number_base = SearchListNumberBase;
+								}
+							}
+
+
+						}
+						difficulty++;
+						if (difficulty > 4)difficulty = 4;
+						if (difficulty < 1)difficulty = 1;
+					}
+
+					if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+						StopSoundMem(SH_SONG);
+						//DeleteSoundMem(SH_SONG);
+						int beforeSongNumber = song_number;
+						int beforeDifficulty = difficulty;
+						int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
+
+						list_number_base--;
+						list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+
+						list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
+
+						song_number = folder->folder[folder->selected_folder][list_number].song_number;
+
+						titleStrUpdateFlag = TOP;
+						if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
+							difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+							bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+							if (isNeedAllTitleStrUpdate) {
+								titleStrUpdateFlag = ALL;
+							}
+						}
+
+						bn_draw_counter--;
+						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						song_play_counter = 1;
+
+						jacket_show_counter = 1;//ジャケットの読み込み
+						jacket_alpha = 0;
+						widthCalcFlag = 1;
+						titleCycleIndex.minus();
+					}
+					else {
+						if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] >= PressFrame) {
+							if (roll_counter == 0) {
+								StopSoundMem(SH_SONG);
+								//DeleteSoundMem(SH_SONG);
+								int beforeSongNumber = song_number;
+								int beforeDifficulty = difficulty;
+								int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
+
+								list_number_base--;
+								list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+
+								list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
+								song_number = folder->folder[folder->selected_folder][list_number].song_number;
+
+								titleStrUpdateFlag = TOP;
+								if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
+									difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+									bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+									if (isNeedAllTitleStrUpdate) {
+										titleStrUpdateFlag = ALL;
+									}
+								}
+
+								bn_draw_counter--;
+								roll_counter = 1;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								song_play_counter = 1;
+
+								jacket_show_counter = 1;//ジャケットの読み込み
+								jacket_alpha = 0;
+								widthCalcFlag = 1;
+								titleCycleIndex.minus();
+							}
+						}
+					}
+
+
+					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+						StopSoundMem(SH_SONG);
+						//DeleteSoundMem(SH_SONG);
+						int beforeSongNumber = song_number;
+						int beforeDifficulty = difficulty;
+						int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
+
+						list_number_base++;
+						list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+
+						list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
+						song_number = folder->folder[folder->selected_folder][list_number].song_number;
+
+						titleStrUpdateFlag = BOTTOM;
+						if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
+							difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+							bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+							if (isNeedAllTitleStrUpdate) {
+								titleStrUpdateFlag = ALL;
+							}
+						}
+
+						bn_draw_counter++;
+						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						song_play_counter = 1;
+
+						jacket_show_counter = 1;//ジャケットの読み込み
+						jacket_alpha = 0;
+						widthCalcFlag = 1;
+						titleCycleIndex.plus();
+					}
+					else {
+						if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
+							if (roll_counter == 0) {
+								StopSoundMem(SH_SONG);
+								//DeleteSoundMem(SH_SONG);
+
+								int beforeSongNumber = song_number;
+								int beforeDifficulty = difficulty;
+								int beforeDifficultyShouldBe = folder->folder[folder->selected_folder][list_number].difficulty;
+
+								list_number_base++;
+								list_number_base = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+
+								list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
+								song_number = folder->folder[folder->selected_folder][list_number].song_number;
+
+								titleStrUpdateFlag = BOTTOM;
+								if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && folder->folder[folder->selected_folder][list_number].difficulty != 0) {//レベル別フォルダの時で「フォルダ選択に戻る」じゃないときは難易度も変えておく
+									difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+									bool isNeedAllTitleStrUpdate = Music[beforeSongNumber].exist[beforeDifficulty] == false || beforeDifficulty != beforeDifficultyShouldBe;
+									if (isNeedAllTitleStrUpdate) {
+										titleStrUpdateFlag = ALL;
+									}
+								}
+
+								bn_draw_counter++;
+								roll_counter = 1;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								song_play_counter = 1;
+
+								jacket_show_counter = 1;//ジャケットの読み込み
+								jacket_alpha = 0;
+								widthCalcFlag = 1;
+								titleCycleIndex.plus();
+							}
+						}
+					}
+
+
+					if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//曲決定
+						if (folder->folder[folder->selected_folder][list_number].kind == 0) {//内容が「フォルダ選択に戻る」じゃなくて「曲」のとき
+							if ((Music[song_number].exist[difficulty] == 1 && Music[song_number].secret != UnlockState::Secret)//その難易度が存在して隠し曲ではない
+								|| (Music[song_number].exist[difficulty] == 1 && Music[song_number].secret == UnlockState::Secret && secret->song_appear_number == song_number)//それか隠し曲で出現対象になっているとき
+								) {
+								activityState = FLAG_CLOSING_STATE;
+								PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+								coverAlphaClose();
+							}
+							else {
+								PlaySoundMem(SH_NO, DX_PLAYTYPE_BACK, TRUE);//選曲不可
+							}
+
+						}
+						else {//「フォルダ選択に戻る」を決定したとき
+							*SelectingTarget = SELECTING_FOLDER;
+
+							StopSoundMem(SH_SONG);
+
+							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+							song_play_counter = 1;
+
+							jacket_show_counter = 1;//ジャケットの読み込み
+							jacket_alpha = 0;
+							widthCalcFlag = 1;
+							titleStrUpdateFlag = ALL;
+							Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
+						}
+					}
+				}
+			}
+
+			if (OptionOpen == 0 && *SelectingTarget == SELECTING_COURSE) {//段位認定選択モードのとき
+				if ((Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[KEY_INPUT_UP] >= 1)
+					&& (Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[KEY_INPUT_DOWN] >= 1)
+					|| Key[KEY_INPUT_BACK] >= 1
+					) {//上下同時押しでフォルダセレクトに戻る
+					*SelectingTarget = SELECTING_FOLDER;
+					PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+					widthCalcFlag = 1;
+					optionListView.setSkillTestMode(false);
+					titleStrUpdateFlag = ALL;
+				}
+				else {
+					if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+						list_number--;
+						list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
+						list_number_base = list_number;
+						bn_draw_counter--;
+						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						widthCalcFlag = 1;
+						titleStrUpdateFlag = TOP;
+						titleCycleIndex.minus();
+					}
+					else {
+						if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] >= PressFrame) {
+							if (roll_counter == 0) {
+								list_number--;
+								list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
+								list_number_base = list_number;
+								bn_draw_counter--;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								widthCalcFlag = 1;
+								roll_counter = 1;
+								titleStrUpdateFlag = TOP;
+								titleCycleIndex.minus();
+							}
+						}
+					}
+
+					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+						list_number++;
+						list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
+						list_number_base = list_number;
+						bn_draw_counter++;
+						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						widthCalcFlag = 1;
+						titleStrUpdateFlag = BOTTOM;
+						titleCycleIndex.plus();
+					}
+					else {
+						if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
+							if (roll_counter == 0) {
+								list_number++;
+								list_number = number_ring(list_number, NUMBER_OF_COURSES - 1);
+								list_number_base = list_number;
+								bn_draw_counter++;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								widthCalcFlag = 1;
+								roll_counter = 1;
+								titleStrUpdateFlag = BOTTOM;
+								titleCycleIndex.plus();
+
+							}
+						}
+					}
+
+					if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//コース決定
+						if (STList->Kind[list_number] != 2) {//内容が「フォルダ選択に戻る」じゃなくて「コース」のとき
+							activityState = FLAG_CLOSING_STATE;
+							PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
+							coverAlphaClose();
+						}
+						else {//「フォルダ選択に戻る」を決定したとき
+							PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+							*SelectingTarget = SELECTING_FOLDER;
+							widthCalcFlag = 1;
+							titleStrUpdateFlag = ALL;
+							Get_Key_State(Buf, Key, AC);//すぐ下の決定処理に反応しないようにもう一度キー入力把握処理
+							optionListView.setSkillTestMode(false);
+						}
+					}
+				}
+			}
+
+
+			if (OptionOpen == 0 && *SelectingTarget == SELECTING_FOLDER) {//フォルダ選択モードのとき
+
+				if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
+					if (difficulty != 1) {
+						PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						widthCalcFlag = 1;
+						titleStrUpdateFlag = ALL;
+					}
+					difficulty--;
+					if (difficulty > 4)difficulty = 4;
+					if (difficulty < 1)difficulty = 1;
+				}
+
+				if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
+					if (difficulty != 4) {
+						PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+						widthCalcFlag = 1;
+						titleStrUpdateFlag = ALL;
+					}
+					difficulty++;
+					if (difficulty > 4)difficulty = 4;
+					if (difficulty < 1)difficulty = 1;
+				}
+
+
+				if (!((Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[KEY_INPUT_UP] >= 1)
+					&& (Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[KEY_INPUT_DOWN] >= 1))
+					) {//上下同時押ししてたら動かさない
+					if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+
+						folder->selected_folder--;
+						folder->selected_folder = number_ring(folder->selected_folder, folder->NumberOfFolders - 1);
+
+						bn_draw_counter--;
+						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+
+
+						widthCalcFlag = 1;
+						titleStrUpdateFlag = TOP;
+						titleCycleIndex.minus();
+					}
+					else {
+						if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] >= PressFrame) {
+							if (roll_counter == 0) {
+								folder->selected_folder--;
+								folder->selected_folder = number_ring(folder->selected_folder, folder->NumberOfFolders - 1);
+								bn_draw_counter--;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								widthCalcFlag = 1;
+								roll_counter = 1;
+								titleStrUpdateFlag = TOP;
+								titleCycleIndex.minus();
+								//time_base_str = GetNowCount_d(config);
+							}
+						}
+					}
+
+					if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+						folder->selected_folder++;
+						folder->selected_folder = number_ring(folder->selected_folder, folder->NumberOfFolders - 1);
+
+						bn_draw_counter++;
+						PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+
+
+						widthCalcFlag = 1;
+						titleStrUpdateFlag = BOTTOM;
+						titleCycleIndex.plus();
+					}
+					else {
+						if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] >= PressFrame) {
+							if (roll_counter == 0) {
+								folder->selected_folder++;
+								folder->selected_folder = number_ring(folder->selected_folder, folder->NumberOfFolders - 1);
+								bn_draw_counter++;
+								PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+								widthCalcFlag = 1;
+								roll_counter = 1;
+								titleStrUpdateFlag = BOTTOM;
+								titleCycleIndex.plus();
+								//time_base_str = GetNowCount_d(config);
+							}
+						}
+					}
+
+				}
+
+				if (Key[Button[1][1]] == 1 || Key[Button[1][2]] == 1 || Key[KEY_INPUT_RETURN] == 1) {//フォルダ決定
+					if (folder->folder_c[folder->selected_folder] != 0) {//そのフォルダに曲が存在したら(曲数が0じゃないとき)
+						PlaySoundMem(SH_FOLDER_SELECT, DX_PLAYTYPE_BACK, TRUE);
+
+						if (folder->FolderKind[folder->selected_folder] != FOLDER_KIND_SKILL_TEST) {//段位認定以外のフォルダを開いたとき
+							*SelectingTarget = SELECTING_SONG;
+							list_number_base = 0;
+
+							list_number = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base].index;
+
+							song_number = folder->folder[folder->selected_folder][list_number].song_number;
+
+							if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY) {//レベル別フォルダを開いた時は難易度も変えておく
+								difficulty = folder->folder[folder->selected_folder][list_number].difficulty;
+							}
+
+						}
+						else {//段位認定フォルダを開いた時
+							list_number = 0;//コース選択番号を0に song_numberは初期化必要無し
+							list_number_base = list_number;
+							*SelectingTarget = SELECTING_COURSE;
+							optionListView.setSkillTestMode(true);
+
+						}
+
+
+					}
+					else {
+						PlaySoundMem(SH_NO, DX_PLAYTYPE_BACK, TRUE);//選曲不可
+					}
+
+					song_play_counter = 1;
+					jacket_show_counter = 1;//ジャケットの読み込み
+					jacket_alpha = 0;
+
+					widthCalcFlag = 1;
+					titleStrUpdateFlag = ALL;
+				}
+			}
+
+			if (OptionOpen == 1) {//オプション選択画面の時
+				auto changeRow = [&](bool isSelectUp) {
+					if (isSelectUp)option_select--;
+					else option_select++;
+					option_select = number_ring((int)option_select, option->OPTION_NUM - 1);//OPTION_NUM収める
+					DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
+
+					if (option_select > OptionShowEnd) {
+						OptionShowEnd = option_select;
+						OptionShowStart = option_select - (OptionShowAmount - 1);
+					}
+					else if (option_select < OptionShowStart) {
+						OptionShowEnd = option_select + (OptionShowAmount - 1);
+						OptionShowStart = option_select;
+					}
+
+					PlaySoundMem(SH_SONG_SELECT, DX_PLAYTYPE_BACK, TRUE);
+					time_base_str = int(GetNowCount_d(config));
+
+					if (isSelectUp)optionListView.moveToSelectUp();
+					else optionListView.moveToSelectDown();
+
+					};
+
+				if (Key[Button[0][1]] == 1 || Key[Button[0][2]] == 1 || Key[KEY_INPUT_UP] == 1) {
+					changeRow(true);
+				}
+				if (Key[Button[0][1]] > PressFrame || Key[Button[0][2]] > PressFrame || Key[KEY_INPUT_UP] > PressFrame) {
+					if (roll_counter == 0) {
+						changeRow(true);
+						roll_counter = 1;
+					}
+				}
+				if (Key[Button[2][1]] == 1 || Key[Button[2][2]] == 1 || Key[KEY_INPUT_DOWN] == 1) {
+					changeRow(false);
+				}
+				if (Key[Button[2][1]] > PressFrame || Key[Button[2][2]] > PressFrame || Key[KEY_INPUT_DOWN] > PressFrame) {
+					if (roll_counter == 0) {
+						changeRow(false);
+						roll_counter = 1;
+					}
+				}
+
+				//メモリ解放
+				auto deleteCoverImage = [&]() {
+					DeleteGraph(H_BG);
+					DeleteGraph(H_BG);
+					DeleteGraph(H_COVER[1]);
+					DeleteGraph(H_COVER[2]);
+					DeleteGraph(H_COVER[3]);
+					DeleteGraph(H_COVER[4]);
+					DeleteGraph(H_COVER_SKILL_TEST);
+					DeleteGraph(H_COVER_OPTION);
+					DeleteGraph(H_COVER_MIDDLE);
+					};
+
+				auto changeOption = [&](int indexStep) {
+					time_base_str = int(GetNowCount_d(config));
+					OptionValueChange(option, option_select, indexStep);
+					DrawOptionSentence(option, (OptionItem::Name)option_select, config, FontHandle);
+					if (option_select != (int)OptionItem::Name::HITSOUND)PlaySoundMem(SH_DIFFICULTY_SELECT, DX_PLAYTYPE_BACK, TRUE);
+
+					if (option_select == (int)OptionItem::Name::COLOR || option_select == (int)OptionItem::Name::SORT) {
+						//元のlist_numberと同じ番号を指すlist_number_baseを探す
+						int now_list_number = list_number;
+						for (int SearchListNumberBase = 0; SearchListNumberBase < folder->folder_c[folder->selected_folder]; SearchListNumberBase++) {
+							if (now_list_number == SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][SearchListNumberBase].index) {
+								list_number_base = SearchListNumberBase;
+							}
+						}
+						widthCalcFlag = 1;//ソート種類を変更したときは曲名画像再描画
+						titleStrUpdateFlag = ALL;
+					}
+
+					if (option_select == (int)OptionItem::Name::NOTE) {
+						DeleteGraph(H_OPTION_NOTE_PREVIEW[0]);
+						DeleteGraph(H_OPTION_NOTE_PREVIEW[1]);
+						sprintfDx(strcash, L"img/notes/%s/%s.png", option->op.note.toString().c_str(), ReadNameRGB[1]);
+						H_OPTION_NOTE_PREVIEW[0] = LoadGraph(strcash);
+						sprintfDx(strcash, L"img/notes/%s/%s.png", option->op.note.toString().c_str(), ReadNameRGB[8]);
+						H_OPTION_NOTE_PREVIEW[1] = LoadGraph(strcash);
+					}
+					if (option_select == (int)OptionItem::Name::NOTE_SYMBOL) {
+						DeleteGraph(H_OPTION_NOTE_SYMBOL_PREVIEW[0]);
+						DeleteGraph(H_OPTION_NOTE_SYMBOL_PREVIEW[1]);
+						sprintfDx(strcash, L"img/note_symbol/%s/%s.png", option->op.noteSymbol.toString().c_str(), ReadNameRGB[1]);
+						H_OPTION_NOTE_SYMBOL_PREVIEW[0] = LoadGraph(strcash);
+						sprintfDx(strcash, L"img/note_symbol/%s/%s.png", option->op.noteSymbol.toString().c_str(), ReadNameRGB[8]);
+						H_OPTION_NOTE_SYMBOL_PREVIEW[1] = LoadGraph(strcash);
+					}
+					if (option_select == (int)OptionItem::Name::HITSOUND) {
+						DeleteSoundMem(SH_OPTION_HITSOUND_PREVIEW);
+						sprintfDx(strcash, L"sound/hit_sound/%s/f3.wav", option->op.hitSound.toString().c_str());
+						SH_OPTION_HITSOUND_PREVIEW = NPLoadHitSoundMem(strcash, option);//HIT SOUNDプレビュー音声読み込み
+						PlaySoundMem(SH_OPTION_HITSOUND_PREVIEW, DX_PLAYTYPE_BACK, TRUE);
+					}
+					if (option_select == (int)OptionItem::Name::THEME) {
+						deleteCoverImage();
+						wstring themeStr1(L"img/themes/");
+						wstring themeStr2(option->op.theme.toString());
+						H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
+						H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
+						H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
+						H_COVER[3] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_rainy.png")).c_str());
+						H_COVER[4] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_thunder.png")).c_str());
+						H_COVER_SKILL_TEST = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_skill_test.png")).c_str());
+						H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
+						H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
+						optionListView.setCoverImage();
+					}
+
+					if (option_select == (int)OptionItem::Name::HITSOUNDVOL) {
+						updateVolume();
+					}
+
+					if (option_select == (int)OptionItem::Name::FXSOUNDVOL) {
+						updateVolume();
+					}
+
+					if (option_select == (int)OptionItem::Name::BGMSOUNDVOL) {
+						updateVolume();
+					}
+
+					if (indexStep == -1)optionListView.pushLeftArrow();
+					if (indexStep == 1)optionListView.pushRightArrow();
+
+					optionListView.updateSelectedOptionItem();
+					};
+
+
+				if (Key[Button[1][0]] == 1 || Key[KEY_INPUT_LEFT] == 1) {
+					changeOption(-1);
+				}
+
+				if (Key[Button[1][0]] > PressFrame || Key[KEY_INPUT_LEFT] > PressFrame) {//押し続けたとき
+					if (roll_counter == 0) {
+						changeOption(-1);
+						roll_counter = 1;
+					}
+				}
+
+				if (Key[Button[1][3]] == 1 || Key[KEY_INPUT_RIGHT] == 1) {
+					changeOption(1);
+				}
+
+
+				if (Key[Button[1][3]] > PressFrame || Key[KEY_INPUT_RIGHT] > PressFrame) {//押し続けたとき
+					if (roll_counter == 0) {
+						changeOption(1);
+						roll_counter = 1;
+					}
+				}
+			}
+
+		}
+
+		//←→ボタンを離していたらオプションの矢印画像を非活性にする
+		if (Key[Button[1][0]] == 0 && Key[KEY_INPUT_LEFT] == 0) {
+			optionListView.releaseLeftArrow();
+		}
+		if (Key[Button[1][3]] == 0 && Key[KEY_INPUT_RIGHT] == 0) {
+			optionListView.releaseRightArrow();
+		}
+
+		if (!option->op.color.isRainbow()) {//虹オプション選択フラグの設定
+			select_rainbow = 0;
+		}
+		if (option->op.color.isRainbow()) {
+			select_rainbow = 4;
+		}
+
+		for (i = 0; i < CRTBuf; i++) {
+			if (roll_counter > 0) {
+				roll_counter -= 0.01;
+			}
+			if (roll_counter < 0) {
+				roll_counter = 0;
+			}
+		}
+	}
+
+	//printfDx(L"LOOP2:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+
+
+	for (i = 0; i < CRTBuf; i++) {
+		if (bn_draw_counter > 0) {
+			bn_draw_counter -= bn_draw_counter / 140;
+		}
+		if (bn_draw_counter < 0) {
+			bn_draw_counter -= bn_draw_counter / 140;
+		}
+		if (fabs(bn_draw_counter * 1.0) <= 0.01 && bn_draw_counter != 0) {
+			bn_draw_counter = 0;
+		}
+
+
+
+		if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number && *SelectingTarget == SELECTING_SONG) {//隠し曲はレーダー,グラフを表示しない
+			DRShowTotal += 0.01 * ((double)0 - DRShowTotal);
+			DRShowGlobal += 0.01 * ((double)0 - DRShowGlobal);
+			DRShowLocal += 0.01 * ((double)0 - DRShowLocal);
+			DRShowChain += 0.01 * ((double)0 - DRShowChain);
+			DRShowUnstability += 0.01 * ((double)0 - DRShowUnstability);
+			DRShowStreak += 0.01 * ((double)0 - DRShowStreak);
+			DRShowColor += 0.01 * ((double)0 - DRShowColor);
+
+			for (j = 0; j < 9; j++) {
+				ShowLocalNotesGraph[j] += 0.01 * (0 - ShowLocalNotesGraph[j]);
+				ShowColorNotesGraph[j] += 0.01 * (0 - ShowColorNotesGraph[j]);
+			}
+		}
+		else {//通常曲、解禁曲はレーダー,グラフ表示
+			int R = 0;
+			if (option->op.color.isRainbow())R = 1;
+
+			int total =
+				Music[song_number].global[R][difficulty] +
+				Music[song_number].local[R][difficulty] +
+				Music[song_number].chain[R][difficulty] +
+				Music[song_number].unstability[R][difficulty] +
+				Music[song_number].longNote[R][difficulty] +
+				Music[song_number].color[R][difficulty];
+
+			if (*SelectingTarget == SELECTING_SONG) {
+				DRShowGlobal += 0.01 * ((double)Music[song_number].global[R][difficulty] - DRShowGlobal);
+				DRShowLocal += 0.01 * ((double)Music[song_number].local[R][difficulty] - DRShowLocal);
+				DRShowChain += 0.01 * ((double)Music[song_number].chain[R][difficulty] - DRShowChain);
+				DRShowUnstability += 0.01 * ((double)Music[song_number].unstability[R][difficulty] - DRShowUnstability);
+				DRShowStreak += 0.01 * ((double)Music[song_number].longNote[R][difficulty] - DRShowStreak);
+				DRShowColor += 0.01 * ((double)Music[song_number].color[R][difficulty] - DRShowColor);
+				DRShowTotal += 0.01 * ((double)total - DRShowTotal);
+			}
+			else if (*SelectingTarget == SELECTING_FOLDER) {
+				DRShowGlobal += 0.01 * (skill_radar_result.global - DRShowGlobal);
+				DRShowLocal += 0.01 * (skill_radar_result.local - DRShowLocal);
+				DRShowChain += 0.01 * (skill_radar_result.chain - DRShowChain);
+				DRShowUnstability += 0.01 * (skill_radar_result.unstability - DRShowUnstability);
+				DRShowStreak += 0.01 * (skill_radar_result.streak - DRShowStreak);
+				DRShowColor += 0.01 * (skill_radar_result.color - DRShowColor);
+				DRShowTotal += 0.01 * (skill_radar_result.robustness - DRShowTotal);
+			}
+
+
+			for (j = 0; j < 9; j++) {
+				ShowLocalNotesGraph[j] += 0.01 * (Music[song_number].LocalNotesAmount[R][difficulty][j] - ShowLocalNotesGraph[j]);
+				ShowColorNotesGraph[j] += 0.01 * (Music[song_number].ColorNotesAmount[R][difficulty][j] - ShowColorNotesGraph[j]);
+			}
+		}
+		if (DRShowGlobal < 0)DRShowGlobal = 0;
+		if (DRShowLocal < 0)DRShowLocal = 0;
+		if (DRShowChain < 0)DRShowChain = 0;
+		if (DRShowUnstability < 0)DRShowUnstability = 0;
+		if (DRShowStreak < 0)DRShowStreak = 0;
+		if (DRShowColor < 0)DRShowColor = 0;
+		if (DRShowTotal < 0)DRShowTotal = 0;
+
+		for (j = 0; j < 9; j++) {
+			if (ShowLocalNotesGraph[j] < 0)ShowLocalNotesGraph[j] = 0;
+			if (ShowColorNotesGraph[j] < 0)ShowColorNotesGraph[j] = 0;
+		}
+
+		if (song_play_counter >= 0) {
+			song_play_counter -= 0.002;
+		}
+
+		if (jacket_show_counter >= 0) {
+			jacket_show_counter -= 0.005;
+		}
+
+		if (button_draw_counter <= 1) {
+			button_draw_counter += 0.0004;
+		}
+		if (button_draw_counter > 1) {
+			button_draw_counter = 0;
+		}
+
+		if (OptionOpen == 1) {//
+			if (option_draw_counter <= 1) {
+				option_draw_counter += 0.003;
+			}
+			if (option_draw_counter > 1) {
+				option_draw_counter = 1;
+			}
+		}
+		if (OptionOpen == 0) {
+			if (option_draw_counter >= 0) {
+				option_draw_counter -= 0.003;
+			}
+			if (option_draw_counter < 0) {
+				option_draw_counter = 0;
+			}
+		}
+		if (ShowResultFlag == 1) {
+			if (result_draw_counter <= 1) {
+				result_draw_counter += 0.003;
+			}
+			if (result_draw_counter > 1) {
+				result_draw_counter = 1;
+			}
+		}
+		if (ShowResultFlag == 0) {
+			if (result_draw_counter >= 0) {
+				result_draw_counter -= 0.003;
+			}
+			if (result_draw_counter < 0) {
+				result_draw_counter = 0;
+			}
+		}
+
+		if (jacket_alpha >= 1) {
+			jacket_alpha = 1;
+		}
+		if (jacket_alpha < 1 && CheckHandleASyncLoad(H_JACKET) == FALSE && jacket_show_counter == -2) {
+			if (Music[song_number].secret != UnlockState::Secret || secret->song_appear_number == song_number) {
+				//隠し曲ではないまたは隠し曲の出現中の時のみジャケットを表示する
+				jacket_alpha += 0.003;
+			}
+		}
+
+		if (*SelectingTarget == SELECTING_FOLDER || *SelectingTarget == SELECTING_COURSE) {//フォルダ,コースセレクト時
+			if (BGM_continue == 0) {
+				if (bgm_vol_ratio < 1) {
+					bgm_vol_ratio += 0.001;
+				}
+				if (bgm_vol_ratio >= 1) {
+					bgm_vol_ratio = 1;
+				}
+			}
+		}
+
+
+		if (*SelectingTarget == SELECTING_SONG) {//曲選択時はBGMの音量0になめらかに移行
+			if (BGM_continue == 0) {
+				if (bgm_vol_ratio > 0) {
+					bgm_vol_ratio -= 0.01;
+				}
+				if (bgm_vol_ratio <= 0) {
+					bgm_vol_ratio = 0;
+				}
+			}
+		}
+	}
+
+
+	if (*SelectingTarget == SELECTING_SONG) {
+		if (song_play_counter < 0 && song_play_counter != -1 && song_play_counter != -2 && song_play_counter != -3 && BGM_continue == 0) {//専用選曲BGMのある未解禁隠し曲の出現時以外で曲読み込み
+			song_play_counter = -1;
+			SetUseASyncLoadFlag(TRUE);
+
+			SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMPRESS);
+			DeleteSoundMem(SH_SONG);
+			SH_SONG = NPLoadBgmSoundMem(Music[song_number].wavpath[difficulty], option);
+
+			SetCreateSoundDataType(DX_SOUNDDATATYPE_MEMNOPRESS);
+
+			SetUseASyncLoadFlag(FALSE);
+		}
+	}
+
+	if (*SelectingTarget == SELECTING_SONG) {
+		if (jacket_show_counter < 0 && jacket_show_counter != -1 && jacket_show_counter != -2) {//ジャケット読み込み
+			jacket_show_counter = -1;
+			jacket_alpha = 0;
+			SetUseASyncLoadFlag(TRUE);
+			DeleteGraph(H_JACKET);
+			DeleteGraph(H_JACKET_GAUSS);
+			H_JACKET = LoadGraph(Music[song_number].jacketpath[difficulty]);//ジャケットの読み込み
+			H_JACKET_GAUSS = LoadGraph(Music[song_number].jacketpath[difficulty]);//ぼかす方のジャケットの読み込み
+			SetUseASyncLoadFlag(FALSE);
+		}
+	}
+
+	//ProcessMessage();
+
+	if (*SelectingTarget == SELECTING_SONG) {
+		if (CheckHandleASyncLoad(SH_SONG) == FALSE && song_play_counter == -1) {//曲の読み込みが終了したので再生
+			song_play_counter = -2;
+			SetCurrentPositionSoundMem(int(((double)Music[song_number].demostart[difficulty] / 1000) * 44100), SH_SONG);
+			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら鳴らさない
+				//鳴らさない
+			}
+			else {//隠し曲ではない(解禁済み)なので鳴らす
+				PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);
+			}
+		}
+
+		//曲の再生が終了したらループ再生
+		if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら鳴らさない
+			//鳴らさない
+		}
+		else {//隠し曲ではない(解禁済み)なので鳴らす
+			if (song_play_counter == -2 && CheckSoundMem(SH_SONG) == 0) {
+				SetCurrentPositionSoundMem(int(((double)Music[song_number].demostart[difficulty] / 1000) * 44100), SH_SONG);
+				PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);
+			}
+		}
+
+	}
+
+	brightness = int(155 + 100 * (1 + sin((double)GAME_passed_time / 300)) / 2);
+
+	if (activityState == FLAG_END_FUNCTION_STATE) {
+		//デモのフェードアウト
+		if (demo_vol > 0) {
+			demo_vol = 1.0 - ((GAME_passed_time - CoverClosedTime) / 1200);
+		}
+		if (demo_vol < 0) {
+			demo_vol = 0;
+		}
+		int bgmVolume = option->op.bgmSoundVol.getVolume();
+
+		ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_SONG);//デモの音量は曲決定後にフェードアウト
+		if (BGM_continue == 1) {
+
+			ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_BGM);//BGM有り隠し曲出現時はBGMもフェードアウト
+		}
+		if (*SelectingTarget == SELECTING_COURSE || *SelectingTarget == SELECTING_FOLDER) {
+			ChangeVolumeSoundMem(int(demo_vol * bgmVolume), SH_BGM);//段位コース、曲フォルダを選んでいる時はBGMもフェードアウト
+		}
+	}
+
+	if (activityState == FLAG_END_FUNCTION_STATE && GAME_passed_time - CoverClosedTime >= 1200) {//曲選択
+
+		for (i = 0; i <= 40; i++) {
+			/*
+			if (ProcessMessage() != 0 || Key[KEY_INPUT_ESCAPE] == 1 && activityState != FLAG_CLOSING_STATE) {//ESCでゲーム終了
+				dxLibFinishProcess();
+				return;
+			}
+			*/
+			Sleep(1);
+		}
+
+
+		DeleteFontToHandle(FontHandle);//フォントハンドル削除
+		InitSoundMem();
+		InitGraph();//グラフィックメモリ開放
+
+
+		if (*isBackToTitle == false) {//タイトルに戻る場合演奏画面には遷移しない
+			if (*SelectingTarget == SELECTING_SONG) {//曲選択の時
+
+				int gauge_buf = (int)option->op.gauge.getIndex();//今選んでいるゲージ種類を保存
+				int AllowExit = 1;//途中退出可能か
+				if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number == song_number) {//隠し曲出現中にその隠し曲を選択したので
+					//debug取り消し
+					*debug = 0;
+					//ゲージ種類決定
+					if (SECRET_GAUGE_CHANGE_OFF == 0) {
+
+						int rank_point = result_rank_buf[0] + result_rank_buf[1] + result_rank_buf[2];
+
+
+						if (rank_point == 5 * 3) {//全てBランク(rank_point==15)
+							option->op.gauge.setIndex((int)OptionItem::Gauge::FC_ATTACK);//強制FC ATTACKゲージ
+						}
+						else if (rank_point < 6 * 3) {//平均がAランクより小さい値(rank_point==16~17)
+							option->op.gauge.setIndex((int)OptionItem::Gauge::SUPER_HARD);//強制SUPER HARDゲージ
+						}
+						else if (rank_point < 7 * 3) {//平均がSランクより小さい値(rank_point==18~20)
+							option->op.gauge.setIndex((int)OptionItem::Gauge::HARD);//強制HARDゲージ
+						}
+						else {//全てSランク(rank_point==21)
+							option->op.gauge.setIndex((int)OptionItem::Gauge::NORMAL);//強制NORMALゲージ
+						}
+					}
+
+					AllowExit = 0;
+				}
+
+				int CourseCombo = 0;
+				int CourseMaxCombo = 0;
+
+				int TryCount = 0;//トライ数(クイックリトライするたびに加算)
+				do {
+					TryCount++;
+					escape = 0;
+
+					//選曲番号と難易度を渡してゲーム画面へ
+					auto game_screen = Game::GameScreen(
+						song_number,difficulty,&res,
+						&escape, option, &retryAble,
+						debug, Music, Button, Button_Shutter, Key, Buf, secret->song_appear_number != -1, AC,
+						config, ir,
+						0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit
+					);
+					game_screen.run();
+
+					Get_Key_State(Buf, Key, AC);
+				} while ((Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
+					&& (Key[Button[1][0]] >= 1 || Key[Button[1][1]] >= 1 || Key[Button[1][2]] >= 1 || Key[Button[1][3]] >= 1)
+					&& (Key[Button[2][0]] >= 1 || Key[Button[2][1]] >= 1 || Key[Button[2][2]] >= 1 || Key[Button[2][3]] >= 1)
+					&& (retryAble == 1)
+					&& (secret->song_appear_number != song_number || Music[song_number].secret != UnlockState::Secret)//リトライできるときの条件(隠し曲演出中の未解禁隠し曲プレイはリトライできない)
+					);
+
+				RESULT STResDummy;
+				//演奏終了後処理
+				if (escape == 0
+					|| (*debug == 0
+						&& escape == 1
+						&& secret->song_appear_number == song_number
+						&& secret->get_song_number[secret->secret_song_appear_number] == 0)) {
+					//途中で抜け出していない,または抜け出してても非デバッグモードでそれが隠し曲演出中の未解禁隠し曲ならクリア失敗扱いにする
+
+					if (escape == 1 && secret->song_appear_number == song_number) {//隠し曲プレイの抜け出しはランクをFに
+						res.rank = 1;
+					}
+
+					SHOW_RESULT(res, option, song_number, difficulty, debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
+						STList,
+						list_number, config, ir);//結果発表
+					if (*debug == 0) {
+						if (secret->secret_song_appear_number == -1) {//通常プレイで隠し曲演出になっていないとき
+							result_rank_buf[*result_count] = res.rank;//ランクを保存
+
+							(*result_count)++;
+							if (*result_count == SECRET_SONG_APPEAR_CYCLE) {
+								(*result_count) = 0;
+							}
+						}
+						if (secret->secret_song_appear_number != -1) {//隠し曲演出の後
+							*result_count = 0;
+							for (i = 0; i <= SECRET_SONG_APPEAR_CYCLE - 1; i++) {
+								result_rank_buf[i] = 0;//ランクバッファを初期化
+							}
+
+							if (res.clear >= CLEARTYPE_EASY_CLEARED && song_number == secret->song_appear_number) {//対象曲をクリアしていた
+								//解禁情報を更新
+								secret->get_song_number[secret->secret_song_appear_number] = 1;//解禁済みにする
+								Music[secret->song_appear_number].secret = UnlockState::Unlocked;
+								//全解禁したか確認
+								secret_all_get(secret);//全解禁されているならall_getは1
+							}
+							//隠し曲演出終了
+							secret->secret_song_appear_number = -1;
+							secret->song_appear_number = -1;
+						}
+					}
+					option->op.gauge.setIndex((int)(OptionItem::Gauge)gauge_buf);//ゲージをもとに戻す
+				}
+
+			}
+			else if (*SelectingTarget == SELECTING_COURSE) {//段位認定コース選択の時
+				//*debug = 0;//debug取り消し
+				//対象曲パス読み込み
+
+				//オプションを直す
+				int gauge_buf = (int)option->op.gauge.getIndex();//後で戻すためのバッファ
+
+				option->op.gauge.setIndex((int)OptionItem::Gauge::SKILL_TEST);
+
+				if (option->op.lane.getIndex() != (int)OptionItem::Lane::MIRROR) {//MIRROR以外を選んだときは正規にする
+					option->op.lane.setIndex((int)OptionItem::Lane::NONE);
+				}
+
+
+				option->op.color.setIndex((int)OptionItem::Color::NONE);
+
+
+
+				//基本なら虹オプションにする
+				if (STList->Kind[list_number] == 0) {
+					option->op.color.setIndex((int)OptionItem::Color::RAINBOW);
+				}
+
+				int SongNumberList[4];//曲番号リスト
+				int DifficultyList[4];//難易度リスト
+
+				LoadSkillTestNpsPathList(SongNumberList, DifficultyList, STList->fliepath[list_number], Music, *NumberOfSongs);//npsファイルパス読み込み
+				RESULT STRes;//段位認定リザルト
+				STRes.clear = 1;//初期値は合格にしておく
+
+				RESULT Result[4];//各曲のリザルト
+
+				double GaugeVal = 100;
+
+				int CourseCombo = 0;
+				int CourseMaxCombo = 0;
+				int AllowExit = 1;
+
+				int playedSongIndex = 0;
+				//1~4曲目
+				for (i = 0; i <= 3; i++) {
+					int TryCount = 1;//トライ数
+
+					//選曲番号と難易度を渡してゲーム画面へ
+					auto game_screen = Game::GameScreen(
+						SongNumberList[i], DifficultyList[i],
+						&Result[i], &escape, option, &retryAble,
+						debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config, ir,
+						i + 1, &GaugeVal,
+						&CourseCombo, &CourseMaxCombo, AllowExit
+					);
+					game_screen.run();
+
+					if (escape == 1) {//プレイの抜け出しはランクをF、FAILEDに
+						Result[i].rank = 1;
+						Result[i].clear = CLEARTYPE_FAILED;
+					}
+					if (escape == 0) {//抜けだしてない
+						SHOW_RESULT(Result[i], option, SongNumberList[i], DifficultyList[i], debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
+							STList,
+							list_number,
+							config,
+							ir,
+							i + 1);//結果発表
+					}
+
+					if (Result[i].clear >= CLEARTYPE_FULL_COMBO && Music[SongNumberList[i]].secret == UnlockState::Secret) {//隠し曲をフルコンボ以上でクリアした
+						//解禁情報を更新
+						int secretSongNnumber = 0;
+						//隠し曲番号の確認
+						for (j = 0; j < secret->total; j++) {
+							if (secret->song_number[j] == SongNumberList[i]) {
+								secretSongNnumber = j;
+							}
+						}
+						secret->get_song_number[secretSongNnumber] = 1;//解禁済みにする
+						Music[SongNumberList[i]].secret = UnlockState::Unlocked;
+						//全解禁したか確認
+						secret_all_get(secret);//全解禁されているならall_getは1
+					}
+
+					playedSongIndex = i;
+					if (Result[i].clear == CLEARTYPE_FAILED) {//この曲で抜け出した時段位終了
+						STRes.clear = 0;
+						break;
+					}
+				}
+
+				if (escape == 0) {//抜けだしてない
+					//段位認定リザルトの保存
+					STRes.save_data_version = RESULT_DATA_VERSION;
+					for (i = 0; i <= 3; i++) {
+						STRes.sky_perfect += Result[i].sky_perfect;
+						STRes.perfect += Result[i].perfect;
+						STRes.good += Result[i].good;
+						STRes.miss += Result[i].miss;
+						STRes.score += Result[i].score;
+						STRes.rank += Result[i].rank;
+					}
+
+					STRes.max_combo = CourseMaxCombo;
+
+					if (STRes.score >= 38000) {//S
+						STRes.rank = 7;
+					}
+					else if (STRes.score >= 36000) {//A
+						STRes.rank = 6;
+					}
+					else if (STRes.score >= 32000) {//B
+						STRes.rank = 5;
+					}
+					else if (STRes.score >= 32000) {//C
+						STRes.rank = 4;
+					}
+					else if (STRes.score >= 28000) {//D
+						STRes.rank = 3;
+					}
+					else if (STRes.score >= 24000) {//E
+						STRes.rank = 2;
+					}
+					else {//F
+						STRes.rank = 1;
+					}
+
+					if (STRes.rank <= 0)STRes.rank = 1;//F以下にはしない
+
+
+
+
+					//段位のリザルト表示
+
+
+					SHOW_RESULT(STRes, option, SongNumberList[playedSongIndex], DifficultyList[playedSongIndex], debug, Music, Button, Button_Shutter, Key, Buf, AC, 0,
+						STList,
+						list_number,
+						config,
+						ir,
+						SHOW_SKILL_TEST_RESULT);//結果発表
+				}
+				option->op.gauge.setIndex((int)(OptionItem::Gauge)gauge_buf);//ゲージを元に戻す
+			}
+		}
+
+		*l_n = list_number_base;//前選んだフォルダ中のリストを選んでいる状態にする
+		*s_n = song_number;//前選んだ曲を選んでいる状態にする
+		*diff = difficulty;//前選んだ難易度を選んでいる状態にする
+		//*opt = Option->op;//前選んだオプションを選択している状態にする
+
+		//プレイオプションの保存
+		OP op_buf = option->op;//オプション保存用
+		if (op_buf.gauge.getIndex() == (int)OptionItem::Gauge::SKILL_TEST) {//段位ゲージの時はNORMALゲージで保存
+			op_buf.gauge.setIndex((int)OptionItem::Gauge::NORMAL);
+		}
+		SaveOptionState(op_buf);
+
+		free(Highscore);
+		free(HighscoreRival);
+		exitScreen();
+		return;//関数終了
+	}
+
+	//printfDx(L"LOOP3:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+	//表示する複数のジャンル、アーティスト、曲名幅の計算
+	if (*SelectingTarget == SELECTING_SONG) {
+		if (widthCalcFlag == 1) {//上下左右のキーを押して曲,難易度が変わっていたら
+			for (i = 0; i <= Column; i++) {//Column/2が中心
+				//title_width[i] = GetDrawStringWidth(Music[number_ring(list_number + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1)].title[difficulty],wcslen(Music[number_ring(song_number + (i - Column / 2), NumberOfSongs - 1)].title[difficulty]));
+				int list_number_base_buf = number_ring(list_number_base + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1);
+
+				int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
+
+				int sn_buf = folder->folder[folder->selected_folder]
+					[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
+
+
+				int difficulty_buf = difficulty;
+
+				if (folder->FolderKind[folder->selected_folder] == FOLDER_KIND_DIFFICULTY && (i != (Column / 2))) {//難易度別フォルダの時は選んでない曲は難易度固定で表示するためにループ毎にdifficultyの値をフォルダでの指定値に変更
+					difficulty_buf = folder->folder[folder->selected_folder]
+						[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].difficulty;//list_numberの情報から曲番号を算出
+				}
+
+				season_banner_buf[i] = Music[sn_buf].season[difficulty_buf];//季節のバナー飾りのための値をバッファに格納
+
+				if (Music[sn_buf].secret != UnlockState::Secret) {//隠し曲ではない、それか隠し曲でも解禁済みの曲のときは通常表示
+					//タイトル
+					title_buf[i] =
+						Music[sn_buf].title[difficulty_buf];//曲名の先頭ポインタを配列に格納
+					title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
+
+					title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
+				}
+				else {//隠し曲(secret=1)
+					if (secret->song_appear_number == sn_buf) {//隠し曲出現対象になっている
+						//タイトル
+						title_buf[i] =
+							Music[sn_buf].title[difficulty_buf];//曲名の先頭ポインタを配列に格納
+						title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
+						title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
+					}
+					else {//隠し曲出現対象になっていない
+						if (Music[sn_buf].exist[difficulty_buf] == 1) {//譜面が存在するなら
+
+							title_buf[i] =
+								secret_str;//曲名の先頭ポインタを配列に格納
+							title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
+							title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
+						}
+						else {
+							//タイトル
+							title_buf[i] =
+								Music[sn_buf].title[difficulty_buf];//曲名の先頭ポインタを配列に格納
+							title_color[i] = Music[sn_buf].StrColor[difficulty_buf];//色を配列に格納
+							title_shadow_color[i] = Music[sn_buf].StrShadowColor[difficulty_buf];//色を配列に格納
+						}
+					}
+
+
+				}
+				int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+				if (titleStrUpdateFlag == TOP) {
+					if (index != cycleIndex(0 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+				}
+				if (titleStrUpdateFlag == BOTTOM) {
+					if (index != cycleIndex(config.SongSelectRowNumber - 1 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+				}
+				title_width[index] =
+					GetDrawStringWidthToHandle(//文字長を取得
+						title_buf[i], //タイトルを出す
+						wcslen(title_buf[i]),//同じようにその文字数も引数として入れてやる
+						FontHandle);
+
+				SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+				SetDrawScreen(H_TITLE_STR[index]);//曲名画像を描画対象に
+				ClearDrawScreen();//前に描かれていた文字を消す
+				//画像として一時的に描画
+				ShowExtendedStrFitToHandle2(320, 4,
+					title_buf[i],
+					title_width[index],
+					620, config,
+					FontHandle,
+					title_color[i],
+					title_shadow_color[i]);//曲名描画
+
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+				GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+
+				SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
+				SetDrawMode(DX_DRAWMODE_NEAREST);
+
+
+
+			}
+
+			//ジャンル、アーティストのwidthの計算
+			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
+				genre_width = GetDrawStringWidthToHandle(secret_str, wcslen(secret_str), FontHandle);
+				artist_width = GetDrawStringWidthToHandle(secret_str, wcslen(secret_str), FontHandle);
+			}
+			else {
+				genre_width = GetDrawStringWidthToHandle(Music[song_number].genre[difficulty], wcslen(Music[song_number].genre[difficulty]), FontHandle);
+				artist_width = GetDrawStringWidthToHandle(Music[song_number].artist[difficulty], wcslen(Music[song_number].artist[difficulty]), FontHandle);
+			}
+			widthCalcFlag = 0;
+
+
+
+		}
+	}
+
+	//段位認定コース名幅の計算
+	if (*SelectingTarget == SELECTING_COURSE) {
+		if (widthCalcFlag == 1) {//上下左右のキーを押して曲,難易度が変わっていたら
+			for (i = 0; i <= Column; i++) {//Column/2が中心
+				//title_width[i] = GetDrawStringWidth(Music[number_ring(list_number + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1)].title[difficulty],wcslen(Music[number_ring(song_number + (i - Column / 2), NumberOfSongs - 1)].title[difficulty]));
+				int sn_buf = number_ring(list_number + (i - Column / 2), NUMBER_OF_COURSES - 1);//list_numberの情報から曲番号を算出
+
+				title_buf[i] = STList->title[sn_buf];
+				title_color[i] = STList->Color[sn_buf];//色を配列に格納
+				title_shadow_color[i] = STList->ShadowColor[sn_buf];//色を配列に格納
+
+				int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+				if (titleStrUpdateFlag == TOP) {
+					if (index != cycleIndex(0 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+				}
+				if (titleStrUpdateFlag == BOTTOM) {
+					if (index != cycleIndex(config.SongSelectRowNumber - 1 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+				}
+
+				title_width[index] =
+					GetDrawStringWidthToHandle(//文字長を取得
+						title_buf[i], //タイトルを出す
+						wcslen(title_buf[i]),//同じようにその文字数も引数として入れてやる
+						FontHandle);
+
+				SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+				SetDrawScreen(H_TITLE_STR[index]);//段位認定コース名画像を描画対象に
+				ClearDrawScreen();//前に描かれていた文字を消す
+				//画像として一時的に描画
+				ShowExtendedStrFitToHandle2(320, 4,
+					title_buf[i],
+					title_width[index],
+					620, config,
+					FontHandle,
+					title_color[i],
+					title_shadow_color[i]);//曲名描画
+
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+				SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
+				SetDrawMode(DX_DRAWMODE_NEAREST);
+				GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+			}
+
+			widthCalcFlag = 0;
+		}
+	}
+
+	//フォルダ名幅の計算
+	if (*SelectingTarget == SELECTING_FOLDER) {
+		if (widthCalcFlag == 1) {//上下左右のキーを押して曲,難易度が変わっていたら
+			for (i = 0; i <= Column; i++) {//Column/2が中心
+				int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+				if (titleStrUpdateFlag == TOP) {
+					if (index != cycleIndex(0 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+				}
+				if (titleStrUpdateFlag == BOTTOM) {
+					if (index != cycleIndex(config.SongSelectRowNumber - 1 + titleCycleIndex.index, config.SongSelectRowNumber))continue;
+				}
+
+				folder_name_width[index] = GetDrawStringWidthToHandle(folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)],
+					wcslen(folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)]), FontHandle);
+				//printfDx(L"i:%d num:%d ring:%d\n",i, song_number + (i - 8), number_ring(song_number + (i - 8), NumberOfSongs-1));
+
+
+				SetDrawScreen(H_TITLE_STR[index]);//フォルダ名画像を描画対象に
+				ClearDrawScreen();//前に描かれていた文字を消す
+				//画像として一時的に描画
+
+				ShowExtendedStrFitToHandle2(320, 4,
+					folder->folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)],
+					folder_name_width[index],
+					620, config,
+					FontHandle, colorRatio(255, 255, 255), colorRatio(0, 0, 0));//フォルダ名表示
+
+				SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
+				GraphBlend(H_TITLE_STR[index], screenHandle, 255, DX_GRAPH_BLEND_DODGE);//覆い焼き
+
+			}
+			widthCalcFlag = 0;
+		}
+	}
+
+	show_bpm = (Music[song_number].bpmmax[difficulty] + Music[song_number].bpmmin[difficulty]) / 2 + (sin(0.002 * GetNowCount_d(config))) * ((double)Music[song_number].bpmmax[difficulty] - Music[song_number].bpmmin[difficulty]);//実際に表示するBPMを決定
+	if (show_bpm >= Music[song_number].bpmmax[difficulty]) {
+		show_bpm = Music[song_number].bpmmax[difficulty];
+	}
+	if (show_bpm <= Music[song_number].bpmmin[difficulty]) {
+		show_bpm = Music[song_number].bpmmin[difficulty];
+	}
+
+	if (*SelectingTarget == SELECTING_SONG) {
+		if (ScoreShowMode == 0) {
+			number_digit(int(Highscore[song_number].score[difficulty + select_rainbow] + 0.5), score_digit, 5);//ハイスコアを桁ごとに格納
+		}
+		else if (ScoreShowMode == 1) {
+			number_digit(int(HighscoreRival[song_number].score[difficulty + select_rainbow] + 0.5), score_digit, 5);//ハイスコアを桁ごとに格納
+		}
+	}
+	else if (*SelectingTarget == SELECTING_FOLDER) {//ハイスコアを桁ごとに格納
+		int R = option->op.color.isRainbow();
+		number_digit(int(FolderScore[R][folder->selected_folder][difficulty].AverageScore + 0.5), score_digit, 5);
+	}
+	else if (*SelectingTarget == SELECTING_COURSE) {//ハイスコアを桁ごとに格納
+		number_digit(int(STscore[list_number] + 0.5), score_digit, 5);
+	}
+
+	//printfDx(L"%d\n",score[song_number][difficulty]);
+	number_digit(int(show_bpm + 0.5), bpm_digit, 5);//BPMを桁ごとに格納
+
+
+	if (*SelectingTarget == SELECTING_COURSE) {//段位
+		number_digit(int(STList->pop[list_number]), level_digit, 3);//レベルを桁ごとに格納
+		number_digit(int(STList->bpmmin[list_number]), bpm_min_digit, 5);//最小BPMを桁ごとに格納
+		number_digit(int(STList->bpmmax[list_number]), bpm_max_digit, 5);//最大BPMを桁ごとに格納
+	}
+	else {
+		number_digit(int(Music[song_number].level[difficulty]), level_digit, 3);//レベルを桁ごとに格納
+		number_digit(int(Music[song_number].bpmmin[difficulty]), bpm_min_digit, 5);//最小BPMを桁ごとに格納
+		number_digit(int(Music[song_number].bpmmax[difficulty]), bpm_max_digit, 5);//最大BPMを桁ごとに格納
+	}
+
+
+	//printfDx(L"LOOP4:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+	
+}
+
+
+
+
+void SongSelect::SongSelectScreen::updateView()
+{
+	//DRAW
+	SetDrawScreen(appContext.baseHandle.getHandle());
+	ClearDrawScreen();//グラフィックを初期化
+	DrawGraph(0, 0, H_BG, TRUE);//背景表示
+	show_cloud(H_CLOUD, &pos_cloud, 1, LOOP_passed_time);//隠し曲演出中なら白い雲表示
+
+	viewAlpha.process();
+	double viewAlphaRatio = (double)viewAlpha.value / 255;
+
+
+	if (CheckHandleASyncLoad(H_JACKET) == FALSE && CheckHandleASyncLoad(H_JACKET_GAUSS) == FALSE && jacket_show_counter == -1) {//普通とぼかし用どちらも読み込み完了してたらぼかし処理
+		jacket_show_counter = -2;
+		GetGraphSize(H_JACKET, &jacketSize.x, &jacketSize.y);//サイズを取得
+		GetGraphSize(H_JACKET_GAUSS, &jacketGaussSize.x, &jacketGaussSize.y);//サイズを取得
+		//GraphFilter(H_JACKET_GAUSS, DX_GRAPH_FILTER_DOWN_SCALE, 4);
+		GraphFilter(H_JACKET_GAUSS, DX_GRAPH_FILTER_GAUSS, 16, 4000);
+
+
+
+		if (jacketArea.x - jacketSize.x >= jacketArea.y - jacketSize.y) {//エリアに対して縦長
+			jacketScale = (double)jacketArea.y / jacketSize.y;
+			//DrawExtendGraph(int(center.x - jacketScale*(jacketSize.x / 2)), int(center.y - jacketScale*(jacketSize.y / 2)), int(center.x + jacketScale*(jacketSize.x / 2)), int(center.y + jacketScale*(jacketSize.y / 2)), H_JACKET, TRUE);
+		}
+		else {//エリアに対して横長
+			jacketScale = (double)jacketArea.x / jacketSize.x;
+			//DrawExtendGraph(int(center.x - jacketScale*(jacketSize.x / 2)), int(center.y - jacketScale*(jacketSize.y / 2)), int(center.x + jacketScale*(jacketSize.x / 2)), int(center.y + jacketScale*(jacketSize.y / 2)), H_JACKET, TRUE);
+		}
+
+		if (jacketArea.x - jacketGaussSize.x >= jacketArea.y - jacketGaussSize.y) {//ぼかしたジャケット画像がエリアに対して縦長
+			jacketGaussScale = (double)jacketArea.x / jacketGaussSize.x;
+			//DrawExtendGraph(int(center.x - jacketScale*(jacketSize.x / 2)), int(center.y - jacketScale*(jacketSize.y / 2)), int(center.x + jacketScale*(jacketSize.x / 2)), int(center.y + jacketScale*(jacketSize.y / 2)), H_JACKET, TRUE);
+		}
+		else {//エリアに対して横長
+			jacketGaussScale = (double)jacketArea.y / jacketGaussSize.y;
+			//DrawExtendGraph(int(center.x - jacketScale*(jacketSize.x / 2)), int(center.y - jacketScale*(jacketSize.y / 2)), int(center.x + jacketScale*(jacketSize.x / 2)), int(center.y + jacketScale*(jacketSize.y / 2)), H_JACKET, TRUE);
+		}
+
+	}
+
+	//printfDx(L"%d %d\n", CheckHandleASyncLoad(H_JACKET), jacket_show_counter);
+	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで
+	if (CheckHandleASyncLoad(H_JACKET) == FALSE && jacket_show_counter == -2) {//ぼかし完了してたら画像表示
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * jacket_alpha));
+
+		//ぼかしたジャケットで隙間を埋める
+		SetDrawArea(320, 96, 960, 624);//描画可能エリアを指定
+		if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら表示しない
+			//表示しない
+		}
+		else {
+			//ぼかしたジャケット
+			DrawExtendGraph(int(center.x - jacketGaussScale * (jacketGaussSize.x / 2) - 1),
+				int(center.y - jacketGaussScale * (jacketGaussSize.y / 2) - 1),
+				int(center.x + jacketGaussScale * (jacketGaussSize.x / 2) + 1),
+				int(center.y + jacketGaussScale * (jacketGaussSize.y / 2) + 1), H_JACKET_GAUSS, FALSE);
+			//元のジャケット
+			DrawExtendGraph(int(center.x - jacketScale * (jacketSize.x / 2)), int(center.y - jacketScale * (jacketSize.y / 2)), int(center.x + jacketScale * (jacketSize.x / 2)), int(center.y + jacketScale * (jacketSize.y / 2)), H_JACKET, FALSE);
+		}
+		SetDrawArea(0, 0, 1280, 720);//描画可能エリアを元に戻す
+	}
+	SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+
+	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, int((flash) * 100));
+	//jacket_show_counter == -1
+
+
+	for (i = 0; i <= Column; i++) {//画面真ん中領域の「フォルダ名、曲名」の後ろに置くバナーの表示
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(100 * jacket_alpha));
+		//SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(155 * jacket_alpha));
+		int list_number_base_buf = number_ring(list_number_base + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1);
+
+		int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
+
+
+		if (*SelectingTarget == SELECTING_SONG) {
+			if (Music[folder->folder[folder->selected_folder][number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number].exist[difficulty]
+				== 1//そこの譜面が存在するとき
+				//Music[number_ring(song_number + (i - Column / 2), NumberOfSongs - 1)].exist[difficulty]
+				) {
+				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_BACK, TRUE);//バナー(存在する譜面)
+			}
+			else {
+				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_BACK_NE, TRUE);//バナー(存在しない譜面)
+			}
+		}
+
+		if (*SelectingTarget == SELECTING_FOLDER) {
+			DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_BACK, TRUE);//バナー
+		}
+
+		if (*SelectingTarget == SELECTING_SONG) {
+			if (season_banner_buf[i] != 0) {
+				//無季節じゃないなら
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150 - int(150 * jacket_alpha));
+				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_SEASON[season_banner_buf[i] - 1], TRUE);
+				//バナー(季節の模様)に飾りを付ける
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+				if (i != Column / 2)SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(100 * jacket_alpha));
+			}
+		}
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100 - int(100 * jacket_alpha));
+		DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_FLAME, TRUE);//バナーフレーム
+
+	}
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+	//printfDx(L"LOOP5:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+	DrawGraph(640 - 16 + int(((double)1 - button_draw_counter) * 288) + 32, 360 - 16, H_BUTTON_G, TRUE);//左真ん中Gボタン
+	DrawGraph(640 - 16 + int(((double)button_draw_counter - 1) * 288) - 32, 360 - 16, H_BUTTON_G, TRUE);//右真ん中Gボタン
+	if (Key[Button[1][2]] >= 1) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(640 - 16 + int(((double)1 - button_draw_counter) * 288) + 32, 360 - 16, H_BUTTON_PRESS, TRUE);//左真ん中Gボタン
+	}
+	if (Key[Button[1][1]] >= 1) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(640 - 16 + int(((double)button_draw_counter - 1) * 288) - 32, 360 - 16, H_BUTTON_PRESS, TRUE);//右真ん中Gボタン
+	}
+
+	//printfDx(L"LOOP5.1:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+
+	//キー操作指示表示
+	for (i = 1; i <= 2; i++) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(0 + 90 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_B, TRUE);//Bボタン
+		if (Key[Button[0][i]] >= 1) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+			DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(0 + 90 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_PRESS, TRUE);//Bボタン
+		}
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(688 - 90 - 7 + ((double)button_draw_counter - 1) * 32), H_BUTTON_R, TRUE);//Rボタン
+		if (Key[Button[2][i]] >= 1) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+			DrawGraph(int(640 + ((double)i - 1.5) * 128 * 4) - 16, int(688 - 90 - 7 + ((double)button_draw_counter - 1) * 32), H_BUTTON_PRESS, TRUE);//Rボタン
+		}
+	}
+
+	//SetFontSize(28);
+
+	if (*SelectingTarget == SELECTING_SONG) {//曲名表示
+		for (i = 0; i <= Column; i++) {
+			int list_number_base_buf = number_ring(list_number_base + (i - Column / 2), folder->folder_c[folder->selected_folder] - 1);
+
+			int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
+
+			int sn_buf = folder->folder[folder->selected_folder]
+				[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
+
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(255 * jacket_alpha));//選択してる曲名以外非表示アニメーション
+
+			//文字列を求める処理が重い
+			//title_buf[i];曲名の先頭ポインタが配列に格納されている
+			int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+			DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
+
+
+			if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == UnlockState::Secret)) {//隠し曲が出現対象になっている
+				//Attack the Secret Song!の表示
+				SetDrawBright(brightness, brightness, brightness);//点滅
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(255 * jacket_alpha));
+				DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_BANNER_FLAME_SECRET, TRUE);
+				SetDrawBright(255, 255, 255);
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+			}
+		}
+
+		//下部に選択中の曲名を表示
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255.0 * jacket_alpha));//ジャケット表示と同時に表示
+		int index = cycleIndex(Column / 2 + titleCycleIndex.index, config.SongSelectRowNumber);
+		DrawGraph(320, int(336 + (12 - Column / 2) * 48) - 48 + 48.0 * jacket_alpha, H_TITLE_STR[index], TRUE);
+
+		int list_number_base_buf = number_ring(list_number_base, folder->folder_c[folder->selected_folder] - 1);
+		int list_number_buf = SortList[(int)option->op.sort.getIndex()][folder->selected_folder][option->op.color.isRainbow()][difficulty - 1][list_number_base_buf].index;
+		int sn_buf = folder->folder[folder->selected_folder]
+			[number_ring(list_number_buf, folder->folder_c[folder->selected_folder] - 1)].song_number;//list_numberの情報から曲番号を算出
+
+		if ((secret->song_appear_number == sn_buf) && (Music[sn_buf].secret == UnlockState::Secret)) {//隠し曲が出現対象になっている
+			//Attack the Secret Song!の表示
+			SetDrawBright(brightness, brightness, brightness);//点滅
+			DrawGraph(320, int(336 + (12 - Column / 2) * 48) - 48 + 48.0 * jacket_alpha, H_BANNER_FLAME_SECRET, TRUE);
+			SetDrawBright(255, 255, 255);
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+		}
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	if (*SelectingTarget == SELECTING_COURSE) {//段位認定コース名表示
+		for (i = 0; i <= Column; i++) {
+			int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+			DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
+		}
+	}
+
+
+	if (*SelectingTarget == SELECTING_FOLDER) {//フォルダ名表示
+		for (i = 0; i <= Column; i++) {
+			int index = cycleIndex(i + titleCycleIndex.index, config.SongSelectRowNumber);
+			DrawGraph(320, int(336 + (bn_draw_counter + i - Column / 2) * 48), H_TITLE_STR[index], TRUE);
+		}
+		/*
+		for (i = 0; i <= Column; i++) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+			if (i != Column / 2)SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(168 * jacket_alpha));
+
+			ShowExtendedStrFitToHandle(640, int(7 + 336 + (bn_draw_counter + i - Column / 2) * 48), folder_name[number_ring(folder->selected_folder + (i - Column / 2), folder->NumberOfFolders - 1)], folder_name_width[i], 620, FontHandle);//フォルダ名表示
+		}
+		*/
+	}
+
+	//printfDx(L"LOOP5.3:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	DrawGraph(320, 0, H_BANNER_UD, TRUE);//上下バナー
+
+	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+	//ジャンル、アーティスト表示
+	if (*SelectingTarget == SELECTING_SONG) {
+		if (Music[song_number].genre[difficulty][0] != 0) {//ジャンルが存在
+			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
+				ShowExtendedStrFitToHandle(640, int(8 + 336 + (0 + 3 - 20 / 2) * 48), secret_str, genre_width, 500, config, FontHandle);//ジャンル表示「???」
+			}
+			else {
+				ShowExtendedStrFitToHandle(640, int(8 + 336 + (0 + 3 - 20 / 2) * 48), Music[song_number].genre[difficulty], genre_width, 500, config, FontHandle);//ジャンル表示
+			}
+			DrawGraph(320, 0, H_BANNER_AREA, TRUE);//AREA文字表示
+		}
+		if (Music[song_number].artist[difficulty][0] != 0) {//アーティストが存在
+			if (Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) {//隠し曲なら???にする
+				ShowExtendedStrFitToHandle(640, int(1 + 336 + (0 + 4 - 20 / 2) * 48), secret_str, artist_width, 480, config, FontHandle);//アーティスト表示「???」
+			}
+			else {
+				ShowExtendedStrFitToHandle(640, int(1 + 336 + (0 + 4 - 20 / 2) * 48), Music[song_number].artist[difficulty], artist_width, 480, config, FontHandle);//アーティスト表示
+			}
+			DrawGraph(320, 0, H_BANNER_ARTIST, TRUE);//ARTIST文字表示
+		}
+
+
+		/*
+		DrawStringToHandle(int(640 - ((double)genre_width / 2)) + 2, int(11 + 336 + (0 + 3 - 20 / 2) * 48 + 2), Music[song_number].genre[difficulty], GetColor(0, 0, 0), FontHandle);//ジャンル(影)
+		DrawStringToHandle(int(640 - ((double)genre_width / 2)), int(11 + 336 + (0 + 3 - 20 / 2) * 48), Music[song_number].genre[difficulty], GetColor(255, 255, 255), FontHandle);//ジャンル
+
+		DrawStringToHandle(int(640 - ((double)artist_width / 2)) + 2, int(6 + 336 + (0 + 4 - 20 / 2) * 48 + 2), Music[song_number].artist[difficulty], GetColor(0, 0, 0), FontHandle);//アーティスト(影)
+		DrawStringToHandle(int(640 - ((double)artist_width / 2)), int(6 + 336 + (0 + 4 - 20 / 2) * 48), Music[song_number].artist[difficulty], GetColor(255, 255, 255), FontHandle);//アーティスト
+		*/
+	}
+	else if (*SelectingTarget == SELECTING_COURSE) {//段位認定用説明
+		ShowExtendedStrFitToHandle(640, int(8 + 336 + (0 + 3 - 20 / 2) * 48), Des1, Des1_width, 640, config, FontHandle);//ジャンル表示
+		ShowExtendedStrFitToHandle(640, int(1 + 336 + (0 + 4 - 20 / 2) * 48), Des2, Des2_width, 640, config, FontHandle);//アーティスト表示
+	}
+	SetDrawMode(DX_DRAWMODE_NEAREST);
+
+	//printfDx(L"LOOP6:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+	//printfDx(L"%s\n", Music[song_number].artist[difficulty]);
+
+
+
+
+
+	//アナウンス表示
+	if (*SelectingTarget == SELECTING_FOLDER) {
+		SetDrawArea(328, 8, 953, 88);//描画可能エリアを指定
+		if (secret->song_appear_number != -1) {//隠し曲出現演出中
+			show_str(GetNowCount(), Announse_show_time_base, H_ANNOUNSE, 960, 29, secret->Announce_width);
+
+			//show_str(GetNowCount(), Announse_show_time_base, secret->Announce, 330 * 3, 32, secret->Announce_width, config, FontHandle, secret->Color, secret->ShadowColor);
+		}
+		else {//通常状態は通常アナウンス
+			show_str(GetNowCount(), Announse_show_time_base, H_ANNOUNSE, 960, 29, AnnounceWidth);
+
+			//show_str(GetNowCount(), Announse_show_time_base, StrAnnounce,      330 * 3, 32, AnnounceWidth, config, FontHandle, GetColor(255, 255, 255), GetColor(0, 0, 0));
+		}
+		SetDrawArea(0, 0, 1280, 720);//描画可能エリアを元に戻す
+	}
+
+	//実際のハイスピを決める
+	if (Music[song_number].speed_list[difficulty] != 0) {//瞬間風速が0ではないときにハイスピを合わせる
+		option->op.speedVal = option->op.speed.getVal() / (double)Music[song_number].speed_list[difficulty][option->op.speedAdapter.getIndex()];
+	}
+	else {
+		option->op.speedVal = 1;
+	}
+
+	oi_counter = int(0.0004 * GetNowCount_d(config)) % OPERATION_INSTRUCTION_NUMBER;//操作説明表示用のカウンタ
+	if (OptionOpen == 1) {//オプション説明表示
+		if (option_select == (int)OptionItem::Name::SPEED ||
+			option_select == (int)OptionItem::Name::SPEED_ADAPTER) {
+			if (*SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {//曲選択の時で譜面が存在するときは上に表示しハイスピがかかった速さも表示
+				wchar_t SpeedStr[128] = L"(0～0)";
+				int SpeedStrWidth = 0;
+
+				DrawGraph(320, 2 + 48 * 13, option->H_SENT, TRUE);
+				//速さ表示
+				if (*SelectingTarget == SELECTING_SONG) {
+					sprintfDx(SpeedStr, L"(MID:%d FAST:%d MAX:%d)",
+						int(Music[song_number].speed_list[difficulty][Speed::MID] * option->op.speedVal + 0.5),
+						int(Music[song_number].speed_list[difficulty][Speed::FAST] * option->op.speedVal + 0.5),
+						int(Music[song_number].speed_list[difficulty][Speed::MAX] * option->op.speedVal + 0.5)
+					);
+				}
+				else if (*SelectingTarget == SELECTING_COURSE) {
+					sprintfDx(SpeedStr, L"(%d～%d)",
+						int(STList->bpmmin[list_number] * option->op.speedVal + 0.5),
+						int(STList->bpmmax[list_number] * option->op.speedVal + 0.5));
+				}
+				SpeedStrWidth = GetDrawStringWidthToHandle(SpeedStr, wcslen(SpeedStr), FontHandle);
+				ShowExtendedStrFitToHandle(640, 2 + 48 * 14, SpeedStr, SpeedStrWidth, 620, config, FontHandle);
+			}
+			else {//フォルダセレクト、段位認定の時は真ん中に表示
+				DrawGraph(320, 24 + 48 * 13, option->H_SENT, TRUE);
+			}
+
+			//show_str(GetNowCount_d(config), time_base_str, Option->sent_speed[Option->op.speed], 330 * 3, 655, width_sent_speed[Option->op.speed],FontHandle);
+		}
+		else {
+			DrawGraph(320, 24 + 48 * 13, option->H_SENT, TRUE);
+
+			//show_str(GetNowCount_d(config), time_base_str, Option->sent_gauge[Option->op.gauge], 330 * 3, 655, width_sent_gauge[Option->op.gauge],FontHandle);
+		}
+
+
+	}
+	else {//操作説明表示
+		if (oi_counter <= 4) {
+			DrawGraph(329, 632, H_BANNER_D_BUTTON[oi_counter], TRUE);//コントローラ画像
+		}
+		else {
+			DrawGraph(329, 632, H_BANNER_D_BUTTON[5], TRUE);//コントローラ画像
+		}
+
+		DrawGraph(320, 655, H_OI_STR[oi_counter], TRUE);
+
+		//if (config.ShowStrShadow == TRUE)DrawStringToHandle(int(696 - ((double)width_ope_ins[oi_counter] / 2)) + 2, int(655 + 2), ope_ins[oi_counter], GetColor(0, 0, 0),FontHandle);//説明(影)
+		//DrawStringToHandle(int(696 - ((double)width_ope_ins[oi_counter] / 2)), int(655), ope_ins[oi_counter], GetColor(255, 255, 255), FontHandle);//説明
+	}
+
+
+
+	DrawGraph(320, 0, H_BANNER_UD_SKIN, TRUE);//上下バナー(枠)
+
+	SetDrawBright(brightness, brightness, brightness);//選択枠点滅
+	if (OptionOpen == 0) {//選曲のモードのとき
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 - int(255 * jacket_alpha));
+		DrawGraph(320, 336, H_BANNER_SELECT, TRUE);//選択枠
+	}
+	SetDrawBright(255, 255, 255);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+	float GraphColorV = 255;
+	unsigned int GraphColorArray[9][3] = {//各色の音符個数バー表示用の色配列
+		{255,0,0},
+		{0,255,0},
+		{0,0,255},
+		{0,255,255},
+		{255,0,255},
+		{255,255,0},
+		{255,255,255},
+		{0,0,0},
+		{0,0,0}
+	};
+
+
+	if (*SelectingTarget != SELECTING_COURSE) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, coverAlpha.value);
+		DrawGraph(0, 0, H_COVER[difficulty], TRUE);//カバー表示
+		DrawGraph(960, 0, H_COVER[difficulty], TRUE);//右側
+
+		//各色の音符密度グラフの描画
+		if (*SelectingTarget == SELECTING_SONG || *SelectingTarget == SELECTING_COURSE) {
+			int BarWidth = 33;
+
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 110);
+			for (i = 0; i < 8; i++) {
+				DrawBox(11 + 960 + i * BarWidth, 720, 11 + 960 + BarWidth + i * BarWidth, int(720 - ShowColorNotesGraph[i]), GetColor(GraphColorArray[i][0], GraphColorArray[i][1], GraphColorArray[i][2]), TRUE);
+				/*
+				for (j = 0; j < 32; j++) {
+					DrawLine(11 + 960 + j + i * 33, 720, 11 + 960 + j + i * 33, 720 - Music[song_number].ColorNotesAmount[difficulty][i], GetCylinderColor(j, 32, GraphColorArray[i][0], GraphColorArray[i][1], GraphColorArray[i][2]), TRUE);
+				}
+				*/
+			}
+
+			//虹のグラフ
+			for (j = 0; j < BarWidth; j++) {
+				DrawLine(11 + 960 + j + 8 * BarWidth, 720, 11 + 960 + j + 8 * BarWidth, int(720 - ShowColorNotesGraph[i]), GetRainbowColor((double)BarWidth - 1 - j, BarWidth), 1);
+			}
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+
+			//密度折れ線グラフの描画
+			for (i = 0; i < 8; i++) {
+				DrawLineAA(float(11 + 960 + (i + 1) * BarWidth - 17), float(720 - ShowLocalNotesGraph[i]), float(11 + 960 + BarWidth + (i + 1) * BarWidth - 17), float(720 - ShowLocalNotesGraph[i + 1]), GetColor(255, 255, 255), 3);
+			}
+
+			for (i = 0; i < 9; i++) {
+				DrawCircleAA(float(11 + 960 + (i + 1) * BarWidth - 17), float(720 - ShowLocalNotesGraph[i]), float(4), 32, GetColor(255, 255, 255), TRUE);
+			}
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+			DrawGraph(960, 0, H_COVER_POP, TRUE);//右側の文字
+		}
+
+
+	}
+	else {//段位認定カバー
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, coverAlpha.value);
+		DrawGraph(0, 0, H_COVER_SKILL_TEST, TRUE);//カバー表示
+		DrawGraph(960, 0, H_COVER_SKILL_TEST, TRUE);//右側
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+		DrawGraph(960, 0, H_COVER_SKILL_TEST_POP, TRUE);//右側の文字
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * 255);
+	DrawGraph(0, 0, H_COVER_RADAR, TRUE);
+
+	if (*SelectingTarget == SELECTING_SONG) {
+		DrawGraph(0, 0, H_COVER_RADAR_NAME_TOTAL, TRUE);
+	}
+	else if (*SelectingTarget == SELECTING_FOLDER) {
+		DrawGraph(0, 0, H_COVER_RADAR_NAME_ROBUSTNESS, TRUE);
+	}
+
+
+
+	DrawGraph(0, 0, H_COVER_HIGH_SCORE, TRUE);//左側の文字
+
+	//レベル描画
+	if (*SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
+		DrawGraph(1180, 100, H_PERCENT, TRUE);
+		for (i = 0; i <= int(log10(Music[song_number].level[difficulty])); i++) {
+			DrawGraph(10 + 1120 - i * 40, 100, H_SCORE_NUMBER[level_digit[i]], TRUE);
+		}
+	}
+	else if (*SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2) {//段位難易度
+		DrawGraph(1145, 100, H_PERCENT, TRUE);
+		for (i = 0; i <= int(log10(STList->pop[list_number])); i++) {
+			DrawGraph(10 + 1060 - i * 40, 100, H_SCORE_NUMBER[level_digit[i]], TRUE);
+		}
+	}
+
+	//難易度画像描画
+	//printfDx(L"%d\n", H_DIFFICULTY[difficulty]);
+	if (*SelectingTarget == SELECTING_SONG) {
+		if (Music[song_number].exist[difficulty] == 1) {//存在するとき
+			if (Music[song_number].season[difficulty] != 4) {//冬じゃないとき
+				DrawExtendGraph(970, 112, 970 + 80, 112 + 80, H_DIFFICULTY[difficulty], TRUE);//譜面難易度
+
+
+				//DrawGraph(1020, 260, H_DIFFICULTY[difficulty], TRUE);
+			}
+			else {//冬のとき
+				if (difficulty <= 2) {//晴れ曇りはそのまま
+					DrawExtendGraph(970, 112, 970 + 80, 112 + 80, H_DIFFICULTY[difficulty], TRUE);//譜面難易度
+
+				}
+				if (difficulty >= 3 && difficulty <= 4) {//雪 吹雪
+					DrawExtendGraph(970, 112, 970 + 80, 112 + 80, H_DIFFICULTY[difficulty + 2], TRUE);//譜面難易度
+
+				}
+			}
+		}
+	}
+
+	//スコア描画
+
+	int R_ShowFlag = 0;//R表示フラグ
+	if ((*SelectingTarget == SELECTING_SONG || *SelectingTarget == SELECTING_FOLDER) && option->op.color.isRainbow()) {
+		R_ShowFlag = 1;
+	}
+	else if (*SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] == 0) {
+		R_ShowFlag = 1;
+	}
+
+
+	if (R_ShowFlag) {
+		for (i = 0; i <= 4; i++) {
+			DrawExtendGraph(245 - i * 40, int(100), 245 + 64 - i * 40, int(100 + 100), H_SCORE_NUMBER[score_digit[i]], TRUE);
+		}
+	}
+	else {
+		for (i = 0; i <= 4; i++) {
+			DrawExtendGraph(210 - i * 40, int(100), 210 + 64 - i * 40, int(100 + 100), H_SCORE_NUMBER[score_digit[i]], TRUE);
+		}
+	}
+
+	//R表示
+	if (R_ShowFlag) {//曲選択
+		DrawGraph(0, 97, H_R, TRUE);
+	}
+
+	int boxAlpha = viewAlphaRatio * 80;
+	int boxLineAlpha = viewAlphaRatio * 255;
+	//BPM, VERSION描画
+	//枠の表示
+	if (*SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
+
+		//BPM用表示枠
+		DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255), boxAlpha, boxLineAlpha);
+		DrawBoxWithLine(1130, 200, 1264, 240, GetColor(255, 50, 50), boxAlpha, boxLineAlpha);
+
+		//バージョン用表示枠
+		DrawBoxWithLine(976, 250, 1110, 290, GetColor(50, 255, 50), boxAlpha, boxLineAlpha);
+
+		//最大同時押し数用表示枠
+		DrawBoxWithLine(1130, 250, 1264, 290, GetColor(255, 255, 255), boxAlpha, boxLineAlpha);
+
+		DrawGraph(960, 200, H_BPM_MINMAX_STR, TRUE);
+		DrawGraph(960, 250, H_VER_MAX_CHORDS_STR, TRUE);
+	}
+	else if (*SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2) {//段位
+		DrawBoxWithLine(976, 200, 1110, 240, GetColor(50, 50, 255), boxAlpha, boxLineAlpha);
+		DrawBoxWithLine(1130, 200, 1264, 240, GetColor(255, 50, 50), boxAlpha, boxLineAlpha);
+
+		DrawGraph(960, 200, H_BPM_MINMAX_STR, TRUE);
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * 255);
+	//BPM, VERSION数値描画
+	if (*SelectingTarget == SELECTING_SONG && Music[song_number].exist[difficulty] == 1) {
+
+		DrawNumber(1062, 196, Music[song_number].bpmmin[difficulty], 25, 0, 0, H_BPM_NUMBER_MIN);
+		DrawNumber(1216, 196, Music[song_number].bpmmax[difficulty], 25, 0, 0, H_BPM_NUMBER_MAX);
+		DrawFloatNumber(1090, 246, Music[song_number].version[difficulty], 20, 3, 0.5, H_VERSION_NUMBER, H_VERSION_DECIMAL);
+
+		DrawNumber(1235, 246, Music[song_number].maxChords[option->op.color.isRainbow()][difficulty], 25, 0, 0, H_MAX_CHORDS_NUMBER);
+	}
+	else if (*SelectingTarget == SELECTING_COURSE && STList->Kind[list_number] != 2) {//段位
+		DrawNumber(1062, 196, STList->bpmmin[list_number], 25, 0, 0, H_BPM_NUMBER_MIN);
+		DrawNumber(1216, 196, STList->bpmmax[list_number], 25, 0, 0, H_BPM_NUMBER_MAX);
+	}
+
+
+	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+
+	if (*SelectingTarget == SELECTING_SONG || *SelectingTarget == SELECTING_FOLDER || *SelectingTarget == SELECTING_COURSE) {
+		int RankBuf = 0;
+		int ClearStateBuf = 0;
+		int PlayCountBuf = 0;
+		int ExistBuf = Music[song_number].exist[difficulty];
+
+		if (*SelectingTarget == SELECTING_SONG) {
+			if (ScoreShowMode == 0) {
+				RankBuf = Highscore[song_number].rank[difficulty + select_rainbow];
+				ClearStateBuf = Highscore[song_number].clear_state[difficulty + select_rainbow];
+				PlayCountBuf = Highscore[song_number].play_count[difficulty + select_rainbow];
+			}
+			else if (ScoreShowMode == 1) {
+				RankBuf = HighscoreRival[song_number].rank[difficulty + select_rainbow];
+				ClearStateBuf = HighscoreRival[song_number].clear_state[difficulty + select_rainbow];
+				PlayCountBuf = HighscoreRival[song_number].play_count[difficulty + select_rainbow];
+			}
+		}
+		else if (*SelectingTarget == SELECTING_COURSE) {
+			RankBuf = STrank[list_number];
+			ClearStateBuf = STclear_state[list_number];
+			PlayCountBuf = STplay_count[list_number];
+			ExistBuf = 1;
+		}
+		else if (*SelectingTarget == SELECTING_FOLDER) {
+			RankBuf = FolderScore[option->op.color.isRainbow()][folder->selected_folder][difficulty].folderRank;
+			ClearStateBuf = FolderScore[option->op.color.isRainbow()][folder->selected_folder][difficulty].ClearType;
+			PlayCountBuf = 1;
+			ExistBuf = 1;
+		}
+
+		//ランク描画
+		if (RankBuf != 0) {
+			int RankSize = 210;
+			DrawExtendGraph(7 + 50, 460 + 50, 7 + RankSize + 50, 460 + RankSize + 50, H_RANK[RankBuf], TRUE);
+
+			//DrawExtendGraph(0 + 50, 200 + 50, 220 + 50, 420 + 50, H_RANK[RankBuf], TRUE);
+		}
+		int PlayStateY = 650;
+		float PlayStateRatioG = 0.75;
+		float PlayStateRatio = (float)0.8 * PlayStateRatioG;
+		float PlayStateRatioF = (float)0.66 * PlayStateRatioG;
+		int PlayStatex = -30;
+
+		//プレイ状態描画
+		if (RankBuf != 0 && ClearStateBuf == CLEARTYPE_FAILED && ExistBuf == 1) {//FAILED,不合格状態
+			if (*SelectingTarget == SELECTING_SONG || *SelectingTarget == SELECTING_FOLDER) {
+				DrawExtendGraph(PlayStatex - 5, PlayStateY, int(PlayStatex - 5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_FAILED, TRUE);
+			}
+			else if (*SelectingTarget == SELECTING_COURSE) {
+				DrawExtendGraph(PlayStatex + 5, PlayStateY, int(PlayStatex + 5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_SKILL_TEST_FAILED, TRUE);
+			}
+		}
+		if (ClearStateBuf == CLEARTYPE_PLAY && ExistBuf == 1) {//PLAY状態(何も表示しない)
+			//DrawExtendGraph(-95, 580, int(-95 + ((double)640 * 0.8)), int(580 + ((double)100 * 0.8)), H_CLEARED_EASY, TRUE);
+		}
+		if (ClearStateBuf == CLEARTYPE_EASY_CLEARED && ExistBuf == 1) {//EASY_CLEARED,合格状態
+			if (*SelectingTarget == SELECTING_SONG) {
+				DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_EASY, TRUE);
+			}
+			else if (*SelectingTarget == SELECTING_COURSE) {
+				DrawExtendGraph(PlayStatex + 5, PlayStateY, int(PlayStatex + 5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_SKILL_TEST_PASSED, TRUE);
+			}
+		}
+		if (ClearStateBuf == CLEARTYPE_CLEARED && ExistBuf == 1) {//NORMAL_CLEARED状態
+			DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_NORMAL, TRUE);
+		}
+		if (ClearStateBuf == CLEARTYPE_HARD_CLEARED && ExistBuf == 1) {//HARD_CLEARED状態
+			DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_HARD, TRUE);
+		}
+		if (ClearStateBuf == CLEARTYPE_SUPER_HARD_CLEARED && ExistBuf == 1) {//SUPER_HARD_CLEARED状態
+			DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_CLEARED_SUPER_HARD, TRUE);
+		}
+		if (ClearStateBuf == CLEARTYPE_FULL_COMBO && ExistBuf == 1) {//FULL_COMBO状態
+			DrawExtendGraph(PlayStatex + 30, PlayStateY + 10, int(PlayStatex + 30 + ((double)640 * PlayStateRatioF)), int(PlayStateY + 10 + ((double)100 * PlayStateRatioF)), H_FULL_COMBO[(int(GAME_passed_time) / 70) % 6], TRUE);
+		}
+
+		if (ClearStateBuf == CLEARTYPE_PERFECT && ExistBuf == 1) {//PERFECT_FULLCOMBO状態
+			DrawExtendGraph(PlayStatex, PlayStateY, int(PlayStatex + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_PFC, TRUE);
+		}
+
+		if (ClearStateBuf == CLEARTYPE_NO_PLAY && ExistBuf == 1) {//no play状態
+			DrawExtendGraph(PlayStatex - 5, PlayStateY, int(PlayStatex - 5 + ((double)640 * PlayStateRatio)), int(PlayStateY + ((double)100 * PlayStateRatio)), H_NO_PLAY, TRUE);
+		}
+
+	}
+	SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+
+
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	if (activityState == FLAG_OPENING_STATE) {//開ける
+		DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+		if (c_m_draw_counter > 1) {
+			if (*SelectingTarget == SELECTING_SONG) {
+				//開いたら曲再生
+				SetCurrentPositionSoundMem(int(((double)Music[song_number].demostart[difficulty] / 1000) * 44100), SH_SONG);
+				if ((Music[song_number].secret == UnlockState::Secret && secret->song_appear_number != song_number) || BGM_continue == 1) {//隠し曲,専用BGM再生中なら鳴らさない
+					//鳴らさない
+				}
+				else {
+					PlaySoundMem(SH_SONG, DX_PLAYTYPE_BACK, FALSE);
+					song_play_counter = -2;
+				}
+			}
+			c_m_draw_counter = 1;
+			activityState = FLAG_SELECT_STATE;
+		}
+		for (i = 0; i < CRTBuf; i++) {
+			if (c_m_draw_counter <= 1) {
+				c_m_draw_counter += 0.001;
+			}
+		}
+		if (openflag == 0) {
+			PlaySoundMem(SH_OPEN, DX_PLAYTYPE_BACK, TRUE);
+			openflag = 1;
+		}
+	}
+
+
+
+	if (activityState == FLAG_CLOSING_STATE) {//閉める
+		DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+		if (c_m_draw_counter < 0) {
+			PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
+			activityState = FLAG_END_FUNCTION_STATE;
+			CoverClosedTime = (int)GAME_passed_time;
+		}
+		for (i = 0; i < CRTBuf; i++) {
+			if (c_m_draw_counter >= 0) {
+				c_m_draw_counter -= 0.001;
+			}
+		}
+
+	}
+
+	if (activityState == FLAG_END_FUNCTION_STATE) {//閉まった後
+		DrawGraph(320, int((cos((3.14 / 2) * c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, viewAlphaRatio * 255);
+	//譜面レーダーの数値表示
+	if (*SelectingTarget == SELECTING_SONG || *SelectingTarget == SELECTING_FOLDER) {
+		int RaderNumberInterval = 15;
+		DrawNumber(160, 200, int(DRShowGlobal + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+		DrawNumber(288, 257, int(DRShowLocal + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+		DrawNumber(288, 445, int(DRShowChain + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+		DrawNumber(160, 502, int(DRShowUnstability + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+		DrawNumber(34, 445, int(DRShowStreak + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+		DrawNumber(34, 257, int(DRShowColor + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+		DrawNumber(218, 348, int(DRShowTotal + 0.5), RaderNumberInterval, 0, 3, H_RADER_NUMBER);
+
+	}
+
+
+	//譜面レーダーの回転する線表示
+	DrawRadarLine(GAME_passed_time / 1000);
+
+	//譜面レーダー描画
+	if (*SelectingTarget == SELECTING_SONG || *SelectingTarget == SELECTING_FOLDER) {
+		//if (Music[song_number].exist[difficulty] == 1) {//存在するとき
+		DrawHexagon(
+			(short)(DRShowGlobal + 0.5),
+			(short)(DRShowLocal + 0.5),
+			(short)(DRShowChain + 0.5),
+			(short)(DRShowUnstability + 0.5),
+			(short)(DRShowStreak + 0.5),
+			(short)(DRShowColor + 0.5));
+		//}
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	//NOTEを選択しているときはプレビュー画像を表示
+	if (OptionOpen == 1 && option_select == (int)OptionItem::Name::NOTE) {
+		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+		DrawExtendGraph(332, 632, 412, 712, H_OPTION_NOTE_PREVIEW[0], TRUE);
+		DrawExtendGraph(868, 632, 948, 712, H_OPTION_NOTE_PREVIEW[1], TRUE);
+		SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+	}
+
+	//NOTE SYMBOLを選択しているときはプレビュー画像を表示
+	if (OptionOpen == 1 && option_select == (int)OptionItem::Name::NOTE_SYMBOL) {
+		SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+		DrawExtendGraph(332, 632, 412, 712, H_OPTION_NOTE_SYMBOL_PREVIEW[0], TRUE);
+		DrawExtendGraph(868, 632, 948, 712, H_OPTION_NOTE_SYMBOL_PREVIEW[1], TRUE);
+		SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+	}
+
+
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	optionListView.draw();
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
+	cache = int(cos((3.14159265) / 2 * ((double)1 - result_draw_counter)) * (-320) + 1280 + 0.5);//リザルトカバー
+
+	DrawGraph(cache, 0, H_COVER_OPTION, TRUE);
+	if ((*SelectingTarget == SELECTING_SONG) || (*SelectingTarget == SELECTING_COURSE)) {
+		DrawGraph(cache, 0, H_RESULT, TRUE);//リザルトタイトル
+		DrawGraph(cache, 0, H_RESULT_OBJ, TRUE);//リザルトボード
+	}
+
+	if ((Music[song_number].exist[difficulty] == 1 && *SelectingTarget == SELECTING_SONG) || *SelectingTarget == SELECTING_COURSE) {//曲選択状態で譜面が存在するときか、段位選択のとき
+		int SkyPerfectBuf = 0;
+		int PerfectBuf = 0;
+		int GoodBuf = 0;
+		int MissBuf = 0;
+		int MinMissBuf = 0;
+		int MaxComboBuf = 0;
+		int PlayCountBuf = 0;
+
+		if (*SelectingTarget == SELECTING_SONG) {
+			if (ScoreShowMode == 0) {
+				SkyPerfectBuf = Highscore[song_number].sky_perfect[difficulty + select_rainbow];
+				PerfectBuf = Highscore[song_number].perfect[difficulty + select_rainbow];
+				GoodBuf = Highscore[song_number].good[difficulty + select_rainbow];
+				MissBuf = Highscore[song_number].miss[difficulty + select_rainbow];
+				MinMissBuf = Highscore[song_number].min_miss[difficulty + select_rainbow];
+				MaxComboBuf = Highscore[song_number].max_combo[difficulty + select_rainbow];
+				PlayCountBuf = Highscore[song_number].play_count[difficulty + select_rainbow];
+			}
+			else if (ScoreShowMode == 1) {
+				SkyPerfectBuf = HighscoreRival[song_number].sky_perfect[difficulty + select_rainbow];
+				PerfectBuf = HighscoreRival[song_number].perfect[difficulty + select_rainbow];
+				GoodBuf = HighscoreRival[song_number].good[difficulty + select_rainbow];
+				MissBuf = HighscoreRival[song_number].miss[difficulty + select_rainbow];
+				MinMissBuf = HighscoreRival[song_number].min_miss[difficulty + select_rainbow];
+				MaxComboBuf = HighscoreRival[song_number].max_combo[difficulty + select_rainbow];
+				PlayCountBuf = HighscoreRival[song_number].play_count[difficulty + select_rainbow];
+			}
+		}
+		else if (*SelectingTarget == SELECTING_COURSE) {
+			SkyPerfectBuf = STsky_perfect[list_number];
+			PerfectBuf = STperfect[list_number];
+			GoodBuf = STgood[list_number];
+			MissBuf = STmiss[list_number];
+			MinMissBuf = STmin_miss[list_number];
+			MaxComboBuf = STmax_combo[list_number];
+			PlayCountBuf = STplay_count[list_number];
+		}
+
+		//数値描画
+		DrawNumber((cache - 960) + 1212, 210, SkyPerfectBuf, 25, 1, 0, H_JUDGE_NUMBER);
+		DrawNumber((cache - 960) + 1212, 262, PerfectBuf, 25, 1, 0, H_JUDGE_NUMBER);
+		DrawNumber((cache - 960) + 1212, 314, GoodBuf, 25, 1, 0, H_JUDGE_NUMBER);
+		DrawNumber((cache - 960) + 1212, 367, MissBuf, 25, 1, 0, H_JUDGE_NUMBER);
+
+		if (MinMissBuf != -1) {//MinMissが保存されているとき
+			DrawNumber((cache - 960) + 1221, 499, MinMissBuf, 25, 1, 4, H_MIN_MISS_NUMBER);
+		}
+
+		DrawNumber((cache - 960) + 1221, 557, MaxComboBuf, 25, 1, 4, H_MAX_COMBO_NUMBER);
+		DrawNumber((cache - 960) + 1221, 615, PlayCountBuf, 25, 1, 4, H_PLAY_COUNT_NUMBER);
+	}
+	else if (*SelectingTarget == SELECTING_FOLDER) {
+		int boxHeight = 40;
+		//枠の表示
+
+		//フォルダ記録
+		//クリア状態
+		DrawBoxWithLine((cache - 960) + 976, 130, (cache - 960) + 1110, 130 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 170, (cache - 960) + 1110, 170 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 210, (cache - 960) + 1110, 210 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 250, (cache - 960) + 1110, 250 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 290, (cache - 960) + 1110, 290 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 330, (cache - 960) + 1110, 330 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 370, (cache - 960) + 1110, 370 + boxHeight, GetColor(50, 50, 50));
+
+		//ランク
+		DrawBoxWithLine((cache - 960) + 1130, 130, (cache - 960) + 1264, 130 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 1130, 170, (cache - 960) + 1264, 170 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 1130, 210, (cache - 960) + 1264, 210 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 1130, 250, (cache - 960) + 1264, 250 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 1130, 290, (cache - 960) + 1264, 290 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 1130, 330, (cache - 960) + 1264, 330 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 1130, 370, (cache - 960) + 1264, 370 + boxHeight, GetColor(50, 50, 50));
+
+
+		DrawBoxWithLine((cache - 960) + 976, 410, (cache - 960) + 1110, 410 + boxHeight, GetColor(50, 50, 50));;//PLAY
+		DrawBoxWithLine((cache - 960) + 976, 450, (cache - 960) + 1264, 450 + boxHeight, GetColor(50, 50, 50));//NO PLAY
+
+		//トータル記録
+		DrawBoxWithLine((cache - 960) + 976, 540, (cache - 960) + 1264, 540 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 580, (cache - 960) + 1264, 580 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 620, (cache - 960) + 1264, 620 + boxHeight, GetColor(50, 50, 50));
+		DrawBoxWithLine((cache - 960) + 976, 660, (cache - 960) + 1264, 660 + boxHeight, GetColor(50, 50, 50));
+
+		//文字
+		DrawGraph((cache), 0, H_COVER_STATUS_STR, TRUE);
+		DrawGraph((cache), 0, H_COVER_STATUS, TRUE);
+
+		//DrawGraph((cache - 960) + 960, 250, H_VERSION_STR, TRUE);
+
+
+		//数値描画
+
+		//フォルダ記録
+		//クリア状態
+		int R = 0;
+		if (option->op.color.isRainbow())R = 1;
+
+		FolderScore[R][folder->selected_folder][difficulty].clearState[CLEARTYPE_PERFECT];
+
+		DrawNumber((cache - 960) + 1092, 130 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_PERFECT)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1092, 170 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_FULL_COMBO)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1092, 210 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_SUPER_HARD_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1092, 250 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_HARD_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1092, 290 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1092, 330 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_EASY_CLEARED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1092, 370 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_FAILED)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1092, 410 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_PLAY)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1246, 450 - 4, FolderScore[R][folder->selected_folder][difficulty].clearState[clearStateConverter(CLEARTYPE_NO_PLAY)], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+
+
+		//ランク
+		DrawNumber((cache - 960) + 1246, 130 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_S], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1246, 170 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_A], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1246, 210 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_B], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1246, 250 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_C], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1246, 290 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_D], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1246, 330 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_E], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1246, 370 - 4, FolderScore[R][folder->selected_folder][difficulty].rank[RANK_F], 25, 1, 0, H_PLAY_COUNT_NUMBER);
+
+
+
+		//トータル記録
+		DrawNumber((cache - 960) + 1248, 536, saveData.totalBootCount, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+		DrawNumber((cache - 960) + 1248, 576, saveData.totalPlayCount, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+		if (option->op.color.isRainbow()) {
+			DrawNumber((cache - 960) + 1248, 616, saveData.totalHighScoreRainbow, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+		}
+		else {
+			DrawNumber((cache - 960) + 1248, 616, saveData.totalHighScore, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+
+		}
+		DrawNumber((cache - 960) + 1248, 656, saveData.totalHitNotes, 22, 1, 0, H_PLAY_COUNT_NUMBER);
+
+
+	}
+
+
+
+	//キー操作指示表示
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+	DrawGraph(int(320 - 16 - (button_draw_counter) * 320), 7 + 1, H_BUTTON_B, TRUE);//左Bボタン
+	if (Key[Button[0][0]] >= 1) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(int(320 - 16 - (button_draw_counter) * 320), 7 + 1, H_BUTTON_PRESS, TRUE);//左Bボタン
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+	DrawGraph(int(960 - 16 + (button_draw_counter) * 320), 7, H_BUTTON_B, TRUE);//右Bボタン
+	if (Key[Button[0][3]] >= 1) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(int(960 - 16 + (button_draw_counter) * 320), 7, H_BUTTON_PRESS, TRUE);//右Bボタン
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+	DrawGraph(int(320 - 16 - (button_draw_counter) * 320), 681, H_BUTTON_R, TRUE);//左Rボタン
+	if (Key[Button[2][0]] >= 1) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(int(320 - 16 - (button_draw_counter) * 320), 681, H_BUTTON_PRESS, TRUE);//左Rボタン
+	}
+
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+	DrawGraph(int(960 - 16 + (button_draw_counter) * 320), 681, H_BUTTON_R, TRUE);//右Rボタン
+	if (Key[Button[2][3]] >= 1) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+		DrawGraph(int(960 - 16 + (button_draw_counter) * 320), 681, H_BUTTON_PRESS, TRUE);//右Rボタン
+	}
+
+
+
+	//DrawGraph(int(960 + ((double)i - 1.5) * 128) - 16, int(0 + 7 + ((double)1 - button_draw_counter) * 32), H_BUTTON_B, TRUE);//右Bボタン
+
+	if (OptionOpen == 0) {
+		if (difficulty >= 2) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+			DrawGraph(320 - 16 + int(((double)1 - button_draw_counter) * 32) - 32, 360 - 16, H_BUTTON_G, TRUE);//左Gボタン
+			if (Key[Button[1][0]] >= 1) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+				DrawGraph(320 - 16 + int(((double)1 - button_draw_counter) * 32) - 32, 360 - 16, H_BUTTON_PRESS, TRUE);//左Gボタン
+			}
+		}
+		if (difficulty <= 3) {
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(140 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+			DrawGraph(960 - 16 + int(((double)button_draw_counter - 1) * 32) + 32, 360 - 16, H_BUTTON_G, TRUE);//右Gボタン
+			if (Key[Button[1][3]] >= 1) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(230 * sin(3.1415 * button_draw_counter) * c_m_draw_counter));
+				DrawGraph(960 - 16 + int(((double)button_draw_counter - 1) * 32) + 32, 360 - 16, H_BUTTON_PRESS, TRUE);//右Gボタン
+			}
+		}
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	if (activityState == FLAG_END_FUNCTION_STATE) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(255 * (GAME_passed_time - CoverClosedTime) / 1200));
+		DrawGraph(0, 0, H_DARKNESS, TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+	}
+	/*
+	if (debug == 1) {
+	SetFontSize(28);
+	DrawString(int(120 - ((double)150 / 2)) + 2, 690 + 2, "DEBUG MODE", GetColor(0, 0, 0));//デバッグ表示(影)
+	DrawString(int(120 - ((double)150 / 2)), 690, "DEBUG MODE", GetColor(255, 255, 255));//デバッグ表示
+	}
+	*/
+
+	//printfDx(L"LOOP7:%d\n", GetNowCount_d(config) - GAME_start_time - time_cash);
+
+
+
+	if (*debug == 1 && config.ShowDebug == 1) {
+		printfDx(L"AUTO PLAY\n");
+	}
+	if (ScoreShowMode == 1) {
+		printfDx(L"RIVAL SCORE表示\n");
+	}
+
+	/*
+	printfDx(L"Global:%d\n", Music[song_number].global[difficulty]);
+	printfDx(L"Local:%d\n", Music[song_number].local[difficulty]);
+	printfDx(L"Color:%d\n", Music[song_number].color[difficulty]);
+	printfDx(L"Streak:%d\n", Music[song_number].longNote[difficulty]);
+	printfDx(L"Unstability:%d\n", Music[song_number].unstability[difficulty]);
+	printfDx(L"Chain:%d\n", Music[song_number].chain[difficulty]);
+	*/
+	/*
+	printfDx(L"R:%d\n", Music[song_number].ColorNotesAmount[difficulty][0]);
+	printfDx(L"G:%d\n", Music[song_number].ColorNotesAmount[difficulty][1]);
+	printfDx(L"B:%d\n", Music[song_number].ColorNotesAmount[difficulty][2]);
+	printfDx(L"C:%d\n", Music[song_number].ColorNotesAmount[difficulty][3]);
+	printfDx(L"M:%d\n", Music[song_number].ColorNotesAmount[difficulty][4]);
+	printfDx(L"Y:%d\n", Music[song_number].ColorNotesAmount[difficulty][5]);
+	printfDx(L"W:%d\n", Music[song_number].ColorNotesAmount[difficulty][6]);
+	printfDx(L"D:%d\n", Music[song_number].ColorNotesAmount[difficulty][7]);
+	printfDx(L"F:%d\n", Music[song_number].ColorNotesAmount[difficulty][8]);
+
+	for (i = 0; i < 9; i++) {
+		printfDx(L"i:%d\n", Music[song_number].LocalNotesAmount[difficulty][i]);
+	}
+	*/
+
+	//printfDx(L"瞬間BPM:%d\n", Music[song_number].speed_list[difficulty]);
+
+	if (config.Vsync == 0) {
+		i = 0;
+		while (LOOP_passed_time + i < (double)1000 / config.Fps) {//FPSを安定させるため待つ
+			WaitTimer(1);
+			i++;
+		}
+	}
+
+	//Sleep(7);
+	ScreenFlip();
+	clsDx();
+}
+
+wchar_t* SongSelect::SongSelectScreen::announce_str(int StageCount, int PlayCount)
+{
+	//PlayCountが0,1,2のときは
+	static wchar_t str[300] = L" ";
+
+	if (PlayCount == 0) {
+		return L"【はじめてお越しの方へ】　「上下キー」と「Enterキー」でフォルダを選び、曲を選んで下さい。「左右キー」で難易度変更が行えます。最初は降水確率の小さい晴れた曲がお勧めです。";
+	}
+
+	if (PlayCount == 1) {
+		return L"初めてのプレイお疲れ様でした。赤緑青のキー配置には慣れましたか？　実はこれらのキーだけで下の図のように、このシステムの操作をすることができます。オプションを開くと様々な設定が行えます。それでは次の曲を選んでみましょう。";
+	}
+
+	if (PlayCount == 2) {
+		return L"プレイお疲れ様でした。難易度は適切でしたか？　色の認識が難しい場合はオプションを開き、COLORをRAINBOWにすることで色を気にせず楽しめます。　これで案内は以上となります。　どうぞごゆっくりお過ごしください。";
+	}
+
+	//チュートリアル以後
+
+	time_t now;//現在時刻(グリニッジ標準時)
+	struct tm tm_now;//時間構造体
+	errno_t error = 0;
+
+	now = time(NULL);//時刻取得
+	error = _localtime64_s(&tm_now, &now);
+
+	if (StageCount == 0) {//起動時
+		wchar_t* Greeting[3] = { L"おはようございます。",L"こんにちは。",L"こんばんは。" };
+		wchar_t DayOfWeek[7][3] = { L"日", L"月",L"火",L"水",L"木",L"金",L"土" };
+
+		int GreetingUse = 0;//どのあいさつを使うか
+
+		if (tm_now.tm_hour >= 5 && tm_now.tm_hour < 9) {//5時～9時までは「おはようございます」
+			GreetingUse = 0;
+		}
+		else if (tm_now.tm_hour >= 9 && tm_now.tm_hour < 17) {//9時～17時までは「こんにちは」
+			GreetingUse = 1;
+		}
+		else {//それ以外(17～5時)は「こんばんは」
+			GreetingUse = 2;
+		}
+
+		sprintfDx(str, L"%d月%d日%s曜日　%sこちらはnature prhysm自然管理センターです。本日もご来館いただきありがとうございます。ごゆっくりお過ごしください。",
+			tm_now.tm_mon + 1, tm_now.tm_mday, DayOfWeek[tm_now.tm_wday], Greeting[GreetingUse]);
+
+		return str;
+	}
+
+	const int GeneralStrNum = 25;
+	wchar_t* GeneralStr[GeneralStrNum] = {
+	L"【ヒント:スピード調節】音符が詰まりすぎて見づらいときは、オプションのSPEEDを変更し見やすい速さにしてみましょう。",
+	L"【ヒント:音符の種類】音符の種類は「赤,緑,青,虹」の他に「水色,紫,黄色」や「白」があります。　それぞれ曇り、雨難易度以上から出現します。　光の色を混ぜて対処しましょう。　また、叩いてはいけない黒い音符もあります。",
+	L"【ヒント:判定の種類】判定の種類は4つあり、MISS,GOOD,PERFECT,SKY PERFECTがあります。　タイミングよく叩いて良い判定を多くとりハイスコアを目指しましょう。",
+	L"【ヒント:点数とランク】スコアに応じて曲にはランクが付きます。　F:5000点未満　E:5000点以上　D:6000点以上　C:7000点以上　B:8000点以上　A:9000点以上　S:9500点以上です。",
+	L"【ヒント:ゲージの種類】オプションでゲージの種類を選ぶことができます。　より厳しいゲージでのクリアを目指しましょう。　練習にはゲージの減ることが無いNO FAILゲージがおすすめです。",
+	L"【ヒント:ゲージの増減】ミスが続いてゲージが無くなると失敗になりますが、良い判定を取るとゲージは増えていきます。　光っている音符は増減量が２倍なので叩き逃さないようにしましょう。",
+	L"【ヒント:色の覚え方】音符の色と叩く場所は自然風景と対応させて覚えると良いでしょう。　例えば、青は上に広がる空の色……のように。",
+	L"【ヒント:速度変化】曲の中には途中で速度が変化するものがあります。　右上に予測値が表示されていますが稀に予報が外れる場合があります。　そのため常に注意を払ってください。",
+	L"【ヒント:未調査エリア】「???」と表示されている項目は未調査エリアです。　危険なエリアのため立ち入りは禁じられています。　万が一調査する場合は厳重に警戒してください。　安全が確認された場合、エリアは解放されます。",
+	L"【ヒント:上達のコツ】自分の実力より少し上の難易度をプレイし続けることが上達への近道です。",
+	L"【ヒント:RAINBOWオプション】色を認識するのが難しい場合は、オプションのCOLORをRAINBOWにしてみましょう。　色を気にせずプレイすることができます。",
+	L"【ヒント:クイックリトライ】クリアに失敗してしまったときは赤緑青を押し続けてみましょう。　リザルト画面に移動せずすぐにリトライすることができます。",
+	L"【ヒント:自然管理技術者検定】自然管理技術者検定会場では自分の実力を測ることができます。　より高いレベルを目指しましょう。",
+	L"【ヒント:気象レーダー】曲を選ぶとき、左の気象レーダーには譜面の傾向が示されます。　Global:平均密度 Local:最大局所密度 Chain:縦連打度 Unstability:速度変化度 Streak:ロングノーツ度 Color:色の複雑さ Total:合計値 を表しています。",
+	L"【ヒント:スキルレーダー】曲フォルダを選ぶとき、左のレーダーには譜面傾向毎のスキルが示されます。　気象レーダーが大きい曲で高いスコアを取り、スキルを伸ばしましょう。",
+	L"【ヒント:ブラックロングノート】終端が黒いロングノートは終端でしっかり離さないとMISSになります。　押しっぱなしにしないように注意しましょう。",
+	L"【ヒント:グラデーションロングノート】ロングノートは途中で色が変わることがあります。　色の変化に合わせて押しましょう。",
+	L"【ヒント:雨温図】右の色の付いた棒グラフは各色の音符密度を示しています。　白い折れ線グラフは音符密度の時間推移を表しています。",
+	L"【ヒント:NIGHTオプション】音符の色が見づらいときはオプションのNIGHTを変更して背景を暗くしてみましょう。",
+	L"【ヒント:リザルト】リザルトで表示される天気予報を見てみましょう。　天気が精度推移を表し、降水確率がゲージ推移を表しています。",
+	L"【ヒント:クイックプレイ】曲が始まる前にEnterキーを押すとすぐに曲を開始できます。",
+	L"【ヒント:～～Music地方】～～Music地方は、ここから遠く離れた場所を示しています。　雰囲気が気に入った場合はそちらに赴くのも良いでしょう。",
+	L"【ヒント:WIND BREAKシステム】演奏中にCtrlとShiftキーでカバーの位置を調節できます。 音符が詰まっている箇所で下げると見やすくなります。",
+	L"【ヒント:NOTE SYMBOLオプション】オプションのNOTE SYMBOLを変更すると音符の色毎に表示する記号を変更できます。　色の認識に慣れていない時は\"arrow\"がお勧めです。",
+	L"【ヒント:SPEED ADAPTERオプション】オプションのSPEED ADAPTERで音符のスピードをどこに合わせるか調整できます。　初めてプレイする譜面では\"FAST\"に調整するのがお勧めです。"
+	};
+	int GeneralStrUse = 0;//どの通常アナウンスを使うか
+	GeneralStrUse = GetRand(GeneralStrNum - 1);//
+	//GeneralStrUse = 14;
+	return GeneralStr[GeneralStrUse];
+}
+
+void SongSelect::SongSelectScreen::DrawRadarLine(double angle)
+{
+	//short r[6] = { v1,v2,v3,v4,v5,v6 };//半径
+	short r = 99;
+	short o[2] = { 160,360 };//原点座標
+
+	float X[2] = { 0,0 }, Y[2] = { 0,0 };
+
+	//short sum = r[0] + r[1] + r[2] + r[3] + r[4] + r[5];
+	//short th = 75;//色を変化させるsumの閾値
+	//double ind = 0;//0~255
+	int color = GetColor(255, 255, 255);
+
+	float d = (float)1 / 60;//
+
+	int range = 10;//線の幅
+
+	//100で120pixの長さ
+	for (int i = 0; i <= range; i++) {
+		float id = (float)i / 60;
+
+		X[0] = (float)(o[0] + sin((3.14159265 / 3) * (angle + id - d)) * r * 1.2);
+		Y[0] = (float)(o[1] - cos((3.14159265 / 3) * (angle + id - d)) * r * 1.2);
+
+		X[1] = (float)(o[0] + sin((3.14159265 / 3) * (angle + id)) * r * 1.2);
+		Y[1] = (float)(o[1] - cos((3.14159265 / 3) * (angle + id)) * r * 1.2);
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(80 * (double)i / range));
+		//内側
+
+		DrawTriangle((int)X[0], (int)Y[0],
+			(int)X[1], (int)Y[1],
+			o[0], o[1], color, TRUE);
+	}
+
+	return;
+}
+
+int SongSelect::SongSelectScreen::GetCylinderColor(double val, double range, unsigned int R, unsigned int G, unsigned int B)
+{
+	int color = 0;
+	double indR = 0;
+	double indG = 0;
+	double indB = 0;
+
+	double th = range / 6;
+	if (val <= th) {//
+		indR = (double)R * val / th;
+		indG = (double)G * val / th;
+		indB = (double)B * val / th;
+		color = GetColor((int)indR, (int)indG, (int)indB);
+	}
+	else if (val <= th * 5) {//
+		color = GetColor(R, G, B);
+	}
+	else if (val <= th * 6) {//
+		indR = (double)R * (1 - ((val - 5 * th) / th));
+		indG = (double)G * (1 - ((val - 5 * th) / th));
+		indB = (double)B * (1 - ((val - 5 * th) / th));
+		color = GetColor((int)indR, (int)indG, (int)indB);
+	}
+	else {
+		color = GetColor(0, 0, 0);
+	}
+	return color;
+}
+
+int SongSelect::SongSelectScreen::GetRainbowColorForRadar(int val, int th)
+{
+	int color = 0;
+	double ind = 0;
+	if (val <= th) {
+		ind = (double)255 * val / th;
+		color = GetColor(0, (int)ind, 255);
+	}
+	else if (val <= th * 2) {
+		ind = (double)255 * ((double)val - th) / th;
+		color = GetColor(0, 255, 255 - (int)ind);
+	}
+	else if (val <= th * 3) {
+		ind = (double)255 * ((double)val - (double)2 * th) / th;
+		color = GetColor((int)ind, 255, 0);
+	}
+	else if (val <= th * 4) {
+		ind = (double)255 * ((double)val - (double)3 * th) / th;
+		color = GetColor(255, 255 - (int)ind, 0);
+	}
+	else if (val <= th * 5) {
+		ind = (double)255 * ((double)val - (double)4 * th) / th;
+		color = GetColor(255, 0, (int)ind);
+	}
+	else if (val <= th * 6) {
+		ind = (double)255 * ((double)val - (double)5 * th) / th;
+		color = GetColor(255 - (int)ind, 0, 255 - (int)ind);
+	}
+	else {
+		color = GetColor(0, 0, 0);
+	}
+	return color;
+}
+
+void SongSelect::SongSelectScreen::DrawHexagon(short v1, short v2, short v3, short v4, short v5, short v6)
+{
+	short r[6] = { v1,v2,v3,v4,v5,v6 };//半径
+	short o[2] = { 160,360 };//原点座標
+	float posX[6] = { 0,0,0,0,0,0 };
+	float posY[6] = { 0,0,0,0,0,0 };
+
+	float posX_i[6] = { 0,0,0,0,0,0 };//内側用
+	float posY_i[6] = { 0,0,0,0,0,0 };
+
+	short sum = r[0] + r[1] + r[2] + r[3] + r[4] + r[5];
+	short th = 75;//色を変化させるsumの閾値
+	double ind = 0;//0~255
+	int color = GetColor(255, 255, 255);
+
+	color = GetRainbowColorForRadar(sum, th);//対応する虹色を得る
+
+	//100で120pixの長さ
+	for (int i = 0; i <= 5; i++) {
+		posX[i] = (float)(o[0] + sin((3.14159265 / 3) * i) * r[i] * 1.2);
+		posY[i] = (float)(o[1] - cos((3.14159265 / 3) * i) * r[i] * 1.2);
+
+		posX_i[i] = (float)(o[0] + sin((3.14159265 / 3) * i) * (r[i] + 0.5) * 1.2);
+		posY_i[i] = (float)(o[1] - cos((3.14159265 / 3) * i) * (r[i] + 0.5) * 1.2);
+	}
+
+
+
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+	//内側
+	for (int i = 0; i <= 5; i++) {
+		DrawTriangleAA(posX_i[i], posY_i[i], posX_i[(i + 1) % 6], posY_i[(i + 1) % 6], o[0], o[1], color, TRUE);
+	}
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 256);
+	//外枠
+	for (int i = 0; i <= 5; i++) {
+		DrawLineAA(posX[i], posY[i], posX[(i + 1) % 6], posY[(i + 1) % 6], GetColor(30, 30, 30), 2);
+	}
+
+	return;
+}
+
+void SongSelect::SongSelectScreen::OptionValueChange(Option* Option, int option_select, int add)
+{
+	if (add >= 0) {
+		for (int i = 0; i < add; i++) {
+			Option->op.list[option_select]->incrementIndex();
+		}
+	}
+	else {
+		for (int i = 0; i < -add; i++) {
+			Option->op.list[option_select]->decrementIndex();
+		}
+	}
+	return;
+}
+
+void SongSelect::SongSelectScreen::DrawOptionSentence(Option* Option, OptionItem::Name option_select, Config config, int FontHandle)
+{
+	int i = 0;
+
+	//選んでいるオプションの説明文の先頭アドレス
+	const auto desc = Option->op.list[(int)option_select]->getDescription();
+
+	const auto StrAddress = desc.c_str();
+
+	int width = 0;
+	width = GetDrawStringWidthToHandle(StrAddress, wcslen(StrAddress), FontHandle);
+	SetDrawScreen(Option->H_SENT);//オプション説明画像を描画対象に
+	ClearDrawScreen();//前の画像を消去
+	//説明を描画して画像作成
+	SetDrawMode(DX_DRAWMODE_BILINEAR);//バイリニアで描く
+	ShowExtendedStrFitToHandle(320, 7, StrAddress, width, 620, config, FontHandle);
+	SetDrawMode(DX_DRAWMODE_NEAREST);//バイリニアから戻す
+
+	SetDrawScreen(DX_SCREEN_BACK);//描画対象を裏画面に戻す
+	return;
+}
+
+int SongSelect::SongSelectScreen::clearStateConverter(int clearState)
+{
+	switch (clearState)
+	{
+	case CLEARTYPE_NO_PLAY:
+		return 0;
+		break;
+	case CLEARTYPE_PLAY:
+		return 1;
+		break;
+	case CLEARTYPE_FAILED:
+		return 2;
+		break;
+	case CLEARTYPE_EASY_CLEARED:
+		return 3;
+		break;
+	case CLEARTYPE_CLEARED:
+		return 4;
+		break;
+	case CLEARTYPE_HARD_CLEARED:
+		return 5;
+		break;
+	case CLEARTYPE_SUPER_HARD_CLEARED:
+		return 6;
+		break;
+	case CLEARTYPE_FULL_COMBO:
+		return 7;
+		break;
+	case CLEARTYPE_PERFECT:
+		return 8;
+		break;
+	default:
+		break;
+	}
+}
+

@@ -1,4 +1,5 @@
-﻿#include"DxLib.h"
+﻿
+#include"DxLib.h"
 #include<math.h>
 #include<sys/stat.h>
 #include<string.h>
@@ -47,7 +48,8 @@ void SONG_SELECT(int *l_n,
 	int Button[3][4], int Button_Shutter, int *Key, char *Buf, 
 	int *debug, int *NumberOfSongs,
 	int *result_count,int *result_rank_buf,SECRET *secret, ANDROID_CONTROLLER *AC,int *StageCount, SkillTestList *STList,
-	Config config, IR_SETTING* ir, bool* isBackToTitle) {
+	Config config, IR_SETTING* ir, bool* isBackToTitle
+) {
 	Asset asset;//使う画像セット
 	//コンテキスト
 	AppContext appContext = AppContext(NULL, option, &config);
@@ -4323,4 +4325,6 @@ int clearStateConverter(int clearState) {//クリア状態番号をFolderScore�
 		break;
 	}
 }
+
+
 

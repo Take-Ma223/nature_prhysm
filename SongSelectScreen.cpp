@@ -1837,6 +1837,8 @@ void SongSelect::SongSelectScreen::updateModel()
 						deleteCoverImage();
 						wstring themeStr1(L"img/themes/");
 						wstring themeStr2(option->op.theme.toString());
+
+						//‰æ‘œ‚ÌØ‚è‘Ö‚¦
 						H_BG = LoadGraph((themeStr1 + themeStr2 + wstring(L"/bg.png")).c_str());
 						H_COVER[1] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_sunny.png")).c_str());
 						H_COVER[2] = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_cloudy.png")).c_str());
@@ -1846,6 +1848,12 @@ void SongSelect::SongSelectScreen::updateModel()
 						H_COVER_OPTION = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_option.png")).c_str());
 						H_COVER_MIDDLE = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cover_middle.png")).c_str());
 						optionListView.setCoverImage();
+						if (secret->song_appear_number == -1) {
+							H_CLOUD = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cloud.png")).c_str());
+						}
+						else if (secret->song_appear_number != -1) {//‰B‚µ‹È‰‰o
+							H_CLOUD = LoadGraph((themeStr1 + themeStr2 + wstring(L"/cloud_black.png")).c_str());//‰B‚µ‹È‰‰o‚È‚ç•‚¢‰_
+						}
 					}
 
 					if (option_select == (int)OptionItem::Name::HITSOUNDVOL) {

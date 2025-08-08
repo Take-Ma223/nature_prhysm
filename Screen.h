@@ -22,7 +22,7 @@ protected:
 	/// <summary>
 	/// ‰æ–Ê‚ÌI—¹
 	/// </summary>
-	void exit() {
+	void exitScreen() {
 		isContinueScreen = false;
 	}
 

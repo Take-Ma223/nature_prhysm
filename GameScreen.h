@@ -146,6 +146,7 @@ namespace Game {
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 4; j++) {
 					GameScreen::Button[i][j] = Button[i][j];
+					Keylist[i][j] = Button[i][j];
 				}
 			}
 		}
@@ -278,9 +279,9 @@ namespace Game {
 		int H_GAME_STR_JUDGE_BPM;
 		int H_GAME_STR_SCORE_GRAPH;
 
-		DrawableInitParam retryViewParam;
+		DrawableInitParam retryViewParam = DrawableInitParam(Cordinate(320, 600));
 		RetryView retryView = RetryView(&context, retryViewParam);
-
+		
 		TransValue viewAlpha = TransValue(&context);
 
 		std::function<void(void)> playAnimationOnEscAtStart;
@@ -558,9 +559,7 @@ namespace Game {
 		GradationNoteImage gradationLongNote = GradationNoteImage(wstring(L"img/notes/") + wstring(note_folder.c_str()));
 		NoteSymbolImage noteSymbol = NoteSymbolImage(config, option->op.noteSymbol.toString());
 
-		int Keylist[3][4] = { { Button[0][0],Button[0][1],Button[0][2],Button[0][3] },
-		{ Button[1][0],Button[1][1],Button[1][2],Button[1][3] },
-		{ Button[2][0],Button[2][1],Button[2][2],Button[2][3] } };//キーのリスト
+		int Keylist[3][4];//キーのリスト
 
 		XY pos_cloud;//雲の座標
 

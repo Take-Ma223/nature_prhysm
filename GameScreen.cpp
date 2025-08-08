@@ -30,9 +30,6 @@ void Game::GameScreen::init() {
 	score_cell_head.before = NULL;
 	score_cell_head.step = -1;
 
-
-	retryViewParam.cordinate = Cordinate(320, 600);
-
 	viewAlpha.value = 255;
 
 	playAnimationOnEscAtStart = [&]() {
@@ -105,6 +102,9 @@ void Game::GameScreen::init() {
 	for (i = 0; i <= 3; i++) {
 		note[i] = (NOTE*)calloc(NOTE_MAX_NUMBER, sizeof(NOTE));
 	}
+	speedBuffer = SpeedBuffer(note, j_n_n);
+	noteSearcher = NoteSearcher(note);
+
 	barline = (BARLINE*)calloc(BARLINE_MAX_NUMBER, sizeof(BARLINE));
 
 
@@ -168,8 +168,8 @@ void Game::GameScreen::init() {
 	rand_seed = DateBuf.Hour * 3600 + DateBuf.Min * 60 + DateBuf.Sec;
 	SRand(rand_seed);//乱数シード値決定
 	GAME_LOAD(song_number, difficulty, note, barline, laneCordinateX, 0, &Cdiff, option, bpmchange, scrollchange, stopSequence, Music, &MusicSub, &TimeToEndScroll, &playing_time, config, 1, NULL, SkillTestFlag);//noteに譜面情報を入れる(譜面部分のロード)
-
 	speedBuffer.updateAverage();
+
 
 
 	if (playing_time > GAUGE_INC_BASE_TIME) {//120秒以上の譜面なら
@@ -355,8 +355,6 @@ void Game::GameScreen::init() {
 	LoadDivGraph(L"img/SmallNumberCyan.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_CYAN);
 	LoadDivGraph(L"img/SmallNumberMagenta.png", 10, 10, 1, 25, 50, H_SMALL_NUMBER_MAGENTA);
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_POP_NUMBER);
-
-
 
 	std::wstring fast = L"img/judge/fast_c.png";
 	std::wstring slow = L"img/judge/slow_r.png";
@@ -672,18 +670,6 @@ void Game::GameScreen::init() {
 
 	
 	GAME_start_time = GetNowCount_d(config);
-	//while (1) {
-	//	
-	//}
-
-
-
-
-	
-
-	while (1) {
-		
-	}
 
 	return;
 }
@@ -711,7 +697,7 @@ void Game::GameScreen::updateModelReady()
 	appContext.updateTime();
 	if (ProcessMessage() != 0) {
 		dxLibFinishProcess();
-		return;
+		exitScreen();
 	}
 
 	//Calc
@@ -758,15 +744,7 @@ void Game::GameScreen::updateModelReady()
 		playAnimationOnEscAtStart();
 		if (SkillTestFlag == 0 && Music[song_number].secret != UnlockState::Secret)retryView.showImmediately();
 		startPlaying();
-		game_screen_phase = Playing;
 		return;
-		/*
-		*escape = 1;
-		ClearFlag = 2;
-		//c_m_draw_counter = 0;
-		PlaySoundMem(SH_CLOSE, DX_PLAYTYPE_BACK, TRUE);
-		cleared_time = int(GAME_passed_time);
-		*/
 	}
 
 	if (Key[KEY_INPUT_RETURN] == 1) {//エンターでスキップできる
@@ -834,7 +812,6 @@ void Game::GameScreen::updateModelReady()
 		jingleVolume.play();
 
 		startPlaying();
-		game_screen_phase = Playing;
 		return;
 	}
 
@@ -1175,6 +1152,7 @@ void Game::GameScreen::startPlaying()
 		coverView.finishMiddleCover();//カバーを下げる
 
 	}
+	game_screen_phase = Playing;
 }
 
 void Game::GameScreen::updateModelPlaying()
@@ -2810,7 +2788,7 @@ void Game::GameScreen::updateModelPlaying()
 
 		// エフェクトリソースを削除する。(Effekseer終了時に破棄されるので削除しなくてもいい)
 		DeleteEffekseerEffect(FXH_FULLCOMBO);
-
+		exitScreen();
 		return;//関数終了
 
 	}

@@ -18,6 +18,7 @@
 #include "LoadSkillTestNpsPathList.h"
 #include "OptionStateSaveLoad.h"
 #include "number_digit.h"
+#include "GameScreen.h"
 
 void SongSelect::SongSelectScreen::init()
 {
@@ -2215,11 +2216,16 @@ void SongSelect::SongSelectScreen::updateModel()
 					TryCount++;
 					escape = 0;
 
-					GAME(song_number, difficulty,
-						&res, &escape, option, &retryAble,
+					//選曲番号と難易度を渡してゲーム画面へ
+					auto game_screen = Game::GameScreen(
+						song_number,difficulty,&res,
+						&escape, option, &retryAble,
 						debug, Music, Button, Button_Shutter, Key, Buf, secret->song_appear_number != -1, AC,
 						config, ir,
-						0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ
+						0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit
+					);
+					game_screen.run();
+
 					Get_Key_State(Buf, Key, AC);
 				} while ((Key[Button[0][0]] >= 1 || Key[Button[0][1]] >= 1 || Key[Button[0][2]] >= 1 || Key[Button[0][3]] >= 1)
 					&& (Key[Button[1][0]] >= 1 || Key[Button[1][1]] >= 1 || Key[Button[1][2]] >= 1 || Key[Button[1][3]] >= 1)
@@ -2317,11 +2323,17 @@ void SongSelect::SongSelectScreen::updateModel()
 				//1~4曲目
 				for (i = 0; i <= 3; i++) {
 					int TryCount = 1;//トライ数
-					GAME(SongNumberList[i], DifficultyList[i],
+
+					//選曲番号と難易度を渡してゲーム画面へ
+					auto game_screen = Game::GameScreen(
+						SongNumberList[i], DifficultyList[i],
 						&Result[i], &escape, option, &retryAble,
 						debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config, ir,
 						i + 1, &GaugeVal,
-						&CourseCombo, &CourseMaxCombo, AllowExit);//選曲番号と難易度を渡してゲーム画面へ	
+						&CourseCombo, &CourseMaxCombo, AllowExit
+					);
+					game_screen.run();
+
 					if (escape == 1) {//プレイの抜け出しはランクをF、FAILEDに
 						Result[i].rank = 1;
 						Result[i].clear = CLEARTYPE_FAILED;
@@ -2426,7 +2438,7 @@ void SongSelect::SongSelectScreen::updateModel()
 
 		free(Highscore);
 		free(HighscoreRival);
-		exit();
+		exitScreen();
 		return;//関数終了
 	}
 

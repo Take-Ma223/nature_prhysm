@@ -40,7 +40,7 @@ typedef struct Config {//コンフィグデータ
 
 	std::wstring BaseFont = L"Noto Sans CJK JP Black";
 	int UseDefaultFont = 1;
-	//std::wstring AlternativeFont = L"メイリオ";
+	int UseEnterInsteadOfSpaceWhenAutoMode = 0;
 
 
 } Config;

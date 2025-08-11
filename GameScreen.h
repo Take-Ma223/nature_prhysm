@@ -204,6 +204,7 @@ namespace Game {
 
 		GameScreenPhase game_screen_phase = Ready;
 
+		int stop_play_key = KEY_INPUT_SPACE;//再生停止に使用するキー
 
 
 		Asset asset;//使う画像セット

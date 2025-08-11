@@ -233,6 +233,13 @@ void ConfigLoad(Config *config) {//Configファイルの読み込み
 			config->BaseFont = std::wstring(Val);
 		}
 
+		if (wcscmp(L"USE_ENTER_INSTEAD_OF_SPACE_WHEN_AUTO_MODE", sharp1) == 0) {
+			wchar_t Val[256];
+			swscanf_s(sharp2, L"%[^,\n]",
+				Val, _countof(Val));
+			config->UseEnterInsteadOfSpaceWhenAutoMode = _wtoi(Val);//数値格納
+		}
+
 		//if (wcscmp(L"ALTERNATIVE_FONT", sharp1) == 0) {
 		//	wchar_t Val[256];
 		//	swscanf_s(sharp2, L"%[^,\n]",

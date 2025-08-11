@@ -48,6 +48,7 @@ void Game::GameScreen::init() {
 		viewAlpha.play();
 		};
 
+	stop_play_key = config.UseEnterInsteadOfSpaceWhenAutoMode ? KEY_INPUT_RETURN : KEY_INPUT_SPACE;
 
 	//グラデーション画像の用意
 	screenHandle = MakeScreen(640, 48, TRUE);
@@ -1494,7 +1495,7 @@ void Game::GameScreen::updateModelPlaying()
 			PauseMovieToGraph(MovieGraphHandle);
 		}
 
-		if (Key[KEY_INPUT_SPACE] == 1) {//再生停止(開始)
+		if (Key[stop_play_key] == 1) {//再生停止(開始)
 			if (debug_stop == 0) {
 				debug_stop = 1;
 				debug_stoped_time = GetNowCount_d(config);
@@ -3494,10 +3495,20 @@ void Game::GameScreen::updateModelPlaying()
 			printfDx(L"F5:MUSIC:OFF\n");
 		}
 		if (debug_stop == 1) {
-			printfDx(L"SPACE:START\n");
+			if (config.UseEnterInsteadOfSpaceWhenAutoMode) {
+				printfDx(L"ENTER:START\n");
+			}
+			else {
+				printfDx(L"SPACE:START\n");
+			}
 		}
 		else {
-			printfDx(L"SPACE:STOP\n");
+			if (config.UseEnterInsteadOfSpaceWhenAutoMode) {
+				printfDx(L"ENTER:STOP\n");
+			}
+			else {
+				printfDx(L"SPACE:STOP\n");
+			}
 		}
 		printfDx(L"↑↓:MOVE\n");
 		printfDx(L"←→:PITCH:%d ×%.3f\n", pitch_step, pitch);

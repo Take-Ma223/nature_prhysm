@@ -3327,18 +3327,19 @@ void Game::GameScreen::updateModelPlaying()
 		}
 	}
 	else if (ClearFlag != 0) {//演奏終了していたら中心カバーの表示
-		//DrawGraph(320, int((cos((3.14 / 2)*c_m_draw_counter) - 1) * 720), H_COVER_MIDDLE, TRUE);
 		coverView.draw(DX_SCREEN_BACK);
-		for (i = 0; i < CRTBuf; i++) {
-			if (c_m_draw_counter > 0) {
-				c_m_draw_counter -= 0.0012;
+		if (str_draw_counter == -1) {
+			for (i = 0; i < CRTBuf; i++) {
+				if (c_m_draw_counter >= 0) {
+					c_m_draw_counter -= 0.0012;
+				}
 			}
-		}
-		if (c_m_draw_counter < 0) {
-			//printfDx("flag\n");
-			PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
-			c_m_draw_counter = int(0);
-			if (str_draw_counter == -1)str_draw_counter = int(1);//CLEARED FAILEDカウンタを1に
+			if (c_m_draw_counter < 0) {
+				//printfDx("flag\n");
+				PlaySoundMem(SH_CLOSED, DX_PLAYTYPE_BACK, TRUE);
+				c_m_draw_counter = int(0);
+				str_draw_counter = int(1);//CLEARED FAILEDカウンタを1に
+			}
 		}
 	}
 	else {//演奏中のカバー位置

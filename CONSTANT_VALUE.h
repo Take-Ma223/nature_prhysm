@@ -4,7 +4,7 @@
 #define NOTE_MAX_NUMBER 10000//1レーンの最大音符数 6500は無理 6000ぐらいまでいけた
 #define BARLINE_MAX_NUMBER 50000//小節線の最大数
 constexpr auto SONG_MAX_NUMBER = 9999;//最大曲数
-const wchar_t APPLICATION_VERSION[] = L"1.41";//バージョン
+const wchar_t APPLICATION_VERSION[] = L"1.42";//バージョン
 
 constexpr int OFFSET_MARGIN = 100;//音声、動画の先頭を合わせるためのオフセットマージン
 

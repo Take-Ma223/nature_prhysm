@@ -365,6 +365,7 @@
     <ClInclude Include="OptionItemHitSound.h" />
     <ClInclude Include="OptionItemHitSoundVol.h" />
     <ClInclude Include="OptionItemLane.h" />
+    <ClInclude Include="OptionItemLaneWidth.h" />
     <ClInclude Include="OptionItemMissEffect.h" />
     <ClInclude Include="OptionItemMovie.h" />
     <ClInclude Include="OptionItemNote.h" />

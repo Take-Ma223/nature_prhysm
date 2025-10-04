@@ -895,6 +895,9 @@
     <ClInclude Include="GameScreen.h">
       <Filter>ソース ファイル\GAME</Filter>
     </ClInclude>
+    <ClInclude Include="OptionItemLaneWidth.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

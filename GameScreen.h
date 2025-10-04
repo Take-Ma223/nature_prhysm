@@ -168,6 +168,15 @@ namespace Game {
 		void updateModelPlaying();
 		void updateViewPlaying();
 
+		/// <summary>
+		/// 音符画像などの正方形画像を指定座標を中心に[scale]の倍率で描画
+		/// </summary>
+		/// <param name="x">x座標</param>
+		/// <param name="y">y座標</param>
+		/// <param name="handle">イメージハンドル</param>
+		/// <param name="TransFlag">透過フラグ</param>
+		void drawSquareImage(double x, double y, int handle, int TransFlag);
+
 		void drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, int BlendVal, int  H_NOTE[12], double flash, const int FLASH_VALUE, const int FLASH_VALUE_ALWAYS, NoteSearcher& noteSearcher, Option* option, GradationNoteImage& gradationLongNote, int  H_LNOTE[12], int  LN_flash[4], int  j_n_n[4], const int FLASH_VALUE_LN_PUSH, NoteSymbolImage& noteSymbol);
 
 		//フルコンボエフェクト
@@ -335,15 +344,11 @@ namespace Game {
 		double cbpm = 120;//現在のBPM
 		double speed = 0.00000000001;//スピード調整
 		double high_speed = 1;//ハイスピ
-		double scale = 1;//判定の横の広がり幅
+		double width_scale = 1;//レーンの横の広がり幅の倍率
+		int laneCordinateX[4] = {0,0,0,0};
 
-		int laneCordinateX[4] = {
-			int(512 - 240 * scale),//レーンのx座標
-			int(512 - 80 * scale),
-			int(512 + 80 * scale),
-			int(512 + 240 * scale) };
 		int cash = 0;//式の見た目を簡単にするため
-		int judge_area = 490, note_fall = -192;//ノートの判定エリアと落ち始める高さ-192~490
+		int judge_area = 618, note_fall = -64;//ノートの判定エリアと落ち始める高さ-192~490
 
 		double judge_time_sky_perfect = 16.66;//判定時間/2(パーフェクト)ms
 		double judge_time_perfect = 40;//判定時間/2(パーフェクト)ms

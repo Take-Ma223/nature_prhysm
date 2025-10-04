@@ -90,10 +90,13 @@ void Drawable::drawWithProcessing(int drawScreen)
 			GraphBlend(drawScreen, handle.getHandle(), blendModeParam.blendRatio.value, blendModeParam.convert());
 		}
 		else if (extendParam.isExtend) {
-			auto start_to_center = handle.getSize().x * centerRatioX;
-			auto top_to_center = handle.getSize().y * centerRatioY;
-			auto end_to_center = handle.getSize().x * centerRatioX;
-			auto bottom_to_center = handle.getSize().y * centerRatioY;
+			auto size_x = handle.getSize().x;
+			auto size_y = handle.getSize().y;
+
+			auto start_to_center = size_x * centerRatioX;
+			auto top_to_center = size_y * centerRatioY;
+			auto end_to_center = size_x - size_x * centerRatioX;
+			auto bottom_to_center = size_y - size_y * centerRatioY;
 
 			auto x1 = X.value - start_to_center * extendParam.ratioX;
 			auto y1 = Y.value - top_to_center * extendParam.ratioY;

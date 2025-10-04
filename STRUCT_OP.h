@@ -22,6 +22,7 @@
 #include "OptionItemSpeedAdapter.h"
 #include "OptionItemNoteSymbol.h"
 #include "OptionItemMissEffect.h"
+#include "OptionItemLaneWidth.h"
 
 #ifndef _STRUCT_OP
 #define _STRUCT_OP
@@ -40,6 +41,7 @@ namespace OptionItem {
 		DARKNESS,
 		GRADATION,
 		MISS_EFFECT,
+		LANE_WIDTH,
 		NOTE_OFFSET,
 
 		SCORETARGET,
@@ -88,6 +90,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		L"25%",
 		L"ON",
 		L"BGM FADE",
+		L"EXTRA WIDE",
 		L"0ms",
 
 		L"OFF",
@@ -125,6 +128,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItemDarkness darkness;
 	OptionItemBlackGradation blackGradation;
 	OptionItemMissEffect missEffect;
+	OptionItemLaneWidth laneWidth;
 	OptionItemNoteOffset noteOffset;
 
 	OptionItemScoreGraph scoreGraph;
@@ -155,6 +159,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		&darkness,
 		&blackGradation,
 		&missEffect,
+		&laneWidth,
 		&noteOffset,
 
 		&scoreGraph,
@@ -179,7 +184,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 24;//オプションの数
+	static const int OPTION_NUM = 25;//オプションの数
 
 	wchar_t* OptionName[OPTION_NUM] = { 
 		L"SPEED",
@@ -194,6 +199,7 @@ typedef struct Option {//オプション構造体(全体)
 		L"NIGHT",
 		L"GRADATION",
 		L"MISS EFFECT",
+		L"LANE WIDTH",
 		L"NOTE OFFSET",
 
 		L"SCORE GRAPH",
@@ -219,6 +225,7 @@ typedef struct Option {//オプション構造体(全体)
 		OptionItem::BannerColor::GREEN,
 		OptionItem::BannerColor::GREEN,
 
+		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,

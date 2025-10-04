@@ -50,6 +50,18 @@ void Game::GameScreen::init() {
 
 	stop_play_key = config.UseEnterInsteadOfSpaceWhenAutoMode ? KEY_INPUT_RETURN : KEY_INPUT_SPACE;
 
+	//レーン幅オプションの設定値からレーン幅を決定
+	width_scale = 
+		OptionItemLaneWidth::getLaneWidth(
+			static_cast<OptionItem::LaneWidth>(option->op.laneWidth.getIndex())
+		);
+
+	//レーンのx座標
+	laneCordinateX[0] = int(640 - 240 * width_scale);
+	laneCordinateX[1] = int(640 - 80 * width_scale);
+	laneCordinateX[2] = int(640 + 80 * width_scale);
+	laneCordinateX[3] = int(640 + 240 * width_scale);	
+
 	//グラデーション画像の用意
 	screenHandle = MakeScreen(640, 48, TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
@@ -380,7 +392,7 @@ void Game::GameScreen::init() {
 		fast_count_color = H_SMALL_NUMBER_RED;
 		slow_count_color = H_SMALL_NUMBER_CYAN;
 	}
-
+	
 
 
 
@@ -388,6 +400,8 @@ void Game::GameScreen::init() {
 		fastSlowCordinate[i] = Cordinate(laneCordinateX[i], judge_area + fastSlowY);
 		fastSlowParams[i].visible = 0;
 		fastSlowParams[i].cordinate = fastSlowCordinate[i];
+		fastSlowParams[i].centerRatio = CenterRatio(0.5, 0.5);
+		fastSlowParams[i].extendParam = ExtendParam(true,width_scale,width_scale);
 		I_Fast[i] = Image(&context, asset.img(fast.c_str()), fastSlowParams[i]);
 		I_Slow[i] = Image(&context, asset.img(slow.c_str()), fastSlowParams[i]);
 	}
@@ -909,17 +923,17 @@ void Game::GameScreen::updateModelReady()
 		}
 	}
 	SetDrawBright(int(HitAreaBright[2][0] * 160 + 75), int(HitAreaBright[1][0] * 160 + 75), int(HitAreaBright[0][0] * 160 + 75));
-	DrawGraph(laneCordinateX[0], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[0], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(int(HitAreaBright[2][1] * 160 + 75), int(HitAreaBright[1][1] * 160 + 75), int(HitAreaBright[0][1] * 160 + 75));
-	DrawGraph(laneCordinateX[1], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[1], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(int(HitAreaBright[2][2] * 160 + 75), int(HitAreaBright[1][2] * 160 + 75), int(HitAreaBright[0][2] * 160 + 75));
-	DrawGraph(laneCordinateX[2], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[2], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(int(HitAreaBright[2][3] * 160 + 75), int(HitAreaBright[1][3] * 160 + 75), int(HitAreaBright[0][3] * 160 + 75));
-	DrawGraph(laneCordinateX[3], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[3], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(255, 255, 255);
 
 	for (i = 0; i <= 3; i++) {
-		DrawGraph(laneCordinateX[i], judge_area, H_JUDGE_AREA, TRUE);//判定枠の表示
+		drawSquareImage(laneCordinateX[i], judge_area, H_JUDGE_AREA, TRUE);//判定枠の表示
 	}
 
 
@@ -2265,17 +2279,17 @@ void Game::GameScreen::updateModelPlaying()
 	for (i = 0; i <= MusicSub.totalMeasures[difficulty] - 1; i++) {//小節線の座標計算
 		//小節線
 		barline[i].x = 640;
-		barline[i].y = -228;
+		barline[i].y = -64;
 
 		QE_x = high_speed * barline[i].bpm * (GAME_passed_time_scroll - ((double)barline[i].timing / TIMING_SHOW_RATIO)) + sqrt(1 / speed); //放物線のxを算出
 		if ((QE_x >= 0) && barline[i].fall != 2) {//まだ叩かれてなく落ち切ってなく放物線の半分超えている(x>=0)とき
 			barline[i].fall = 1;//落ちた(表示をする)
 			QE_y = double(((double)judge_area - note_fall) * speed * pow(QE_x, 2) + note_fall);//GAME_passed_time_scroollを変数とした2次関数(値域0~1にnote_fallとjudge_areaで位置調整)
-			if (QE_y >= 720) {//落ち切ったとき
-				barline[i].y = 720;
+			if (QE_y >= 720 + 128) {//落ち切ったとき
+				barline[i].y = 720 + 128;
 				barline[i].fall = 2;//単ノートが落ちて見えなくなったら表示をしない(落ち切った)
 			}
-			if (QE_y < 720) {
+			if (QE_y < 720 + 128) {
 				barline[i].y = (float)QE_y;
 			}
 		}
@@ -2288,7 +2302,7 @@ void Game::GameScreen::updateModelPlaying()
 			//音符
 
 			note[j][i].x = laneCordinateX[j];//レーンのx座標
-			note[j][i].y = -228;
+			note[j][i].y = -64;
 			QE_x = high_speed * note[j][i].bpm * (GAME_passed_time_scroll - ((double)note[j][i].timing / TIMING_SHOW_RATIO)) + sqrt(1 / speed); //放物線のx座標を算出
 			if ((QE_x >= 0) && (note[j][i].hit == 0) && note[j][i].fall != NoteFall::Failed) {//まだ叩かれてなく落ち切ってなく放物線の半分超えている(x>=0)とき
 				note[j][i].fall = NoteFall::Faling;//落ちた(表示をする)
@@ -2298,13 +2312,13 @@ void Game::GameScreen::updateModelPlaying()
 				float brightRingAlpha = (float)((double)(QE_y - note_fall) / 30);//光る音符の輪を位置に応じてフェードインで表示する
 				note[j][i].brightRingAlpha = brightRingAlpha > 1 ? 1 : brightRingAlpha;
 
-				if (QE_y >= 720) {//落ち切ったとき
-					note[j][i].y = 720;
+				if (QE_y >= 720 + 128) {//落ち切ったとき
+					note[j][i].y = 720 + 128;
 				}
-				if (QE_y < 720) {
+				if (QE_y < 720 + 128) {
 					note[j][i].y = (float)QE_y;
 				}
-				if (note[j][i].y >= 720 && (note[j][i].group == NoteGroup::Single || note[j][i].group == NoteGroup::LongNoteEnd)) {
+				if (note[j][i].y >= 720 + 128 && (note[j][i].group == NoteGroup::Single || note[j][i].group == NoteGroup::LongNoteEnd)) {
 					if (note[j][i].group == NoteGroup::LongNoteEnd) {
 						//始点までの音符を全て落ち切ったことにする
 						int ind = i;
@@ -2996,19 +3010,19 @@ void Game::GameScreen::updateModelPlaying()
 		}
 	}
 	SetDrawBright(int(HitAreaBright[2][0] * 160 + 75), int(HitAreaBright[1][0] * 160 + 75), int(HitAreaBright[0][0] * 160 + 75));
-	DrawGraph(laneCordinateX[0], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[0], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(int(HitAreaBright[2][1] * 160 + 75), int(HitAreaBright[1][1] * 160 + 75), int(HitAreaBright[0][1] * 160 + 75));
-	DrawGraph(laneCordinateX[1], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[1], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(int(HitAreaBright[2][2] * 160 + 75), int(HitAreaBright[1][2] * 160 + 75), int(HitAreaBright[0][2] * 160 + 75));
-	DrawGraph(laneCordinateX[2], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[2], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(int(HitAreaBright[2][3] * 160 + 75), int(HitAreaBright[1][3] * 160 + 75), int(HitAreaBright[0][3] * 160 + 75));
-	DrawGraph(laneCordinateX[3], judge_area, H_JUDGE_AREA_PAINT, TRUE);
+	drawSquareImage(laneCordinateX[3], judge_area, H_JUDGE_AREA_PAINT, TRUE);
 	SetDrawBright(255, 255, 255);
 
 	BlendVal = 255 * 0.75;
 	SetDrawBlendMode(BlendMode, BlendVal);
 	for (i = 0; i <= 3; i++) {
-		DrawGraph(laneCordinateX[i], judge_area, H_JUDGE_AREA, TRUE);//判定枠の表示
+		drawSquareImage(laneCordinateX[i], judge_area, H_JUDGE_AREA, TRUE);//判定枠の表示
 	}
 
 
@@ -3017,12 +3031,12 @@ void Game::GameScreen::updateModelPlaying()
 	for (i = 0; i <= 3; i++) {//ノートを叩いた後に一瞬表示するノート
 		for (j = 0; j <= NOTE_HIT_LARGE_FLASH_NUMBER - 1; j++) {
 			if (note_hit_flash[j][i] >= 7) {
-				DrawGraph(laneCordinateX[i], judge_area, H_NOTE[(int)hit_n[i].color_init], TRUE);
+				drawSquareImage(laneCordinateX[i], judge_area, H_NOTE[(int)hit_n[i].color_init], TRUE);
 				break;
 			}
 		}
 		if (dnote_hit_flash[i] >= 7) {//黒
-			DrawGraph(laneCordinateX[i], judge_area, H_NOTE[8], TRUE);
+			drawSquareImage(laneCordinateX[i], judge_area, H_NOTE[8], TRUE);
 		}
 	}
 
@@ -3034,10 +3048,10 @@ void Game::GameScreen::updateModelPlaying()
 				SetDrawBlendMode(BlendMode, BlendVal);
 				//if (note[j][i].color_init != 0)DrawGraph(note[j][i].x - 32, note[j][i].y, H_NOTE_OR_FRAME, TRUE);//ORノートの場合
 				if (option->op.darkness.getIndex() >= (int)OptionItem::Darkness::DARKNESS_50) {//暗さ50%以上のときだけ白で描画
-					DrawLineAA(float(320), float(barline[i].y + 128), float(960), float(barline[i].y + 128), GetColor(255, 255, 255), 2.5);
+					DrawLineAA(float(320), float(barline[i].y), float(960), float(barline[i].y), GetColor(255, 255, 255), 2.5);
 				}
 				else {
-					DrawLineAA(float(320), float(barline[i].y + 128), float(960), float(barline[i].y + 128), GetColor(0, 0, 0), 2.5);
+					DrawLineAA(float(320), float(barline[i].y), float(960), float(barline[i].y), GetColor(0, 0, 0), 2.5);
 				}
 				//DrawGraph(barline[i].x, barline[i].y, H_NOTE[7], TRUE);//単ノートの場合
 			}
@@ -3354,27 +3368,39 @@ void Game::GameScreen::updateModelPlaying()
 	int ComboBuf = combo;
 	if (SkillTestFlag != 0)ComboBuf = *CourseCombo;//コースモードの時はコース全体のコンボで表示
 
+	int screen_center_x = 640;
+	int comboX = 600 + 128;
+	int scaled_comboX = screen_center_x + (comboX - screen_center_x) * width_scale;
+	
+	double comboNumberX = 485 + 32; //コンボ数値横並びの起点X座標(右側)
+	int scaled_combo_number_X = screen_center_x + (comboNumberX - screen_center_x) * width_scale;
 
-	int comboYScale = 10 - cos(3.14 / 2 * combo_draw_counter) * 10;
-	int comboNumberX = 485; int comboNumberY = 360; int comboNumberHeight = 100; int comboNumberWidth = 256;
-	int comboNumberTop = comboNumberY - (comboNumberHeight / 2);
-	int comboNumberBottom = comboNumberY + (comboNumberHeight / 2);
 
-	int comboX = 600;
-	int comboWidth = 64;
-	int comboDuration = 40;
+
+	double comboYScale = (10 - cos(3.14 / 2 * combo_draw_counter) * 10) * width_scale;
+
+	double comboImgY = 360; double comboNumberHeight = 100; double comboNumberWidth = 256;
+
+	int comboImgTop = comboImgY - (comboNumberHeight / 2) * width_scale;
+	int comboImgBottom = comboImgY + (comboNumberHeight / 2) * width_scale;
+	int comboNumberStart = scaled_comboX - (comboNumberWidth / 2) * width_scale;
+	int comboNumberEnd = scaled_comboX + (comboNumberWidth / 2) * width_scale;
+
+	int comboWidth = 64 * width_scale;
+	int comboDuration = 40 * width_scale;
 	int comboDigit = int(log10(ComboBuf));
 	int comboXOffset = comboDigit * (comboDuration / 2);
 	int comboAlphaGeneral = getAlpha(255, 128, 0);
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, comboAlphaGeneral);
 	if (combo_draw_counter > 0 && ComboBuf > 0) {//コンボ描画
-		DrawExtendGraph(comboX, int(comboNumberTop - comboYScale), comboX + comboNumberWidth, int(comboNumberBottom + comboYScale), H_COMBO, TRUE);
+
+		DrawExtendGraphF(comboNumberStart, comboImgTop - comboYScale, comboNumberEnd, comboImgBottom + comboYScale, H_COMBO, TRUE);
 		for (i = 0; i <= comboDigit; i++) {
-			DrawExtendGraph(
-				comboNumberX - i * comboDuration + comboXOffset,
-				int(comboNumberTop - comboYScale),
-				comboNumberX + comboWidth - i * comboDuration + comboXOffset,
-				int(comboNumberBottom + comboYScale),
+			DrawExtendGraphF(
+				scaled_combo_number_X - (comboWidth / 2) - i * comboDuration + comboXOffset,
+				int(comboImgTop - comboYScale),
+				scaled_combo_number_X + (comboWidth / 2) - i * comboDuration + comboXOffset,
+				int(comboImgBottom + comboYScale),
 				H_COMBO_NUMBER[combo_digit[i]], TRUE);
 		}
 	}
@@ -3382,18 +3408,18 @@ void Game::GameScreen::updateModelPlaying()
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 	for (i = 0; i <= 3; i++) {//ノートを叩いた時のフラッシュ、判定表示
 		for (j = 0; j <= NOTE_HIT_LARGE_FLASH_NUMBER - 1; j++) {//4個までなら同時に表示
-			if (note_hit_flash[j][i] >= 0)DrawGraph(laneCordinateX[i], judge_area, H_HIT[11 - (int)note_hit_flash[j][i]], TRUE);//ノートを叩いた時のフラッシュ
-			if (note_hit_large_flash[j][i] >= 0)DrawGraph(laneCordinateX[i] - 22, judge_area - 22, H_HIT_LARGE[19 - (int)note_hit_large_flash[j][i]], TRUE);//光るノートを叩いた時のフラッシュ
+			if (note_hit_flash[j][i] >= 0)drawSquareImage(laneCordinateX[i], judge_area, H_HIT[11 - (int)note_hit_flash[j][i]], TRUE);//ノートを叩いた時のフラッシュ
+			if (note_hit_large_flash[j][i] >= 0)drawSquareImage(laneCordinateX[i], judge_area, H_HIT_LARGE[19 - (int)note_hit_large_flash[j][i]], TRUE);//光るノートを叩いた時のフラッシュ
 		}
 
 
 
 
-		if (dnote_hit_flash[i] >= 0)DrawGraph(laneCordinateX[i], judge_area, H_HIT_D[11 - (int)dnote_hit_flash[i]], TRUE);//黒ノートを叩いた時のフラッシュ
-		if (hit_sky_perfect[i] > 0)DrawGraph(laneCordinateX[i], int(-10 * cos(3.14 * hit_sky_perfect[i] / 2) + 10 + judge_area), H_SKY_PERFECT, TRUE);
-		if (hit_perfect[i] > 0)DrawGraph(laneCordinateX[i], int(-10 * cos(3.14 * hit_perfect[i] / 2) + 10 + judge_area), H_PERFECT, TRUE);
-		if (hit_good[i] > 0)DrawGraph(laneCordinateX[i], int(-10 * cos(3.14 * hit_good[i] / 2) + 10 + judge_area), H_GOOD, TRUE);
-		if (hit_miss[i] > 0)DrawGraph(laneCordinateX[i], int(-10 * cos(3.14 * hit_miss[i] / 2) + 10 + judge_area), H_MISS, TRUE);
+		if (dnote_hit_flash[i] >= 0)drawSquareImage(laneCordinateX[i], judge_area, H_HIT_D[11 - (int)dnote_hit_flash[i]], TRUE);//黒ノートを叩いた時のフラッシュ
+		if (hit_sky_perfect[i] > 0)drawSquareImage(laneCordinateX[i], int(-10 * cos(3.14 * hit_sky_perfect[i] / 2) + 10 + judge_area), H_SKY_PERFECT, TRUE);
+		if (hit_perfect[i] > 0)drawSquareImage(laneCordinateX[i], int(-10 * cos(3.14 * hit_perfect[i] / 2) + 10 + judge_area), H_PERFECT, TRUE);
+		if (hit_good[i] > 0)drawSquareImage(laneCordinateX[i], int(-10 * cos(3.14 * hit_good[i] / 2) + 10 + judge_area), H_GOOD, TRUE);
+		if (hit_miss[i] > 0)drawSquareImage(laneCordinateX[i], int(-10 * cos(3.14 * hit_miss[i] / 2) + 10 + judge_area), H_MISS, TRUE);
 
 		for (j = 0; j < CRTBuf; j++) {
 			for (k = 0; k <= NOTE_HIT_LARGE_FLASH_NUMBER - 1; k++) {
@@ -3648,6 +3674,19 @@ void Game::GameScreen::updateViewPlaying()
 {
 }
 
+void Game::GameScreen::drawSquareImage(double x, double y, int handle, int TransFlag)
+{
+	int size_x = 0;	int size_y = 0;
+	GetGraphSize(handle, &size_x, &size_y);
+
+	double extent_x = (double)size_x / 2;
+	double extent_y = (double)size_y / 2;
+
+	auto new_extent_x = extent_x * width_scale;
+	auto new_extent_y = extent_y * width_scale;
+	DrawExtendGraphF(x - new_extent_x, y - new_extent_y, x + new_extent_x, y + new_extent_y, handle, TransFlag);
+}
+
 void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note, int BlendMode, int BlendVal, int H_NOTE[12], double flash, const int FLASH_VALUE, const int FLASH_VALUE_ALWAYS, NoteSearcher& noteSearcher, Option* option, GradationNoteImage& gradationLongNote, int H_LNOTE[12], int LN_flash[4], int j_n_n[4], const int FLASH_VALUE_LN_PUSH, NoteSymbolImage& noteSymbol)
 {
 
@@ -3681,7 +3720,7 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 				if (is_next_same_color) continue;
 			}
 
-			DrawGraphF(
+			drawSquareImage(
 				symbol_location[i].x,
 				symbol_location[i].y,
 				noteSymbol.H_NOTE_TEXT[static_cast<int>(symbol_location[i].note_color)],
@@ -3692,6 +3731,50 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 
 		};
 
+
+	auto drawLnTopEdge = [&](float x, float y, int handle, int TransFlag) {
+		int size_x = 0;	int size_y = 0;
+		GetGraphSize(handle, &size_x, &size_y);
+		double extent_x = (double)size_x / 2;
+		double extent_y = (double)size_y / 2;
+
+		DrawRectExtendGraphF(
+			x - extent_x * width_scale, y - extent_y * width_scale,
+			x + extent_x * width_scale, y,
+			0, 0, 
+			size_x, extent_y,
+			handle, TransFlag
+		);
+	};
+
+	auto drawLnMiddle = [&](float x, float y1, float y2, int handle, int TransFlag) {
+		int size_x = 0;	int size_y = 0;
+		GetGraphSize(handle, &size_x, &size_y);
+		double extent_x = (double)size_x / 2;
+		double extent_y = (double)size_y / 2;
+
+		DrawExtendGraphF(
+			x - extent_x * width_scale, y1,
+			x + extent_x * width_scale, y2,
+			handle, TransFlag
+		);
+	};
+
+	auto drawLnBottomEdge = [&](float x, float y, int handle, int TransFlag) {
+		int size_x = 0;	int size_y = 0;
+		GetGraphSize(handle, &size_x, &size_y);
+		double extent_x = (double)size_x / 2;
+		double extent_y = (double)size_y / 2;
+
+		DrawRectExtendGraphF(
+			x - extent_x * width_scale, y,
+			x + extent_x * width_scale, y + extent_y * width_scale,
+			0, extent_y,
+			size_x, extent_y,
+			handle, TransFlag
+		);
+	};
+
 	SetDrawMode(DX_DRAWMODE_BILINEAR);
 	for (int j = 0; j <= 3; j++) {
 		for (int i = MusicSub.objOfLane[difficulty][j] - 1; i >= 0; i--) {//ノーツの描画
@@ -3701,13 +3784,13 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 				if (note[j][i].fall == NoteFall::Faling) {
 					SetDrawBlendMode(BlendMode, BlendVal);
 
-					DrawGraphF(note[j][i].x, note[j][i].y, H_NOTE[static_cast<int>(note[j][i].color)], TRUE);//単ノートの場合
+					drawSquareImage(note[j][i].x, note[j][i].y, H_NOTE[static_cast<int>(note[j][i].color)], TRUE);//単ノートの場合
 
 					if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-						DrawGraphF(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//白く光らせる
+						drawSquareImage(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//白く光らせる
 						SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-						DrawGraphF(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//常に白くする
+						drawSquareImage(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//常に白くする
 					}
 
 
@@ -3715,7 +3798,7 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 
 				//Note Symbolの描画
 				SetDrawBlendMode(BlendMode, BlendVal);
-				DrawGraphF(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[static_cast<int>(note[j][i].color)], TRUE);
+				drawSquareImage(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[static_cast<int>(note[j][i].color)], TRUE);
 			}
 
 			if (note[j][i].group == NoteGroup::LongNoteStart) {//始点について
@@ -3733,55 +3816,56 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 						//LN中間表示
 						SetDrawBlendMode(BlendMode, BlendVal);
 						if (note[j][i + 1].LN_k == 1 && option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON) {
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 						}
 						else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i + 1].color_init != note[j][i].color_init)) {
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 						}
 						else {
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[(int)note[j][i].color_init], TRUE);
 						}
 
 						if (LN_flash[j] == 1 && j_n_n[j] - 1 == i) {//LNを叩いているとき
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
 
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);//白く光らせる
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[11], TRUE);//白く光らせる
 						}
 
 						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 						}
 
 						SetDrawBlendMode(BlendMode, BlendVal);
-						DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//LN始点の場合(始点下半分と中間を表示)
+						drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[(int)note[j][i].color_init], TRUE);//LN始点の場合(始点下半分と中間を表示)
 						if (LN_flash[j] == 1 && j_n_n[j] - 1 == i && note[j][i].group == NoteGroup::LongNoteStart) {//LNを叩いているとき
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-							DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[11], TRUE, FALSE);//LN始点の場合(始点下半分を表示)
+							drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[11], TRUE);//LN始点の場合(始点下半分を表示)
 						}
 
 						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//白く光らせる
+							drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//白く光らせる
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);//常に白くする
+							drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);//常に白くする
 
 						}
 					}
 					else {////始点が終点より上にある場合
 						SetDrawBlendMode(BlendMode, BlendVal);
 
-						DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//通常終端
+						drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[(int)note[j][i].color_init], TRUE);//通常終端
 
 						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+							drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+							drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);
 						}
 
 
@@ -3798,22 +3882,22 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 					if (isBeforeUnder && isNextUpper) {//前が自信より下、次が自身より上  ／／
 						//LN中間表示
 						SetDrawBlendMode(BlendMode, BlendVal);
-						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraphF(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						if (note[j][i].color_init != note[j][i - 1].color_init)drawSquareImage(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 					}
 					else if (!isBeforeUnder && isNextUpper) {//前が自信より上、次が自身より上  ＼／
 						//LN中間表示
 						SetDrawBlendMode(BlendMode, BlendVal);
-						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraphF(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						if (note[j][i].color_init != note[j][i - 1].color_init)drawSquareImage(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 					}
 					else if (isBeforeUnder && !isNextUpper) {//前が自信より下、次が自身より下  ／＼
 						//LN中間表示
 						SetDrawBlendMode(BlendMode, BlendVal);
-						if (note[j][i].color_init != note[j][i - 1].color_init)DrawGraphF(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						if (note[j][i].color_init != note[j][i - 1].color_init)drawSquareImage(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 					}
 					else if (!isBeforeUnder && !isNextUpper) {//前が自信より上、次が自身より下 ＼＼
 						//LN中間表示
 						SetDrawBlendMode(BlendMode, BlendVal);
-						if (note[j][i].color_init != note[j][i + 1].color_init)DrawGraphF(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
+						if (note[j][i].color_init != note[j][i + 1].color_init)drawSquareImage(note[j][i].x, note[j][i].y, noteSymbol.H_NOTE_TEXT[(int)note[j][i].color_init], TRUE);
 					}
 
 					if (isNextUpper) {//次が自身より上にある場合
@@ -3821,52 +3905,52 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 						SetDrawBlendMode(BlendMode, BlendVal);
 
 						if (note[j][i + 1].LN_k == 1 && option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON) {
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)NoteColor::K], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 						}
 						else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i + 1].color_init != note[j][i].color_init)) {
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i + 1].color_init], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 						}
 						else {
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[(int)note[j][i].color_init], TRUE);
 						}
 
 
 						if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);//白く光らせる
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[11], TRUE);//白く光らせる
 						}
 
 						if (note[j][i].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i + 1].x, note[j][i + 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i + 1].x, note[j][i + 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 						}
 					}
 					if (!isBeforeUnder) {//前が自身より上にある場合
 						//LN中間表示
 						SetDrawBlendMode(BlendMode, BlendVal);
 						if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i - 1].color_init != note[j][i].color_init)) {
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
 						}
 						else {
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[(int)note[j][i].color_init], TRUE);
 						}
 
 
 						if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[11], TRUE);
 						}
 
 						if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 						}
 
 					}
@@ -3882,71 +3966,71 @@ void Game::GameScreen::drawNotes(SongSub& MusicSub, int difficulty, NOTE** note,
 						SetDrawBlendMode(BlendMode, BlendVal);
 
 						if (note[j][i].LN_k == 0) {
-							DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//上半分表示
+							drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[(int)note[j][i].color_init], TRUE);//上半分表示
 						}
 						else if (note[j][i].LN_k == 1) {
-							DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[8], TRUE, FALSE);//上半分黒音符表示
+							drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[8], TRUE);//上半分黒音符表示
 						}
 
 						if (note[j][i].LN_k == 0) {//黒終端はLN叩いてるとき光らせない
 							if (LN_flash[j] == 1 && noteSearcher.searchLnStart(j, i) == j_n_n[j] - 1) {//LNを叩いているとき
 								SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-								DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[11], TRUE, FALSE);
+								drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[11], TRUE);
 							}
 						}
 
 						if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+							drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y, 0, 0, 256, 128, H_NOTE[10], TRUE, FALSE);
+							drawLnTopEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);
 						}
 					}
 					else {//始点が終点より上にある場合
 						SetDrawBlendMode(BlendMode, BlendVal);
 
 						if (note[j][i].LN_k == 0) {
-							DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[(int)note[j][i].color_init], TRUE, FALSE);//下半分表示
+							drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[(int)note[j][i].color_init], TRUE);//下半分表示
 
 						}
 						else if (note[j][i].LN_k == 1) {
-							DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[8], TRUE, FALSE);//下半分表示
+							drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[8], TRUE);//下半分表示
 						}
 
 
 						if (note[j][i - 1].isBright == 1) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);
+							drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawRectGraphF(note[j][i].x, note[j][i].y + 128, 0, 128, 256, 128, H_NOTE[10], TRUE, FALSE);
+							drawLnBottomEdge(note[j][i].x, note[j][i].y, H_NOTE[10], TRUE);
 						}
 
 						//LN中間表示
 						SetDrawBlendMode(BlendMode, BlendVal);
 						if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && note[j][i].LN_k == 1) {
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)NoteColor::K], TRUE);
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)NoteColor::K], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
 						}
 						else if (option->op.blackGradation.getIndex() == (int)OptionItem::BlackGradation::ON && (note[j][i].color_init != note[j][i - 1].color_init)) {
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_OUT[(int)note[j][i].color_init], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, gradationLongNote.H_LNOTE_GRAD_FADE_IN[(int)note[j][i - 1].color_init], TRUE);
 						}
 						else {
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[(int)note[j][i - 1].color_init], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[(int)note[j][i - 1].color_init], TRUE);
 						}
 
 						//DrawRectExtendGraph
 						//DrawRect
 						if (LN_flash[j] == 1 && j_n_n[j] == i && note[j][i].group == NoteGroup::LongNoteEnd) {//LNを叩いているとき
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, FLASH_VALUE_LN_PUSH);
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[11], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[11], TRUE);
 						}
 
 						if (note[j][i - 1].isBright != 0) {//光るノートは点滅させる(flashに合わせて)
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(flash * FLASH_VALUE * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, int(FLASH_VALUE_ALWAYS * note[j][i].brightRingAlpha));
-							DrawExtendGraphF(note[j][i - 1].x, note[j][i - 1].y + 128, note[j][i].x + 256, note[j][i].y + 128, H_LNOTE[10], TRUE);
+							drawLnMiddle(note[j][i - 1].x, note[j][i - 1].y, note[j][i].y, H_LNOTE[10], TRUE);
 						}
 					}
 				}

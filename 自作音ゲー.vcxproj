@@ -206,6 +206,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AuroraView.cpp" />
     <ClCompile Include="AutoDifficultyPrediction.cpp" />
     <ClCompile Include="DetailView.cpp" />
     <ClCompile Include="DifficultyRadar.cpp" />
@@ -306,6 +307,7 @@
     <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AuroraView.h" />
     <ClInclude Include="AutoDifficultyPrediction.h" />
     <ClInclude Include="DetailView.h" />
     <ClInclude Include="DifficultyRadar.h" />

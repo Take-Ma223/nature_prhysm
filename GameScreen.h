@@ -28,6 +28,7 @@
 #include "NoteTextImage.h"
 #include "CoverView.h"
 #include "DetailView.h"
+#include "AuroraView.h"
 
 namespace Game {
 
@@ -638,8 +639,8 @@ namespace Game {
 		bool isSkip = false;
 
 
-
-
+		vector<unique_ptr<AuroraView>> aurora;
+		bool update_aurora_color[4] = { true, true, true, true };
 
 
 	};

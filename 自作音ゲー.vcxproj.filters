@@ -184,6 +184,9 @@
     <Filter Include="ソース ファイル\Util\Screen">
       <UniqueIdentifier>{45743136-31f0-4437-ba5d-f1ffc96f3b24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\GAME\AuroraView">
+      <UniqueIdentifier>{0a57024f-4f93-4447-bcc4-647d1da2f2eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="nature prhysm.cpp">
@@ -470,6 +473,9 @@
     </ClCompile>
     <ClCompile Include="GameScreen.cpp">
       <Filter>ソース ファイル\GAME</Filter>
+    </ClCompile>
+    <ClCompile Include="AuroraView.cpp">
+      <Filter>ソース ファイル\GAME\AuroraView</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -897,6 +903,9 @@
     </ClInclude>
     <ClInclude Include="OptionItemLaneWidth.h">
       <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
+    <ClInclude Include="AuroraView.h">
+      <Filter>ソース ファイル\GAME\AuroraView</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

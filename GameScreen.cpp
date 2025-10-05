@@ -446,6 +446,22 @@ void Game::GameScreen::init() {
 		}
 	};
 
+	//色ガイド
+	DrawableInitParam aurora_param = DrawableInitParam();
+	aurora_param.centerRatio.x = 0.5;
+	aurora_param.centerRatio.y = 0.25;
+
+	aurora_param.extendParam = ExtendParam(true, width_scale,1);
+	aurora_param.cordinate.y = 0;
+
+	for (int i = 0; i < 4; i++) {
+		aurora_param.cordinate.x = laneCordinateX[i];
+		
+		aurora.push_back(
+			unique_ptr<AuroraView>(new AuroraView(&context, aurora_param))
+		);
+	}
+
 	wstring hit_sound_folder = option->op.hitSound.toString();
 	sprintfDx(tmpPath, L"sound/hit_sound/%s/f2.wav", hit_sound_folder.c_str());
 	SH.SH_HIT_N = NPLoadHitSoundMem(tmpPath, option, 1);
@@ -2276,7 +2292,7 @@ void Game::GameScreen::updateModelPlaying()
 
 
 
-	for (i = 0; i <= MusicSub.totalMeasures[difficulty] - 1; i++) {//小節線の座標計算
+	for (i = 0; i < MusicSub.totalMeasures[difficulty]; i++) {//小節線の座標計算
 		//小節線
 		barline[i].x = 640;
 		barline[i].y = -64;
@@ -2298,14 +2314,17 @@ void Game::GameScreen::updateModelPlaying()
 		}
 	}
 	for (j = 0; j <= 3; j++) {
-		for (i = 0; i <= MusicSub.objOfLane[difficulty][j] - 1; i++) {//ノートの座標計算
+		for (i = 0; i < MusicSub.objOfLane[difficulty][j]; i++) {//ノートの座標計算
 			//音符
 
 			note[j][i].x = laneCordinateX[j];//レーンのx座標
 			note[j][i].y = -64;
 			QE_x = high_speed * note[j][i].bpm * (GAME_passed_time_scroll - ((double)note[j][i].timing / TIMING_SHOW_RATIO)) + sqrt(1 / speed); //放物線のx座標を算出
 			if ((QE_x >= 0) && (note[j][i].hit == 0) && note[j][i].fall != NoteFall::Failed) {//まだ叩かれてなく落ち切ってなく放物線の半分超えている(x>=0)とき
-				note[j][i].fall = NoteFall::Faling;//落ちた(表示をする)
+				if (note[j][i].fall == NoteFall::NotFaling) {
+					note[j][i].fall = NoteFall::Faling;//落ちた(表示をする)
+					update_aurora_color[j] = true;
+				}
 
 				QE_y = double(((double)judge_area - note_fall) * speed * pow(QE_x, 2) + note_fall);//GAME_passed_time_scroollを変数とした2次関数(値域0~1にnote_fallとjudge_areaで位置調整)
 
@@ -2337,6 +2356,24 @@ void Game::GameScreen::updateModelPlaying()
 		}
 	}
 
+	//オーロラ色の更新
+	for (j = 0; j <= 3; j++) {
+		if (update_aurora_color[j] == false)continue;
+
+		for (i = std::min(j_n_n[j],j_dn_n[j]); i < MusicSub.objOfLane[difficulty][j]; i++) {
+			if (note[j][i].fall == NoteFall::NotFaling) {
+				aurora[j]->setColor(note[j][i].color);
+				update_aurora_color[j] = false;
+				break;
+			}
+		}
+		if (update_aurora_color[j] == true) {
+			update_aurora_color[j] = false;
+			aurora[j]->setColor(NoteColor::NONE);
+		}
+	}
+
+	
 
 
 
@@ -3024,6 +3061,14 @@ void Game::GameScreen::updateModelPlaying()
 	for (i = 0; i <= 3; i++) {
 		drawSquareImage(laneCordinateX[i], judge_area, H_JUDGE_AREA, TRUE);//判定枠の表示
 	}
+
+	//色ガイド　オーロラ
+	for (int i = 0; i < 4; i++) {
+		aurora[i]->draw();
+	}
+
+
+
 
 
 	//printfDx("jnn:%d", j_n_n[2]);

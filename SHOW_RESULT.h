@@ -14,6 +14,7 @@ extern void SHOW_RESULT(RESULT res, Option *option, int song_number, int difficu
 	int list_number,
 	Config config,
 	IR_SETTING* ir,
+	FastSlow fast_slow,
 	int SkillTestFlag = 0
 );
 

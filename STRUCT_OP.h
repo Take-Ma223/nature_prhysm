@@ -23,6 +23,7 @@
 #include "OptionItemNoteSymbol.h"
 #include "OptionItemMissEffect.h"
 #include "OptionItemLaneWidth.h"
+#include "OptionItemAurora.h"
 
 #ifndef _STRUCT_OP
 #define _STRUCT_OP
@@ -35,14 +36,17 @@ namespace OptionItem {
 		COLOR,
 		GAUGE,
 
-		WINDBREAK,
+		
+		NOTE_OFFSET,
+		DARKNESS,
+		LANE_WIDTH,
 		FAST_SLOW,
 		BARLINE,
-		DARKNESS,
+		AURORA,
 		GRADATION,
 		MISS_EFFECT,
-		LANE_WIDTH,
-		NOTE_OFFSET,
+		WINDBREAK,
+		
 
 		SCORETARGET,
 		TARGETSCORE1,
@@ -84,14 +88,16 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		L"NONE",
 		L"NORMAL",
 
-		L"OFF",
+		L"0ms",
+		L"25%",
+		L"EXTRA WIDE",
 		L"ON:C/R",
 		L"ON",
-		L"25%",
+		L"ON",
 		L"ON",
 		L"BGM FADE",
-		L"EXTRA WIDE",
-		L"0ms",
+		L"OFF",
+
 
 		L"OFF",
 		L"E",
@@ -122,14 +128,15 @@ struct OP {//オプション構造体(ロード時に渡す値)
 	OptionItemColor color;
 	OptionItemGauge gauge;
 
-	OptionItemWindbreak windbreak;
+	OptionItemNoteOffset noteOffset;
+	OptionItemDarkness darkness;
+	OptionItemLaneWidth laneWidth;
 	OptionItemFastSlow fastSlow;
 	OptionItemBarline barline;
-	OptionItemDarkness darkness;
+	OptionItemAurora aurora;
 	OptionItemBlackGradation blackGradation;
 	OptionItemMissEffect missEffect;
-	OptionItemLaneWidth laneWidth;
-	OptionItemNoteOffset noteOffset;
+	OptionItemWindbreak windbreak;
 
 	OptionItemScoreGraph scoreGraph;
 	OptionItemTargetScore1 targetScore1;
@@ -153,14 +160,15 @@ struct OP {//オプション構造体(ロード時に渡す値)
 		&color,
 		&gauge,
 
-		&windbreak,
+		&noteOffset,
+		&darkness,
+		&laneWidth,
 		&fastSlow,
 		&barline,
-		&darkness,
+		&aurora,
 		&blackGradation,
 		&missEffect,
-		&laneWidth,
-		&noteOffset,
+		&windbreak,
 
 		&scoreGraph,
 		&targetScore1,
@@ -184,7 +192,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 typedef struct Option {//オプション構造体(全体)
 	OP op;
 
-	static const int OPTION_NUM = 25;//オプションの数
+	static const int OPTION_NUM = 26;//オプションの数
 
 	wchar_t* OptionName[OPTION_NUM] = { 
 		L"SPEED",
@@ -193,14 +201,15 @@ typedef struct Option {//オプション構造体(全体)
 		L"COLOR",
 		L"GAUGE",
 
-		L"WINDBREAK",
+		L"NOTE OFFSET",
+		L"NIGHT",
+		L"LANE WIDTH",
 		L"FAST/SLOW",
 		L"BARLINE",
-		L"NIGHT",
+		L"AURORA",
 		L"GRADATION",
 		L"MISS EFFECT",
-		L"LANE WIDTH",
-		L"NOTE OFFSET",
+		L"WINDBREAK",
 
 		L"SCORE GRAPH",
 		L"TARGET SCORE1",
@@ -225,6 +234,7 @@ typedef struct Option {//オプション構造体(全体)
 		OptionItem::BannerColor::GREEN,
 		OptionItem::BannerColor::GREEN,
 
+		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,
 		OptionItem::BannerColor::BLUE,

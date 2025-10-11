@@ -121,7 +121,8 @@ namespace Game {
 			double* GaugeVal,
 			int* CourseCombo,
 			int* CourseMaxCombo,
-			int AllowExit
+			int AllowExit,
+			FastSlow* fast_slow
 		) :
 			song_number(song_number),
 			difficulty(difficulty),
@@ -142,7 +143,8 @@ namespace Game {
 			GaugeVal(GaugeVal),
 			CourseCombo(CourseCombo),
 			CourseMaxCombo(CourseMaxCombo),
-			AllowExit(AllowExit)
+			AllowExit(AllowExit),
+			fast_slow(fast_slow)
 		{
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 4; j++) {
@@ -206,6 +208,7 @@ namespace Game {
 		int* CourseCombo;
 		int* CourseMaxCombo;
 		int AllowExit;
+		FastSlow* fast_slow;
 
 		enum GameScreenPhase {
 			Ready,//‰‰‘tŠJŽn‘O

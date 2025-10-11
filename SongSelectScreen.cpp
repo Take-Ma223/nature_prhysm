@@ -2220,6 +2220,8 @@ void SongSelect::SongSelectScreen::updateModel()
 				int CourseMaxCombo = 0;
 
 				int TryCount = 0;//トライ数(クイックリトライするたびに加算)
+				FastSlow fast_slow;
+
 				do {
 					TryCount++;
 					escape = 0;
@@ -2230,7 +2232,7 @@ void SongSelect::SongSelectScreen::updateModel()
 						&escape, option, &retryAble,
 						debug, Music, Button, Button_Shutter, Key, Buf, secret->song_appear_number != -1, AC,
 						config, ir,
-						0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit
+						0, NULL, &CourseCombo, &CourseMaxCombo, AllowExit, &fast_slow
 					);
 					game_screen.run();
 
@@ -2257,7 +2259,7 @@ void SongSelect::SongSelectScreen::updateModel()
 
 					SHOW_RESULT(res, option, song_number, difficulty, debug, Music, Button, Button_Shutter, Key, Buf, AC, TryCount,
 						STList,
-						list_number, config, ir);//結果発表
+						list_number, config, ir, fast_slow);//結果発表
 					if (*debug == 0) {
 						if (secret->secret_song_appear_number == -1) {//通常プレイで隠し曲演出になっていないとき
 							result_rank_buf[*result_count] = res.rank;//ランクを保存
@@ -2328,6 +2330,8 @@ void SongSelect::SongSelectScreen::updateModel()
 				int AllowExit = 1;
 
 				int playedSongIndex = 0;
+				FastSlow fast_slow;
+
 				//1~4曲目
 				for (i = 0; i <= 3; i++) {
 					int TryCount = 1;//トライ数
@@ -2338,7 +2342,7 @@ void SongSelect::SongSelectScreen::updateModel()
 						&Result[i], &escape, option, &retryAble,
 						debug, Music, Button, Button_Shutter, Key, Buf, 0, AC, config, ir,
 						i + 1, &GaugeVal,
-						&CourseCombo, &CourseMaxCombo, AllowExit
+						&CourseCombo, &CourseMaxCombo, AllowExit, &fast_slow
 					);
 					game_screen.run();
 
@@ -2351,7 +2355,7 @@ void SongSelect::SongSelectScreen::updateModel()
 							STList,
 							list_number,
 							config,
-							ir,
+							ir, fast_slow,
 							i + 1);//結果発表
 					}
 
@@ -2419,13 +2423,13 @@ void SongSelect::SongSelectScreen::updateModel()
 
 
 					//段位のリザルト表示
-
+					FastSlow fast_slow_dummy;
 
 					SHOW_RESULT(STRes, option, SongNumberList[playedSongIndex], DifficultyList[playedSongIndex], debug, Music, Button, Button_Shutter, Key, Buf, AC, 0,
 						STList,
 						list_number,
 						config,
-						ir,
+						ir, fast_slow_dummy,
 						SHOW_SKILL_TEST_RESULT);//結果発表
 				}
 				option->op.gauge.setIndex((int)(OptionItem::Gauge)gauge_buf);//ゲージを元に戻す

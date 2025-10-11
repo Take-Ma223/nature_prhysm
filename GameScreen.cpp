@@ -1834,7 +1834,7 @@ void Game::GameScreen::updateModelPlaying()
 
 							//後ろに落ちるものの処理
 							insert_cell(insert, img_num(Music[song_number].season[difficulty]),
-								float(640 + (laneCordinateX[i] + 128 - 640) * 2),
+								float(640 + (laneCordinateX[i] - 640) * 2),
 								rand() % 10000,
 								rand() % 10000,
 								rand() % 401,
@@ -1863,7 +1863,7 @@ void Game::GameScreen::updateModelPlaying()
 							hit_n[i] = note[i][searching];
 							//後ろに落ちるものの処理
 							insert_cell(insert, img_num(Music[song_number].season[difficulty]),
-								float(640 + (laneCordinateX[i] + 128 - 640) * 2),
+								float(640 + (laneCordinateX[i] - 640) * 2),
 								rand() % 10000,
 								rand() % 10000,
 								rand() % 401,
@@ -2099,7 +2099,7 @@ void Game::GameScreen::updateModelPlaying()
 
 							//後ろに落ちるものの処理
 							insert_cell(insert, img_num(Music[song_number].season[difficulty]),
-								float(640 + (laneCordinateX[i] + 128 - 640) * 2),
+								float(640 + (laneCordinateX[i] - 640) * 2),
 								rand() % 10000,
 								rand() % 10000,
 								rand() % 401,
@@ -2615,7 +2615,7 @@ void Game::GameScreen::updateModelPlaying()
 								//後ろに落ちるものの処理
 								if (note[i][j_n_n[i]].group == NoteGroup::Single || note[i][j_n_n[i]].group == NoteGroup::LongNoteEnd) {
 									insert_cell(insert, img_num(Music[song_number].season[difficulty]),
-										float(640 + (laneCordinateX[i] + 128 - 640) * 2),
+										float(640 + (laneCordinateX[i] - 640) * 2),
 										rand() % 10000,
 										rand() % 10000,
 										rand() % 401,
@@ -2942,6 +2942,8 @@ void Game::GameScreen::updateModelPlaying()
 
 			res->min_miss = -1;
 
+			fast_slow->fast = fast_count;
+			fast_slow->slow = slow_count;
 
 		}
 
@@ -3063,10 +3065,11 @@ void Game::GameScreen::updateModelPlaying()
 	}
 
 	//色ガイド　オーロラ
-	for (int i = 0; i < 4; i++) {
-		aurora[i]->draw();
+	if (option->op.aurora.getIndex() == static_cast<int>(OptionItem::Aurora::ON)) {
+		for (int i = 0; i < 4; i++) {
+			aurora[i]->draw();
+		}
 	}
-
 
 
 

@@ -355,6 +355,7 @@
     <ClInclude Include="NPTimer.h" />
     <ClInclude Include="NumberView.h" />
     <ClInclude Include="NumberViewShowType.h" />
+    <ClInclude Include="OptionItemAurora.h" />
     <ClInclude Include="OptionItemBarline.h" />
     <ClInclude Include="OptionItemBase.h" />
     <ClInclude Include="OptionItemBgmSoundVol.h" />

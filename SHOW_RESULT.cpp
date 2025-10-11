@@ -23,6 +23,8 @@
 #include "DxLibUtil.h"
 #include "NPLoadSoundMem.h"
 #include "WindowTitleSetter.h"
+#include "Image.h"
+#include "NumberView.h"
 
 using namespace std;
 
@@ -42,6 +44,7 @@ void SHOW_RESULT(RESULT res,
 	int list_number,
 	Config config,
 	IR_SETTING* ir,
+	FastSlow fast_slow,
 	int SkillTestFlag) {
 	Asset asset;//使う画像セット
 	//コンテキスト
@@ -56,6 +59,10 @@ void SHOW_RESULT(RESULT res,
 	int H_SCORE_BOARD;
 	int H_STR;
 	int H_SCORE_NUMBER[10];
+
+	int H_FAST_NUMBER[10];
+	int H_SLOW_NUMBER[10];
+	Image fast, slow;
 	
 	int H_POP_NUMBER[10];
 	int H_MAX_COMBO_NUMBER[10];
@@ -124,6 +131,9 @@ void SHOW_RESULT(RESULT res,
 	int perfect_digit[5] = { 0,0,0,0,0 };
 	int good_digit[5] = { 0,0,0,0,0 };
 	int miss_digit[5] = { 0,0,0,0,0 };
+
+	int fast_digit[5] = { 0,0,0,0,0 };
+	int slow_digit[5] = { 0,0,0,0,0 };
 
 	int pop_digit[6][3] = { {0,0,0},{ 0,0,0 },{ 0,0,0 },{ 0,0,0 },{ 0,0,0 },{ 0,0,0 } };
 	int max_combo_digit[4] = { 0,0,0,0 };
@@ -632,6 +642,26 @@ void SHOW_RESULT(RESULT res,
 	//LoadDivGraph(L"img/score_number.png", 10, 10, 1, 64, 100, H_SCORE_NUMBER);
 	LoadDivGraph(L"img/HighScoreNumber.png", 10, 10, 1, 25, 50, H_SCORE_NUMBER);
 
+	DrawableInitParam fast_slow_param(Cordinate(83, 0), CenterRatio(0.5, 0.5));
+	fast_slow_param.extendParam.isExtend = true;
+	fast_slow_param.extendParam.ratioX = 0.7;
+	fast_slow_param.extendParam.ratioY = 0.7;
+	if (option->op.fastSlow.getIndex() == static_cast<int>(OptionItem::FastSlow::ON_FAST_RED)) {
+		LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_FAST_NUMBER);
+		LoadDivGraph(L"img/SmallNumberCyan.png", 10, 10, 1, 25, 50, H_SLOW_NUMBER);
+		fast = Image(&context, context.getAsset()->img(L"img/judge/fast_r.png"), fast_slow_param);
+		slow = Image(&context, context.getAsset()->img(L"img/judge/slow_c.png"), fast_slow_param);
+	}
+	else {
+		LoadDivGraph(L"img/SmallNumberCyan.png", 10, 10, 1, 25, 50, H_FAST_NUMBER);
+		LoadDivGraph(L"img/SmallNumberRed.png", 10, 10, 1, 25, 50, H_SLOW_NUMBER);
+		fast = Image(&context, context.getAsset()->img(L"img/judge/fast_c.png"), fast_slow_param);
+		slow = Image(&context, context.getAsset()->img(L"img/judge/slow_r.png"), fast_slow_param);
+	}
+
+	
+
+
 	LoadDivGraph(L"img/HighScoreNumber.png", 10, 10, 1, 25, 50, H_HIGH_SCORE_NUMBER);
 
 	LoadDivGraph(L"img/SmallNumberBlue.png", 10, 10, 1, 25, 50, H_POP_NUMBER);
@@ -1026,6 +1056,8 @@ void SHOW_RESULT(RESULT res,
 		number_digit(res.perfect, perfect_digit, 5);
 		number_digit(res.good, good_digit, 5);
 		number_digit(res.miss, miss_digit, 5);
+		number_digit(fast_slow.fast, fast_digit, 5);
+		number_digit(fast_slow.slow, slow_digit, 5);
 
 		for (i = 0; i <= 5; i++) {
 			number_digit(res.pop[i], pop_digit[i], 3);
@@ -1216,6 +1248,33 @@ void SHOW_RESULT(RESULT res,
 			SkillTestShowSlide.y);
 
 
+		if (SkillTestFlag != SHOW_SKILL_TEST_RESULT) {
+			//fast slow数表示
+			ShowJudgeNumber(fast_slow.fast,
+				442,
+				SkillTestFlag,
+				draw_alpha,
+				H_FAST_NUMBER,
+				fast_digit,
+				SkillTestShowSlide.x,
+				SkillTestShowSlide.y);
+
+			ShowJudgeNumber(fast_slow.slow,
+				482,
+				SkillTestFlag,
+				draw_alpha,
+				H_SLOW_NUMBER,
+				slow_digit,
+				SkillTestShowSlide.x,
+				SkillTestShowSlide.y);
+
+			fast.Y.value = (468 + (1 - draw_alpha) * 50);
+			slow.Y.value = (508 + (1 - draw_alpha) * 50);
+			fast.alpha.value = int((double)draw_alpha * entireAlpha);
+			slow.alpha.value = int((double)draw_alpha * entireAlpha);
+			fast.draw();
+			slow.draw();
+		}
 
 		//ハイスコアバナー表示
 		if (bestscore == 1) {

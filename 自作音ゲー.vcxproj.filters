@@ -907,6 +907,9 @@
     <ClInclude Include="AuroraView.h">
       <Filter>ソース ファイル\GAME\AuroraView</Filter>
     </ClInclude>
+    <ClInclude Include="OptionItemAurora.h">
+      <Filter>ソース ファイル\Util\Option\OptionItem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

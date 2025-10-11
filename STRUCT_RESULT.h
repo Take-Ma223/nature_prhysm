@@ -64,4 +64,12 @@ typedef struct RESULT {//リザルト用構造体
 
 }RESULT;
 
+/// <summary>
+/// FAST SLOWの個数
+/// </summary>
+typedef struct FastSlow {
+	int fast = 0;
+	int slow = 0;
+};
+
 #endif

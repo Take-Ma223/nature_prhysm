@@ -3695,7 +3695,7 @@ wchar_t* SongSelect::SongSelectScreen::announce_str(int StageCount, int PlayCoun
 	static wchar_t str[300] = L" ";
 
 	if (PlayCount == 0) {
-		return L"【はじめてお越しの方へ】　「上下キー」と「Enterキー」でフォルダを選び、曲を選んで下さい。「左右キー」で難易度変更が行えます。最初は降水確率の小さい晴れた曲がお勧めです。";
+		return L"【はじめてお越しの方へ】　「上下キー」と「Enterキー」でフォルダを選び、曲を選んで下さい。「左右キー」で難易度変更が行えます。最初にオススメなのは、降水確率が低く天気が晴れの曲です。";
 	}
 
 	if (PlayCount == 1) {
@@ -3737,7 +3737,7 @@ wchar_t* SongSelect::SongSelectScreen::announce_str(int StageCount, int PlayCoun
 		return str;
 	}
 
-	const int GeneralStrNum = 25;
+	const int GeneralStrNum = 27;
 	wchar_t* GeneralStr[GeneralStrNum] = {
 	L"【ヒント:スピード調節】音符が詰まりすぎて見づらいときは、オプションのSPEEDを変更し見やすい速さにしてみましょう。",
 	L"【ヒント:音符の種類】音符の種類は「赤,緑,青,虹」の他に「水色,紫,黄色」や「白」があります。　それぞれ曇り、雨難易度以上から出現します。　光の色を混ぜて対処しましょう。　また、叩いてはいけない黒い音符もあります。",
@@ -3746,7 +3746,7 @@ wchar_t* SongSelect::SongSelectScreen::announce_str(int StageCount, int PlayCoun
 	L"【ヒント:ゲージの種類】オプションでゲージの種類を選ぶことができます。　より厳しいゲージでのクリアを目指しましょう。　練習にはゲージの減ることが無いNO FAILゲージがおすすめです。",
 	L"【ヒント:ゲージの増減】ミスが続いてゲージが無くなると失敗になりますが、良い判定を取るとゲージは増えていきます。　光っている音符は増減量が２倍なので叩き逃さないようにしましょう。",
 	L"【ヒント:色の覚え方】音符の色と叩く場所は自然風景と対応させて覚えると良いでしょう。　例えば、青は上に広がる空の色……のように。",
-	L"【ヒント:速度変化】曲の中には途中で速度が変化するものがあります。　右上に予測値が表示されていますが稀に予報が外れる場合があります。　そのため常に注意を払ってください。",
+	L"【ヒント:速度変化】曲の中には途中で速度が変化するものがあります。　右上に予測値が表示されていますが稀に予報が外れる場合があります。　そのため常に注意してください。",
 	L"【ヒント:未調査エリア】「???」と表示されている項目は未調査エリアです。　危険なエリアのため立ち入りは禁じられています。　万が一調査する場合は厳重に警戒してください。　安全が確認された場合、エリアは解放されます。",
 	L"【ヒント:上達のコツ】自分の実力より少し上の難易度をプレイし続けることが上達への近道です。",
 	L"【ヒント:RAINBOWオプション】色を認識するのが難しい場合は、オプションのCOLORをRAINBOWにしてみましょう。　色を気にせずプレイすることができます。",
@@ -3763,11 +3763,13 @@ wchar_t* SongSelect::SongSelectScreen::announce_str(int StageCount, int PlayCoun
 	L"【ヒント:～～Music地方】～～Music地方は、ここから遠く離れた場所を示しています。　雰囲気が気に入った場合はそちらに赴くのも良いでしょう。",
 	L"【ヒント:WIND BREAKシステム】演奏中にCtrlとShiftキーでカバーの位置を調節できます。 音符が詰まっている箇所で下げると見やすくなります。",
 	L"【ヒント:NOTE SYMBOLオプション】オプションのNOTE SYMBOLを変更すると音符の色毎に表示する記号を変更できます。　色の認識に慣れていない時は\"arrow\"がお勧めです。",
-	L"【ヒント:SPEED ADAPTERオプション】オプションのSPEED ADAPTERで音符のスピードをどこに合わせるか調整できます。　初めてプレイする譜面では\"FAST\"に調整するのがお勧めです。"
+	L"【ヒント:SPEED ADAPTERオプション】オプションのSPEED ADAPTERで音符のスピードをどこに合わせるか調整できます。　初めてプレイする譜面では\"FAST\"に調整するのがお勧めです。",
+	L"【ヒント:AURORAオプション】演奏中に上に表示される光は次に降ってくる音符の色を表しています。　AURORAオプションをOFFにすると消すことができます。",
+	L"【ヒント:LANE WIDTHオプション】オプションのLANE WIDTHでレーンの幅を変更することができます。　見やすい幅に調節してみましょう。",
 	};
 	int GeneralStrUse = 0;//どの通常アナウンスを使うか
 	GeneralStrUse = GetRand(GeneralStrNum - 1);//
-	//GeneralStrUse = 14;
+	//GeneralStrUse = 25;
 	return GeneralStr[GeneralStrUse];
 }
 

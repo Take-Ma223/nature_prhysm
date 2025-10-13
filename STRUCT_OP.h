@@ -90,7 +90,7 @@ struct OP {//オプション構造体(ロード時に渡す値)
 
 		L"0ms",
 		L"25%",
-		L"EXTRA WIDE",
+		L"NORMAL",
 		L"ON:C/R",
 		L"ON",
 		L"ON",

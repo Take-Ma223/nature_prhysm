@@ -2404,13 +2404,13 @@ void SongSelect::SongSelectScreen::updateModel()
 					else if (STRes.score >= 32000) {//B
 						STRes.rank = 5;
 					}
-					else if (STRes.score >= 32000) {//C
+					else if (STRes.score >= 28000) {//C
 						STRes.rank = 4;
 					}
-					else if (STRes.score >= 28000) {//D
+					else if (STRes.score >= 24000) {//D
 						STRes.rank = 3;
 					}
-					else if (STRes.score >= 24000) {//E
+					else if (STRes.score >= 20000) {//E
 						STRes.rank = 2;
 					}
 					else {//F
